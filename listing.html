@@ -1,0 +1,454 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>3 Westbrooke Lane, Nobleton</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Barlow:wght@400;500;600&display=swap">
+<style>
+/* Layout: full-bleed photo stage + thumbnail rail, then a two-column body (facts left, sticky agent card right). Same RE/MAX navy + red system as the homepage. */
+:root{
+  --navy:#26348B; --ink:#141833; --red:#D7141E; --coral:#FF5A5F;
+  --mist:#F2F4F9; --line:#DCE0EC; --muted:#545B78; --pale:#C9D0F2; --white:#ffffff; --stage:#0E1128;
+  --display:'Barlow Condensed','Arial Narrow',system-ui,sans-serif;
+  --body:'Barlow',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --wrap:1240px; --gut:clamp(16px,4vw,32px);
+  --ease:cubic-bezier(.2,.7,.1,1);
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}
+body{margin:0;background:var(--white);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.55;overflow-x:hidden}
+a{color:var(--navy)}a:hover{color:var(--red)}
+img{max-width:100%;display:block}
+button,input,select{font:inherit}
+:focus-visible{outline:3px solid var(--red);outline-offset:3px}
+[hidden]{display:none!important}
+.wrap{max-width:var(--wrap);margin:0 auto;padding-inline:var(--gut)}
+h1,h2,h3{font-family:var(--display);font-weight:700;text-transform:uppercase;line-height:.95;margin:0;text-wrap:balance}
+h2{font-size:clamp(30px,3.4vw,40px)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 20px;border:0;border-radius:4px;background:var(--red);color:var(--white)!important;font-weight:600;cursor:pointer;text-decoration:none;transition:background .2s}
+.btn:hover{background:#b30f18}
+.btn.ghost{background:transparent;color:var(--ink)!important;border:1px solid var(--line)}
+.btn.ghost:hover{background:var(--mist)}
+
+/* header */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:40;background:var(--white);border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;height:72px}
+.top img{height:44px;width:auto}
+.nav{display:flex;align-items:center;gap:24px;font-weight:600;font-size:16px}
+.nav a{color:var(--ink);text-decoration:none}.nav a:hover{color:var(--red)}
+@media (max-width:860px){.nav a:not(.btn){display:none}}
+
+/* photo stage */
+.stage{position:relative;background:var(--stage);height:clamp(380px,74vh,860px);overflow:hidden;outline:none;touch-action:pan-y}
+.slide{position:absolute;inset:0;opacity:0;transition:opacity .7s var(--ease)}
+.slide img{width:100%;height:100%;object-fit:cover;transform:scale(1.035);transition:transform 6s var(--ease)}
+.slide.on{opacity:1}
+.slide.on img{transform:scale(1)}
+.stage::after{content:"";position:absolute;inset:auto 0 0 0;height:34%;background:linear-gradient(180deg,rgba(14,17,40,0),rgba(14,17,40,.6));pointer-events:none}
+.arrow{position:absolute;top:50%;z-index:3;width:56px;height:56px;margin-top:-28px;border-radius:50%;border:0;background:rgba(255,255,255,.92);color:var(--ink);cursor:pointer;display:grid;place-items:center;box-shadow:0 6px 20px rgba(0,0,0,.25);transition:transform .2s,background .2s}
+.arrow:hover{background:var(--white);transform:scale(1.06)}
+.arrow svg{width:22px;height:22px}
+.prev{left:var(--gut)}.next{right:var(--gut)}
+.hud{position:absolute;left:0;right:0;bottom:0;z-index:3;display:flex;justify-content:space-between;align-items:flex-end;gap:12px;padding:18px var(--gut)}
+.hud .left{display:flex;gap:8px;flex-wrap:wrap}
+.pill{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 16px;border-radius:4px;border:0;background:rgba(255,255,255,.95);color:var(--ink);font-weight:600;cursor:pointer}
+.pill svg{width:18px;height:18px}
+.count{color:var(--white);font-family:var(--display);font-weight:600;font-size:22px;font-variant-numeric:tabular-nums;letter-spacing:.02em}
+.credit{position:absolute;top:16px;left:var(--gut);z-index:3;display:flex;gap:8px;align-items:center}
+.chip{font-size:12px;font-weight:600;padding:5px 9px;border-radius:3px;background:var(--ink);color:var(--white);letter-spacing:.04em}
+.chip.red{background:var(--red)}
+.caption{position:absolute;top:18px;right:var(--gut);z-index:3;font-size:13px;color:rgba(255,255,255,.9);text-shadow:0 1px 4px rgba(0,0,0,.5)}
+@media (max-width:640px){.arrow{width:44px;height:44px;margin-top:-22px}.caption{display:none}}
+
+/* thumbnail rail */
+.rail{background:var(--stage);padding:10px 0 12px}
+.rail ol{list-style:none;margin:0;padding:0 var(--gut);display:flex;gap:8px;overflow-x:auto;scroll-behavior:smooth;scrollbar-width:thin;scrollbar-color:#3A4060 transparent}
+.rail li{flex:none}
+.rail button{display:block;padding:0;border:2px solid transparent;border-radius:4px;overflow:hidden;cursor:pointer;background:none;opacity:.55;transition:opacity .25s,border-color .25s}
+.rail button:hover{opacity:.9}
+.rail button[aria-current="true"]{opacity:1;border-color:var(--coral)}
+.rail img{width:132px;height:88px;object-fit:cover}
+@media (max-width:640px){.rail img{width:96px;height:64px}}
+
+/* title band */
+.title{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:24px;align-items:end;padding-block:36px 28px;border-bottom:1px solid var(--line)}
+.title .tags{display:flex;gap:8px;margin-bottom:12px}
+.title h1{font-size:clamp(44px,6vw,80px);font-weight:800;line-height:.9}
+.title .sub{margin:10px 0 0;font-size:19px;color:var(--muted)}
+.price{text-align:right}
+.price b{display:block;font-family:var(--display);font-weight:700;font-size:clamp(44px,5.4vw,72px);line-height:.9;font-variant-numeric:tabular-nums}
+.price span{display:block;margin-top:8px;color:var(--muted);font-size:15px;font-variant-numeric:tabular-nums}
+@media (max-width:760px){.title{grid-template-columns:1fr}.price{text-align:left}}
+
+/* key facts */
+.facts{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));border-bottom:1px solid var(--line)}
+.facts div{padding:22px 16px;border-left:1px solid var(--line);display:flex;flex-direction:column;gap:2px;min-width:0}
+.facts div:first-child{border-left:0;padding-left:0}
+.facts b{font-family:var(--display);font-weight:700;font-size:36px;line-height:1;font-variant-numeric:tabular-nums}
+.facts span{font-size:14px;color:var(--muted)}
+@media (max-width:900px){.facts{grid-template-columns:repeat(3,minmax(0,1fr))}.facts div:nth-child(4){border-left:0;padding-left:0}.facts div:nth-child(n+4){border-top:1px solid var(--line)}}
+
+/* open house bar */
+.oh{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 24px;margin-top:24px;padding:16px 20px;background:var(--mist);border-radius:6px}
+.oh strong{font-family:var(--display);font-size:24px;text-transform:uppercase}
+.oh span{color:var(--muted)}
+
+/* body */
+.body{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:56px;padding-block:48px 80px}
+@media (max-width:1000px){.body{grid-template-columns:1fr}}
+.main{display:flex;flex-direction:column;gap:56px;min-width:0}
+.main section{display:flex;flex-direction:column;gap:18px}
+.desc p{margin:0;max-width:66ch;font-size:18px}
+.hl{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 28px}
+.hl li{padding-left:20px;position:relative}
+.hl li::before{content:"";position:absolute;left:0;top:.62em;width:8px;height:8px;background:var(--red);border-radius:1px}
+@media (max-width:600px){.hl{grid-template-columns:1fr}}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);overflow-x:auto}
+.tabs button{flex:none;min-height:46px;padding:0 16px;border:0;background:none;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-1px}
+.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--red)}
+dl.kv{margin:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:40px}
+dl.kv div{display:flex;justify-content:space-between;gap:16px;padding:12px 0;border-bottom:1px solid var(--line);min-width:0}
+dl.kv dt{color:var(--muted)}
+dl.kv dd{margin:0;font-weight:600;text-align:right;font-variant-numeric:tabular-nums}
+@media (max-width:640px){dl.kv{grid-template-columns:1fr}}
+.tbl{overflow-x:auto}
+table{width:100%;min-width:560px;border-collapse:collapse;font-variant-numeric:tabular-nums}
+th{text-align:left;font-size:13px;font-weight:600;color:var(--muted);padding:10px 12px 10px 0;border-bottom:2px solid var(--ink)}
+td{padding:12px 12px 12px 0;border-bottom:1px solid var(--line)}
+td:first-child{font-weight:600}
+.loc{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:24px;align-items:stretch}
+@media (max-width:700px){.loc{grid-template-columns:1fr}}
+.map{position:relative;min-height:240px;border-radius:6px;overflow:hidden;background:url(aerial.jpg) center/cover}
+.map::after{content:"";position:absolute;inset:0;background:rgba(20,24,51,.35)}
+.map .pin{position:absolute;left:50%;top:50%;z-index:1;transform:translate(-50%,-100%);width:34px;height:44px;color:var(--red)}
+.map a{position:absolute;left:14px;bottom:14px;z-index:1}
+.loc ul{list-style:none;margin:0;padding:0}
+.loc li{display:flex;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid var(--line)}
+.loc li span:last-child{color:var(--muted);font-variant-numeric:tabular-nums}
+.calc{border:1px solid var(--line);border-radius:6px;padding:24px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;align-items:end}
+.calc label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin-bottom:4px}
+.calc input,.calc select{width:100%;height:46px;border:1px solid var(--line);border-radius:4px;padding:0 10px;background:var(--white);color:var(--ink);font-variant-numeric:tabular-nums}
+.calc .out{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px;padding-top:14px;border-top:1px solid var(--line)}
+.calc .out b{font-family:var(--display);font-size:48px;line-height:1;font-variant-numeric:tabular-nums}
+.calc .out small{color:var(--muted);flex-basis:100%}
+@media (max-width:700px){.calc{grid-template-columns:1fr 1fr}}
+
+/* agent card */
+.aside{position:relative}
+.agent{position:sticky;top:96px;border:1px solid var(--line);border-radius:6px;overflow:hidden;box-shadow:0 20px 40px -24px rgba(20,24,51,.35)}
+.agent .who{display:flex;align-items:flex-end;gap:14px;background:var(--navy);color:var(--white);padding:18px 20px 0}
+.agent .who img{width:96px;height:auto;flex:none}
+.agent .who div{padding-bottom:16px}
+.agent .who strong{display:block;font-family:var(--display);font-size:26px;text-transform:uppercase;line-height:1}
+.agent .who span{font-size:14px;color:var(--pale)}
+.agent form{padding:20px;display:flex;flex-direction:column;gap:12px}
+.agent label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin-bottom:4px}
+.agent input,.agent select{width:100%;height:46px;border:1px solid var(--line);border-radius:4px;padding:0 12px;background:var(--white);color:var(--ink)}
+.agent .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.days{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.days button{min-height:62px;border:1px solid var(--line);border-radius:4px;background:var(--white);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.1;color:var(--ink)}
+.days button small{font-size:12px;color:var(--muted)}
+.days button b{font-family:var(--display);font-size:24px}
+.days button[aria-pressed="true"]{border-color:var(--navy);background:var(--navy);color:var(--white)}
+.days button[aria-pressed="true"] small{color:var(--pale)}
+.agent .ok{margin:0;font-size:14px;color:var(--navy);font-weight:600}
+.agent .alt{padding:0 20px 20px;font-size:14px;color:var(--muted)}
+
+/* similar */
+.similar{background:var(--mist)}
+.similar .wrap{padding-block:64px 80px;display:flex;flex-direction:column;gap:28px}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:28px}
+@media (max-width:900px){.grid{grid-template-columns:1fr}}
+.card{display:flex;flex-direction:column;text-decoration:none;color:inherit}
+.card .ph{aspect-ratio:4/3;max-width:100%;overflow:hidden;border-radius:4px;position:relative}
+.card img{width:100%;height:100%;object-fit:cover;transition:transform 1.2s var(--ease)}
+.card:hover img{transform:scale(1.045)}
+.card .ph .chip{position:absolute;top:12px;left:12px}
+.card b{margin-top:14px;font-family:var(--display);font-size:30px;line-height:1}
+.card span{color:var(--muted);font-size:15px}
+
+/* all photos dialog */
+dialog{width:min(1200px,100vw - 32px);max-height:calc(100vh - 32px);padding:0;border:0;border-radius:6px;background:var(--white);color:var(--ink)}
+dialog::backdrop{background:rgba(14,17,40,.85)}
+.dlg-head{position:sticky;top:0;z-index:1;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 20px;background:var(--white);border-bottom:1px solid var(--line)}
+.dlg-head h2{font-size:26px}
+.all{padding:20px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.all button{padding:0;border:0;background:none;cursor:pointer;border-radius:4px;overflow:hidden}
+.all button:first-child{grid-column:1/-1}
+.all img{width:100%;aspect-ratio:3/2;object-fit:cover}
+@media (max-width:600px){.all{grid-template-columns:1fr}}
+
+footer{background:var(--ink);color:#E4E8FA}
+footer .wrap{padding-block:40px;display:flex;flex-wrap:wrap;gap:20px;justify-content:space-between;align-items:center;font-size:13px}
+footer img{width:200px;height:auto}
+footer span{max-width:640px;color:var(--pale)}
+.badge{display:inline-flex;gap:6px;border:1px solid var(--pale);border-radius:4px;padding:6px 12px;white-space:nowrap}
+.badge strong{color:var(--white)}
+
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a href="index.html" aria-label="SoldMike home"><img src="logo.png" alt="RE/MAX Premier The OP Team, SoldMike.ca"></a>
+    <nav class="nav" aria-label="Main">
+      <a href="index.html#listings">Buy</a>
+      <a href="index.html#value">Sell</a>
+      <a href="index.html#areas">Neighbourhoods</a>
+      <a href="index.html#results">Results</a>
+      <a class="btn" href="#showing">Book a showing</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+<!-- Photo stage: full-width lead photo, crossfades between shots -->
+<section class="stage" id="stage" tabindex="0" aria-roledescription="carousel" aria-label="Photos of 3 Westbrooke Lane. Use left and right arrow keys to browse.">
+  <div id="slides"></div>
+  <div class="credit"><span class="chip red">New</span><span class="chip">Sample listing</span></div>
+  <div class="caption" id="cap"></div>
+  <button class="arrow prev" id="prev" type="button" aria-label="Previous photo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+  <button class="arrow next" id="next" type="button" aria-label="Next photo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button>
+  <div class="hud">
+    <div class="left">
+      <button class="pill" id="openAll" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>View all 18 photos</button>
+      <a class="pill" href="#location" style="text-decoration:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>Map</a>
+    </div>
+    <div class="count" aria-live="polite"><span id="n">1</span> / <span id="tot">18</span></div>
+  </div>
+</section>
+<nav class="rail" aria-label="Photo thumbnails"><ol id="rail"></ol></nav>
+
+<div class="wrap">
+  <div class="title">
+    <div>
+      <h1>3 Westbrooke Lane</h1>
+      <p class="sub">Nobleton, King, Ontario · Detached 2-storey</p>
+    </div>
+    <div class="price"><b>$3,295,000</b><span>Taxes [$X,XXX] (2026) · MLS® [N0000000]</span></div>
+  </div>
+
+  <div class="facts" aria-label="Key facts">
+    <div><b>5</b><span>bedrooms</span></div>
+    <div><b>6</b><span>bathrooms</span></div>
+    <div><b>[4,500]</b><span>sq ft, above grade</span></div>
+    <div><b>[60×130]</b><span>lot, feet</span></div>
+    <div><b>6</b><span>parking, 2 in garage</span></div>
+    <div><b>3</b><span>days on market</span></div>
+  </div>
+
+  <div class="oh">
+    <div><strong>Open house</strong> <span>Saturday, October 3 · 2 to 4 PM</span></div>
+    <a class="btn ghost" href="#showing">Book a private showing instead</a>
+  </div>
+
+  <div class="body">
+    <div class="main">
+      <section class="desc" aria-labelledby="d-h">
+        <h2 id="d-h">About this home</h2>
+        <p>A brick and stone family home on a quiet crescent in Nobleton, built with the finishes most buyers ask for: wide-plank floors, a white kitchen with gold fixtures and a long waterfall island, and a primary suite with a freestanding tub and glass shower. The backyard is fully fenced with a covered patio and a large stone terrace, and the lot backs onto open green space.</p>
+        <p style="color:var(--muted);font-size:15px">Sample description for the prototype. On the live site this comes from the listing feed.</p>
+        <ul class="hl">
+          <li>Chef's kitchen with 48" range and walk-in pantry</li>
+          <li>Main-floor office with French doors</li>
+          <li>Primary suite with dressing room</li>
+          <li>Covered patio with ceiling fixtures</li>
+          <li>Mudroom and main-floor laundry</li>
+          <li>Walk-up basement, ready to finish</li>
+        </ul>
+      </section>
+
+      <section aria-labelledby="det-h">
+        <h2 id="det-h">Property details</h2>
+        <div class="tabs" role="tablist" aria-label="Detail groups">
+          <button type="button" role="tab" aria-selected="true" aria-controls="p-int" id="t-int">Interior</button>
+          <button type="button" role="tab" aria-selected="false" aria-controls="p-ext" id="t-ext">Exterior &amp; lot</button>
+          <button type="button" role="tab" aria-selected="false" aria-controls="p-rooms" id="t-rooms">Rooms</button>
+          <button type="button" role="tab" aria-selected="false" aria-controls="p-tax" id="t-tax">Taxes &amp; history</button>
+        </div>
+        <div role="tabpanel" id="p-int" aria-labelledby="t-int">
+          <dl class="kv">
+            <div><dt>Bedrooms</dt><dd>5</dd></div><div><dt>Bathrooms</dt><dd>6</dd></div>
+            <div><dt>Kitchens</dt><dd>1</dd></div><div><dt>Family room</dt><dd>Yes</dd></div>
+            <div><dt>Heating</dt><dd>Forced air, gas</dd></div><div><dt>Cooling</dt><dd>Central air</dd></div>
+            <div><dt>Fireplace</dt><dd>Gas, family room</dd></div><div><dt>Basement</dt><dd>Unfinished, walk-up</dd></div>
+            <div><dt>Laundry</dt><dd>Main floor</dd></div><div><dt>Approx. age</dt><dd>[0–5 years]</dd></div>
+          </dl>
+        </div>
+        <div role="tabpanel" id="p-ext" aria-labelledby="t-ext" hidden>
+          <dl class="kv">
+            <div><dt>Style</dt><dd>2-storey</dd></div><div><dt>Exterior</dt><dd>Brick, stone</dd></div>
+            <div><dt>Garage</dt><dd>Attached, 2 cars</dd></div><div><dt>Driveway</dt><dd>4 spaces</dd></div>
+            <div><dt>Lot size</dt><dd>[60 × 130 ft]</dd></div><div><dt>Fronting on</dt><dd>[North]</dd></div>
+            <div><dt>Water</dt><dd>Municipal</dd></div><div><dt>Sewer</dt><dd>Sewers</dd></div>
+          </dl>
+        </div>
+        <div role="tabpanel" id="p-rooms" aria-labelledby="t-rooms" hidden>
+          <div class="tbl"><table>
+            <thead><tr><th scope="col">Room</th><th scope="col">Level</th><th scope="col">Size (m)</th><th scope="col">Features</th></tr></thead>
+            <tbody>
+              <tr><td>Living</td><td>Main</td><td>[5.2 × 4.6]</td><td>Hardwood, coffered ceiling</td></tr>
+              <tr><td>Dining</td><td>Main</td><td>[4.9 × 4.0]</td><td>Hardwood, chandelier</td></tr>
+              <tr><td>Kitchen</td><td>Main</td><td>[6.1 × 4.3]</td><td>Waterfall island, pantry</td></tr>
+              <tr><td>Office</td><td>Main</td><td>[3.6 × 3.3]</td><td>French doors</td></tr>
+              <tr><td>Primary</td><td>Second</td><td>[5.8 × 4.9]</td><td>5-pc ensuite, dressing room</td></tr>
+              <tr><td>Bedroom 2</td><td>Second</td><td>[4.3 × 3.7]</td><td>Ensuite, walk-in closet</td></tr>
+            </tbody>
+          </table></div>
+        </div>
+        <div role="tabpanel" id="p-tax" aria-labelledby="t-tax" hidden>
+          <dl class="kv">
+            <div><dt>Annual taxes</dt><dd>[$X,XXX] (2026)</dd></div><div><dt>Assessment</dt><dd>[$X,XXX,XXX]</dd></div>
+            <div><dt>Listed</dt><dd>[Sept 27, 2026]</dd></div><div><dt>Previous sale</dt><dd>[Date, price]</dd></div>
+          </dl>
+        </div>
+      </section>
+
+      <section id="location" aria-labelledby="loc-h">
+        <h2 id="loc-h">Location</h2>
+        <div class="loc">
+          <div class="map">
+            <svg class="pin" viewBox="0 0 24 32" aria-hidden="true"><path d="M12 0C5.4 0 0 5.2 0 11.7 0 20.5 12 32 12 32s12-11.5 12-20.3C24 5.2 18.6 0 12 0z" fill="currentColor"/><circle cx="12" cy="11.5" r="4.2" fill="#fff"/></svg>
+            <a class="pill" href="https://www.google.com/maps/search/Westbrooke+Lane+Nobleton+ON" target="_blank" rel="noopener" style="text-decoration:none">Open in Google Maps</a>
+          </div>
+          <div>
+            <ul>
+              <li><span>Highway 400</span><span>[12 min]</span></li>
+              <li><span>King City GO</span><span>[15 min]</span></li>
+              <li><span>Nobleton Public School</span><span>[4 min]</span></li>
+              <li><span>Downtown Toronto</span><span>[45 min]</span></li>
+            </ul>
+            <p style="margin:16px 0 0"><a href="index.html#areas" style="font-weight:600">Read the Nobleton neighbourhood guide</a></p>
+          </div>
+        </div>
+      </section>
+
+      <section aria-labelledby="m-h">
+        <h2 id="m-h">Monthly payment</h2>
+        <form class="calc" id="calc">
+          <div><label for="c-price">Price</label><input id="c-price" inputmode="numeric" value="3,295,000"></div>
+          <div><label for="c-down">Down payment</label><select id="c-down"><option value="20" selected>20%</option><option value="25">25%</option><option value="35">35%</option><option value="50">50%</option></select></div>
+          <div><label for="c-rate">Rate (%)</label><input id="c-rate" inputmode="decimal" value="4.29"></div>
+          <div><label for="c-am">Amortization</label><select id="c-am"><option value="25" selected>25 years</option><option value="30">30 years</option></select></div>
+          <div class="out"><b id="c-out">$0</b><span>per month</span><small id="c-note">Mortgage principal and interest only, compounded semi-annually as Canadian fixed rates are. An estimate, not a quote.</small></div>
+        </form>
+      </section>
+    </div>
+
+    <aside class="aside" id="showing" aria-label="Book a showing">
+      <div class="agent">
+        <div class="who"><img src="mike.png" alt=""><div><strong>Michael Barillari</strong><span>Broker, RE/MAX Premier The OP Team</span></div></div>
+        <form id="showForm">
+          <div>
+            <span style="display:block;font-size:13px;font-weight:600;color:var(--muted);margin-bottom:6px">Pick a day to see it</span>
+            <div class="days" id="days"></div>
+          </div>
+          <div><label for="b-time">Time</label><select id="b-time"><option>Morning</option><option selected>Afternoon</option><option>Evening</option></select></div>
+          <div class="two">
+            <div><label for="b-name">Name</label><input id="b-name" autocomplete="name"></div>
+            <div><label for="b-phone">Phone</label><input id="b-phone" type="tel" autocomplete="tel"></div>
+          </div>
+          <div><label for="b-email">Email</label><input id="b-email" type="email" autocomplete="email"></div>
+          <button class="btn" type="submit">Request a showing</button>
+          <p class="ok" id="showOk" hidden>Prototype only. On the live site this goes to Follow Up Boss, tagged Nobleton and buyer.</p>
+        </form>
+        <p class="alt">Listed by: The OP Team (sample). Michael can show you any home on MLS®, whoever lists it.</p>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<section class="similar" aria-labelledby="s-h">
+  <div class="wrap">
+    <h2 id="s-h">Similar homes nearby</h2>
+    <div class="grid">
+      <a class="card" href="listing.html"><div class="ph"><img src="l5.jpg" alt="Modern home lit up at twilight" loading="lazy"><span class="chip">Sample</span></div><b>$1,849,000</b><span>Tottenham · 4 bed · 4 bath</span></a>
+      <a class="card" href="listing.html"><div class="ph"><img src="l3.jpg" alt="Brick home with covered porch" loading="lazy"><span class="chip">Sample</span></div><b>$1,399,000</b><span>Aurora · 3 bed · 3 bath</span></a>
+      <a class="card" href="listing.html"><div class="ph"><img src="l6.jpg" alt="Stone and siding detached home" loading="lazy"><span class="chip">Sample</span></div><b>$1,875,000</b><span>Sonoma Heights · 4 bed · 4 bath</span></a>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <img src="logo-white.png" alt="RE/MAX Premier The OP Team">
+    <span>Michael Barillari, Broker, SOLDMIKE. RE/MAX Premier The OP Team Inc., Brokerage. REALTOR®, MLS® and related marks are controlled by CREA.</span>
+    <span class="badge">Powered by <strong>REALTOR.ca</strong></span>
+  </div>
+</footer>
+
+<dialog id="dlg" aria-labelledby="dlg-h">
+  <div class="dlg-head"><h2 id="dlg-h">All 18 photos</h2><button class="btn ghost" type="button" id="closeAll">Close</button></div>
+  <div class="all" id="all"></div>
+</dialog>
+
+<script>
+(function(){
+  var caps=['Front at dusk','From the air','Front, daytime','Entrance','Family room','Dining room','Kitchen','Kitchen island','Kitchen and range','Office','Primary bedroom','Primary ensuite','Ensuite shower','Bedroom','Covered patio','Back of the house','Backyard at dusk','Street at night'];
+  var N=caps.length, cur=0;
+  var slides=document.getElementById('slides'), rail=document.getElementById('rail'), all=document.getElementById('all');
+  var sh='', rh='', ah='';
+  for(var i=0;i<N;i++){
+    sh+='<div class="slide'+(i===0?' on':'')+'" role="group" aria-roledescription="slide" aria-label="'+(i+1)+' of '+N+': '+caps[i]+'"'+(i?' aria-hidden="true"':'')+'><img src="lp/'+(i+1)+'.jpg" alt="'+caps[i]+'"'+(i>1?' loading="lazy"':'')+'></div>';
+    rh+='<li><button type="button" data-i="'+i+'" aria-label="Show photo '+(i+1)+', '+caps[i]+'"'+(i===0?' aria-current="true"':'')+'><img src="lp/t'+(i+1)+'.jpg" alt="" loading="lazy"></button></li>';
+    ah+='<button type="button" data-i="'+i+'" aria-label="Open photo '+(i+1)+', '+caps[i]+'"><img src="lp/'+(i+1)+'.jpg" alt="" loading="lazy"></button>';
+  }
+  slides.innerHTML=sh; rail.innerHTML=rh; all.innerHTML=ah;
+  var S=[].slice.call(slides.children), T=[].slice.call(rail.querySelectorAll('button'));
+  var cap=document.getElementById('cap'), n=document.getElementById('n');
+  function go(i){
+    i=(i+N)%N; if(i===cur) return;
+    S[cur].classList.remove('on'); S[cur].setAttribute('aria-hidden','true'); T[cur].removeAttribute('aria-current');
+    cur=i;
+    S[cur].classList.add('on'); S[cur].removeAttribute('aria-hidden'); T[cur].setAttribute('aria-current','true');
+    n.textContent=cur+1; cap.textContent=caps[cur];
+    var b=T[cur], r=rail.getBoundingClientRect(), br=b.getBoundingClientRect();
+    if(br.left<r.left+40||br.right>r.right-40) rail.scrollLeft+=br.left-r.left-(r.width-br.width)/2;
+    var pre=new Image(); pre.src='lp/'+((cur+1)%N+1)+'.jpg';
+  }
+  cap.textContent=caps[0];
+  document.getElementById('prev').onclick=function(){go(cur-1);};
+  document.getElementById('next').onclick=function(){go(cur+1);};
+  rail.addEventListener('click',function(e){var b=e.target.closest('button');if(b)go(+b.dataset.i);});
+  var stage=document.getElementById('stage');
+  stage.addEventListener('keydown',function(e){if(e.key==='ArrowLeft'){go(cur-1);e.preventDefault();}if(e.key==='ArrowRight'){go(cur+1);e.preventDefault();}});
+  var x0=null;
+  stage.addEventListener('touchstart',function(e){x0=e.touches[0].clientX;},{passive:true});
+  stage.addEventListener('touchend',function(e){if(x0===null)return;var dx=e.changedTouches[0].clientX-x0;if(Math.abs(dx)>40)go(cur+(dx<0?1:-1));x0=null;});
+
+  // all-photos dialog
+  var dlg=document.getElementById('dlg');
+  document.getElementById('openAll').onclick=function(){if(dlg.showModal)dlg.showModal();};
+  document.getElementById('closeAll').onclick=function(){dlg.close();};
+  all.addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;dlg.close();go(+b.dataset.i);stage.scrollIntoView({behavior:'smooth',block:'start'});stage.focus({preventScroll:true});});
+
+  // detail tabs
+  var tabs=[].slice.call(document.querySelectorAll('.tabs [role=tab]'));
+  tabs.forEach(function(t){t.addEventListener('click',function(){tabs.forEach(function(x){var on=x===t;x.setAttribute('aria-selected',on);document.getElementById(x.getAttribute('aria-controls')).hidden=!on;});});});
+
+  // showing days: next 8 days from today
+  var days=document.getElementById('days'), dn=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'], mn=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'], dh='';
+  for(var d=1;d<=8;d++){var dt=new Date();dt.setDate(dt.getDate()+d);dh+='<button type="button" aria-pressed="'+(d===1)+'"><small>'+dn[dt.getDay()]+'</small><b>'+dt.getDate()+'</b><small>'+mn[dt.getMonth()]+'</small></button>';}
+  days.innerHTML=dh;
+  days.addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;[].forEach.call(days.children,function(x){x.setAttribute('aria-pressed',x===b);});});
+  document.getElementById('showForm').addEventListener('submit',function(e){e.preventDefault();document.getElementById('showOk').hidden=false;});
+
+  // mortgage: Canadian fixed rates compound semi-annually
+  var f=document.getElementById('calc');
+  function num(s){return parseFloat(String(s).replace(/[^0-9.]/g,''))||0;}
+  function calc(){
+    var P=num(f['c-price'].value)*(1-num(f['c-down'].value)/100), r=num(f['c-rate'].value)/100, m=num(f['c-am'].value)*12;
+    var i=Math.pow(1+r/2,1/6)-1, pay=i?P*i/(1-Math.pow(1+i,-m)):P/m;
+    document.getElementById('c-out').textContent='$'+Math.round(pay).toLocaleString('en-CA');
+  }
+  f.addEventListener('input',calc); f.addEventListener('submit',function(e){e.preventDefault();}); calc();
+})();
+</script>
+</body>
+</html>
