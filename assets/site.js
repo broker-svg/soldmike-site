@@ -19,6 +19,24 @@
     setTimeout(function(){els.forEach(function(el){el.classList.add('in');});},6000);
   }
 
+
+  // centred confirmation after a form is sent
+  function sentPopup(text){
+    var d=document.getElementById('sentDlg');
+    if(!d){
+      var st=document.createElement('style');
+      st.textContent='#sentDlg{border:0;border-radius:8px;padding:0;max-width:min(440px,calc(100vw - 32px));box-shadow:0 30px 60px rgba(10,14,40,.35);font-family:Barlow,system-ui,sans-serif;color:#141833;background:#fff}#sentDlg::backdrop{background:rgba(20,24,51,.6)}#sentDlg .in{padding:34px 30px 26px;display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center}#sentDlg .ck{width:64px;height:64px;border-radius:50%;background:#26348B;display:grid;place-items:center}#sentDlg .ck svg{width:30px;height:30px}#sentDlg h2{margin:6px 0 0;font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:40px;line-height:1;text-transform:uppercase}#sentDlg p{margin:0;color:#545B78;font-size:17px;line-height:1.5}#sentDlg button{margin-top:10px;min-height:48px;padding:0 28px;border:0;border-radius:4px;background:#D7141E;color:#fff;font:600 17px Barlow,system-ui,sans-serif;cursor:pointer}';
+      document.head.appendChild(st);
+      d=document.createElement('dialog'); d.id='sentDlg'; d.setAttribute('aria-labelledby','sentH');
+      d.innerHTML='<div class="in"><div class="ck" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div><h2 id="sentH">Message sent</h2><p id="sentP"></p><button type="button">Close</button></div>';
+      document.body.appendChild(d);
+      d.querySelector('button').addEventListener('click',function(){d.close();});
+      d.addEventListener('click',function(e){if(e.target===d)d.close();});
+    }
+    document.getElementById('sentP').textContent=text.replace(/^Sent\.\s*/,'');
+    if(d.showModal){d.showModal();}else{d.setAttribute('open','');}
+  }
+
   // lead forms -> Follow Up Boss (same Worker as the landing page)
   [].forEach.call(document.querySelectorAll('form[data-lead]'),function(f){
     f.addEventListener('submit',function(e){
@@ -35,9 +53,9 @@
         property:'soldmike.com, '+f.dataset.lead
       })}).then(function(r){return r.json();}).then(function(r){
         if(!r.success) throw 0;
-        f.reset(); msg.className='msg'; msg.textContent=f.dataset.done||'Sent. Michael will be in touch shortly.'; btn.textContent=t; btn.disabled=false;
+        var done=f.dataset.done||'Sent. Michael will be in touch shortly.'; f.reset(); msg.className='msg'; msg.textContent=done; btn.textContent=t; btn.disabled=false; sentPopup(done);
       }).catch(function(){
-        msg.className='msg err'; msg.textContent='That did not go through. Call or text Michael at 647-278-2237.'; btn.textContent=t; btn.disabled=false;
+        msg.className='msg err'; msg.textContent='That did not go through. Call or text Michael at 647-694-3109.'; btn.textContent=t; btn.disabled=false;
       });
     });
   });

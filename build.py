@@ -6,8 +6,8 @@ import json, os, html
 from datetime import date
 
 SITE = 'https://soldmike.com'
-PHONE = '647-278-2237'
-EMAIL = 'broker@soldmike.com'
+PHONE = '647-694-3109'
+EMAIL = 'mike@theopteam.ca'
 ADDRESS = {'street': '3550 Rutherford Rd, Unit 80', 'city': 'Vaughan', 'region': 'ON', 'postal': 'L4H 3T8'}
 BROKERAGE = 'RE/MAX Premier The OP Team Inc., Brokerage'
 AREAS = ['Vaughan', 'Woodbridge', 'Kleinburg', 'Maple', 'Caledon', 'King', 'East Gwillimbury', 'Toronto']
@@ -131,7 +131,7 @@ def form(kind, uid=''):
             ctl = '<input id="%s" name="%s" type="%s" autocomplete="%s" data-label="%s"%s>' % (fid, name, typ, auto, e(label), ' placeholder="%s"' % e(ph) if ph else '')
         out += '<div%s><label for="%s">%s</label>%s</div>' % (cls, fid, e(label), ctl)
     return ('<form class="form" data-lead="%s" data-done="%s" aria-label="%s">%s<button class="btn full" type="submit">%s</button>'
-            '<p class="msg full" role="status"></p><p class="fine full">Goes straight to Michael. No spam, and you can opt out any time.</p></form>') % (e(lead), e(done), e(lead), out, e(btn))
+            '<p class="msg full" role="status"></p><p class="fine full">By sending, I agree to be contacted by RE/MAX Premier The OP Team by call, text and email. To opt out, reply STOP or click unsubscribe.</p></form>') % (e(lead), e(done), e(lead), out, e(btn))
 
 def cta(h, p, kind='value'):
     return '<section class="cta"><div class="wrap"><div><h2>%s</h2><p>%s</p></div>%s</div></section>' % (e(h), p, form(kind, '-cta'))
@@ -278,11 +278,11 @@ P('/sell/',
 
 P('/sell/home-value/',
   lambda: hero([('Home', '/'), ('Sell', '/sell/'), ('Home value', '/sell/home-value/')], "What's my home worth?", 'A price range for your home based on what similar homes nearby actually sold for, sent with the comparables attached.'),
-  lambda: band('<div class="two"><div class="stack">' + prose(
+  lambda: band('<div class="two">' + form('value') + '<div class="stack">' + prose(
       '<h2>How we price it</h2>',
       'Online estimates guess from averages. We look at the homes that sold closest to yours in the last few months, then adjust for size, lot, finishes, basement and parking.',
       'You get a range, the sales we used, and what we would list at if you sold today. No obligation and no pressure to list.') +
-      '</div>' + form('value') + '</div>'),
+      '</div></div>'),
   lambda: band(head_block('Questions sellers ask first') + faq([
       ('How accurate is an online home value?', 'Often off by tens of thousands of dollars, because it cannot see inside your home or know which nearby sales are truly comparable. A local agent pricing from recent sales is more reliable.'),
       ('Does asking for a value commit me to anything?', 'No. You get the price range and the comparables. What you do with them is up to you.'),
@@ -525,9 +525,9 @@ P('/join/',
 
 P('/contact/',
   lambda: hero([('Home', '/'), ('Contact', '/contact/')], 'Contact Michael', 'Call or text %s, email %s, or send a message below.' % (PHONE, EMAIL)),
-  lambda: band('<div class="two"><div class="stack">' + kv([('Call or text', PHONE), ('Email', EMAIL), ('Office', '%s, %s' % (ADDRESS['street'], ADDRESS['city'])), ('Brokerage', 'RE/MAX Premier The OP Team')]) +
+  lambda: band('<div class="two">' + form('contact') + '<div class="stack">' + kv([('Call or text', PHONE), ('Email', EMAIL), ('Office', '%s, %s' % (ADDRESS['street'], ADDRESS['city'])), ('Brokerage', 'RE/MAX Premier The OP Team')]) +
                '<a class="btn ghost" href="https://www.google.com/maps/search/%s" target="_blank" rel="noopener" style="align-self:flex-start">Open the office in Google Maps</a>' % (ADDRESS['street'] + ' ' + ADDRESS['city']).replace(' ', '+') +
-               todo('Confirm the one office address to use everywhere (3550 Rutherford Rd Unit 80 vs Unit 43 on the RE/MAX page)', 'Office hours') + '</div>' + form('contact') + '</div>'),
+               todo('Confirm the one office address to use everywhere (3550 Rutherford Rd Unit 80 vs Unit 43 on the RE/MAX page)', 'Office hours') + '</div></div>'),
   title='Contact Michael Barillari | SoldMike', desc='Contact Michael Barillari, Broker, RE/MAX Premier The OP Team. Call or text %s.' % PHONE,
   trail=[('Contact', '/contact/')])
 
