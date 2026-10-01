@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>3 Westbrooke Lane, Nobleton</title>
+<title>3 Westbrooke Lane, Nobleton (Sample Listing) | SoldMike</title><link rel="canonical" href="https://soldmike.com/listing.html">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Barlow:wght@400;500;600&display=swap">
 <style>
@@ -195,12 +195,12 @@ footer span{max-width:640px;color:var(--pale)}
 
 <header class="top">
   <div class="wrap">
-    <a href="index.html" aria-label="SoldMike home"><img src="logo.png" alt="RE/MAX Premier The OP Team, SoldMike.ca"></a>
+    <a href="/" aria-label="SoldMike home"><img src="logo.png" alt="RE/MAX Premier The OP Team, SoldMike.ca"></a>
     <nav class="nav" aria-label="Main">
-      <a href="index.html#listings">Buy</a>
-      <a href="index.html#value">Sell</a>
-      <a href="index.html#areas">Neighbourhoods</a>
-      <a href="index.html#results">Results</a>
+      <a href="/listings/">Buy</a>
+      <a href="/sell/home-value/">Sell</a>
+      <a href="/neighbourhoods/king-city-nobleton/">Neighbourhoods</a>
+      <a href="/results/">Results</a>
       <a class="btn" href="#showing">Book a showing</a>
     </nav>
   </div>
@@ -323,7 +323,7 @@ footer span{max-width:640px;color:var(--pale)}
               <li><span>Nobleton Public School</span><span>[4 min]</span></li>
               <li><span>Downtown Toronto</span><span>[45 min]</span></li>
             </ul>
-            <p style="margin:16px 0 0"><a href="index.html#areas" style="font-weight:600">Read the Nobleton neighbourhood guide</a></p>
+            <p style="margin:16px 0 0"><a href="/neighbourhoods/king-city-nobleton/" style="font-weight:600">Read the Nobleton neighbourhood guide</a></p>
           </div>
         </div>
       </section>
@@ -343,19 +343,19 @@ footer span{max-width:640px;color:var(--pale)}
     <aside class="aside" id="showing" aria-label="Book a showing">
       <div class="agent">
         <div class="who"><img src="mike.png" alt=""><div><strong>Michael Barillari</strong><span>Broker, RE/MAX Premier The OP Team</span></div></div>
-        <form id="showForm">
+        <form id="showForm" data-lead="Showing request: 3 Westbrooke Lane (sample)" data-done="Sent. Michael will confirm your showing time.">
           <div>
             <span style="display:block;font-size:13px;font-weight:600;color:var(--muted);margin-bottom:6px">Pick a day to see it</span>
             <div class="days" id="days"></div>
           </div>
-          <div><label for="b-time">Time</label><select id="b-time"><option>Morning</option><option selected>Afternoon</option><option>Evening</option></select></div>
+          <div><label for="b-time">Time</label><select id="b-time" name="time"><option>Morning</option><option selected>Afternoon</option><option>Evening</option></select></div>
           <div class="two">
-            <div><label for="b-name">Name</label><input id="b-name" autocomplete="name"></div>
-            <div><label for="b-phone">Phone</label><input id="b-phone" type="tel" autocomplete="tel"></div>
+            <div><label for="b-name">Name</label><input id="b-name" name="name" autocomplete="name"></div>
+            <div><label for="b-phone">Phone</label><input id="b-phone" name="phone" type="tel" autocomplete="tel"></div>
           </div>
-          <div><label for="b-email">Email</label><input id="b-email" type="email" autocomplete="email"></div>
+          <div><label for="b-email">Email</label><input id="b-email" name="email" type="email" autocomplete="email"></div>
           <button class="btn" type="submit">Request a showing</button>
-          <p class="ok" id="showOk" hidden>Prototype only. On the live site this goes to Follow Up Boss, tagged Nobleton and buyer.</p>
+          <p class="ok msg" role="status"></p>
         </form>
         <p class="alt">Listed by: The OP Team (sample). Michael can show you any home on MLS®, whoever lists it.</p>
       </div>
@@ -437,7 +437,6 @@ footer span{max-width:640px;color:var(--pale)}
   for(var d=1;d<=8;d++){var dt=new Date();dt.setDate(dt.getDate()+d);dh+='<button type="button" aria-pressed="'+(d===1)+'"><small>'+dn[dt.getDay()]+'</small><b>'+dt.getDate()+'</b><small>'+mn[dt.getMonth()]+'</small></button>';}
   days.innerHTML=dh;
   days.addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;[].forEach.call(days.children,function(x){x.setAttribute('aria-pressed',x===b);});});
-  document.getElementById('showForm').addEventListener('submit',function(e){e.preventDefault();document.getElementById('showOk').hidden=false;});
 
   // mortgage: Canadian fixed rates compound semi-annually
   var f=document.getElementById('calc');
@@ -450,5 +449,6 @@ footer span{max-width:640px;color:var(--pale)}
   f.addEventListener('input',calc); f.addEventListener('submit',function(e){e.preventDefault();}); calc();
 })();
 </script>
+<script src="/assets/site.js" defer></script>
 </body>
 </html>

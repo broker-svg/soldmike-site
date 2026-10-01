@@ -1,4 +1,5 @@
-<title>SoldMike.ca Homepage</title>
+<title>SoldMike | Michael Barillari, Broker | Vaughan &amp; Woodbridge Real Estate</title>
+<meta name="description" content="Michael Barillari, Broker, SOLDMIKE. RE/MAX Premier The OP Team, selling homes in Vaughan, Woodbridge, Kleinburg, King, Caledon and Toronto."><link rel="canonical" href="https://soldmike.com/"><meta property="og:title" content="SoldMike | Michael Barillari, Broker"><meta property="og:image" content="https://soldmike.com/hero.jpg"><link rel="icon" href="/logo.png"><script type="application/ld+json">{"@context": "https://schema.org", "@type": "RealEstateAgent", "@id": "https://soldmike.com/#michael", "name": "Michael Barillari", "alternateName": "SOLDMIKE", "jobTitle": "Broker", "description": "Michael Barillari, Broker, SOLDMIKE. RE/MAX Premier The OP Team, Vaughan & Woodbridge.", "url": "https://soldmike.com", "image": "https://soldmike.com/mike.png", "logo": "https://soldmike.com/logo.png", "telephone": "+1-647-278-2237", "email": "broker@soldmike.com", "address": {"@type": "PostalAddress", "streetAddress": "3550 Rutherford Rd, Unit 80", "addressLocality": "Vaughan", "addressRegion": "ON", "postalCode": "L4H 3T8", "addressCountry": "CA"}, "areaServed": [{"@type": "City", "name": "Vaughan"}, {"@type": "City", "name": "Woodbridge"}, {"@type": "City", "name": "Kleinburg"}, {"@type": "City", "name": "Maple"}, {"@type": "City", "name": "Caledon"}, {"@type": "City", "name": "King"}, {"@type": "City", "name": "East Gwillimbury"}, {"@type": "City", "name": "Toronto"}], "parentOrganization": {"@type": "RealEstateAgent", "name": "RE/MAX Premier The OP Team Inc., Brokerage"}}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Barlow:wght@400;500;600&display=swap">
 <style>
@@ -40,7 +41,7 @@ h2{font-size:clamp(40px,5.2vw,64px)}
 .top.solid .logo .w{opacity:0}.top.solid .logo .c{opacity:1}
 .top.solid .nav a:not(.btn){color:var(--ink)}
 .top.solid .nav a:not(.btn):hover{color:var(--red)}
-@media (max-width:900px){.nav a:not(.btn){display:none}}
+.mbtn{display:none;min-height:46px;padding:0 14px;border-radius:4px;border:1px solid rgba(255,255,255,.6);background:transparent;color:var(--white);font-weight:600;cursor:pointer}.top.solid .mbtn{border-color:var(--line);color:var(--ink)}@media (max-width:900px){.nav a:not(.btn){display:none}.mbtn{display:inline-flex;align-items:center}.nav.open{position:fixed;inset:calc(76px + env(safe-area-inset-top,0px)) 0 0 0;background:var(--white);flex-direction:column;align-items:stretch;gap:0;padding:12px var(--gut) 32px;overflow-y:auto}.nav.open a:not(.btn){display:block;color:var(--ink)!important;padding:16px 0;border-bottom:1px solid var(--line);font-size:20px}.nav.open .btn{margin-top:16px}}
 
 /* ---------- hero ---------- */
 .hero{position:relative;height:clamp(600px,92vh,900px);overflow:hidden;background:var(--ink);color:var(--white);isolation:isolate}
@@ -187,7 +188,7 @@ details p{margin:0 0 20px;color:#3A4060;max-width:62ch}
 .form label{display:block;font-size:14px;font-weight:600;margin-bottom:4px}
 .form input,.form select{width:100%;height:48px;border:1px solid var(--line);border-radius:4px;padding:0 12px;background:var(--white);color:var(--ink)}
 .form .btn{height:52px;font-size:17px}
-.form .ok{font-size:14px;color:var(--navy);font-weight:600}
+.form .ok{font-size:14px;color:var(--navy);font-weight:600}.form .msg.err{color:var(--red)}
 @media (max-width:520px){.form{grid-template-columns:1fr}}
 
 /* ---------- footer ---------- */
@@ -213,14 +214,16 @@ footer .wrap{padding-block:56px 32px;display:flex;flex-direction:column;gap:28px
       <img class="w" src="logo-white.png" alt="RE/MAX Premier The OP Team">
       <img class="c" src="logo.png" alt="">
     </a>
-    <nav class="nav" aria-label="Main">
-      <a href="#listings">Buy</a>
-      <a href="#value">Sell</a>
-      <a href="#areas">Neighbourhoods</a>
-      <a href="#results">Results</a>
-      <a href="#questions">Questions</a>
-      <a class="btn" href="#value">Book a call</a>
-    </nav>
+    <div style="display:flex;gap:10px;align-items:center"><button class="mbtn" type="button" id="mbtn" aria-expanded="false" aria-controls="mainnav">Menu</button>
+    <nav class="nav" id="mainnav" aria-label="Main">
+      <a href="/buy/">Buy</a>
+      <a href="/sell/">Sell</a>
+      <a href="/neighbourhoods/">Neighbourhoods</a>
+      <a href="/results/">Results</a>
+      <a href="/questions/">Questions</a>
+      <a href="/about/">About</a>
+      <a class="btn" href="/sell/home-value/">Home value</a>
+    </nav></div>
   </div>
 </header>
 
@@ -278,7 +281,7 @@ footer .wrap{padding-block:56px 32px;display:flex;flex-direction:column;gap:28px
     <a class="card rv" style="--i:2" data-a="north" href="listing.html"><div class="ph"><img src="l3.jpg" alt="Brick home with covered porch" loading="lazy"><span class="tag">Sample</span></div><div class="meta"><div class="price">$1,399,000</div><div class="addr">Sample listing, Aurora</div><div class="specs">3 bed · 3 bath · Detached</div><div class="fine"><span>Listed by: [Listing brokerage]</span><span>MLS® [number]</span></div></div></a>
   </div>
   <div class="below">
-    <a href="#listings" style="font-weight:600">See all listings</a>
+    <a href="/listings/" style="font-weight:600">See all listings</a>
     <span class="badge">Powered by <strong>REALTOR.ca</strong></span>
   </div>
 </section>
@@ -292,11 +295,11 @@ footer .wrap{padding-block:56px 32px;display:flex;flex-direction:column;gap:28px
       <p class="lede">Prices, schools, streets and what's selling, one page per community.</p>
     </div>
     <ul class="rows" id="rows">
-      <li><a href="#areas" data-s="1"><span class="nm">Woodbridge</span><span class="ds">Vellore, Sonoma Heights, East Woodbridge</span></a></li>
-      <li><a href="#areas" data-s="-1"><span class="nm">Kleinburg</span><span class="ds">Village core and estate lots</span></a></li>
-      <li><a href="#areas" data-s="1"><span class="nm">Maple</span><span class="ds">Family homes near the GO line</span></a></li>
-      <li><a href="#areas" data-s="-1"><span class="nm">Caledon</span><span class="ds">Bolton and country properties</span></a></li>
-      <li><a href="#areas" data-s="1"><span class="nm">Toronto</span><span class="ds">Condos and freeholds</span></a></li>
+      <li><a href="/neighbourhoods/woodbridge/" data-s="1"><span class="nm">Woodbridge</span><span class="ds">Vellore, Sonoma Heights, East Woodbridge</span></a></li>
+      <li><a href="/neighbourhoods/kleinburg/" data-s="-1"><span class="nm">Kleinburg</span><span class="ds">Village core and estate lots</span></a></li>
+      <li><a href="/neighbourhoods/maple/" data-s="1"><span class="nm">Maple</span><span class="ds">Family homes near the GO line</span></a></li>
+      <li><a href="/neighbourhoods/caledon-bolton/" data-s="-1"><span class="nm">Caledon</span><span class="ds">Bolton and country properties</span></a></li>
+      <li><a href="/neighbourhoods/toronto/" data-s="1"><span class="nm">Toronto</span><span class="ds">Condos and freeholds</span></a></li>
     </ul>
   </div>
 </section>
@@ -313,13 +316,13 @@ footer .wrap{padding-block:56px 32px;display:flex;flex-direction:column;gap:28px
     <table>
       <thead><tr><th scope="col">Home</th><th scope="col">Area</th><th scope="col">Sold for</th><th scope="col">Days</th><th scope="col">How we did it</th></tr></thead>
       <tbody>
-        <tr class="rv" style="--i:0"><td class="home">226 Via Borghese</td><td>Woodbridge</td><td class="sold">$1,790,000</td><td>[X]</td><td class="how">[One line: staging, pricing, offer night]</td></tr>
-        <tr class="rv" style="--i:1"><td class="home">49 Walter Proctor</td><td>[Area]</td><td class="sold">[$X,XXX,XXX]</td><td>[X]</td><td class="how">[One line on the strategy]</td></tr>
-        <tr class="rv" style="--i:2"><td class="home">179 Lio Ave</td><td>[Area]</td><td class="sold">[$X,XXX,XXX]</td><td>[X]</td><td class="how">[One line on the strategy]</td></tr>
+        <tr class="rv" style="--i:0"><td class="home"><a href="/results/226-via-borghese/" style="color:inherit">226 Via Borghese</a></td><td>Vellore Village</td><td class="sold">$1,790,000</td><td>[X]</td><td class="how">[One line: staging, pricing, offer night]</td></tr>
+        <tr class="rv" style="--i:1"><td class="home"><a href="/results/49-walter-proctor/" style="color:inherit">49 Walter Proctor</a></td><td>East Gwillimbury</td><td class="sold">[$X,XXX,XXX]</td><td>[X]</td><td class="how">[One line on the strategy]</td></tr>
+        <tr class="rv" style="--i:2"><td class="home"><a href="/results/179-lio-ave/" style="color:inherit">179 Lio Ave</a></td><td>Woodbridge</td><td class="sold">[$X,XXX,XXX]</td><td>[X]</td><td class="how">[One line on the strategy]</td></tr>
       </tbody>
     </table>
   </div>
-  <p style="margin:22px 0 0"><a href="#results" style="font-weight:600">Read the full case studies</a></p>
+  <p style="margin:22px 0 0"><a href="/results/" style="font-weight:600">Read the full case studies</a></p>
 </section>
 
 <!-- Reviews -->
@@ -350,7 +353,7 @@ footer .wrap{padding-block:56px 32px;display:flex;flex-direction:column;gap:28px
       <details><summary>When is the best time to sell in Vaughan?<span class="plus" aria-hidden="true">+</span></summary><p>[Answer in the first sentence, then the reasoning, backed by local numbers.]</p></details>
       <details><summary>Should I buy first or sell first?<span class="plus" aria-hidden="true">+</span></summary><p>[Answer in the first sentence, then the trade-offs.]</p></details>
       <details><summary>What does it cost to sell a house in Ontario?<span class="plus" aria-hidden="true">+</span></summary><p>[Answer in the first sentence, then the line-by-line costs.]</p></details>
-      <p style="margin:22px 0 0"><a href="#questions" style="font-weight:600">See all 30 buying and selling steps</a></p>
+      <p style="margin:22px 0 0"><a href="/questions/" style="font-weight:600">See all questions</a> · <a href="/buy/buyer-guide/" style="font-weight:600">Buyer guide</a> · <a href="/sell/seller-guide/" style="font-weight:600">Seller guide</a></p>
     </div>
   </div>
 </section>
@@ -362,14 +365,14 @@ footer .wrap{padding-block:56px 32px;display:flex;flex-direction:column;gap:28px
       <h2 id="v-h">What's your home worth today?</h2>
       <p class="lede">Tell us the address. Michael sends a price range based on real recent sales near you, no obligation.</p>
     </div>
-    <form class="form" id="valueForm" aria-label="Home value request">
-      <div class="full"><label for="v-address">Property address</label><input id="v-address" type="text" placeholder="Street, city" required></div>
-      <div><label for="v-name">Your name</label><input id="v-name" type="text" autocomplete="name"></div>
-      <div><label for="v-phone">Phone</label><input id="v-phone" type="tel" autocomplete="tel"></div>
-      <div class="full"><label for="v-email">Email</label><input id="v-email" type="email" autocomplete="email"></div>
-      <div class="full"><label for="v-plan">I'm planning to</label><select id="v-plan"><option>Sell in the next 3 months</option><option>Sell in 3 to 12 months</option><option>Sell and buy</option><option>Just curious</option></select></div>
+    <form class="form" id="valueForm" aria-label="Home value request" data-lead="Home value request" data-done="Sent. Michael will send your price range with the comparable sales attached.">
+      <div class="full"><label for="v-address">Property address</label><input id="v-address" name="address" type="text" placeholder="Street, city" required></div>
+      <div><label for="v-name">Your name</label><input id="v-name" name="name" type="text" autocomplete="name"></div>
+      <div><label for="v-phone">Phone</label><input id="v-phone" name="phone" type="tel" autocomplete="tel"></div>
+      <div class="full"><label for="v-email">Email</label><input id="v-email" name="email" type="email" autocomplete="email"></div>
+      <div class="full"><label for="v-plan">I'm planning to</label><select id="v-plan" name="plan"><option>Sell in the next 3 months</option><option>Sell in 3 to 12 months</option><option>Sell and buy</option><option>Just curious</option></select></div>
       <button class="btn full" type="submit">Send me my home value</button>
-      <p class="ok full" id="valueOk" hidden>Prototype only. On the live site this request goes straight to Follow Up Boss, tagged by area and selling.</p>
+      <p class="ok full msg" role="status"></p>
     </form>
   </div>
 </section>
@@ -379,8 +382,8 @@ footer .wrap{padding-block:56px 32px;display:flex;flex-direction:column;gap:28px
   <div class="wrap">
     <div class="fcols">
       <div style="flex:1 1 320px;gap:14px"><img src="logo-white.png" alt="RE/MAX Premier The OP Team" style="width:240px;height:auto"><span style="max-width:420px">Michael Barillari, Broker, SOLDMIKE. RE/MAX Premier The OP Team Inc., Brokerage. Independently owned and operated.</span></div>
-      <div><strong>Contact</strong><span>[Phone]</span><span>broker@soldmike.com</span><span>[Office address], Woodbridge, ON</span></div>
-      <div><strong>Follow</strong><a href="#home">Instagram</a><a href="#home">YouTube</a><a href="#home">LinkedIn</a><a href="#home">Google reviews</a></div>
+      <div><strong>Contact</strong><span>Call or text 647-278-2237</span><span>broker@soldmike.com</span><span>3550 Rutherford Rd, Unit 80, Vaughan, ON L4H 3T8</span></div>
+      <div><strong>Explore</strong><a href="/listings/">Search homes</a><a href="/sell/home-value/">Home value</a><a href="/reviews/">Reviews</a><a href="/videos/">Videos</a><a href="/join/">Join the team</a><a href="/contact/">Contact</a></div>
     </div>
     <div class="legal">
       <span>The trademarks REALTOR®, REALTORS®, and the REALTOR® logo are controlled by The Canadian Real Estate Association (CREA) and identify real estate professionals who are members of CREA. The trademarks MLS®, Multiple Listing Service® and the associated logos are owned by CREA and identify the quality of services provided by real estate professionals who are members of CREA.</span>
@@ -454,9 +457,10 @@ footer .wrap{padding-block:56px 32px;display:flex;flex-direction:column;gap:28px
   function onScroll(){if(!ticking){ticking=true;requestAnimationFrame(frame);}}
   addEventListener('scroll',onScroll,{passive:true}); addEventListener('resize',onScroll); frame();
 
-  // forms: prototype only
-  document.getElementById('searchForm').addEventListener('submit',function(e){e.preventDefault();document.getElementById('listings').scrollIntoView({behavior:reduce?'auto':'smooth'});});
+  var mb=document.getElementById('mbtn'),mn=document.getElementById('mainnav');mb.addEventListener('click',function(){var o=mn.classList.toggle('open');mb.setAttribute('aria-expanded',o);mb.textContent=o?'Close':'Menu';top.classList.add('solid');});
+  // forms
+  document.getElementById('searchForm').addEventListener('submit',function(e){e.preventDefault();location.href='/listings/';});
   document.getElementById('askForm').addEventListener('submit',function(e){e.preventDefault();document.getElementById('askNote').textContent='Prototype only. The live assistant launches in Phase 4, after CREA confirms the listing-data rules.';});
-  document.getElementById('valueForm').addEventListener('submit',function(e){e.preventDefault();document.getElementById('valueOk').hidden=false;});
 })();
 </script>
+<script src="/assets/site.js" defer></script>
