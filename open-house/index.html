@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="en-CA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Open House Sign-In | SoldMike</title>
+<meta name="robots" content="noindex">
+<link rel="manifest" href="/open-house/manifest.json">
+<meta name="theme-color" content="#1D2870">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Open House">
+<link rel="apple-touch-icon" href="/open-house/icon-192.png">
+<link rel="icon" href="/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600&display=swap">
+<style>
+/* Open house sign-in app. Same navy/red system as soldmike.com; form styled like the Mika chat window. */
+:root{--navy:#1D2870;--ink:#141833;--red:#D7141E;--mist:#F7F8FB;--line:#DCE0EC;--muted:#545B78;--pale:#C9D0F2;--white:#fff;
+  --display:'Barlow Condensed','Arial Narrow',system-ui,sans-serif;--body:'Barlow',system-ui,-apple-system,'Segoe UI',sans-serif;color-scheme:light}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:var(--mist);color:var(--ink);font-family:var(--body);font-size:18px;line-height:1.5;-webkit-tap-highlight-color:transparent}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--red);outline-offset:2px}
+[hidden]{display:none!important}
+h1,h2{font-family:var(--display);font-weight:800;text-transform:uppercase;line-height:.95;margin:0}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:56px;padding:0 24px;border:0;border-radius:10px;background:var(--red);color:#fff;font-weight:600;font-size:19px;cursor:pointer;text-decoration:none}
+.btn:disabled{opacity:.6}
+.btn.navy{background:var(--navy)}
+.btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--line)}
+.wrap{max-width:720px;margin:0 auto;padding:0 16px}
+.card{background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 24px 60px -30px rgba(20,24,51,.45)}
+label,.q{display:block;font-size:15px;font-weight:600;color:var(--muted);margin-bottom:6px}
+input,select,textarea{width:100%;min-height:58px;border:1px solid var(--line);border-radius:10px;padding:0 16px;background:#fff;font-size:19px}
+input:focus,select:focus{border-color:var(--navy);outline:none;box-shadow:0 0 0 3px rgba(29,40,112,.15)}
+.opt{font-weight:400;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:10px}
+.chips button{min-height:54px;padding:0 22px;border:1px solid var(--line);border-radius:30px;background:#fff;font-size:18px;font-weight:600;cursor:pointer}
+.chips button[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:#fff}
+.err{color:var(--red);font-weight:600;margin:0}
+.muted{color:var(--muted)}
+
+/* ---------- top bar (host) ---------- */
+.bar{background:var(--navy);color:#fff;padding:calc(14px + env(safe-area-inset-top,0px)) 16px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.bar img{height:34px;width:auto}
+.bar b{font-family:var(--display);font-size:24px;text-transform:uppercase;letter-spacing:.02em}
+.bar button{background:none;border:1px solid #4A5592;color:#fff;border-radius:8px;min-height:40px;padding:0 14px;cursor:pointer}
+
+/* ---------- host screens ---------- */
+.host{padding:20px 0 60px;display:flex;flex-direction:column;gap:20px}
+.host .card{padding:20px;display:flex;flex-direction:column;gap:14px}
+.host h2{font-size:32px}
+.res{display:flex;flex-direction:column;gap:8px}
+.res button,.ohs a,.ohs button.row{display:flex;gap:12px;align-items:center;text-align:left;padding:10px;border:1px solid var(--line);border-radius:12px;background:#fff;cursor:pointer;width:100%;color:inherit;text-decoration:none}
+.res button[aria-pressed="true"]{border-color:var(--navy);box-shadow:0 0 0 2px var(--navy) inset}
+.res img{width:84px;height:62px;object-fit:cover;border-radius:8px;flex:none;background:var(--mist)}
+.res b{display:block}
+.res small{color:var(--muted);font-size:14px}
+.three{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:10px}
+.ohs{display:flex;flex-direction:column;gap:10px}
+.ohs .row{justify-content:space-between}
+.ohs .n{font-family:var(--display);font-size:28px;font-weight:700;color:var(--navy);flex:none;min-width:48px;text-align:right}
+.signins{width:100%;border-collapse:collapse;font-size:15px}
+.signins td,.signins th{padding:8px 6px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+.tblwrap{overflow-x:auto}
+
+/* ---------- visitor sign-in ---------- */
+.kiosk{min-height:100vh;display:flex;flex-direction:column}
+.hero{position:relative;background:var(--ink);color:#fff;aspect-ratio:4/3;max-height:52vh;width:100%;overflow:hidden}
+.hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 1.2s}
+.hero img.on{opacity:1}
+.hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(14,17,40,.15) 0%,rgba(14,17,40,0) 35%,rgba(14,17,40,.85) 100%)}
+.hero .txt{position:absolute;left:0;right:0;bottom:0;z-index:1;padding:20px 20px 22px}
+.hero .chip{display:inline-block;background:var(--red);color:#fff;font-weight:700;font-size:13px;letter-spacing:.08em;padding:6px 10px;border-radius:4px;text-transform:uppercase;margin-bottom:10px}
+.hero h1{font-size:clamp(40px,7vw,68px);text-shadow:0 2px 14px rgba(0,0,0,.35)}
+.hero p{margin:8px 0 0;font-size:18px;color:#E4E8FA}
+.hostbtn{position:absolute;top:calc(10px + env(safe-area-inset-top,0px));right:10px;z-index:2;width:44px;height:44px;border-radius:50%;border:0;background:rgba(14,17,40,.45);color:#fff;font-size:22px;cursor:pointer}
+.credit{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 16px;background:#fff;border-bottom:1px solid var(--line);font-size:14px;color:var(--muted)}
+.credit img{width:90px;height:auto}
+.form{margin:16px auto 30px;position:relative;z-index:3;width:min(680px,calc(100% - 24px))}
+.form .head{background:var(--navy);color:#fff;border-radius:16px 16px 0 0;padding:18px 20px;display:flex;align-items:center;gap:14px}
+.form .head img{width:52px;height:52px;border-radius:50%;object-fit:cover;object-position:top;background:#fff;flex:none}
+.form .head strong{display:block;font-family:var(--display);font-size:26px;text-transform:uppercase;line-height:1}
+.form .head span{font-size:15px;color:var(--pale)}
+.form form{padding:20px;display:flex;flex-direction:column;gap:18px;background:var(--mist);border-radius:0 0 16px 16px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:560px){.two{grid-template-columns:1fr}.three{grid-template-columns:1fr 1fr}.three>:first-child{grid-column:1/-1}}
+.consent{display:flex;gap:12px;align-items:flex-start;font-size:16px;color:var(--ink);cursor:pointer}
+.consent input{width:26px;height:26px;min-height:0;flex:none;margin-top:1px;accent-color:var(--navy)}
+.fine{font-size:13px;color:var(--muted);margin:0}
+.fine a{color:var(--muted)}
+.thanks{position:fixed;inset:0;z-index:20;background:var(--navy);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;text-align:center;padding:24px}
+.thanks .ck{width:96px;height:96px;border-radius:50%;background:#fff;display:grid;place-items:center}
+.thanks h2{font-size:clamp(44px,8vw,72px)}
+.thanks p{font-size:21px;color:#E4E8FA;max-width:30ch;margin:0}
+.queue{position:fixed;left:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:5;background:var(--ink);color:#fff;border-radius:20px;padding:6px 12px;font-size:13px}
+dialog{border:0;border-radius:16px;padding:22px;width:min(380px,calc(100vw - 32px));box-shadow:0 30px 60px rgba(10,14,40,.4)}
+dialog::backdrop{background:rgba(20,24,51,.6)}
+dialog form{display:flex;flex-direction:column;gap:12px}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<dialog id="pinDlg"><form method="dialog" id="pinForm"><h2 style="font-size:28px">Host only</h2><label for="pinIn">Enter your PIN</label><input id="pinIn" inputmode="numeric" autocomplete="off" type="password"><p class="err" id="pinErr" hidden>Wrong PIN</p><div style="display:flex;gap:10px"><button class="btn" type="submit" style="flex:1">Continue</button><button class="btn ghost" type="button" id="pinCancel">Cancel</button></div></form></dialog>
+<script src="/assets/listings.js?v=2"></script>
+<script>
+(function(){
+  var SM=window.SM, esc=SM.esc, app=document.getElementById('app');
+  var qs=new URLSearchParams(location.search), OH=qs.get('id');
+  var LOGO='/logo-soldmike-white.png';
+  function pin(){return SM.store('sm_oh_pin')||'';}
+  function hostApi(path,opt){opt=opt||{};opt.headers=Object.assign({'X-OH-Pin':pin()},opt.headers||{});return fetch(SM.api+path,opt).then(function(r){if(r.status===401)throw 'pin';if(!r.ok)throw r.status;return r.json();});}
+  function today(){var d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+  function niceDay(s){if(!s)return '';var p=s.split('-');var d=new Date(+p[0],+p[1]-1,+p[2]);return d.toLocaleDateString('en-CA',{weekday:'long',month:'long',day:'numeric'});}
+  function niceTime(t){if(!t)return '';var h=+t.split(':')[0],m=t.split(':')[1];return (h%12||12)+(m!=='00'?':'+m:'')+(h<12?' AM':' PM');}
+
+  // ---------- PIN ----------
+  var dlg=document.getElementById('pinDlg');
+  function askPin(){
+    return new Promise(function(res,rej){
+      var f=document.getElementById('pinForm'), inp=document.getElementById('pinIn'), er=document.getElementById('pinErr');
+      inp.value='';er.hidden=true;dlg.showModal();setTimeout(function(){inp.focus();},50);
+      f.onsubmit=function(e){e.preventDefault();SM.store('sm_oh_pin',inp.value.trim());hostApi('/api/oh/check',{method:'POST'}).then(function(){dlg.close();res();}).catch(function(){er.hidden=false;});};
+      document.getElementById('pinCancel').onclick=function(){dlg.close();rej();};
+    });
+  }
+
+  // ---------- offline queue: sign-ins wait on the phone until the internet is back ----------
+  function queue(){return SM.store('sm_oh_queue')||[];}
+  function badge(){var q=queue(),b=document.getElementById('qb');if(!q.length){if(b)b.remove();return;}if(!b){b=document.createElement('div');b.id='qb';b.className='queue';document.body.appendChild(b);}b.textContent=q.length+' sign-in'+(q.length>1?'s':'')+' waiting for internet';}
+  function flush(){
+    var q=queue();if(!q.length)return;
+    SM.post('/api/oh/signin',q[0]).then(function(r){if(r&&(r.ok||r.error)){SM.store('sm_oh_queue',queue().slice(1));badge();flush();}}).catch(function(){});
+  }
+  addEventListener('online',flush);setInterval(flush,20000);
+
+  // =========================================================
+  // HOST: list of open houses + create a new one
+  // =========================================================
+  function hostHome(){
+    history.replaceState(null,'','/open-house/');
+    app.innerHTML='<div class="bar"><img src="'+LOGO+'" alt="SoldMike"><b>Open houses</b><span></span></div>'
+      +'<div class="wrap host">'
+      +'<div class="card"><h2>New open house</h2><div><label for="q">Address or MLS® number</label><input id="q" placeholder="Start typing the address" autocomplete="off"></div><div class="res" id="res"></div>'
+      +'<div id="when" hidden><div class="three"><div><label for="day">Date</label><input id="day" type="date" value="'+today()+'"></div><div><label for="st">Start</label><input id="st" type="time" value="14:00"></div><div><label for="en">End</label><input id="en" type="time" value="16:00"></div></div></div>'
+      +'<button class="btn" id="go" disabled>Start open house</button><p class="err" id="herr" hidden></p></div>'
+      +'<div class="card"><h2>Your open houses</h2><div class="ohs" id="ohs"><p class="muted">Loading…</p></div></div>'
+      +'<p class="fine" style="text-align:center">Tip: in Safari tap Share → <b>Add to Home Screen</b> to open this like an app.</p></div>';
+    var q=document.getElementById('q'), res=document.getElementById('res'), go=document.getElementById('go'), pick=null, t=null;
+    q.addEventListener('input',function(){
+      clearTimeout(t);pick=null;go.disabled=true;document.getElementById('when').hidden=true;
+      var v=q.value.trim();if(v.length<3){res.innerHTML='';return;}
+      t=setTimeout(function(){
+        hostApi('/api/oh/find?q='+encodeURIComponent(v)).then(function(r){
+          res.innerHTML=r.items.length?r.items.map(function(l){return '<button type="button" data-id="'+esc(l.id)+'" aria-pressed="false"><img src="'+esc(l.photo||'')+'" alt=""><span><b>'+esc(l.addr)+'</b><small>'+esc(l.city)+' · '+esc(SM.priceText(l))+' · MLS® '+esc(l.mls)+'</small></span></button>';}).join(''):'<p class="muted">No active listing matches yet. Check the spelling, or try the MLS® number.</p>';
+        }).catch(function(e){if(e==='pin')askPin().then(hostHome);});
+      },300);
+    });
+    res.addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;pick=b.dataset.id;[].forEach.call(res.children,function(x){x.setAttribute('aria-pressed',x===b);});document.getElementById('when').hidden=false;go.disabled=false;});
+    go.addEventListener('click',function(){
+      go.disabled=true;
+      hostApi('/api/oh/create',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({key:pick,day:document.getElementById('day').value,start:document.getElementById('st').value,end:document.getElementById('en').value})})
+        .then(function(r){location.href='/open-house/?id='+r.id;})
+        .catch(function(){var h=document.getElementById('herr');h.hidden=false;h.textContent='Could not create it. Check your internet and try again.';go.disabled=false;});
+    });
+    hostApi('/api/oh/list').then(function(r){
+      var el=document.getElementById('ohs');
+      el.innerHTML=r.items.length?r.items.map(function(o){return '<button type="button" class="row" data-id="'+esc(o.id)+'"><span><b>'+esc(o.addr)+'</b><br><small class="muted">'+esc(niceDay(o.day))+(o.start?' · '+niceTime(o.start)+'–'+niceTime(o.end):'')+'</small></span><span class="n">'+o.n+'</span></button>';}).join(''):'<p class="muted">None yet. Create your first one above.</p>';
+      el.onclick=function(e){var b=e.target.closest('[data-id]');if(b)hostDetail(b.dataset.id);};
+    }).catch(function(e){if(e==='pin')askPin().then(hostHome);});
+  }
+  function hostDetail(id){
+    app.innerHTML='<div class="bar"><img src="'+LOGO+'" alt="SoldMike"><b>Sign-ins</b><button type="button" id="back">Back</button></div><div class="wrap host"><div class="card"><a class="btn" href="/open-house/?id='+esc(id)+'">Open the sign-in screen</a><div class="tblwrap" id="sl"><p class="muted">Loading…</p></div><p class="fine">✓ = saved in Follow Up Boss.</p></div></div>';
+    document.getElementById('back').onclick=hostHome;
+    hostApi('/api/oh/signins?id='+encodeURIComponent(id)).then(function(r){
+      document.getElementById('sl').innerHTML=r.items.length?'<table class="signins"><thead><tr><th>Name</th><th>Contact</th><th>Realtor?</th><th>Selling?</th><th></th></tr></thead><tbody>'+r.items.map(function(s){return '<tr><td>'+esc(s.first+' '+s.last)+'</td><td>'+esc(s.email)+(s.phone?'<br>'+esc(s.phone):'')+'</td><td>'+esc(s.realtor)+'</td><td>'+esc(s.sell)+'</td><td>'+(s.fub?'✓':'…')+'</td></tr>';}).join('')+'</tbody></table>':'<p class="muted">No sign-ins yet.</p>';
+    });
+  }
+
+  // =========================================================
+  // VISITOR: sign-in screen for one open house
+  // =========================================================
+  function kiosk(data){
+    var o=data.oh, l=data.listing, photos=l&&l.photos&&l.photos.length?l.photos:[];
+    var specs=l?[l.beds!=null&&l.beds!==''?l.beds+' bed':'',l.baths!=null?l.baths+' bath':'',SM.priceText(l)].filter(Boolean).join(' · '):'';
+    document.title='Open House: '+o.addr+' | SoldMike';
+    app.innerHTML='<div class="kiosk">'
+      +'<section class="hero" id="hero">'+photos.map(function(u,i){return '<img src="'+esc(u)+'" alt=""'+(i?' loading="lazy"':' class="on"')+'>';}).join('')
+      +'<button class="hostbtn" id="hostBtn" type="button" aria-label="Host menu">⋯</button>'
+      +'<div class="txt"><span class="chip">Open house'+(o.day?' · '+esc(niceDay(o.day)):'')+'</span><h1>'+esc(o.addr)+'</h1><p>'+esc(o.city)+(specs?' · '+esc(specs):'')+'</p></div></section>'
+      +(l?'<div class="credit"><span>Listed by '+esc(l.office||'the listing brokerage')+'</span>'+SM.rca(l.rca,90)+'</div>':'')
+      +'<div class="form card"><div class="head"><img src="/mike.png" alt=""><div><strong>Welcome, please sign in</strong><span>Michael Barillari, Broker · RE/MAX Premier The OP Team</span></div></div>'
+      +'<form id="sf" novalidate>'
+      +'<div class="two"><div><label for="fn">First name</label><input id="fn" name="fn" autocomplete="given-name" required></div><div><label for="ln">Last name</label><input id="ln" name="ln" autocomplete="family-name"></div></div>'
+      +'<div><label for="em">Email</label><input id="em" name="em" type="email" inputmode="email" autocomplete="email" required></div>'
+      +'<div><label for="ph">Phone <span class="opt">(optional)</span></label><input id="ph" name="ph" type="tel" inputmode="tel" autocomplete="tel"></div>'
+      +'<div><span class="q">Are you working with a realtor?</span><div class="chips" data-q="realtor"><button type="button" aria-pressed="false">Yes</button><button type="button" aria-pressed="false">No</button></div></div>'
+      +'<div><span class="q">Do you have a home to sell?</span><div class="chips" data-q="sell"><button type="button" aria-pressed="false">Yes</button><button type="button" aria-pressed="false">No</button><button type="button" aria-pressed="false">Thinking about it</button></div></div>'
+      +'<div id="saWrap" hidden><label for="sa">Your property address <span class="opt">(optional)</span></label><input id="sa" name="sa" autocomplete="street-address" placeholder="Street, city"></div>'
+      +'<label class="consent"><input type="checkbox" id="cs"><span>Email me new listings like this one and local market updates. I can unsubscribe anytime.</span></label>'
+      +'<p class="err" id="ferr" role="alert" hidden></p>'
+      +'<button class="btn" type="submit" id="sb">Sign in</button>'
+      +'<p class="fine">By signing in, I agree to be contacted by RE/MAX Premier The OP Team about this home by call, text and email. Reply STOP or click unsubscribe to opt out. Listings are provided under our <a href="/terms/" target="_blank">Terms of Use</a>; see our <a href="/privacy/" target="_blank">Privacy Policy</a>.</p>'
+      +'</form></div></div>';
+
+    // slow photo crossfade on the hero
+    var imgs=[].slice.call(document.querySelectorAll('#hero img')), cur=0;
+    if(imgs.length>1)setInterval(function(){imgs[cur].classList.remove('on');cur=(cur+1)%imgs.length;imgs[cur].classList.add('on');},6000);
+
+    var ans={realtor:'',sell:''};
+    [].forEach.call(document.querySelectorAll('.chips'),function(c){
+      c.addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;var on=b.getAttribute('aria-pressed')!=='true';[].forEach.call(c.children,function(x){x.setAttribute('aria-pressed',x===b&&on);});ans[c.dataset.q]=on?b.textContent:'';if(c.dataset.q==='sell')document.getElementById('saWrap').hidden=!(ans.sell==='Yes'||ans.sell==='Thinking about it');});
+    });
+    document.getElementById('hostBtn').onclick=function(){askPin().then(hostHome).catch(function(){});};
+
+    var f=document.getElementById('sf'), er=document.getElementById('ferr');
+    f.addEventListener('submit',function(e){
+      e.preventDefault();
+      var fn=f.fn.value.trim(), em=f.em.value.trim();
+      if(!fn||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)){er.hidden=false;er.textContent='Please add your first name and a valid email.';return;}
+      er.hidden=true;
+      var body={oh:o.id,firstName:fn,lastName:f.ln.value.trim(),email:em,phone:f.ph.value.trim(),realtor:ans.realtor,sell:ans.sell,sellAddr:f.sa.value.trim(),consent:document.getElementById('cs').checked,at:new Date().toISOString()};
+      var sb=document.getElementById('sb');sb.disabled=true;
+      SM.post('/api/oh/signin',body).then(function(r){
+        if(r&&r.ok){thanks(fn);return;}
+        er.hidden=false;er.textContent=(r&&r.error)||'Something went wrong. Please try again.';sb.disabled=false;
+      }).catch(function(){var q=queue();q.push(body);SM.store('sm_oh_queue',q);badge();thanks(fn);}); // no internet: keep it on the phone
+    });
+  }
+  function thanks(name){
+    var t=document.createElement('div');t.className='thanks';t.setAttribute('role','status');
+    t.innerHTML='<div class="ck"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#1D2870" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div><h2>Thanks, '+esc(name)+'!</h2><p>Enjoy the tour. Michael is here if you have any questions.</p>';
+    document.body.appendChild(t);
+    setTimeout(function(){t.remove();start();window.scrollTo(0,0);},6000);
+  }
+
+  function start(){
+    badge();flush();
+    if(!OH){ if(!pin())askPin().then(hostHome).catch(function(){app.innerHTML='<div class="wrap host"><p>Host PIN needed.</p></div>';}); else hostHome(); return; }
+    var cached=SM.store('sm_oh_'+OH);
+    SM.get('/api/oh/get?id='+encodeURIComponent(OH)).then(function(d){SM.store('sm_oh_'+OH,d);kiosk(d);})
+      .catch(function(){ if(cached)kiosk(cached); else app.innerHTML='<div class="wrap host"><h2>Open house not found</h2><p><a href="/open-house/">Back to open houses</a></p></div>'; });
+  }
+  start();
+  if('serviceWorker' in navigator)navigator.serviceWorker.register('/open-house/sw.js').catch(function(){});
+})();
+</script>
+</body>
+</html>

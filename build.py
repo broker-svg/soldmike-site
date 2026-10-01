@@ -559,7 +559,7 @@ P('/privacy/',
   lambda: hero([('Home', '/'), ('Privacy', '/privacy/')], 'Privacy policy', 'How we collect, use and protect your personal information.'),
   lambda: band(prose(
       '<h2>What we collect</h2>',
-      'When you fill in a form on this site, book a showing or ask about a home, we collect the details you give us, such as your name, email, phone and property address, to reply to you and provide real estate services. Your information goes to Michael Barillari and is stored in our customer relationship system (Follow Up Boss). We do not sell your information.',
+      'When you fill in a form on this site, sign in at one of our open houses, book a showing or ask about a home, we collect the details you give us, such as your name, email, phone and property address, to reply to you and provide real estate services. Your information goes to Michael Barillari and is stored in our customer relationship system (Follow Up Boss). We do not sell your information.',
       '<h2>Homes you view and save</h2>',
       'After you have sent us your contact details, the listings you view and save on this site (address, MLS® number, price and a link) are recorded in your file in our customer relationship system, so Michael can follow up with homes that fit. This is done automatically by the website. If you have not given us your contact details, your browsing is not linked to you.',
       '<h2>Listing statistics for CREA</h2>',
