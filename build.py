@@ -144,7 +144,7 @@ def live_grid(area, n=3):
 
 # ---------- page writer ----------
 SITEMAP = []
-LISTING_HEAD = '<link rel="stylesheet" href="/assets/listings.css?v=6">'
+LISTING_HEAD = '<link rel="stylesheet" href="/assets/listings.css?v=7">'
 LEAFLET_HEAD = '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">'
 LEAFLET_JS = '<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" defer></script>'
 LISTING_JS = '<script src="/assets/listings.js?v=1" defer></script>'
