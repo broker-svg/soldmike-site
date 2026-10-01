@@ -61,12 +61,11 @@
 
     var h='';
     if(N){
-      var side=N>=5?'<div class="side" id="side">'+P.slice(1,5).map(function(p,k){return '<button type="button" data-i="'+(k+1)+'" aria-label="Show photo '+(k+2)+'"><img src="'+esc(p.u)+'" alt="" loading="lazy"></button>';}).join('')+'</div>':'';
-      h+='<div class="gal'+(side?' has-side':'')+'"><section class="stage" id="stage" tabindex="0" aria-roledescription="carousel" aria-label="Photos. Use left and right arrow keys to browse.">'
+      h+='<section class="stage" id="stage" tabindex="0" aria-roledescription="carousel" aria-label="Photos. Use left and right arrow keys to browse.">'
         +'<div id="slides">'+slides+'</div><div class="credit">'+tags+'</div><div class="caption" id="cap"></div>'
         +(N>1?'<button class="arrow prev" id="prev" type="button" aria-label="Previous photo">'+ARW+'</button><button class="arrow next" id="next" type="button" aria-label="Next photo">'+ARW2+'</button>':'')
         +'<div class="hud"><div class="left"><button class="pill" id="openAll" type="button">'+GRID+'View all '+N+' photos</button><a class="pill" href="#location">'+PIN+'Map</a></div><div class="count" aria-live="polite"><span id="n">1</span> / '+N+'</div></div></section>'
-        +side+'</div><nav class="rail" aria-label="Photo thumbnails"><ol id="rail">'+rail+'</ol></nav>';
+        +'<nav class="rail" aria-label="Photo thumbnails"><ol id="rail">'+rail+'</ol></nav>';
     }
     h+='<div class="wrap"><div class="title"><div>'+(N?'':'<div class="tags">'+tags+'</div>')
       +'<h1>'+esc(title)+'</h1><p class="sub">'+esc(place)+(l.type?' · '+esc(l.type):'')+'</p>'
@@ -132,8 +131,6 @@
       cap.textContent=P[0].c||'';
       if(N>1){document.getElementById('prev').onclick=function(){go(cur-1);};document.getElementById('next').onclick=function(){go(cur+1);};}
       rail.addEventListener('click',function(e){var b=e.target.closest('button');if(b)go(+b.dataset.i);});
-      var side=document.getElementById('side');
-      if(side)side.addEventListener('click',function(e){var b=e.target.closest('button');if(b)go(+b.dataset.i);});
       stage.addEventListener('keydown',function(e){if(e.key==='ArrowLeft'){go(cur-1);e.preventDefault();}if(e.key==='ArrowRight'){go(cur+1);e.preventDefault();}});
       var x0=null;
       stage.addEventListener('touchstart',function(e){x0=e.touches[0].clientX;},{passive:true});

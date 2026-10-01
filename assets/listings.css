@@ -87,16 +87,17 @@
 @media (max-width:700px){.ld .stage{height:auto;aspect-ratio:4/3;min-height:0}}
 /* tablets: same shape as a normal 3:2 listing photo */
 @media (min-width:701px) and (max-width:1099px){.ld .stage{height:auto;aspect-ratio:3/2;max-height:75vh;min-height:0}}
-/* laptops and wider: big main photo + 2x2 grid of the next photos, filling the width */
-.ld .gal{background:var(--stage)}
-.ld .side{display:none}
+/* laptops and wider: one big photo, never cropped. The photo + film strip fill the screen;
+   if the screen is wider than the photo, white bars fill the sides. Name and price sit below. */
 @media (min-width:1100px){
-  .ld .gal.has-side{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:6px}
-  .ld .stage{height:clamp(420px,64vh,960px)}
-  .ld .side{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:6px;height:clamp(420px,64vh,960px)}
-  .ld .side button{padding:0;border:0;margin:0;background:none;cursor:pointer;overflow:hidden;min-height:0}
-  .ld .side img{width:100%;height:100%;object-fit:cover;transition:transform .6s var(--ease),opacity .2s}
-  .ld .side button:hover img{transform:scale(1.04);opacity:.9}
+  .ld .stage{height:max(460px,min(66.6vw,calc(100vh - 72px - 124px)));background:var(--white)}
+  .ld .stage::after{display:none}
+  .ld .slide img{object-fit:contain!important;transform:none!important}
+  .ld .hud .count{color:var(--ink)}
+  .ld .pill{border:1px solid var(--line);box-shadow:0 4px 14px rgba(20,24,51,.12)}
+  .ld .rail{background:var(--white)!important;border-bottom:1px solid var(--line)}
+  .ld .rail ol{justify-content:safe center}
+  .ld .rail button{opacity:.7}
 }
 .ld .slide{position:absolute;inset:0;opacity:0;transition:opacity .7s var(--ease)}
 .ld .slide img{width:100%;height:100%;object-fit:cover;transform:scale(1.035);transition:transform 6s var(--ease)}
