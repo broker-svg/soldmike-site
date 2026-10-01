@@ -47,7 +47,7 @@
     var slides='',rail='',all='';
     P.forEach(function(p,i){
       var alt=esc(p.c||('Photo '+(i+1)+' of '+title));
-      slides+='<div class="slide'+(i?'':' on')+'" role="group" aria-roledescription="slide" aria-label="'+(i+1)+' of '+N+'"'+(i?' aria-hidden="true"':'')+'><img src="'+esc(p.u)+'" alt="'+alt+'"'+(i>1?' loading="lazy"':'')+'></div>';
+      slides+='<div class="slide'+(i?'':' on')+'" style="--bg:url(&quot;'+esc(p.u)+'&quot;)" role="group" aria-roledescription="slide" aria-label="'+(i+1)+' of '+N+'"'+(i?' aria-hidden="true"':'')+'><img src="'+esc(p.u)+'" alt="'+alt+'"'+(i>1?' loading="lazy"':'')+'></div>';
       rail+='<li><button type="button" data-i="'+i+'" aria-label="Show photo '+(i+1)+'"'+(i?'':' aria-current="true"')+'><img src="'+esc(p.u)+'" alt="" loading="lazy"></button></li>';
       all+='<button type="button" data-i="'+i+'" aria-label="Open photo '+(i+1)+'"><img src="'+esc(p.u)+'" alt="" loading="lazy"></button>';
     });
