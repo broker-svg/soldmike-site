@@ -461,7 +461,8 @@ footer .wrap{padding-block:56px 32px;display:flex;flex-direction:column;gap:28px
   var mb=document.getElementById('mbtn'),mn=document.getElementById('mainnav');mb.addEventListener('click',function(){var o=mn.classList.toggle('open');mb.setAttribute('aria-expanded',o);mb.textContent=o?'Close':'Menu';top.classList.add('solid');});
   // forms
   document.getElementById('searchForm').addEventListener('submit',function(e){e.preventDefault();location.href='/listings/';});
-  document.getElementById('askForm').addEventListener('submit',function(e){e.preventDefault();document.getElementById('askNote').textContent='Prototype only. The live assistant launches in Phase 4, after CREA confirms the listing-data rules.';});
+  document.getElementById('askForm').addEventListener('submit',function(e){e.preventDefault();var q=document.getElementById('ask');var t=q.value.trim();q.value='';if(window.askMika){t?askMika(t):openMika();}});
 })();
 </script>
 <script src="/assets/site.js" defer></script>
+<script src="/assets/chat.js" defer></script>
