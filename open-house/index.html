@@ -107,7 +107,8 @@ dialog form{display:flex;flex-direction:column;gap:12px}
 <script>
 (function(){
   var SM=window.SM, esc=SM.esc, app=document.getElementById('app');
-  var qs=new URLSearchParams(location.search), OH=qs.get('id');
+  var qs=new URLSearchParams(location.search), OH=qs.get('id'), DEMO=qs.has('demo');
+  var DEMO_DATA={oh:{id:'demo',addr:'123 Sample Crescent',city:'Vaughan',day:'',start:'',end:''},listing:{id:'demo',addr:'123 Sample Crescent',city:'Vaughan',price:1849000,lease:false,beds:'4+1',baths:5,office:'Sample listing (demo)',rca:'https://www.realtor.ca/en',photos:['/lp/1.jpg','/lp/2.jpg','/lp/3.jpg','/lp/7.jpg']}};
   var LOGO='/logo-soldmike-white.png';
   function pin(){return SM.store('sm_oh_pin')||'';}
   function hostApi(path,opt){opt=opt||{};opt.headers=Object.assign({'X-OH-Pin':pin()},opt.headers||{});return fetch(SM.api+path,opt).then(function(r){if(r.status===401)throw 'pin';if(!r.ok)throw r.status;return r.json();});}
@@ -222,6 +223,7 @@ dialog form{display:flex;flex-direction:column;gap:12px}
       er.hidden=true;
       var body={oh:o.id,firstName:fn,lastName:f.ln.value.trim(),email:em,phone:f.ph.value.trim(),realtor:ans.realtor,sell:ans.sell,sellAddr:f.sa.value.trim(),consent:document.getElementById('cs').checked,at:new Date().toISOString()};
       var sb=document.getElementById('sb');sb.disabled=true;
+      if(DEMO){thanks(fn);return;} // demo: nothing is sent
       SM.post('/api/oh/signin',body).then(function(r){
         if(r&&r.ok){thanks(fn);return;}
         er.hidden=false;er.textContent=(r&&r.error)||'Something went wrong. Please try again.';sb.disabled=false;
@@ -236,6 +238,7 @@ dialog form{display:flex;flex-direction:column;gap:12px}
   }
 
   function start(){
+    if(DEMO){kiosk(DEMO_DATA);var c=document.querySelector('.chip');if(c)c.textContent='Open house · Demo';return;}
     badge();flush();
     if(!OH){ if(!pin())askPin().then(hostHome).catch(function(){app.innerHTML='<div class="wrap host"><p>Host PIN needed.</p></div>';}); else hostHome(); return; }
     var cached=SM.store('sm_oh_'+OH);
