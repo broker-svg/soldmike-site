@@ -203,3 +203,4 @@ footer .wrap{padding-block:56px 32px;display:flex;flex-direction:column;gap:32px
 .armed .rv.in{opacity:1;transform:none;transition:opacity .8s var(--ease),transform .8s var(--ease)}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important;scroll-behavior:auto!important}.armed .rv{opacity:1;transform:none}}
 .two dl.kv{grid-template-columns:1fr}
+@media (min-width:1600px){.top .wrap{max-width:1520px}}
