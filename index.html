@@ -213,6 +213,7 @@ footer .wrap{padding-block:56px 32px;display:flex;flex-direction:column;gap:28px
 }
 </style>
 
+<link rel="stylesheet" href="/assets/listings.css?v=1">
 </head>
 <body>
 <header class="top" id="top">
@@ -246,9 +247,9 @@ footer .wrap{padding-block:56px 32px;display:flex;flex-direction:column;gap:28px
       <h1><span class="ln"><span>Michael Barillari, Broker</span></span></h1>
       <p class="fade">RE/MAX Premier The OP Team, selling homes in Vaughan, Woodbridge, Kleinburg, Toronto and Caledon.</p>
       <form class="search fade" id="searchForm" aria-label="Search listings">
-        <div><label for="s-area">Area</label><select id="s-area"><option>Woodbridge</option><option>Vaughan</option><option>Toronto</option><option>All GTA</option></select></div>
-        <div><label for="s-price">Max price</label><select id="s-price"><option>Any price</option><option>$1,000,000</option><option>$1,500,000</option><option>$2,000,000</option></select></div>
-        <div><label for="s-beds">Bedrooms</label><select id="s-beds"><option>Any</option><option>2+</option><option>3+</option><option>4+</option></select></div>
+        <div><label for="s-area">Area</label><select id="s-area"><option value="woodbridge">Woodbridge</option><option value="vaughan">Vaughan</option><option value="king-city-nobleton">King &amp; Nobleton</option><option value="toronto">Toronto</option><option value="">All GTA</option></select></div>
+        <div><label for="s-price">Max price</label><select id="s-price"><option value="">Any price</option><option value="1000000">$1,000,000</option><option value="1500000">$1,500,000</option><option value="2000000">$2,000,000</option><option value="3000000">$3,000,000</option></select></div>
+        <div><label for="s-beds">Bedrooms</label><select id="s-beds"><option value="">Any</option><option value="2">2+</option><option value="3">3+</option><option value="4">4+</option></select></div>
         <button class="btn" type="submit">Search homes</button>
       </form>
     </div>
@@ -274,23 +275,17 @@ footer .wrap{padding-block:56px 32px;display:flex;flex-direction:column;gap:28px
       <p class="lede">Fresh from the MLS® every morning. Our own listings are marked.</p>
     </div>
     <div class="tabs" role="tablist" aria-label="Filter by area">
-      <button type="button" role="tab" aria-selected="true" data-f="all">All</button>
+      <button type="button" role="tab" aria-selected="true" data-f="core">All</button>
       <button type="button" role="tab" aria-selected="false" data-f="woodbridge">Woodbridge</button>
       <button type="button" role="tab" aria-selected="false" data-f="north">North of Vaughan</button>
     </div>
   </div>
-  <div class="grid" id="grid">
-    <a class="card rv" style="--i:0" data-a="woodbridge" href="listing.html"><div class="ph"><img src="l1.jpg" alt="Two-storey brick home with double garage" loading="lazy"><span class="tag">Sample</span><span class="tag op">OP Team</span></div><div class="meta"><div class="price">$1,649,000</div><div class="addr">Sample listing, Vellore Village</div><div class="specs">4 bed · 4 bath · Detached</div><div class="fine"><span>Listed by: The OP Team</span><span>MLS® [number]</span></div></div></a>
-    <a class="card rv" style="--i:1" data-a="woodbridge" href="listing.html"><div class="ph"><img src="l2.jpg" alt="Aerial view of a townhouse community" loading="lazy"><span class="tag">Sample</span></div><div class="meta"><div class="price">$1,189,000</div><div class="addr">Sample listing, Islington Woods</div><div class="specs">3 bed · 3 bath · Townhouse</div><div class="fine"><span>Listed by: [Listing brokerage]</span><span>MLS® [number]</span></div></div></a>
-    <a class="card rv" style="--i:2" data-a="woodbridge" href="listing.html"><div class="ph"><img src="l6.jpg" alt="Stone and siding detached home with dark garage door" loading="lazy"><span class="tag">Sample</span><span class="tag op">OP Team</span></div><div class="meta"><div class="price">$1,875,000</div><div class="addr">Sample listing, Sonoma Heights</div><div class="specs">4 bed · 4 bath · Detached</div><div class="fine"><span>Listed by: The OP Team</span><span>MLS® [number]</span></div></div></a>
-    <a class="card rv" style="--i:0" data-a="north" href="listing.html"><div class="ph"><img src="l4.jpg" alt="Estate homes at dusk from the air" loading="lazy"><span class="tag">Sample</span></div><div class="meta"><div class="price">$3,295,000</div><div class="addr">Sample listing, Nobleton</div><div class="specs">5 bed · 6 bath · Detached</div><div class="fine"><span>Listed by: [Listing brokerage]</span><span>MLS® [number]</span></div></div></a>
-    <a class="card rv" style="--i:1" data-a="north" href="listing.html"><div class="ph"><img src="l5.jpg" alt="Modern home lit up at twilight" loading="lazy"><span class="tag">Sample</span></div><div class="meta"><div class="price">$1,849,000</div><div class="addr">Sample listing, Tottenham</div><div class="specs">4 bed · 4 bath · Detached</div><div class="fine"><span>Listed by: [Listing brokerage]</span><span>MLS® [number]</span></div></div></a>
-    <a class="card rv" style="--i:2" data-a="north" href="listing.html"><div class="ph"><img src="l3.jpg" alt="Brick home with covered porch" loading="lazy"><span class="tag">Sample</span></div><div class="meta"><div class="price">$1,399,000</div><div class="addr">Sample listing, Aurora</div><div class="specs">3 bed · 3 bath · Detached</div><div class="fine"><span>Listed by: [Listing brokerage]</span><span>MLS® [number]</span></div></div></a>
-  </div>
+  <div class="grid lgrid" id="grid" data-listings data-area="core" data-n="6"></div>
   <div class="below">
-    <a href="/listings/" style="font-weight:600">See all listings</a>
-    <span class="badge">Powered by <strong>REALTOR.ca</strong></span>
+    <a href="/listings/" style="font-weight:600" id="seeAll">See all listings</a>
+    <a href="https://www.realtor.ca/en" target="_blank" rel="noopener"><img src="https://www.realtor.ca/images/en-ca/powered_by_realtor.svg" width="125" alt="Powered by REALTOR.ca"></a>
   </div>
+  <p class="crea-note" style="margin-top:18px">The information contained on this site is based in whole or in part on information that is provided by members of The Canadian Real Estate Association (CREA), who are responsible for its accuracy. CREA reproduces and distributes this information as a service for its members and assumes no responsibility for its accuracy.</p>
 </section>
 
 <!-- Neighbourhoods: parallax aerial + drifting names -->
@@ -395,7 +390,7 @@ footer .wrap{padding-block:56px 32px;display:flex;flex-direction:column;gap:28px
     </div>
     <div class="legal">
       <span>The trademarks REALTOR®, REALTORS®, and the REALTOR® logo are controlled by The Canadian Real Estate Association (CREA) and identify real estate professionals who are members of CREA. The trademarks MLS®, Multiple Listing Service® and the associated logos are owned by CREA and identify the quality of services provided by real estate professionals who are members of CREA.</span>
-      <span class="badge">Powered by <strong>REALTOR.ca</strong></span>
+      <a href="https://www.realtor.ca/en" target="_blank" rel="noopener" aria-label="Powered by REALTOR.ca"><img src="https://www.realtor.ca/images/en-ca/powered_by_realtor.svg" width="125" alt="Powered by REALTOR.ca" loading="lazy" style="background:#fff;border-radius:4px;padding:4px"></a>
     </div>
   </div>
 </footer>
@@ -437,13 +432,12 @@ footer .wrap{padding-block:56px 32px;display:flex;flex-direction:column;gap:28px
     counts.forEach(function(el){el.textContent=fmt(0,+(el.dataset.dec||0));cio.observe(el);});
   }
 
-  // listing filter
-  var tabs=[].slice.call(document.querySelectorAll('.tabs button')), cards=[].slice.call(document.querySelectorAll('#grid .card'));
+  // new listings: tabs load each area live (listings.js fills the grid)
+  var tabs=[].slice.call(document.querySelectorAll('.tabs button')), grid=document.getElementById('grid'), seeAll=document.getElementById('seeAll');
   tabs.forEach(function(b){b.addEventListener('click',function(){
-    var f=b.dataset.f;
     tabs.forEach(function(x){x.setAttribute('aria-selected',x===b?'true':'false');});
-    var i=0;
-    cards.forEach(function(c){var show=f==='all'||c.dataset.a===f;c.hidden=!show;if(show){c.style.setProperty('--i',i++%3);c.classList.remove('in');void c.offsetWidth;c.classList.add('in');}});
+    var a=b.dataset.f; grid.dataset.area=a; seeAll.href='/listings/'+(a==='core'?'':'?area='+a);
+    if(window.SM){SM.loading(grid,6);SM.get('/api/area?a='+a).then(function(r){SM.cards(grid,r.items.slice(0,6));}).catch(function(){});}
   });});
 
   // parallax: hero video drifts, aerial moves slower than the page, names slide sideways
@@ -467,11 +461,12 @@ footer .wrap{padding-block:56px 32px;display:flex;flex-direction:column;gap:28px
 
   var mb=document.getElementById('mbtn'),mn=document.getElementById('mainnav');mb.addEventListener('click',function(){var o=mn.classList.toggle('open');document.body.classList.toggle('menu-open',o);mb.setAttribute('aria-expanded',o);mb.textContent=o?'Close':'Menu';top.classList.add('solid');});
   // forms
-  document.getElementById('searchForm').addEventListener('submit',function(e){e.preventDefault();location.href='/listings/';});
+  document.getElementById('searchForm').addEventListener('submit',function(e){e.preventDefault();var q=new URLSearchParams();[['area','s-area'],['max','s-price'],['beds','s-beds']].forEach(function(x){var v=document.getElementById(x[1]).value;if(v)q.set(x[0],v);});location.href='/listings/'+(q.toString()?'?'+q:'');});
   document.getElementById('askForm').addEventListener('submit',function(e){e.preventDefault();var q=document.getElementById('ask');var t=q.value.trim();q.value='';if(window.askMika){t?askMika(t):openMika();}});
 })();
 </script>
-<script src="/assets/site.js?v=4" defer></script>
-<script src="/assets/chat.js?v=5" defer></script>
+<script src="/assets/site.js?v=5" defer></script>
+<script src="/assets/listings.js?v=1" defer></script>
+<script src="/assets/chat.js?v=6" defer></script>
 </body>
 </html>

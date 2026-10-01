@@ -37,6 +37,8 @@
     if(d.showModal){d.showModal();}else{d.setAttribute('open','');}
   }
 
+  window.smSent=sentPopup;
+
   // lead forms -> Follow Up Boss (same Worker as the landing page)
   [].forEach.call(document.querySelectorAll('form[data-lead]'),function(f){
     f.addEventListener('submit',function(e){
@@ -53,6 +55,8 @@
         property:'soldmike.com, '+f.dataset.lead
       })}).then(function(r){return r.json();}).then(function(r){
         if(!r.success) throw 0;
+        // remember the lead in this browser so the listing pages can log their views/saves in FUB
+        try{localStorage.setItem('sm_lead',JSON.stringify({firstName:parts[0],lastName:parts.slice(1).join(' '),email:v('email'),phone:v('phone')}));}catch(x){}
         var done=f.dataset.done||'Sent. Michael will be in touch shortly.'; f.reset(); msg.className='msg'; msg.textContent=done; btn.textContent=t; btn.disabled=false; sentPopup(done);
       }).catch(function(){
         msg.className='msg err'; msg.textContent='That did not go through. Call or text Michael at 647-694-3109.'; btn.textContent=t; btn.disabled=false;

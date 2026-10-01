@@ -66,7 +66,7 @@ def footer():
             '<span>Michael Barillari, Broker, SOLDMIKE. %s Independently owned and operated.</span>'
             '<span>%s, %s, %s %s</span><span>Call or text %s</span><span>%s</span></div>%s</div>'
             '<div class="legal"><span>The trademarks REALTOR®, REALTORS®, and the REALTOR® logo are controlled by The Canadian Real Estate Association (CREA) and identify real estate professionals who are members of CREA. The trademarks MLS®, Multiple Listing Service® and the associated logos are owned by CREA. <a href="/privacy/" style="color:var(--pale)">Privacy</a> · <a href="/terms/" style="color:var(--pale)">Terms</a></span>'
-            '<span class="badge">Powered by <strong>REALTOR.ca</strong></span></div></div></footer>'
+            '<a href="https://www.realtor.ca/en" target="_blank" rel="noopener" class="rca-foot" aria-label="Powered by REALTOR.ca"><img src="https://www.realtor.ca/images/en-ca/powered_by_realtor.svg" width="125" alt="Powered by REALTOR.ca" loading="lazy" style="background:#fff;border-radius:4px;padding:4px"></a></div></div></footer>'
             ) % (BROKERAGE, ADDRESS['street'], ADDRESS['city'], ADDRESS['region'], ADDRESS['postal'], PHONE, EMAIL, cols)
 
 def hero(trail, h1, lede, photo=None):
@@ -98,7 +98,8 @@ def steps(items):
     return '<ol class="steps">%s</ol>' % ''.join('<li class="rv"><div><b>%s</b><p>%s</p></div></li>' % (e(t), e(d)) for t, d in items)
 
 def kv(rows):
-    return '<dl class="kv">%s</dl>' % ''.join('<div><dt>%s</dt><dd>%s</dd></div>' % (e(a), e(b)) for a, b in rows)
+    out = '<dl class="kv">%s</dl>' % ''.join('<div><dt>%s</dt><dd>%s</dd></div>' % (e(a), e(b)) for a, b in rows)
+    return out.replace('LIVECOUNT', '<span data-area-count="%s">…</span>' % (PAGE or '').strip('/').split('/')[-1])
 
 def faq(qs):
     out = ''
@@ -136,22 +137,19 @@ def form(kind, uid=''):
 def cta(h, p, kind='value'):
     return '<section class="cta"><div class="wrap"><div><h2>%s</h2><p>%s</p></div>%s</div></section>' % (e(h), p, form(kind, '-cta'))
 
-LISTINGS = [
-    ('/listing.html', '/l1.jpg', '$1,649,000', 'Sample listing, Vellore Village', '4 bed · 4 bath · Detached', 'The OP Team', 'woodbridge'),
-    ('/listing.html', '/l2.jpg', '$1,189,000', 'Sample listing, Islington Woods', '3 bed · 3 bath · Townhouse', '[Listing brokerage]', 'woodbridge'),
-    ('/listing.html', '/l6.jpg', '$1,875,000', 'Sample listing, Sonoma Heights', '4 bed · 4 bath · Detached', 'The OP Team', 'woodbridge'),
-    ('/listing.html', '/l4.jpg', '$3,295,000', '3 Westbrooke Lane, Nobleton', '5 bed · 6 bath · Detached', 'The OP Team', 'north'),
-    ('/listing.html', '/l5.jpg', '$1,849,000', 'Sample listing, Tottenham', '4 bed · 4 bath · Detached', '[Listing brokerage]', 'north'),
-    ('/listing.html', '/l3.jpg', '$1,399,000', 'Sample listing, Aurora', '3 bed · 3 bath · Detached', '[Listing brokerage]', 'north'),
-]
-def listing_grid(rows):
-    return '<div class="grid3">%s</div>' % ''.join(
-        '<a class="card rv" href="%s"><div class="ph"><img src="%s" alt="" loading="lazy"><span class="tag">Sample</span></div><div class="meta"><div class="price">%s</div><div class="addr">%s</div><div class="specs">%s</div><div class="fine"><span>Listed by: %s</span><span>MLS® [number]</span></div></div></a>'
-        % (u, img, p, e(a), s, e(b)) for u, img, p, a, s, b, _ in rows)
+CREA_NOTE = ('<p class="crea-note">The information contained on this site is based in whole or in part on information that is provided by members of The Canadian Real Estate Association (CREA), who are responsible for its accuracy. CREA reproduces and distributes this information as a service for its members and assumes no responsibility for its accuracy. Listings refresh every day. Deemed reliable but not guaranteed.</p>')
+def live_grid(area, n=3):
+    """Live MLS® listings for an area, filled by /assets/listings.js from the listings Worker."""
+    return '<div class="lgrid" data-listings data-area="%s" data-n="%d"></div>' % (area, n)
 
 # ---------- page writer ----------
 SITEMAP = []
-def page(path, title, desc, trail, body, schema=None, noindex=False):
+LISTING_HEAD = '<link rel="stylesheet" href="/assets/listings.css?v=1">'
+LEAFLET_HEAD = '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">'
+LEAFLET_JS = '<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" defer></script>'
+LISTING_JS = '<script src="/assets/listings.js?v=1" defer></script>'
+
+def page(path, title, desc, trail, body, schema=None, noindex=False, head='', js=''):
     global PAGE
     sch = [agent_schema(), crumbs_schema(trail)] + (schema or [])
     doc = ('<!doctype html><html lang="en-CA"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">'
@@ -159,50 +157,71 @@ def page(path, title, desc, trail, body, schema=None, noindex=False):
            '<meta property="og:type" content="website"><meta property="og:title" content="%s"><meta property="og:description" content="%s"><meta property="og:url" content="%s%s"><meta property="og:image" content="%s/hero.jpg">'
            '%s<link rel="icon" href="/logo.png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
            '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Barlow:wght@400;500;600&display=swap">'
-           '<link rel="stylesheet" href="/assets/site.css?v=4">%s</head><body>%s<main id="main">%s</main>%s<script src="/assets/site.js?v=4" defer></script><script src="/assets/chat.js?v=5" defer></script></body></html>'
+           '<link rel="stylesheet" href="/assets/site.css?v=4">%s%s</head><body>%s<main id="main">%s</main>%s<script src="/assets/site.js?v=5" defer></script>%s<script src="/assets/chat.js?v=6" defer></script></body></html>'
            ) % (e(title), e(desc), SITE, path, e(title), e(desc), SITE, path, SITE,
                 '<meta name="robots" content="noindex">' if noindex else '',
-                ''.join('<script type="application/ld+json">%s</script>' % json.dumps(s, ensure_ascii=False) for s in sch),
-                header(path), body, footer())
+                ''.join('<script type="application/ld+json">%s</script>' % json.dumps(s, ensure_ascii=False) for s in sch), head,
+                header(path), body, footer(), js)
     out = path.strip('/') + '/index.html' if path != '/' else 'index.html'
     os.makedirs(os.path.dirname(out) or '.', exist_ok=True)
     open(out, 'w', encoding='utf-8').write(doc)
     if not noindex: SITEMAP.append(path)
 
 H = [('Home', '/')]
-def P(path, *body_parts, title, desc, trail, schema=None, noindex=False):
+def P(path, *body_parts, title, desc, trail, schema=None, noindex=False, head='', js=''):
     global PAGE
     PAGE = path
     body = ''.join(b() if callable(b) else b for b in body_parts)
-    page(path, title, desc, H + trail, body, schema, noindex)
+    page(path, title, desc, H + trail, body, schema, noindex, head, js)
 
 # =====================================================================
 # BUY
 # =====================================================================
 PAGE = '/listings/'
+AREA_OPTS = [('', 'All areas'), ('woodbridge', 'Woodbridge'), ('vellore', 'Vellore Village'), ('kleinburg', 'Kleinburg'), ('maple', 'Maple'), ('vaughan', 'All of Vaughan'), ('king-city-nobleton', 'King City & Nobleton'), ('caledon-bolton', 'Caledon & Bolton'), ('sharon-east-gwillimbury', 'East Gwillimbury'), ('richmond-hill', 'Richmond Hill'), ('aurora', 'Aurora'), ('newmarket', 'Newmarket'), ('markham', 'Markham'), ('brampton', 'Brampton'), ('mississauga', 'Mississauga'), ('toronto', 'Toronto')]
+def sel(name, label, opts, extra=False):
+    return '<div%s><label' % (' class="xf"' if extra else '') + ' for="f-%s">%s</label><select id="f-%s" name="%s">%s</select></div>' % (name, label, name, name, ''.join('<option value="%s">%s</option>' % (v, e(t)) for v, t in opts))
+PRICES = [500000, 750000, 1000000, 1250000, 1500000, 2000000, 2500000, 3000000, 5000000]
 P('/listings/',
-  lambda: hero([('Home', '/'), ('Search homes', '/listings/')], 'Homes for sale in Vaughan & the GTA', 'Every MLS® listing, refreshed daily. Save the ones you like and get new matches by email.'),
+  lambda: hero([('Home', '/'), ('Search homes', '/listings/')], 'Homes for sale in Vaughan & the GTA', 'MLS® listings from Toronto to King and Caledon, refreshed every day. Save the ones you like and Michael can show you any of them.'),
   lambda: band(
-    '<form class="filters" aria-label="Search listings" onsubmit="event.preventDefault()">'
-    '<div><label for="f-area">Area</label><select id="f-area"><option>All areas</option><option>Woodbridge</option><option>Vellore</option><option>Kleinburg</option><option>Maple</option><option>King</option><option>Caledon</option><option>Toronto</option></select></div>'
-    '<div><label for="f-type">Type</label><select id="f-type"><option>Any type</option><option>Detached</option><option>Semi-detached</option><option>Townhouse</option><option>Condo</option></select></div>'
-    '<div><label for="f-min">Min price</label><select id="f-min"><option>No min</option><option>$750,000</option><option>$1,000,000</option><option>$1,500,000</option></select></div>'
-    '<div><label for="f-max">Max price</label><select id="f-max"><option>No max</option><option>$1,500,000</option><option>$2,000,000</option><option>$3,000,000</option></select></div>'
-    '<div><label for="f-beds">Bedrooms</label><select id="f-beds"><option>Any</option><option>2+</option><option>3+</option><option>4+</option><option>5+</option></select></div>'
-    '<button class="btn" type="submit">Search</button></form>'
-    '<div class="mapbox"><p class="note">Live map search turns on when the TRREB listing feed is connected. These are sample homes from our own shoots.</p></div>'
-    + listing_grid(LISTINGS) +
-    '<div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:28px;flex-wrap:wrap"><a class="btn navy" href="/saved/">Save this search</a><span class="badge">Powered by <strong>REALTOR.ca</strong></span></div>'),
+    '<div class="ls" data-listings><form class="filters" id="lsForm" aria-label="Search listings" onsubmit="return false">'
+    + sel('area', 'Area', AREA_OPTS)
+    + sel('lease', 'For', [('', 'Sale'), ('1', 'Rent')])
+    + sel('type', 'Type', [('', 'Any type'), ('detached', 'Detached'), ('semi', 'Semi-detached'), ('town', 'Townhouse'), ('condo', 'Condo apartment'), ('other', 'Other')], True)
+    + sel('min', 'Min price', [('', 'No min')] + [(str(p), '$%s' % format(p, ',')) for p in PRICES], True)
+    + sel('max', 'Max price', [('', 'No max')] + [(str(p), '$%s' % format(p, ',')) for p in PRICES])
+    + sel('beds', 'Beds', [('', 'Any')] + [(str(b), '%d+' % b) for b in range(1, 6)])
+    + sel('baths', 'Baths', [('', 'Any')] + [(str(b), '%d+' % b) for b in range(1, 5)], True)
+    + sel('sort', 'Sort', [('new', 'Newest'), ('plow', 'Price, low to high'), ('phigh', 'Price, high to low')], True)
+    + '<button type="button" class="btn ghost xfb" onclick="this.form.classList.toggle(\'all\');this.textContent=this.form.classList.contains(\'all\')?\'Fewer filters\':\'More filters\'">More filters</button></form>'
+    '<div class="ls-bar"><p id="lsInfo" aria-live="polite"></p><div class="viewt" role="group" aria-label="View"><button type="button" data-view="list" aria-pressed="true">List</button><button type="button" data-view="map" aria-pressed="false">Map</button></div></div>'
+    '<div class="ls-wrap" id="lsWrap" data-view="list"><div class="ls-listcol"><div class="lgrid" id="lsList"></div><button class="btn navy" id="lsMore" type="button" hidden>Show more homes</button></div>'
+    '<div class="ls-mapcol"><div><div id="lsMap" role="region" aria-label="Map of results"></div><button class="btn navy" id="lsArea" type="button" hidden>Search this map area</button>'
+    '<p style="margin:10px 0 0;font-size:14px"><button type="button" id="lsClearArea" style="border:0;background:none;padding:0;color:var(--navy);font-weight:600;cursor:pointer;text-decoration:underline">Clear map area</button></p></div></div></div>'
+    '<div class="rca-row"><a class="btn ghost" href="/saved/">Your saved homes</a><a href="https://www.realtor.ca/en" target="_blank" rel="noopener"><img src="https://www.realtor.ca/images/en-ca/powered_by_realtor.svg" width="125" alt="Powered by REALTOR.ca"></a></div>'
+    + CREA_NOTE + '</div>'),
   title='Homes for Sale in Vaughan, Woodbridge & the GTA | SoldMike',
-  desc='Search every MLS® listing in Vaughan, Woodbridge, Kleinburg, King, Caledon and Toronto. Save homes and get new listings by email.',
-  trail=[('Search homes', '/listings/')])
+  desc='Search MLS® listings in Vaughan, Woodbridge, Kleinburg, King, Caledon and Toronto, refreshed daily. Map search, saved homes and showings with Michael Barillari.',
+  trail=[('Search homes', '/listings/')],
+  head=LISTING_HEAD + LEAFLET_HEAD, js=LISTING_JS + LEAFLET_JS + '<script src="/assets/search.js?v=1" defer></script>')
+
+P('/listings/home/',
+  '<div class="ld" id="ld" data-listings><p class="ld-loading">Loading this home…</p></div>',
+  title='Home for sale | SoldMike', desc='MLS® listing details, photos and showings with Michael Barillari, Broker.',
+  trail=[('Search homes', '/listings/'), ('Listing', '/listings/home/')],
+  head=LISTING_HEAD + LEAFLET_HEAD, js=LISTING_JS + LEAFLET_JS + '<script src="/assets/home.js?v=1" defer></script>', noindex=False)
 
 P('/saved/',
   lambda: hero([('Home', '/'), ('Saved homes', '/saved/')], 'Your saved homes and searches', 'Create a free account to save homes, save searches and get new matches the morning they hit the market.'),
-  lambda: band('<div class="two"><div class="prose"><p>With an account you can:</p><ul><li>Save homes and compare them side by side</li><li>Save a search and get new matches by email</li><li>See sold prices and price history (once registered, as TRREB requires)</li><li>Book a showing in two taps</li></ul>'
-               + todo('Accounts, saved searches and alerts are built in phase 3, after the TRREB feed is approved. Until then this form adds the person to Follow Up Boss as a buyer.') +
-               '</div>' + form('buyer') + '</div>'),
-  title='Saved Homes & Searches | SoldMike', desc='Save homes and searches and get new MLS® listings by email.', trail=[('Saved homes', '/saved/')], noindex=True)
+  lambda: band(head_block('Saved on this device', 'Tap the heart on any home to save it here.') + '<div class="lgrid" id="savedGrid" data-listings></div>'
+               '<script>document.addEventListener("DOMContentLoaded",function(){var g=document.getElementById("savedGrid"),ids=SM.saved();if(!ids.length){g.innerHTML=\'<p class="empty">No saved homes yet. <a href="/listings/">Search homes</a> and tap the heart to save one.</p>\';return;}SM.loading(g,3);SM.get("/api/cards?ids="+ids.join(",")).then(function(r){var gone=ids.length-r.items.length;SM.cards(g,r.items);if(gone>0)g.insertAdjacentHTML("beforeend",\'<p class="empty">\'+gone+(gone>1?" saved homes are":" saved home is")+\' no longer on the market. Ask Michael what they sold for.</p>\');}).catch(function(){g.innerHTML=\'<p class="empty">Could not load your saved homes. Please refresh.</p>\';});});</script>'
+               + CREA_NOTE),
+  lambda: band('<div class="two"><div class="prose"><h2>Get new matches by email</h2><p>Tell Michael what you are looking for and he will send new listings that fit, the morning they hit the market, and set up showings when you are ready.</p><p>Once you send this form, the homes you view and save on this site go to Michael so he can follow up with the right ones.</p>'
+               + todo('Accounts, saved searches and automatic email alerts: next phase. Until then this form adds the person to Follow Up Boss as a buyer.') +
+               '</div>' + form('buyer') + '</div>', 'tint'),
+  title='Saved Homes & Searches | SoldMike', desc='Save homes and searches and get new MLS® listings by email.', trail=[('Saved homes', '/saved/')], noindex=True,
+  head=LISTING_HEAD, js=LISTING_JS)
 
 P('/buy/',
   lambda: hero([('Home', '/'), ('Buy', '/buy/')], 'Buying a home in Vaughan', 'How we help you find the right home, win it at the right price and get to closing day without surprises.', '/l1.jpg'),
@@ -385,16 +404,16 @@ for slug, name, intro, photo, pockets in HOODS:
     P(path,
       lambda name=name, intro=intro, photo=photo, slug=slug: hero([('Home', '/'), ('Neighbourhoods', '/neighbourhoods/'), (name, '/neighbourhoods/%s/' % slug)], '%s homes for sale & market guide' % name, e(intro) + '<br><small style="color:var(--pale)">Written by Michael Barillari, Broker · Updated [month, year]</small>', photo),
       lambda name=name, pockets=pockets: band('<div class="two"><div class="stack"><h2>%s at a glance</h2>' % e(name) + kv([
-          ('Average sold price, last 90 days', '[$X,XXX,XXX]'), ('Average days on market', '[X] days'), ('Homes for sale right now', '[Live count]'),
+          ('Average sold price, last 90 days', '[$X,XXX,XXX]'), ('Average days on market', '[X] days'), ('Homes for sale right now', 'LIVECOUNT'),
           ('Most common home type', '[Detached]'), ('Homes the OP Team has sold here', '[X]')]) +
           '</div><div class="stack"><h2>Pockets of %s</h2>' % e(name) + cards([('/listings/', p, '[One line on who it suits]') for p in pockets]) + '</div></div>'),
-      lambda name=name: band(head_block('For sale in %s' % name) + listing_grid([l for l in LISTINGS][:3]) +
-          '<div style="margin-top:24px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px"><a href="/listings/" style="font-weight:600">See all %s listings</a><span class="badge">Powered by <strong>REALTOR.ca</strong></span></div>' % e(name), 'tint'),
+      lambda name=name, slug=slug: band(head_block('For sale in %s' % name, 'The newest MLS® listings, refreshed every day.') + live_grid(slug, 6) +
+          '<div class="rca-row"><a class="btn navy" href="/listings/?area=%s">See all %s listings</a><a href="https://www.realtor.ca/en" target="_blank" rel="noopener"><img src="https://www.realtor.ca/images/en-ca/powered_by_realtor.svg" width="125" alt="Powered by REALTOR.ca"></a></div>' % (slug, e(name)) + CREA_NOTE, 'tint'),
       lambda name=name: band(head_block('Living in %s' % name) + todo('Schools (public, Catholic, French) and what they are known for', 'Parks, trails and community centres', 'Shopping, restaurants and places locals love', 'Commute: highways, GO, TTC/YRT', 'What is changing: new builds, transit, development') , narrow=True),
       lambda name=name, qs=qs: band(head_block('%s questions, answered' % name) + faq(qs), 'tint'),
       lambda name=name: cta('Own in %s? See what it is worth.' % name, 'A price range based on real sales on your street.'),
       title='%s Homes for Sale & Neighbourhood Guide | SoldMike' % name, desc=intro[:155],
-      trail=[('Neighbourhoods', '/neighbourhoods/'), (name, path)],
+      trail=[('Neighbourhoods', '/neighbourhoods/'), (name, path)], head=LISTING_HEAD, js=LISTING_JS,
       schema=[{'@context': 'https://schema.org', '@type': 'Place', 'name': name + ', Ontario', 'address': {'@type': 'PostalAddress', 'addressLocality': name.split(' & ')[0], 'addressRegion': 'ON', 'addressCountry': 'CA'}}])
 
 # =====================================================================
@@ -538,15 +557,35 @@ P('/free-guide/',
 
 P('/privacy/',
   lambda: hero([('Home', '/'), ('Privacy', '/privacy/')], 'Privacy policy', 'How we collect, use and protect your personal information.'),
-  lambda: band(prose('When you fill in a form on this site we collect the details you give us, such as your name, email, phone and property address, to reply to you and provide real estate services. Your information goes to Michael Barillari and is stored in our customer relationship system. We do not sell your information.',
-                     'You can ask to see, correct or delete your information at any time by emailing %s.' % EMAIL) + '<div style="margin-top:20px">' + todo('Have the brokerage review this policy (PIPEDA, CASL for emails, cookies/analytics once added)') + '</div>', narrow=True),
+  lambda: band(prose(
+      '<h2>What we collect</h2>',
+      'When you fill in a form on this site, book a showing or ask about a home, we collect the details you give us, such as your name, email, phone and property address, to reply to you and provide real estate services. Your information goes to Michael Barillari and is stored in our customer relationship system (Follow Up Boss). We do not sell your information.',
+      '<h2>Homes you view and save</h2>',
+      'After you have sent us your contact details, the listings you view and save on this site (address, MLS® number, price and a link) are recorded in your file in our customer relationship system, so Michael can follow up with homes that fit. This is done automatically by the website. If you have not given us your contact details, your browsing is not linked to you.',
+      '<h2>Listing statistics for CREA</h2>',
+      'Listings on this site come from The Canadian Real Estate Association (CREA). When you open a listing, we send CREA a record of the view with a random device ID and your IP address, as CREA requires, so listing brokerages can see where their listings are viewed. No name, email or phone number is sent.',
+      '<h2>Stored in your browser</h2>',
+      'Your saved homes, your answer to the terms-of-use notice, the random device ID and, after you send a form, your contact details (so forms fill in for you) are stored in your own browser. You can clear them at any time by clearing this site\'s data in your browser.',
+      '<h2>Other services</h2>',
+      'Listing photos load from CREA\'s servers and maps load from OpenStreetMap, so those services receive your IP address when you view them. We protect the listings on this site from automated copying; requests that look automated may be blocked and their IP addresses logged.',
+      '<h2>Your choices</h2>',
+      'You can ask to see, correct or delete your information at any time, or ask us to stop recording the homes you view, by emailing %s.' % EMAIL) + '<div style="margin-top:20px">' + todo('Have the brokerage review this policy (PIPEDA, CASL for emails, listing activity sent to Follow Up Boss, CREA analytics)') + '</div>', narrow=True),
   title='Privacy Policy | SoldMike', desc='Privacy policy for soldmike.com.', trail=[('Privacy', '/privacy/')], noindex=True)
 
 P('/terms/',
-  lambda: hero([('Home', '/'), ('Terms', '/terms/')], 'Terms of use', 'The rules for using this website and its listing information.'),
-  lambda: band(prose('Listing information on this site is provided for consumers’ personal, non-commercial use and may not be used for any purpose other than to identify prospective properties consumers may be interested in purchasing. Information is deemed reliable but not guaranteed.',
-                     'The trademarks REALTOR®, REALTORS®, and the REALTOR® logo are controlled by The Canadian Real Estate Association (CREA). The trademarks MLS®, Multiple Listing Service® and the associated logos are owned by CREA.') + '<div style="margin-top:20px">' + todo('Add the exact terms of use TRREB/PropTx requires for IDX and VOW (VOW users must accept terms before seeing sold data)') + '</div>', narrow=True),
-  title='Terms of Use | SoldMike', desc='Terms of use for soldmike.com.', trail=[('Terms', '/terms/')], noindex=True)
+  lambda: hero([('Home', '/'), ('Terms', '/terms/')], 'Terms of use', 'The rules for using this website and its listing information. By using this site you agree to these terms.'),
+  lambda: band(prose(
+      '<h2>Who runs this site</h2>',
+      'This website is operated by Michael Barillari, Broker, of %s, a brokerage and salesperson who are members of The Canadian Real Estate Association (CREA).' % BROKERAGE,
+      '<h2>Listing content</h2>',
+      'REALTOR®, REALTORS®, and the REALTOR® logo are certification marks that are owned by REALTOR® Canada Inc. and licensed exclusively to The Canadian Real Estate Association (CREA). These certification marks identify real estate professionals who are members of CREA and who must abide by CREA’s By-Laws, Rules, and the REALTOR® Code. The MLS® trademark and the MLS® logo are owned by CREA and identify the quality of services provided by real estate professionals who are members of CREA.',
+      'The information contained on this site is based in whole or in part on information that is provided by members of The Canadian Real Estate Association (CREA), who are responsible for its accuracy. CREA reproduces and distributes this information as a service for its members and assumes no responsibility for its accuracy.',
+      'The listing content on this website is protected by copyright and other laws, and is intended solely for the private, non-commercial use by individuals. Any other reproduction, distribution or use of the content, in whole or in part, is specifically forbidden. The prohibited uses include commercial use, “screen scraping”, “database scraping”, and any other activity intended to collect, store, reorganize or manipulate data on the pages produced by or displayed on this website.',
+      '<h2>Using this site</h2>',
+      'This site is for consumers with a genuine interest in buying, selling or leasing real estate. Listing information is refreshed at least once every 24 hours and is deemed reliable but not guaranteed accurate. Each listing shows the brokerage that listed it; homes listed by other brokerages are not our listings, and Michael Barillari can help you with any of them as a buyer’s agent.',
+      'Automated access to this site, including bots, scrapers and bulk downloading of listings, is not allowed and may be blocked. Suspected scraping is reported to CREA.',
+      'Calculators and estimates on this site are for information only and are not financial, legal or mortgage advice.') + '<div style="margin-top:20px">' + todo('Have the brokerage review these terms') + '</div>', narrow=True),
+  title='Terms of Use | SoldMike', desc='Terms of use for soldmike.com, including the CREA listing content terms.', trail=[('Terms', '/terms/')], noindex=True)
 
 # ---------- 404, sitemap, robots, checklist ----------
 PAGE = '/404'
@@ -557,7 +596,7 @@ page404 = ('<!doctype html><html lang="en-CA"><head><meta charset="utf-8"><meta 
 open('404.html', 'w', encoding='utf-8').write(page404)
 
 today = date.today().isoformat()
-urls = ['/', '/listing.html'] + SITEMAP
+urls = ['/'] + SITEMAP
 open('sitemap.xml', 'w').write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
                                ''.join('  <url><loc>%s%s</loc><lastmod>%s</lastmod></url>\n' % (SITE, u, today) for u in urls) + '</urlset>\n')
 open('robots.txt', 'w').write('User-agent: *\nAllow: /\nDisallow: /saved/\n\nUser-agent: GPTBot\nAllow: /\n\nUser-agent: OAI-SearchBot\nAllow: /\n\nUser-agent: ClaudeBot\nAllow: /\n\nUser-agent: PerplexityBot\nAllow: /\n\nUser-agent: Google-Extended\nAllow: /\n\nSitemap: %s/sitemap.xml\n' % SITE)
