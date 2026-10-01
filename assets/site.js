@@ -4,7 +4,7 @@
 
   // mobile menu + dropdowns
   var burger=document.querySelector('.burger'), nav=document.getElementById('nav');
-  if(burger){burger.addEventListener('click',function(){var o=nav.classList.toggle('open');burger.setAttribute('aria-expanded',o);});}
+  if(burger){burger.addEventListener('click',function(){var o=nav.classList.toggle('open');document.body.classList.toggle('menu-open',o);burger.setAttribute('aria-expanded',o);});}
   [].forEach.call(document.querySelectorAll('.dd>button'),function(b){
     b.addEventListener('click',function(){var d=b.parentNode,o=!d.classList.contains('open');[].forEach.call(document.querySelectorAll('.dd.open'),function(x){x.classList.remove('open');x.firstElementChild.setAttribute('aria-expanded','false');});d.classList.toggle('open',o);b.setAttribute('aria-expanded',o);});
   });

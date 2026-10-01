@@ -6,10 +6,12 @@
   var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   var css=''
-  +'#mika-btn{position:fixed;right:max(20px,env(safe-area-inset-right,0px));bottom:calc(20px + env(safe-area-inset-bottom,0px));z-index:900;display:flex;align-items:center;gap:12px;min-height:64px;padding:8px 22px 8px 8px;border:0;border-radius:40px;background:#26348B;color:#fff;font:600 18px Barlow,system-ui,sans-serif;cursor:pointer;box-shadow:0 18px 40px -10px rgba(20,24,51,.55);transition:transform .25s cubic-bezier(.2,.7,.1,1)}'
+  +'#mika-btn{position:fixed;right:max(20px,env(safe-area-inset-right,0px));bottom:calc(24px + env(safe-area-inset-bottom,0px));z-index:900;display:flex;align-items:center;gap:12px;min-height:64px;padding:6px 22px 6px 6px;border:3px solid #fff;border-radius:40px;background:#26348B;color:#fff;font:600 18px Barlow,system-ui,sans-serif;cursor:pointer;box-shadow:0 18px 40px -10px rgba(20,24,51,.55);transition:transform .25s cubic-bezier(.2,.7,.1,1)}'
   +'#mika-btn:hover{transform:translateY(-2px)}'
   +'#mika-btn .av{width:48px;height:48px}'
   +'#mika-btn.hide{transform:translateY(140%);pointer-events:none}'
+  +'.menu-open #mika-btn{display:none}'
+  +'@media (max-width:560px){#mika-btn{min-height:56px;font-size:17px;padding:4px 18px 4px 4px;right:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px))}#mika-btn .av{width:42px;height:42px;font-size:21px}#mika-btn .lbl-long{display:none}}'
   +'.mika-av{flex:none;border-radius:50%;background:#D7141E;color:#fff;display:grid;place-items:center;font:800 24px "Barlow Condensed",sans-serif;position:relative}'
   +'.mika-av::after{content:"";position:absolute;right:1px;bottom:1px;width:12px;height:12px;border-radius:50%;background:#2BB673;border:2px solid #26348B}'
   +'#mika{position:fixed;right:max(20px,env(safe-area-inset-right,0px));bottom:calc(20px + env(safe-area-inset-bottom,0px));z-index:901;width:min(460px,calc(100vw - 40px));height:min(720px,calc(100vh - 40px));background:#fff;border-radius:14px;box-shadow:0 30px 80px -20px rgba(20,24,51,.55);display:flex;flex-direction:column;overflow:hidden;font-family:Barlow,system-ui,sans-serif;color:#141833;opacity:0;transform:translateY(24px) scale(.97);transform-origin:bottom right;pointer-events:none;transition:opacity .3s,transform .35s cubic-bezier(.2,.7,.1,1)}'
@@ -18,7 +20,7 @@
   +'#mika header{background:#26348B;color:#fff;padding:18px 18px 16px 20px;display:flex;align-items:center;gap:14px}'
   +'#mika header .av{width:52px;height:52px}'
   +'#mika header b{display:block;font:800 28px/1 "Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.01em}'
-  +'#mika header span{display:block;font-size:15px;color:#C9D0F2;margin-top:4px}'
+  +'#mika header div span{display:block;font-size:15px;color:#C9D0F2;margin-top:4px}'
   +'#mika header button{margin-left:auto;width:48px;height:48px;border:0;border-radius:50%;background:rgba(255,255,255,.12);color:#fff;cursor:pointer;display:grid;place-items:center}'
   +'#mika header button:hover{background:rgba(255,255,255,.22)}'
   +'#mika .log{flex:1;overflow-y:auto;padding:22px 18px 10px;display:flex;flex-direction:column;gap:14px;scroll-behavior:smooth;background:#F7F8FB}'
@@ -33,7 +35,7 @@
   +'#mika .typing i:nth-child(2){animation-delay:.15s}#mika .typing i:nth-child(3){animation-delay:.3s}'
   +'@keyframes mikat{0%,60%,100%{opacity:.25;transform:none}30%{opacity:1;transform:translateY(-4px)}}'
   +'#mika .chips{display:flex;flex-wrap:wrap;gap:8px;padding:2px 0 4px}'
-  +'#mika .chips button{min-height:46px;padding:0 16px;border:1.5px solid #26348B;border-radius:24px;background:#fff;color:#26348B;font:600 17px Barlow,system-ui,sans-serif;cursor:pointer;text-align:left}'
+  +'#mika .chips button{min-height:46px;padding:8px 16px;border:1.5px solid #26348B;border-radius:24px;line-height:1.25;background:#fff;color:#26348B;font:600 17px Barlow,system-ui,sans-serif;cursor:pointer;text-align:left}'
   +'#mika .chips button:hover{background:#26348B;color:#fff}'
   +'#mika .lead{align-self:stretch;background:#fff;border:1px solid #DCE0EC;border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:10px}'
   +'#mika .lead label{font-size:15px;font-weight:600;color:#545B78}'
@@ -54,7 +56,7 @@
 
   var btn=document.createElement('button');
   btn.id='mika-btn'; btn.type='button'; btn.setAttribute('aria-controls','mika'); btn.setAttribute('aria-expanded','false');
-  btn.innerHTML='<span class="mika-av av" aria-hidden="true">M</span>Ask Mika a question';
+  btn.innerHTML='<span class="mika-av av" aria-hidden="true">M</span>Ask Mika<span class="lbl-long">&nbsp;a question</span>';
   var box=document.createElement('section');
   box.id='mika'; box.setAttribute('role','dialog'); box.setAttribute('aria-label','Chat with Mika, the SoldMike assistant'); box.setAttribute('aria-hidden','true');
   box.innerHTML='<header><span class="mika-av av" aria-hidden="true">M</span><div><b>Mika</b><span>SoldMike assistant · Michael follows up personally</span></div><button type="button" class="x" aria-label="Close chat">'+X+'</button></header>'
