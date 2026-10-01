@@ -1,6 +1,6 @@
 /* SoldMike.com inner pages. Same RE/MAX navy + red system as the homepage. */
 :root{
-  --navy:#26348B; --ink:#141833; --red:#D7141E; --coral:#FF5A5F;
+  --navy:#1D2870; --ink:#141833; --red:#D7141E; --coral:#FF5A5F;
   --mist:#F2F4F9; --line:#DCE0EC; --muted:#545B78; --pale:#C9D0F2; --white:#ffffff;
   --display:'Barlow Condensed','Arial Narrow',system-ui,sans-serif;
   --body:'Barlow',system-ui,-apple-system,'Segoe UI',sans-serif;
@@ -24,7 +24,7 @@ h3{font-size:26px;line-height:1}
 p{margin:0}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 20px;border:0;border-radius:4px;background:var(--red);color:var(--white)!important;font-weight:600;cursor:pointer;text-decoration:none;transition:background .2s}
 .btn:hover{background:#b30f18}
-.btn.navy{background:var(--navy)}.btn.navy:hover{background:#1c2770}
+.btn.navy{background:var(--navy)}.btn.navy:hover{background:#151F5C}
 .btn.ghost{background:transparent;color:var(--ink)!important;border:1px solid var(--line)}
 .btn.ghost:hover{background:var(--mist)}
 
