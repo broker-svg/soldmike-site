@@ -43,7 +43,9 @@ input:focus,select:focus{border-color:var(--navy);outline:none;box-shadow:0 0 0 
 .muted{color:var(--muted)}
 
 /* ---------- top bar (host) ---------- */
-.bar{background:var(--navy);color:#fff;padding:calc(14px + env(safe-area-inset-top,0px)) 16px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.bar{background:var(--navy);color:#fff;padding:calc(14px + env(safe-area-inset-top,0px)) 16px 14px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px}
+.bar>:last-child{justify-self:end}
+.bar>a:first-child{justify-self:start;display:block}
 .bar img{height:46px;width:auto;display:block}
 .bar b{font-family:var(--display);font-size:24px;text-transform:uppercase;letter-spacing:.02em}
 .bar button{background:none;border:1px solid #4A5592;color:#fff;border-radius:8px;min-height:40px;padding:0 14px;cursor:pointer}
@@ -159,7 +161,7 @@ dialog form{display:flex;flex-direction:column;gap:12px}
   // =========================================================
   function hostHome(){
     history.replaceState(null,'','/open-house/');
-    app.innerHTML='<div class="bar"><img src="'+LOGO+'" alt="SoldMike"><b>Open houses</b><span></span></div>'
+    app.innerHTML='<div class="bar"><a href="/" aria-label="SoldMike home"><img src="'+LOGO+'" alt="SoldMike"></a><b>Open houses</b><span></span></div>'
       +'<div class="wrap host">'
       +'<div class="card"><h2>New open house</h2><div><label for="q">Address or MLS® number</label><input id="q" placeholder="Start typing the address" autocomplete="off"></div><div class="res" id="res"></div>'
       +'<div id="when" hidden><div class="three"><div><label for="day">Date</label><input id="day" type="date" value="'+today()+'"></div><div><label for="st">Start</label><input id="st" type="time" value="14:00"></div><div><label for="en">End</label><input id="en" type="time" value="16:00"></div></div></div>'
@@ -216,7 +218,7 @@ dialog form{display:flex;flex-direction:column;gap:12px}
   }
 
   function hostDetail(id){
-    app.innerHTML='<div class="bar"><img src="'+LOGO+'" alt="SoldMike"><b>Sign-ins</b><button type="button" id="back">Back</button></div><div class="wrap host"><div class="card"><a class="btn" href="/open-house/?id='+esc(id)+'">Open the sign-in screen</a><div class="tblwrap" id="sl"><p class="muted">Loading…</p></div><p class="fine">✓ = saved in Follow Up Boss.</p><button class="btn ghost" type="button" id="del" style="color:var(--red)!important;border-color:var(--red)">Remove this open house</button></div></div>';
+    app.innerHTML='<div class="bar"><a href="/" aria-label="SoldMike home"><img src="'+LOGO+'" alt="SoldMike"></a><b>Sign-ins</b><button type="button" id="back">Back</button></div><div class="wrap host"><div class="card"><a class="btn" href="/open-house/?id='+esc(id)+'">Open the sign-in screen</a><div class="tblwrap" id="sl"><p class="muted">Loading…</p></div><p class="fine">✓ = saved in Follow Up Boss.</p><button class="btn ghost" type="button" id="del" style="color:var(--red)!important;border-color:var(--red)">Remove this open house</button></div></div>';
     document.getElementById('back').onclick=hostHome;
     document.getElementById('del').onclick=function(){
       if(!confirm('Remove this open house? It disappears from the website. People who already signed in stay in Follow Up Boss.'))return;
