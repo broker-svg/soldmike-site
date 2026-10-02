@@ -177,6 +177,13 @@ td.sold{font-family:var(--display);font-weight:700;font-size:24px;color:var(--re
 .person{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:48px;align-items:end}
 .person .pic{background:var(--navy);border-radius:6px;overflow:hidden;display:flex;justify-content:center;padding-top:28px}
 .person .pic img{width:88%}
+.desig{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:12px}
+.desig figure{margin:0;display:flex;flex-direction:column;gap:8px}
+.desig span{display:flex;align-items:center;justify-content:center;height:84px;padding:12px;background:#fff;border:1px solid var(--line);border-radius:6px}
+.desig img{max-height:56px;max-width:100%;width:auto;height:auto}
+.desig .w{display:none}
+.desig.white span{background:var(--navy);border-color:var(--navy)}.desig.white .c{display:none}.desig.white .w{display:block}
+.desig figcaption{font-size:13px;line-height:1.3;color:var(--muted);text-align:center}.desig figcaption b{display:block;color:var(--ink);font-size:14px}
 @media (max-width:860px){.person{grid-template-columns:1fr}}
 
 /* CTA band */

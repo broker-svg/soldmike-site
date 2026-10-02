@@ -161,7 +161,7 @@ def page(path, title, desc, trail, body, schema=None, noindex=False, head='', js
            '<meta property="og:type" content="website"><meta property="og:title" content="%s"><meta property="og:description" content="%s"><meta property="og:url" content="%s%s"><meta property="og:image" content="%s/hero.jpg">'
            '%s<link rel="icon" href="/logo.png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
            '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Barlow:wght@400;500;600&display=swap">'
-           '<link rel="stylesheet" href="/assets/site.css?v=7">%s%s</head><body>%s<main id="main">%s</main>%s<script src="/assets/site.js?v=8" defer></script>%s<script src="/assets/chat.js?v=7" defer></script></body></html>'
+           '<link rel="stylesheet" href="/assets/site.css?v=8">%s%s</head><body>%s<main id="main">%s</main>%s<script src="/assets/site.js?v=8" defer></script>%s<script src="/assets/chat.js?v=7" defer></script></body></html>'
            ) % (e(title), e(desc), SITE, path, e(title), e(desc), SITE, path, SITE,
                 '<meta name="robots" content="noindex">' if noindex else '',
                 ''.join('<script type="application/ld+json">%s</script>' % json.dumps(s, ensure_ascii=False) for s in sch), head,
@@ -549,9 +549,17 @@ for kind, qs, label in [('buying', BUY_QS, 'Buyer'), ('selling', SELL_QS, 'Selle
 # =====================================================================
 # ABOUT
 # =====================================================================
+# designation logos under Michael's photo (official artwork, same height); ?logos=white shows the all-white option
+DESIGNATIONS = ('<div class="desig" aria-label="Designations">'
+    + ''.join('<figure><span><img class="c" src="/assets/designations/%s.png" alt="%s"><img class="w" src="/assets/designations/%s-white.png" alt="" aria-hidden="true"></span><figcaption><b>%s</b>%s</figcaption></figure>' % (f, alt, f, ab, full)
+              for f, alt, ab, full in [('rene', 'RENE, Real Estate Negotiation Expert', 'RENE', 'Real Estate Negotiation Expert'),
+                                       ('srs', 'SRS, Seller Representative Specialist', 'SRS', 'Seller Representative Specialist'),
+                                       ('abr', 'ABR, Accredited Buyer Representative', 'ABR®', 'Accredited Buyer Representative')])
+    + '</div><script>if(/[?&]logos=white/.test(location.search))document.currentScript.previousElementSibling.classList.add("white")</script>')
+
 P('/about/',
   lambda: hero([('Home', '/'), ('About', '/about/')], 'Michael Barillari, Broker', 'SOLDMIKE. RE/MAX Premier The OP Team, Vaughan & Woodbridge.'),
-  lambda: band('<div class="person"><div class="pic"><img src="/mike.png" alt="Michael Barillari"></div><div class="stack">' + prose(
+  lambda: band('<div class="person"><div><div class="pic"><img src="/mike.png" alt="Michael Barillari"></div>' + DESIGNATIONS + '</div><div class="stack">' + prose(
       'Michael Barillari is a Broker with RE/MAX Premier The OP Team, helping buyers and sellers across Vaughan, Woodbridge, Kleinburg, King, Caledon and Toronto.',
       'He also runs Toronto Property Media, which shoots the photos, drone, video and twilight images for every listing he sells.') +
       todo('Your story in 3 short paragraphs: how you started, why real estate, what you do differently', 'Credentials: Broker licence year, designations, awards (verifiable)', 'Languages spoken', 'A personal line: family, community, what you do outside work') + '</div></div>'),
@@ -671,7 +679,7 @@ open('index.html', 'w', encoding='utf-8').write(idx[:a] + '\n    ' + home_nav() 
 # ---------- 404, sitemap, robots, checklist ----------
 PAGE = '/404'
 page404 = ('<!doctype html><html lang="en-CA"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Page not found | SoldMike</title><meta name="robots" content="noindex">'
-           '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=Barlow:wght@400;600&display=swap"><link rel="stylesheet" href="/assets/site.css?v=7"></head><body>'
+           '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=Barlow:wght@400;600&display=swap"><link rel="stylesheet" href="/assets/site.css?v=8"></head><body>'
            + header('/404') + '<main id="main">' + hero([('Home', '/'), ('Not found', '/404')], 'That page has moved', 'The page you were looking for is not here. Try one of these instead.') +
            band(cards([('/listings/', 'Search homes', 'Every MLS® listing'), ('/sell/home-value/', 'Home value', 'What your home is worth'), ('/neighbourhoods/', 'Neighbourhoods', 'Area guides'), ('/contact/', 'Contact', 'Talk to Michael')])) + '</main>' + footer() + '<script src="/assets/site.js?v=8" defer></script><script src="/assets/chat.js?v=7" defer></script></body></html>')
 open('404.html', 'w', encoding='utf-8').write(page404)
