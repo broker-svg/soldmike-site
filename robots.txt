@@ -3,6 +3,7 @@ Allow: /
 Disallow: /saved/
 Disallow: /alerts/
 Disallow: /leads/
+Disallow: /admin/
 
 User-agent: GPTBot
 Allow: /

@@ -89,7 +89,7 @@ dialog input{min-height:56px;border:1px solid var(--line);border-radius:10px;pad
   function bar(title,right){return '<div class="bar"><a href="/" aria-label="SoldMike home"><img src="'+LOGO+'" alt="SoldMike"></a><b>'+title+'</b>'+(right||'<span></span>')+'</div>';}
 
   function list(){
-    app.innerHTML=bar('Leads','<a class="lnk" href="/open-house/">Open houses</a>')+'<div class="wrap page"><div class="top"><h1>Website leads</h1><span class="muted" id="tot"></span></div>'
+    app.innerHTML=bar('Leads','<a class="lnk" href="/admin/">Back office</a>')+'<div class="wrap page"><div class="top"><h1>Website leads</h1><span class="muted" id="tot"></span></div>'
       +'<input class="search" id="q" type="search" placeholder="Search name, email, phone or source" autocomplete="off"><div class="list" id="ll"><p class="muted">Loading…</p></div>'
       +'<p class="muted" style="font-size:14px">Every lead from the website: open house sign-ins, forms, Mika, listing questions. The homes they view and save are listed on each lead. Follow Up Boss stays your CRM; tap a lead to open it there.</p></div>';
     var t;document.getElementById('q').addEventListener('input',function(){clearTimeout(t);var v=this.value;t=setTimeout(function(){load(v);},300);});
@@ -124,7 +124,10 @@ dialog input{min-height:56px;border:1px solid var(--line);border-radius:10px;pad
         var what=e.home?(e.ref?'<a href="/listings/home/?id='+encodeURIComponent(e.ref)+'" target="_blank" rel="noopener">'+esc(e.home)+'</a>':esc(e.home))+(e.price?' · '+SM.money(e.price)+(e.lease?'/mo':''):''):'';
         return '<div class="ev"><div><div class="k">'+esc(KIND[e.kind]||e.kind)+'</div><div class="t">'+esc(ago(e.at))+'</div></div><div>'+[what,esc(e.note||'')].filter(Boolean).join('<br>')+'</div></div>';
       }).join(''):'<p class="muted" style="margin:0">No activity yet.</p>')+'</div>';
+      h+='<div style="border-top:1px solid var(--line);padding-top:14px"><button class="tog" type="button" id="rm" style="color:var(--red)">Remove from this list</button><p class="muted" style="font-size:14px;margin:6px 0 0">Removes this lead from the website list only. Nothing changes in Follow Up Boss.</p></div>';
       document.getElementById('dd').innerHTML=h;
+      document.getElementById('rm').onclick=function(){if(!confirm('Remove '+name(l)+' from the website lead list? Follow Up Boss is not affected.'))return;
+        api('/api/leads/remove',{method:'POST',body:JSON.stringify({id:l.id})}).then(function(){location.hash='';});};
       [].forEach.call(document.querySelectorAll('.tog'),function(b){b.onclick=function(){var on=b.getAttribute('aria-pressed')!=='true';
         api('/api/leads/search',{method:'POST',body:JSON.stringify({id:+b.dataset.s,active:on})}).then(function(){b.setAttribute('aria-pressed',on);b.textContent=on?'On':'Off';});};});
     });
