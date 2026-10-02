@@ -68,7 +68,7 @@ def footer():
     return ('<footer><div class="wrap"><div class="fcols">'
             '<div><img src="/logo-soldmike-white.png" alt="RE/MAX Premier The OP Team, SoldMike" style="width:220px;height:auto">'
             '<span>Michael Barillari, Broker, SOLDMIKE. %s Independently owned and operated.</span>'
-            '<span>%s, %s, %s %s</span><span>Call or text %s</span><span>%s</span></div>%s</div>'
+            '<span>%s, %s, %s %s</span><span>Call or text %s</span><span>%s</span><a href="/admin/" rel="nofollow" style="margin-top:6px">Team login</a></div>%s</div>'
             '<div class="legal"><span>The trademarks REALTOR®, REALTORS®, and the REALTOR® logo are controlled by The Canadian Real Estate Association (CREA) and identify real estate professionals who are members of CREA. The trademarks MLS®, Multiple Listing Service® and the associated logos are owned by CREA. <a href="/privacy/" style="color:var(--pale)">Privacy</a> · <a href="/terms/" style="color:var(--pale)">Terms</a> · <a href="/admin/" style="color:var(--pale)" rel="nofollow">Team login</a></span>'
             '<a href="https://www.realtor.ca/en" target="_blank" rel="noopener" class="rca-foot" aria-label="Powered by REALTOR.ca"><img src="https://www.realtor.ca/images/en-ca/powered_by_realtor.svg" width="125" alt="Powered by REALTOR.ca" loading="lazy" style="background:#fff;border-radius:4px;padding:4px"></a></div></div></footer>'
             ) % (BROKERAGE, ADDRESS['street'], ADDRESS['city'], ADDRESS['region'], ADDRESS['postal'], PHONE, EMAIL, cols)
