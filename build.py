@@ -548,13 +548,13 @@ for kind, qs, label in [('buying', BUY_QS, 'Buyer'), ('selling', SELL_QS, 'Selle
 # =====================================================================
 # ABOUT
 # =====================================================================
-# designation logos under Michael's photo (official artwork, same height); ?logos=white shows the all-white option
-DESIGNATIONS = ('<div class="desig" aria-label="Designations">'
+# designation logos under Michael's photo (official artwork, same height, white on navy)
+DESIGNATIONS = ('<div class="desig white" aria-label="Designations">'
     + ''.join('<figure><span><img class="c" src="/assets/designations/%s.png" alt="%s"><img class="w" src="/assets/designations/%s-white.png" alt="" aria-hidden="true"></span><figcaption><b>%s</b>%s</figcaption></figure>' % (f, alt, f, ab, full)
               for f, alt, ab, full in [('rene', 'RENE, Real Estate Negotiation Expert', 'RENE', 'Real Estate Negotiation Expert'),
                                        ('srs', 'SRS, Seller Representative Specialist', 'SRS', 'Seller Representative Specialist'),
                                        ('abr', 'ABR, Accredited Buyer Representative', 'ABR®', 'Accredited Buyer Representative')])
-    + '</div><script>if(/[?&]logos=white/.test(location.search))document.currentScript.previousElementSibling.classList.add("white")</script>')
+    + '</div>')
 
 P('/about/',
   lambda: hero([('Home', '/'), ('About', '/about/')], 'Michael Barillari, Broker', 'SOLDMIKE. RE/MAX Premier The OP Team, Vaughan & Woodbridge.'),
