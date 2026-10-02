@@ -225,7 +225,7 @@ dialog form{display:flex;flex-direction:column;gap:12px}
       hostApi('/api/oh/delete',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:id})}).then(hostHome).catch(function(){alert('Could not remove it. Check your internet and try again.');});
     };
     hostApi('/api/oh/signins?id='+encodeURIComponent(id)).then(function(r){
-      document.getElementById('sl').innerHTML=r.items.length?'<table class="signins"><thead><tr><th>Name</th><th>Contact</th><th>Realtor?</th><th>Selling?</th><th></th></tr></thead><tbody>'+r.items.map(function(s){return '<tr><td>'+esc(s.first+' '+s.last)+'</td><td>'+esc(s.email)+(s.phone?'<br>'+esc(s.phone):'')+'</td><td>'+esc(s.realtor)+'</td><td>'+esc(s.sell)+'</td><td>'+(s.fub?'✓':'…')+'</td></tr>';}).join('')+'</tbody></table>':'<p class="muted">No sign-ins yet.</p>';
+      document.getElementById('sl').innerHTML=r.items.length?'<table class="signins"><thead><tr><th>Name</th><th>Contact</th><th>Realtor?</th><th>Evaluation?</th><th></th></tr></thead><tbody>'+r.items.map(function(s){return '<tr><td>'+esc(s.first+' '+s.last)+'</td><td>'+esc(s.email)+(s.phone?'<br>'+esc(s.phone):'')+'</td><td>'+esc(s.realtor)+'</td><td>'+esc(s.sell)+'</td><td>'+(s.fub?'✓':'…')+'</td></tr>';}).join('')+'</tbody></table>':'<p class="muted">No sign-ins yet.</p>';
     });
   }
 
@@ -247,8 +247,8 @@ dialog form{display:flex;flex-direction:column;gap:12px}
       +'<div><label for="em">Email</label><input id="em" name="em" type="email" inputmode="email" autocomplete="email" required></div>'
       +'<div><label for="ph">Phone <span class="opt">(optional)</span></label><input id="ph" name="ph" type="tel" inputmode="tel" autocomplete="tel"></div>'
       +'<div><span class="q">Are you working with a realtor?</span><div class="chips" data-q="realtor"><button type="button" aria-pressed="false">Yes</button><button type="button" aria-pressed="false">No</button></div></div>'
-      +'<div><span class="q">Do you have a home to sell?</span><div class="chips" data-q="sell"><button type="button" aria-pressed="false">Yes</button><button type="button" aria-pressed="false">No</button><button type="button" aria-pressed="false">Thinking about it</button></div></div>'
-      +'<div id="saWrap" hidden><label for="sa">Your property address <span class="opt">(optional)</span></label><input id="sa" name="sa" autocomplete="street-address" placeholder="Street, city"></div>'
+      +'<div><span class="q">Would you like a free home evaluation?</span><div class="chips" data-q="eval"><button type="button" aria-pressed="false">Yes</button><button type="button" aria-pressed="false">No</button><button type="button" aria-pressed="false">Not sure yet</button></div></div>'
+      +'<div id="saWrap" hidden><label for="sa">Your home address <span class="opt">(for the evaluation)</span></label><input id="sa" name="sa" autocomplete="street-address" placeholder="Street, city"></div>'
       +'<label class="consent"><input type="checkbox" id="cs"><span>Email me new listings like this one and local market updates. I can unsubscribe anytime.</span></label>'
       +'<p class="err" id="ferr" role="alert" hidden></p>'
       +'<button class="btn" type="submit" id="sb">Sign in</button>'
@@ -259,9 +259,9 @@ dialog form{display:flex;flex-direction:column;gap:12px}
     var imgs=[].slice.call(document.querySelectorAll('#hero img')), cur=0;
     if(imgs.length>1)setInterval(function(){imgs[cur].classList.remove('on');cur=(cur+1)%imgs.length;imgs[cur].classList.add('on');},6000);
 
-    var ans={realtor:'',sell:''};
+    var ans={realtor:'',eval:''};
     [].forEach.call(document.querySelectorAll('.chips'),function(c){
-      c.addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;var on=b.getAttribute('aria-pressed')!=='true';[].forEach.call(c.children,function(x){x.setAttribute('aria-pressed',x===b&&on);});ans[c.dataset.q]=on?b.textContent:'';if(c.dataset.q==='sell')document.getElementById('saWrap').hidden=!(ans.sell==='Yes'||ans.sell==='Thinking about it');});
+      c.addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;var on=b.getAttribute('aria-pressed')!=='true';[].forEach.call(c.children,function(x){x.setAttribute('aria-pressed',x===b&&on);});ans[c.dataset.q]=on?b.textContent:'';if(c.dataset.q==='eval')document.getElementById('saWrap').hidden=!(ans.eval==='Yes'||ans.eval==='Not sure yet');});
     });
     document.getElementById('hostBtn').onclick=function(){askPin().then(hostHome).catch(function(){});};
 
@@ -271,7 +271,7 @@ dialog form{display:flex;flex-direction:column;gap:12px}
       var fn=f.fn.value.trim(), em=f.em.value.trim();
       if(!fn||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)){er.hidden=false;er.textContent='Please add your first name and a valid email.';return;}
       er.hidden=true;
-      var body={oh:o.id,firstName:fn,lastName:f.ln.value.trim(),email:em,phone:f.ph.value.trim(),realtor:ans.realtor,sell:ans.sell,sellAddr:f.sa.value.trim(),consent:document.getElementById('cs').checked,at:new Date().toISOString()};
+      var body={oh:o.id,firstName:fn,lastName:f.ln.value.trim(),email:em,phone:f.ph.value.trim(),realtor:ans.realtor,eval:ans.eval,sellAddr:ans.eval&&ans.eval!=='No'?f.sa.value.trim():'',consent:document.getElementById('cs').checked,at:new Date().toISOString()};
       var sb=document.getElementById('sb');sb.disabled=true;
       if(DEMO){thanks(fn);return;} // demo: nothing is sent
       SM.post('/api/oh/signin',body).then(function(r){
