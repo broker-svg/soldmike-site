@@ -38,6 +38,7 @@ p{margin:0}
 .nav>a,.nav>.dd>button{display:inline-flex;align-items:center;min-height:44px;padding:0 12px;color:var(--ink);text-decoration:none;background:none;border:0;cursor:pointer;font-weight:600}
 .nav>a:hover,.nav>.dd>button:hover,.nav a[aria-current="page"]{color:var(--red)}
 .nav .btn{margin-left:10px}
+.nav>a.btn{white-space:nowrap;background:var(--red);color:#fff;padding:0 18px;border-radius:4px}.nav>a.btn:hover{background:#b30f18;color:#fff}
 .dd{position:relative}
 .dd>button::after{content:"";width:7px;height:7px;margin-left:8px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg) translateY(-3px)}
 .dd .menu{position:absolute;left:0;top:100%;min-width:250px;background:var(--white);border:1px solid var(--line);border-radius:6px;box-shadow:0 18px 40px -18px rgba(20,24,51,.35);padding:8px;display:none;flex-direction:column}
@@ -46,7 +47,7 @@ p{margin:0}
 .dd .menu a:hover{background:var(--mist);color:var(--red)}
 .burger{display:none;width:48px;height:48px;border:1px solid var(--line);border-radius:4px;background:var(--white);cursor:pointer}
 .burger span{display:block;width:20px;height:2px;margin:4px auto;background:var(--ink)}
-@media (max-width:1200px){
+@media (max-width:1260px){
   .burger{display:block}
   .nav{position:fixed;inset:74px 0 0 0;background:var(--white);flex-direction:column;align-items:stretch;padding:16px var(--gut) 40px;overflow-y:auto;display:none}
   .nav.open{display:flex}

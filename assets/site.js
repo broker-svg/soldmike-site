@@ -86,3 +86,47 @@
     c.addEventListener('input',run); c.addEventListener('submit',function(e){e.preventDefault();}); run();
   }
 })();
+
+// ---------- account button, top right of every page ----------
+(function(){
+  var LAPI=/^(localhost|127\.0\.0\.1)$/.test(location.hostname)?'http://localhost:8787':'https://soldmike-listings.broker-e2c.workers.dev';
+  function get(k){try{return JSON.parse(localStorage.getItem(k)||'null');}catch(e){return null;}}
+  function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+  var st=document.createElement('style');
+  st.textContent='.acct-w{position:relative;order:5;margin-left:8px;flex:none}'
+    +'.acct-b{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 12px;border:1px solid var(--line,#DCE0EC);border-radius:22px;background:transparent;color:var(--ink,#141833);font:600 15px Barlow,system-ui,sans-serif;cursor:pointer;white-space:nowrap}'
+    +'.acct-b svg{width:20px;height:20px;flex:none}.acct-b:hover{color:var(--red,#D7141E)}'
+    +'#top:not(.solid) .acct-b{color:#fff;border-color:rgba(255,255,255,.6)}'
+    +'.acct-m{position:absolute;right:0;top:calc(100% + 8px);min-width:250px;background:#fff;border:1px solid #DCE0EC;border-radius:8px;box-shadow:0 18px 40px -18px rgba(20,24,51,.35);padding:8px;display:none;flex-direction:column;z-index:60}'
+    +'.acct-w.open .acct-m{display:flex}.acct-m p{margin:6px 12px 8px;font-size:14px;color:#545B78;line-height:1.4;word-break:break-all}'
+    +'.acct-m a,.acct-m button{display:block;text-align:left;padding:11px 12px;border-radius:4px;text-decoration:none;color:#141833;font:500 16px Barlow,system-ui,sans-serif;background:none;border:0;cursor:pointer}'
+    +'.acct-m a:hover,.acct-m button:hover{background:#F2F4F9;color:#D7141E}'
+    +'@media (min-width:1261px) and (max-width:1439px){.acct-b .t{display:none}.acct-b{padding:0 11px}}'
+    +'@media (max-width:1260px){.acct-w{order:0;margin-left:auto;margin-right:8px}}'
+    +'@media (max-width:480px){.acct-b .t{max-width:70px;overflow:hidden;text-overflow:ellipsis}}';
+  document.head.appendChild(st);
+  var ICON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>';
+  var w=document.createElement('div');w.className='acct-w';
+  function render(){
+    var me=get('sm_me'),signed=!!get('sm_session')&&me;
+    w.innerHTML='<button type="button" class="acct-b" aria-haspopup="true" aria-expanded="false">'+ICON+'<span class="t">'+(signed?esc(me.first||'My account')+' ▾':'Sign in')+'</span></button>'
+      +(signed?'<div class="acct-m" role="menu"><p>Signed in as<br><b>'+esc(me.email)+'</b></p><a href="/saved/" role="menuitem">Saved homes &amp; searches</a><a href="/listings/" role="menuitem">Search homes</a><button type="button" role="menuitem" class="so">Sign out</button></div>':'');
+    var b=w.querySelector('.acct-b');b.setAttribute('aria-label',signed?'Your account':'Sign in');
+    b.onclick=function(e){e.stopPropagation();
+      if(!signed){if(window.SM&&SM.signIn)SM.signIn().catch(function(){});else location.href='/saved/';return;}
+      var o=w.classList.toggle('open');b.setAttribute('aria-expanded',o);};
+    var so=w.querySelector('.so');
+    if(so)so.onclick=function(){
+      if(window.SM&&SM.signOut)SM.signOut();
+      else{var t=get('sm_session');if(t)fetch(LAPI+'/api/me/logout',{method:'POST',headers:{'Authorization':'Bearer '+t,'Content-Type':'application/json'},body:'{}'}).catch(function(){});
+        ['sm_session','sm_me','sm_lead'].forEach(function(k){try{localStorage.removeItem(k);}catch(e){}});}
+      try{localStorage.removeItem('sm_me');}catch(e){}
+      w.classList.remove('open');render();if(location.pathname==='/saved/')location.reload();};
+  }
+  document.addEventListener('click',function(e){if(!w.contains(e.target))w.classList.remove('open');});
+  document.addEventListener('sm:account',render);
+  // inner pages: before the burger; homepage: before the Menu button
+  var inner=document.querySelector('header.top .wrap .burger'), home=document.getElementById('mbtn');
+  if(inner)inner.parentNode.insertBefore(w,inner); else if(home)home.parentNode.insertBefore(w,home); else return;
+  render();
+})();

@@ -15,13 +15,14 @@
     try{localStorage.setItem('sm_saved',JSON.stringify(j.saved.slice(0,50)));}catch(e){}
     // a signed-in visitor is a known lead, so their views/saves reach Michael like any form lead
     if(j.me&&j.me.email)try{localStorage.setItem('sm_lead',JSON.stringify({firstName:j.me.first||'',lastName:j.me.last||'',email:j.me.email}));}catch(e){}
+    if(j.me)try{localStorage.setItem('sm_me',JSON.stringify({first:j.me.first||'',email:j.me.email}));}catch(e){}
     [].forEach.call(document.querySelectorAll('.save[data-id]'),function(b){b.setAttribute('aria-pressed',j.saved.indexOf(b.dataset.id)>=0);});
     document.dispatchEvent(new CustomEvent('sm:account',{detail:j}));
     return j;
   }
   SM.signedIn=function(){return !!tok();};
   SM.signOut=function(){var t=tok();if(t)call('/api/me/logout',{}).catch(function(){});SM.store('sm_session','');SM.account=null;
-    try{localStorage.removeItem('sm_lead');}catch(e){}document.dispatchEvent(new CustomEvent('sm:account',{detail:null}));};
+    try{localStorage.removeItem('sm_lead');localStorage.removeItem('sm_me');}catch(e){}document.dispatchEvent(new CustomEvent('sm:account',{detail:null}));};
 
   // keep the heart buttons in sync with the account
   var orig=SM.toggleSave;
