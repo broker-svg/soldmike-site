@@ -151,7 +151,7 @@ SITEMAP = []
 LISTING_HEAD = '<link rel="stylesheet" href="/assets/listings.css?v=11">'
 LEAFLET_HEAD = '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">'
 LEAFLET_JS = '<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" defer></script>'
-LISTING_JS = '<script src="/assets/listings.js?v=3" defer></script>'
+LISTING_JS = '<script src="/assets/listings.js?v=3" defer></script><script src="/assets/account.js?v=1" defer></script>'
 
 def page(path, title, desc, trail, body, schema=None, noindex=False, head='', js=''):
     global PAGE
@@ -224,16 +224,38 @@ P('/listings/home/',
   trail=[('Search homes', '/listings/'), ('Listing', '/listings/home/')],
   head=LISTING_HEAD + LEAFLET_HEAD, js=LISTING_JS + LEAFLET_JS + '<script src="/assets/home.js?v=7" defer></script>', noindex=False)
 
+SAVED_JS = """<script>
+document.addEventListener('DOMContentLoaded',function(){
+  var SM=window.SM,esc=SM.esc,box=document.getElementById('acctBox'),g=document.getElementById('savedGrid'),sl=document.getElementById('searchList');
+  function homes(){var ids=SM.saved();if(!ids.length){g.innerHTML='<p class="empty">No saved homes yet. <a href="/listings/">Search homes</a> and tap the heart to save one.</p>';return;}
+    SM.loading(g,3);SM.get('/api/cards?ids='+ids.join(',')).then(function(r){SM.cards(g,r.items,'');});}
+  function qs(q){var p=new URLSearchParams();Object.keys(q||{}).forEach(function(k){p.set(k,q[k]);});return p.toString();}
+  function render(){
+    var a=SM.account;
+    if(!SM.signedIn()){box.innerHTML='<div class="acct"><div><h2>Sign in to keep them everywhere</h2><p>Your saved homes and searches on every phone and computer, and new matches by email the morning they list. Sign in with Google or any email address.</p></div><button class="btn" type="button" id="siBtn">Sign in</button></div>';
+      document.getElementById('siBtn').onclick=function(){SM.signIn().then(render).catch(function(){});};
+      sl.innerHTML='<p class="empty">Sign in, then tap <b>Save this search</b> on the <a href="/listings/">search page</a>.</p>';homes();return;}
+    if(!a){box.innerHTML='<p>Loading your account…</p>';return;}
+    box.innerHTML='<div class="acct"><div><h2>Hi'+(a.me.first?' '+esc(a.me.first):'')+'</h2><p>Signed in as <b>'+esc(a.me.email)+'</b>. Your saved homes and searches follow you to any device.</p></div><button class="btn ghost" type="button" id="soBtn">Sign out</button></div>';
+    document.getElementById('soBtn').onclick=function(){SM.signOut();render();};
+    var ss=a.searches.filter(function(s){return s.active;});
+    sl.innerHTML=ss.length?ss.map(function(s){return '<div class="srow"><div><b>'+esc(s.label)+'</b><small>'+(a.me.alerts?'New matches by email':'No emails')+'</small></div><a class="btn ghost" href="/listings/?'+qs(s.q)+'">View</a><button class="btn ghost" type="button" data-rm="'+s.id+'">Remove</button></div>';}).join('')
+      :'<p class="empty">No saved searches yet. On the <a href="/listings/">search page</a>, set your filters and tap <b>Save this search</b>.</p>';
+    [].forEach.call(sl.querySelectorAll('[data-rm]'),function(btn){btn.onclick=function(){SM.accountCall('/api/me/search/remove',{id:+btn.dataset.rm}).then(SM.accountApply);};});
+    homes();
+  }
+  document.addEventListener('sm:account',render);render();
+});
+</script>"""
 P('/saved/',
-  lambda: hero([('Home', '/'), ('Saved homes', '/saved/')], 'Your saved homes and searches', 'Create a free account to save homes, save searches and get new matches the morning they hit the market.'),
-  lambda: band(head_block('Saved on this device', 'Tap the heart on any home to save it here.') + '<div class="lgrid" id="savedGrid" data-listings></div>'
-               '<script>document.addEventListener("DOMContentLoaded",function(){var g=document.getElementById("savedGrid"),ids=SM.saved();if(!ids.length){g.innerHTML=\'<p class="empty">No saved homes yet. <a href="/listings/">Search homes</a> and tap the heart to save one.</p>\';return;}SM.loading(g,3);SM.get("/api/cards?ids="+ids.join(",")).then(function(r){var gone=ids.length-r.items.length;SM.cards(g,r.items);if(gone>0)g.insertAdjacentHTML("beforeend",\'<p class="empty">\'+gone+(gone>1?" saved homes are":" saved home is")+\' no longer on the market. Ask Michael what they sold for.</p>\');}).catch(function(){g.innerHTML=\'<p class="empty">Could not load your saved homes. Please refresh.</p>\';});});</script>'
-               + CREA_NOTE),
-  lambda: band('<div class="two"><div class="prose"><h2>Get new matches by email</h2><p>Tell Michael what you are looking for and he will send new listings that fit, the morning they hit the market, and set up showings when you are ready.</p><p>Once you send this form, the homes you view and save on this site go to Michael so he can follow up with the right ones.</p>'
-               + todo('Accounts, saved searches and automatic email alerts: next phase. Until then this form adds the person to Follow Up Boss as a buyer.') +
-               '</div>' + form('buyer') + '</div>', 'tint'),
+  lambda: hero([('Home', '/'), ('Saved homes', '/saved/')], 'Your saved homes and searches', 'Save homes and searches, see them on every device, and get new matches the morning they hit the market.'),
+  lambda: band('<div id="acctBox"></div>', 'tint'),
+  lambda: band(head_block('Saved searches') + '<div id="searchList" class="slist"></div>'),
+  lambda: band(head_block('Saved homes', 'Tap the heart on any home to save it here.') + '<div class="lgrid" id="savedGrid" data-listings></div>' + CREA_NOTE),
+  lambda: band('<div class="two"><div class="prose"><h2>Rather talk to Michael?</h2><p>Tell Michael what you are looking for and he will send new listings that fit and set up showings when you are ready.</p></div>' + form('buyer') + '</div>', 'tint'),
   title='Saved Homes & Searches | SoldMike', desc='Save homes and searches and get new MLS® listings by email.', trail=[('Saved homes', '/saved/')], noindex=True,
-  head=LISTING_HEAD, js=LISTING_JS)
+  head=LISTING_HEAD + '<style>.acct{display:flex;gap:20px;align-items:center;justify-content:space-between;flex-wrap:wrap}.acct h2{margin:0 0 6px}.acct p{margin:0;max-width:60ch}.slist{display:flex;flex-direction:column;gap:10px}.srow{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:14px 16px;border:1px solid var(--line);border-radius:8px;background:#fff}.srow>div{flex:1 1 260px}.srow small{display:block;color:var(--muted)}</style>',
+  js=LISTING_JS + SAVED_JS)
 
 P('/buy/',
   lambda: hero([('Home', '/'), ('Buy', '/buy/')], 'Buying a home in Vaughan', 'How we help you find the right home, win it at the right price and get to closing day without surprises.', '/l1.jpg'),

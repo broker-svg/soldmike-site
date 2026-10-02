@@ -76,7 +76,7 @@ dialog input{min-height:56px;border:1px solid var(--line);border-radius:10px;pad
 <script>
 (function(){
   var SM=window.SM, esc=SM.esc, app=document.getElementById('app'), LOGO='/logo-soldmike-white.png';
-  var KIND={view:'Viewed',save:'Saved',inquiry:'Inquiry',openhouse:'Open house',search:'Saved search',alert:'Alert sent',form:'Form',unsubscribe:'Stopped emails'};
+  var KIND={view:'Viewed',save:'Saved',inquiry:'Inquiry',openhouse:'Open house',search:'Saved search',alert:'Alert sent',form:'Form',unsubscribe:'Stopped emails',signin:'Signed in'};
   function pin(){return SM.store('sm_oh_pin')||'';}
   function api(path,opt){opt=opt||{};opt.headers=Object.assign({'X-OH-Pin':pin(),'Content-Type':'application/json'},opt.headers||{});
     return fetch(SM.api+path,opt).then(function(r){if(r.status===401)throw 'pin';if(!r.ok)throw r.status;return r.json();});}

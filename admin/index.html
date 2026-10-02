@@ -86,7 +86,7 @@ dialog input{min-height:56px;border:1px solid var(--line);border-radius:10px;pad
 <script>
 (function(){
   var SM=window.SM, esc=SM.esc, data=null, period='week';
-  var KIND={view:'Homes viewed',save:'Homes saved',inquiry:'Showing / question requests',openhouse:'Open house sign-ins',form:'Website forms & Mika',search:'Saved searches made',alert:'Alert emails sent',unsubscribe:'Stopped emails'};
+  var KIND={view:'Homes viewed',save:'Homes saved',inquiry:'Showing / question requests',openhouse:'Open house sign-ins',form:'Website forms & Mika',search:'Saved searches made',alert:'Alert emails sent',unsubscribe:'Stopped emails',signin:'Website sign-ins'};
   function pin(){return SM.store('sm_oh_pin')||'';}
   function api(path){return fetch(SM.api+path,{headers:{'X-OH-Pin':pin()}}).then(function(r){if(r.status===401)throw 'pin';if(!r.ok)throw r.status;return r.json();});}
   function askPin(){return new Promise(function(res){var d=document.getElementById('pinDlg'),i=document.getElementById('pinIn'),e=document.getElementById('pinErr');
