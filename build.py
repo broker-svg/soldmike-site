@@ -39,7 +39,7 @@ def faq_schema(qs):
 
 # ---------- building blocks ----------
 NAV = [
-    ('Buy', [('/listings/', 'Search homes'), ('/buy/', 'Buying with us'), ('/buy/buyer-guide/', 'Buyer guide: 15 steps'), ('/buy/pre-construction/', 'Pre-construction'), ('/saved/', 'Saved homes & searches'), ('/open-house/', 'Open house sign-in')]),
+    ('Buy', [('/listings/', 'Search homes'), ('/buy/', 'Buying with us'), ('/buy/buyer-guide/', 'Buyer guide: 15 steps'), ('/buy/pre-construction/', 'Pre-construction'), ('/saved/', 'Saved homes & searches'), ('/open-house/', 'Open houses')]),
     ('Sell', [('/sell/home-value/', "What's my home worth?"), ('/sell/', 'Selling with us'), ('/sell/seller-guide/', 'Seller guide: 15 steps'), ('/sell/cost-to-sell-vaughan/', 'Cost to sell calculator'), ('/sell/how-we-market/', 'How we market your home')]),
     ('Neighbourhoods', [('/neighbourhoods/', 'All neighbourhoods')] + [('/neighbourhoods/%s/' % s, n) for s, n in [('woodbridge', 'Woodbridge'), ('vellore', 'Vellore Village'), ('kleinburg', 'Kleinburg'), ('maple', 'Maple'), ('caledon-bolton', 'Caledon & Bolton'), ('king-city-nobleton', 'King City & Nobleton'), ('sharon-east-gwillimbury', 'Sharon & East Gwillimbury'), ('toronto', 'Toronto')]]),
     ('Results', [('/results/', 'Recent sales'), ('/reviews/', 'Client reviews'), ('/market-reports/', 'Market reports')]),

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Open House Sign-In | SoldMike</title>
+<title>Open Houses | SoldMike</title>
 <meta name="robots" content="noindex">
 <link rel="manifest" href="/open-house/manifest.json">
 <meta name="theme-color" content="#1D2870">
@@ -13,6 +13,7 @@
 <meta name="apple-mobile-web-app-title" content="Open House">
 <link rel="apple-touch-icon" href="/open-house/icon-192.png">
 <link rel="icon" href="/logo.png">
+<link rel="stylesheet" href="/assets/listings.css?v=9">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600&display=swap">
 <style>
@@ -43,7 +44,7 @@ input:focus,select:focus{border-color:var(--navy);outline:none;box-shadow:0 0 0 
 
 /* ---------- top bar (host) ---------- */
 .bar{background:var(--navy);color:#fff;padding:calc(14px + env(safe-area-inset-top,0px)) 16px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px}
-.bar img{height:34px;width:auto}
+.bar img{height:46px;width:auto;display:block}
 .bar b{font-family:var(--display);font-size:24px;text-transform:uppercase;letter-spacing:.02em}
 .bar button{background:none;border:1px solid #4A5592;color:#fff;border-radius:8px;min-height:40px;padding:0 14px;cursor:pointer}
 
@@ -95,6 +96,23 @@ input:focus,select:focus{border-color:var(--navy);outline:none;box-shadow:0 0 0 
 .thanks h2{font-size:clamp(44px,8vw,72px)}
 .thanks p{font-size:21px;color:#E4E8FA;max-width:30ch;margin:0}
 .queue{position:fixed;left:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:5;background:var(--ink);color:#fff;border-radius:20px;padding:6px 12px;font-size:13px}
+.pub{padding:24px 0 60px;display:flex;flex-direction:column;gap:22px}
+.pub h2{font-size:clamp(36px,6vw,52px)}
+.pubgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:22px}
+.ohc{display:flex;flex-direction:column;overflow:hidden}
+.ohc .ph{position:relative;aspect-ratio:4/3;background:var(--mist)}
+.ohc .ph img{width:100%;height:100%;object-fit:cover}
+.ohc .ph .chip{position:absolute;left:12px;top:12px;background:var(--red);color:#fff;font-weight:700;font-size:13px;letter-spacing:.06em;padding:6px 10px;border-radius:4px;text-transform:uppercase}
+.ohc .meta{padding:16px;display:flex;flex-direction:column;gap:4px}
+.ohc .price{font-family:var(--display);font-weight:700;font-size:30px;line-height:1}
+.ohc .addr{font-weight:600}
+.ohc .when{color:var(--navy);font-weight:600}
+.ohc .brk{color:var(--muted);font-size:15px}
+.ohc .fine2{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:8px;padding-top:10px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
+.ohc .acts{display:flex;gap:8px;padding:0 16px 16px}
+.ohc .acts .btn{flex:1;min-height:50px;font-size:17px;padding:0 12px}
+.empty{padding:34px 22px;text-align:center;display:flex;flex-direction:column;gap:14px;align-items:center}
+.hostlink{align-self:center;background:none;border:0;color:var(--muted);text-decoration:underline;cursor:pointer;font-size:15px;padding:10px}
 dialog{border:0;border-radius:16px;padding:22px;width:min(380px,calc(100vw - 32px));box-shadow:0 30px 60px rgba(10,14,40,.4)}
 dialog::backdrop{background:rgba(20,24,51,.6)}
 dialog form{display:flex;flex-direction:column;gap:12px}
@@ -147,7 +165,7 @@ dialog form{display:flex;flex-direction:column;gap:12px}
       +'<div id="when" hidden><div class="three"><div><label for="day">Date</label><input id="day" type="date" value="'+today()+'"></div><div><label for="st">Start</label><input id="st" type="time" value="14:00"></div><div><label for="en">End</label><input id="en" type="time" value="16:00"></div></div></div>'
       +'<button class="btn" id="go" disabled>Start open house</button><p class="err" id="herr" hidden></p></div>'
       +'<div class="card"><h2>Your open houses</h2><div class="ohs" id="ohs"><p class="muted">Loading…</p></div></div>'
-      +'<p class="fine" style="text-align:center">Tip: in Safari tap Share → <b>Add to Home Screen</b> to open this like an app.</p></div>';
+      +'<p style="text-align:center;margin:0"><a href="/open-house/?public">View the public page</a></p><p class="fine" style="text-align:center">Tip: in Safari tap Share → <b>Add to Home Screen</b> to open this like an app.</p></div>';
     var q=document.getElementById('q'), res=document.getElementById('res'), go=document.getElementById('go'), pick=null, t=null;
     q.addEventListener('input',function(){
       clearTimeout(t);pick=null;go.disabled=true;document.getElementById('when').hidden=true;
@@ -171,6 +189,32 @@ dialog form{display:flex;flex-direction:column;gap:12px}
       el.onclick=function(e){var b=e.target.closest('[data-id]');if(b)hostDetail(b.dataset.id);};
     }).catch(function(e){if(e==='pin')askPin().then(hostHome);});
   }
+  // =========================================================
+  // PUBLIC: upcoming open houses, or "none scheduled"; small Host login at the bottom
+  // =========================================================
+  function publicHome(){
+    app.innerHTML='<div class="bar"><a href="/"><img src="'+LOGO+'" alt="SoldMike home"></a><b>Open houses</b><a href="/listings/" style="color:#fff;font-size:15px">Search homes</a></div>'
+      +'<div class="wrap pub" data-listings><h2>Upcoming open houses</h2><div id="pl"><p class="muted">Loading…</p></div>'
+      +'<p class="fine">The information contained on this site is based in whole or in part on information that is provided by members of The Canadian Real Estate Association (CREA), who are responsible for its accuracy. CREA reproduces and distributes this information as a service for its members and assumes no responsibility for its accuracy.</p>'
+      +'<button type="button" class="hostlink" id="hl">Host login</button></div>';
+    document.getElementById('hl').onclick=function(){askPin().then(function(){history.replaceState(null,'','/open-house/');hostHome();}).catch(function(){});};
+    SM.get('/api/oh/public').then(function(r){
+      var el=document.getElementById('pl');
+      if(!r.items.length){
+        el.innerHTML='<div class="card empty"><h2 style="font-size:34px">No open houses scheduled right now</h2><p class="muted" style="margin:0;max-width:44ch">Check back soon, or browse the homes for sale. Michael can book you a private showing of any home.</p><a class="btn" href="/listings/">Search homes for sale</a></div>';
+        return;
+      }
+      el.innerHTML='<div class="pubgrid">'+r.items.map(function(x){
+        var o=x.oh,l=x.listing,when=niceDay(o.day)+(o.start?' · '+niceTime(o.start)+'–'+niceTime(o.end):'');
+        var specs=[l.beds!=null&&l.beds!==''?l.beds+' bed':'',l.baths!=null?l.baths+' bath':'',l.type].filter(Boolean).join(' · ');
+        return '<article class="card ohc"><a class="ph" href="'+SM.link(l.id)+'">'+(l.photo?'<img src="'+esc(l.photo)+'" alt="'+esc(l.addr)+'" loading="lazy">':'')+'<span class="chip">'+(o.day===r.today?'Today':'Open house')+'</span></a>'
+          +'<div class="meta"><div class="when">'+esc(when)+'</div><div class="price">'+esc(SM.priceText(l))+'</div><div class="addr">'+esc(SM.addrText(l))+'</div><div class="brk">'+esc(specs)+'</div><div class="brk">Listed by '+esc(l.office||'the listing brokerage')+'</div><div class="fine2"><span>MLS® '+esc(l.mls)+'</span>'+SM.rca(l.rca,90)+'</div></div>'
+          +'<div class="acts"><a class="btn ghost" href="'+SM.link(l.id)+'">See the home</a><a class="btn" href="/open-house/?id='+esc(o.id)+'">'+(o.day===r.today?'Sign in':'Register')+'</a></div></article>';
+      }).join('')+'</div>';
+    }).catch(function(){document.getElementById('pl').innerHTML='<p class="muted">Could not load open houses. Please refresh.</p>';});
+    SM.terms();
+  }
+
   function hostDetail(id){
     app.innerHTML='<div class="bar"><img src="'+LOGO+'" alt="SoldMike"><b>Sign-ins</b><button type="button" id="back">Back</button></div><div class="wrap host"><div class="card"><a class="btn" href="/open-house/?id='+esc(id)+'">Open the sign-in screen</a><div class="tblwrap" id="sl"><p class="muted">Loading…</p></div><p class="fine">✓ = saved in Follow Up Boss.</p></div></div>';
     document.getElementById('back').onclick=hostHome;
@@ -240,7 +284,7 @@ dialog form{display:flex;flex-direction:column;gap:12px}
   function start(){
     if(DEMO){kiosk(DEMO_DATA);var c=document.querySelector('.chip');if(c)c.textContent='Open house · Demo';return;}
     badge();flush();
-    if(!OH){ if(!pin())askPin().then(hostHome).catch(function(){app.innerHTML='<div class="wrap host"><p>Host PIN needed.</p></div>';}); else hostHome(); return; }
+    if(!OH){ if(pin()&&!qs.has('public'))hostHome(); else publicHome(); return; }
     var cached=SM.store('sm_oh_'+OH);
     SM.get('/api/oh/get?id='+encodeURIComponent(OH)).then(function(d){SM.store('sm_oh_'+OH,d);kiosk(d);})
       .catch(function(){ if(cached)kiosk(cached); else app.innerHTML='<div class="wrap host"><h2>Open house not found</h2><p><a href="/open-house/">Back to open houses</a></p></div>'; });
