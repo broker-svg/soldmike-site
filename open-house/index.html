@@ -121,7 +121,7 @@ dialog form{display:flex;flex-direction:column;gap:12px}
 <body>
 <div id="app"></div>
 <dialog id="pinDlg"><form method="dialog" id="pinForm"><h2 style="font-size:28px">Host only</h2><label for="pinIn">Enter your PIN</label><input id="pinIn" inputmode="numeric" autocomplete="off" type="password"><p class="err" id="pinErr" hidden>Wrong PIN</p><div style="display:flex;gap:10px"><button class="btn" type="submit" style="flex:1">Continue</button><button class="btn ghost" type="button" id="pinCancel">Cancel</button></div></form></dialog>
-<script src="/assets/listings.js?v=2"></script>
+<script src="/assets/listings.js?v=3"></script>
 <script>
 (function(){
   var SM=window.SM, esc=SM.esc, app=document.getElementById('app');
@@ -207,17 +207,21 @@ dialog form{display:flex;flex-direction:column;gap:12px}
       el.innerHTML='<div class="pubgrid">'+r.items.map(function(x){
         var o=x.oh,l=x.listing,when=niceDay(o.day)+(o.start?' · '+niceTime(o.start)+'–'+niceTime(o.end):'');
         var specs=[l.beds!=null&&l.beds!==''?l.beds+' bed':'',l.baths!=null?l.baths+' bath':'',l.type].filter(Boolean).join(' · ');
-        return '<article class="card ohc"><a class="ph" href="'+SM.link(l.id)+'">'+(l.photo?'<img src="'+esc(l.photo)+'" alt="'+esc(l.addr)+'" loading="lazy">':'')+'<span class="chip">'+(o.day===r.today?'Today':'Open house')+'</span></a>'
+        return '<article class="card ohc"><a class="ph" href="'+SM.link(l.id)+'" target="_blank" rel="noopener">'+(l.photo?'<img src="'+esc(l.photo)+'" alt="'+esc(l.addr)+'" loading="lazy">':'')+'<span class="chip">'+(o.day===r.today?'Today':'Open house')+'</span></a>'
           +'<div class="meta"><div class="when">'+esc(when)+'</div><div class="price">'+esc(SM.priceText(l))+'</div><div class="addr">'+esc(SM.addrText(l))+'</div><div class="brk">'+esc(specs)+'</div><div class="brk">Listed by '+esc(l.office||'the listing brokerage')+'</div><div class="fine2"><span>MLS® '+esc(l.mls)+'</span>'+SM.rca(l.rca,90)+'</div></div>'
-          +'<div class="acts"><a class="btn ghost" href="'+SM.link(l.id)+'">See the home</a><a class="btn" href="/open-house/?id='+esc(o.id)+'">'+(o.day===r.today?'Sign in':'Register')+'</a></div></article>';
+          +'<div class="acts"><a class="btn ghost" href="'+SM.link(l.id)+'" target="_blank" rel="noopener">See the home</a><a class="btn" href="/open-house/?id='+esc(o.id)+'" target="_blank" rel="noopener">'+(o.day===r.today?'Sign in':'Register')+'</a></div></article>';
       }).join('')+'</div>';
     }).catch(function(){document.getElementById('pl').innerHTML='<p class="muted">Could not load open houses. Please refresh.</p>';});
     SM.terms();
   }
 
   function hostDetail(id){
-    app.innerHTML='<div class="bar"><img src="'+LOGO+'" alt="SoldMike"><b>Sign-ins</b><button type="button" id="back">Back</button></div><div class="wrap host"><div class="card"><a class="btn" href="/open-house/?id='+esc(id)+'">Open the sign-in screen</a><div class="tblwrap" id="sl"><p class="muted">Loading…</p></div><p class="fine">✓ = saved in Follow Up Boss.</p></div></div>';
+    app.innerHTML='<div class="bar"><img src="'+LOGO+'" alt="SoldMike"><b>Sign-ins</b><button type="button" id="back">Back</button></div><div class="wrap host"><div class="card"><a class="btn" href="/open-house/?id='+esc(id)+'">Open the sign-in screen</a><div class="tblwrap" id="sl"><p class="muted">Loading…</p></div><p class="fine">✓ = saved in Follow Up Boss.</p><button class="btn ghost" type="button" id="del" style="color:var(--red)!important;border-color:var(--red)">Remove this open house</button></div></div>';
     document.getElementById('back').onclick=hostHome;
+    document.getElementById('del').onclick=function(){
+      if(!confirm('Remove this open house? It disappears from the website. People who already signed in stay in Follow Up Boss.'))return;
+      hostApi('/api/oh/delete',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:id})}).then(hostHome).catch(function(){alert('Could not remove it. Check your internet and try again.');});
+    };
     hostApi('/api/oh/signins?id='+encodeURIComponent(id)).then(function(r){
       document.getElementById('sl').innerHTML=r.items.length?'<table class="signins"><thead><tr><th>Name</th><th>Contact</th><th>Realtor?</th><th>Selling?</th><th></th></tr></thead><tbody>'+r.items.map(function(s){return '<tr><td>'+esc(s.first+' '+s.last)+'</td><td>'+esc(s.email)+(s.phone?'<br>'+esc(s.phone):'')+'</td><td>'+esc(s.realtor)+'</td><td>'+esc(s.sell)+'</td><td>'+(s.fub?'✓':'…')+'</td></tr>';}).join('')+'</tbody></table>':'<p class="muted">No sign-ins yet.</p>';
     });

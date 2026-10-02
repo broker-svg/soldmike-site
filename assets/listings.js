@@ -62,9 +62,9 @@
     if(l.lease)tags+='<span class="tag">For rent</span>';else if(SM.isNew(l))tags+='<span class="tag">New</span>';
     if(l.mine)tags+='<span class="tag op">SoldMike listing</span>';
     var img=l.photo?'<img src="'+esc(l.photo)+'" alt="'+esc(SM.addrText(l))+'" loading="lazy">':'<span class="nophoto">Photos coming</span>';
-    return '<article class="card lc"><a class="ph" href="'+href+'">'+img+tags+'</a>'
+    return '<article class="card lc"><a class="ph" href="'+href+'" target="_blank" rel="noopener">'+img+tags+'</a>'
       +'<button class="save" type="button" data-id="'+esc(l.id)+'" aria-pressed="'+SM.isSaved(l.id)+'" aria-label="Save this home">'+HEART+'</button>'
-      +'<div class="meta"><a class="price" href="'+href+'">'+esc(SM.priceText(l))+'</a>'
+      +'<div class="meta"><a class="price" href="'+href+'" target="_blank" rel="noopener">'+esc(SM.priceText(l))+'</a>'
       +'<div class="addr">'+esc(SM.addrText(l))+(l.addr?'':' <small>(address not displayed)</small>')+'</div>'
       +'<div class="specs">'+specs.join(' · ')+'</div>'
       +'<div class="brk">Listed by '+esc(l.office||'listing brokerage')+'</div>'
