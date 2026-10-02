@@ -151,7 +151,7 @@ SITEMAP = []
 LISTING_HEAD = '<link rel="stylesheet" href="/assets/listings.css?v=11">'
 LEAFLET_HEAD = '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">'
 LEAFLET_JS = '<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" defer></script>'
-LISTING_JS = '<script src="/assets/listings.js?v=3" defer></script><script src="/assets/account.js?v=1" defer></script>'
+LISTING_JS = '<script src="/assets/listings.js?v=3" defer></script><script src="/assets/account.js?v=2" defer></script>'
 
 def page(path, title, desc, trail, body, schema=None, noindex=False, head='', js=''):
     global PAGE

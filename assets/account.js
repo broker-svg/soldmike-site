@@ -1,7 +1,7 @@
 /* Visitor accounts for soldmike.com: "Sign in with Google", saved homes and saved searches on every device.
    Needs listings.js (SM). The session token lives in this browser only; listing data never goes anywhere but our own Worker. */
 (function(){
-  var GOOGLE_CLIENT_ID=''; // set once Michael creates the Google sign-in key (public value, not a secret)
+  var GOOGLE_CLIENT_ID='759231219390-e0loqv6uo74jfqujtnumhunoe4k1rjko.apps.googleusercontent.com'; // set once Michael creates the Google sign-in key (public value, not a secret)
   var SM=window.SM; if(!SM)return;
   var esc=SM.esc;
   function tok(){return SM.store('sm_session')||'';}
