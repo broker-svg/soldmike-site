@@ -456,7 +456,7 @@ for slug, name, intro, photo, pockets in HOODS:
 # RESULTS
 # =====================================================================
 CASES = [
-    ('226-via-borghese', '226 Via Borghese St', 'Vellore Village, Vaughan', '$1,790,000', '[X]', '[X]%'),
+    ('226-via-borghese', '226 Via Borghese St', 'Vellore Village, Vaughan', '$1.69M', '140', '[X]%'),
     ('49-walter-proctor', '49 Walter Proctor Rd', 'East Gwillimbury', '[$X,XXX,XXX]', '[X]', '[X]%'),
     ('179-lio-ave', '179 Lio Ave', 'Woodbridge', '[$X,XXX,XXX]', '[X]', '[X]%'),
 ]
