@@ -44,12 +44,16 @@ NAV = [
     ('Neighbourhoods', [('/neighbourhoods/', 'All neighbourhoods')] + [('/neighbourhoods/%s/' % s, n) for s, n in [('woodbridge', 'Woodbridge'), ('vellore', 'Vellore Village'), ('kleinburg', 'Kleinburg'), ('maple', 'Maple'), ('caledon-bolton', 'Caledon & Bolton'), ('king-city-nobleton', 'King City & Nobleton'), ('sharon-east-gwillimbury', 'Sharon & East Gwillimbury'), ('toronto', 'Toronto')]]),
     ('Results', [('/results/', 'Recent sales'), ('/reviews/', 'Client reviews'), ('/market-reports/', 'Market reports')]),
     ('Questions', [('/questions/', 'All questions'), ('/questions/buying/', 'Buyer questions'), ('/questions/selling/', 'Seller questions')]),
+    ('TorontoPropertyMedia.ca', 'https://torontopropertymedia.ca/'),
     ('About', [('/about/', 'Michael Barillari'), ('/about/the-op-team/', 'The OP Team'), ('/videos/', 'Videos'), ('/join/', 'Join the team'), ('/contact/', 'Contact')]),
 ]
 
 def header(path):
     out = []
     for label, items in NAV:
+        if isinstance(items, str):
+            out.append('<a href="%s" target="_blank" rel="noopener">%s</a>' % (items, e(label)))
+            continue
         cur = any(path.startswith(u) and u != '/' for u, _ in items)
         links = ''.join('<a href="%s"%s>%s</a>' % (u, ' aria-current="page"' if u == path else '', e(t)) for u, t in items)
         out.append('<div class="dd"><button type="button" aria-expanded="false"%s>%s</button><div class="menu">%s</div></div>'
@@ -60,7 +64,7 @@ def header(path):
             '<nav class="nav" id="nav" aria-label="Main">%s<a class="btn" href="/sell/home-value/">Home value</a></nav></div></header>') % ''.join(out)
 
 def footer():
-    cols = ''.join('<div><strong>%s</strong>%s</div>' % (l, ''.join('<a href="%s">%s</a>' % (u, e(t)) for u, t in items[:5])) for l, items in NAV[:4])
+    cols = ''.join('<div><strong>%s</strong>%s</div>' % (l, ''.join('<a href="%s">%s</a>' % (u, e(t)) for u, t in items[:5])) for l, items in NAV[:4] if not isinstance(items, str))
     return ('<footer><div class="wrap"><div class="fcols">'
             '<div><img src="/logo-soldmike-white.png" alt="RE/MAX Premier The OP Team, SoldMike" style="width:220px;height:auto">'
             '<span>Michael Barillari, Broker, SOLDMIKE. %s Independently owned and operated.</span>'
@@ -157,7 +161,7 @@ def page(path, title, desc, trail, body, schema=None, noindex=False, head='', js
            '<meta property="og:type" content="website"><meta property="og:title" content="%s"><meta property="og:description" content="%s"><meta property="og:url" content="%s%s"><meta property="og:image" content="%s/hero.jpg">'
            '%s<link rel="icon" href="/logo.png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
            '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Barlow:wght@400;500;600&display=swap">'
-           '<link rel="stylesheet" href="/assets/site.css?v=4">%s%s</head><body>%s<main id="main">%s</main>%s<script src="/assets/site.js?v=5" defer></script>%s<script src="/assets/chat.js?v=6" defer></script></body></html>'
+           '<link rel="stylesheet" href="/assets/site.css?v=5">%s%s</head><body>%s<main id="main">%s</main>%s<script src="/assets/site.js?v=5" defer></script>%s<script src="/assets/chat.js?v=6" defer></script></body></html>'
            ) % (e(title), e(desc), SITE, path, e(title), e(desc), SITE, path, SITE,
                 '<meta name="robots" content="noindex">' if noindex else '',
                 ''.join('<script type="application/ld+json">%s</script>' % json.dumps(s, ensure_ascii=False) for s in sch), head,
@@ -182,9 +186,9 @@ AREA_OPTS = [('', 'All areas'), ('woodbridge', 'Woodbridge'), ('vellore', 'Vello
 def sel(name, label, opts, extra=False):
     return '<div%s><label' % (' class="xf"' if extra else '') + ' for="f-%s">%s</label><select id="f-%s" name="%s">%s</select></div>' % (name, label, name, name, ''.join('<option value="%s">%s</option>' % (v, e(t)) for v, t in opts))
 PRICES = [500000, 750000, 1000000, 1250000, 1500000, 2000000, 2500000, 3000000, 5000000]
-P('/listings/',
-  lambda: hero([('Home', '/'), ('Search homes', '/listings/')], 'Homes for sale in Vaughan & the GTA', 'MLS® listings from Toronto to King and Caledon, refreshed every day. Save the ones you like and Michael can show you any of them.'),
-  lambda: band(
+def SEARCH_BLOCK():
+    # full search (box, filters, results, map); used on /listings/ and /buy/
+    return (
     '<div class="ls" data-listings><form id="lsForm" aria-label="Search listings" role="search">'
     '<div class="sbox"><label for="f-q" class="sr">Search</label><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>'
     '<input id="f-q" name="q" type="search" enterkeyhint="search" autocomplete="off" placeholder="Address, MLS®, city or area"><button class="btn" type="submit">Search</button></div>'
@@ -203,7 +207,12 @@ P('/listings/',
     '<div class="ls-mapcol"><div><div id="lsMap" role="region" aria-label="Map of results"></div><button class="btn navy" id="lsArea" type="button" hidden>Search this map area</button>'
     '<p style="margin:10px 0 0;font-size:14px"><button type="button" id="lsClearArea" style="border:0;background:none;padding:0;color:var(--navy);font-weight:600;cursor:pointer;text-decoration:underline">Clear map area</button></p></div></div></div>'
     '<div class="rca-row"><a class="btn ghost" href="/saved/">Your saved homes</a><a href="https://www.realtor.ca/en" target="_blank" rel="noopener"><img src="https://www.realtor.ca/images/en-ca/powered_by_realtor.svg" width="125" alt="Powered by REALTOR.ca"></a></div>'
-    + CREA_NOTE + '</div>', 'lsband'),
+    + CREA_NOTE + '</div>')
+
+P('/listings/',
+  lambda: hero([('Home', '/'), ('Search homes', '/listings/')], 'Homes for sale in Vaughan & the GTA', 'MLS® listings from Toronto to King and Caledon, refreshed every day. Save the ones you like and Michael can show you any of them.'),
+  lambda: band(
+    SEARCH_BLOCK(), 'lsband'),
   title='Homes for Sale in Vaughan, Woodbridge & the GTA | SoldMike',
   desc='Search MLS® listings in Vaughan, Woodbridge, Kleinburg, King, Caledon and Toronto, refreshed daily. Map search, saved homes and showings with Michael Barillari.',
   trail=[('Search homes', '/listings/')],
@@ -228,6 +237,7 @@ P('/saved/',
 
 P('/buy/',
   lambda: hero([('Home', '/'), ('Buy', '/buy/')], 'Buying a home in Vaughan', 'How we help you find the right home, win it at the right price and get to closing day without surprises.', '/l1.jpg'),
+  lambda: band(head_block('Search homes for sale', 'Every MLS® listing from Toronto to King and Caledon, refreshed daily. Use the map or search by address, MLS® number, city or neighbourhood.') + SEARCH_BLOCK(), 'lsband'),
   lambda: band(head_block('Where to start') + cards([
       ('/listings/', 'Search homes', 'Every MLS® listing, refreshed daily'),
       ('/buy/buyer-guide/', 'Buyer guide', 'The 15 steps from your why to closing day'),
@@ -240,7 +250,8 @@ P('/buy/',
       'One real buyer story: area, what they wanted, how you won it'), 'tint'),
   lambda: cta('Start with a 20-minute call', 'Tell us what you need, your budget and timing. We set up your search the same day.', 'buyer'),
   title='Buying a Home in Vaughan & Woodbridge | SoldMike', desc='How Michael Barillari and The OP Team help buyers in Vaughan, Woodbridge and the GTA find, win and close on the right home.',
-  trail=[('Buy', '/buy/')])
+  trail=[('Buy', '/buy/')],
+  head=LISTING_HEAD + LEAFLET_HEAD, js=LISTING_JS + LEAFLET_JS + '<script src="/assets/search.js?v=3" defer></script>')
 
 BUY_STEPS = [
     ('Know your why', 'More space, a better school, a shorter commute. Your reason decides what to look for and what to skip.'),
@@ -590,10 +601,24 @@ P('/terms/',
       'Calculators and estimates on this site are for information only and are not financial, legal or mortgage advice.') + '<div style="margin-top:20px">' + todo('Have the brokerage review these terms') + '</div>', narrow=True),
   title='Terms of Use | SoldMike', desc='Terms of use for soldmike.com, including the CREA listing content terms.', trail=[('Terms', '/terms/')], noindex=True)
 
+# ---------- homepage menu (index.html is hand-edited; its menu comes from NAV so it always matches) ----------
+def home_nav():
+    out = []
+    for label, items in NAV:
+        if isinstance(items, str):
+            out.append('<a href="%s" target="_blank" rel="noopener">%s</a>' % (items, e(label)))
+            continue
+        links = ''.join('<a href="%s">%s</a>' % (u, e(t)) for u, t in items)
+        out.append('<div class="dd"><button type="button" aria-expanded="false">%s</button><div class="menu">%s</div></div>' % (label, links))
+    return '<nav class="nav" id="mainnav" aria-label="Main">%s<a class="btn" href="/sell/home-value/">Home value</a></nav>' % ''.join(out)
+idx = open('index.html', encoding='utf-8').read()
+a, b = idx.index('<!--NAV-->') + len('<!--NAV-->'), idx.index('<!--/NAV-->')
+open('index.html', 'w', encoding='utf-8').write(idx[:a] + '\n    ' + home_nav() + '\n    ' + idx[b:])
+
 # ---------- 404, sitemap, robots, checklist ----------
 PAGE = '/404'
 page404 = ('<!doctype html><html lang="en-CA"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Page not found | SoldMike</title><meta name="robots" content="noindex">'
-           '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=Barlow:wght@400;600&display=swap"><link rel="stylesheet" href="/assets/site.css?v=4"></head><body>'
+           '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=Barlow:wght@400;600&display=swap"><link rel="stylesheet" href="/assets/site.css?v=5"></head><body>'
            + header('/404') + '<main id="main">' + hero([('Home', '/'), ('Not found', '/404')], 'That page has moved', 'The page you were looking for is not here. Try one of these instead.') +
            band(cards([('/listings/', 'Search homes', 'Every MLS® listing'), ('/sell/home-value/', 'Home value', 'What your home is worth'), ('/neighbourhoods/', 'Neighbourhoods', 'Area guides'), ('/contact/', 'Contact', 'Talk to Michael')])) + '</main>' + footer() + '<script src="/assets/site.js?v=4" defer></script><script src="/assets/chat.js?v=5" defer></script></body></html>')
 open('404.html', 'w', encoding='utf-8').write(page404)
