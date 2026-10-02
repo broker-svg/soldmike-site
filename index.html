@@ -59,10 +59,11 @@ h2{font-size:clamp(40px,5.2vw,64px)}
 .hero h1 .ln span{display:block}
 .hero h1 .ln:nth-child(2){color:var(--coral)}
 .hero p{margin:0;font-size:clamp(17px,1.6vw,20px);max-width:44ch;color:#E4E8FA}
-.search{background:var(--white);color:var(--ink);border-radius:6px;padding:12px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr)) auto;gap:10px;align-items:end;width:100%;max-width:700px;text-align:left;box-shadow:0 18px 40px rgba(10,14,40,.35)}
+.search{background:var(--white);color:var(--ink);border-radius:6px;padding:12px;display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr) minmax(0,1fr) auto;gap:10px;align-items:end;width:100%;max-width:700px;text-align:left;box-shadow:0 18px 40px rgba(10,14,40,.35)}
 .search label{font-size:13px;font-weight:600;color:var(--muted);display:block;margin-bottom:4px}
-.search select{width:100%;height:46px;border:1px solid var(--line);border-radius:4px;padding:0 10px;background:var(--white);color:var(--ink)}
-@media (max-width:640px){.search{grid-template-columns:1fr 1fr}.search .btn{grid-column:1/-1}}
+.search select,.search input{width:100%;height:46px;border:1px solid var(--line);border-radius:4px;padding:0 10px;background:var(--white);color:var(--ink);font:inherit}
+.search input{font-size:17px}
+@media (max-width:640px){.search{grid-template-columns:1fr 1fr}.search .sq,.search .btn{grid-column:1/-1}}
 .mike{align-self:end;justify-self:start;display:flex;justify-content:flex-start;margin:0}
 .mike img{width:auto;max-width:100%;max-height:min(62vh,560px);height:auto;filter:drop-shadow(0 20px 40px rgba(0,0,0,.45))}
 .credit{position:absolute;right:var(--gut);top:92px;font-size:13px;color:rgba(255,255,255,.8);display:flex;align-items:center;gap:8px}
@@ -213,7 +214,7 @@ footer .wrap{padding-block:56px 32px;display:flex;flex-direction:column;gap:28px
 }
 </style>
 
-<link rel="stylesheet" href="/assets/listings.css?v=10">
+<link rel="stylesheet" href="/assets/listings.css?v=11">
 </head>
 <body>
 <header class="top" id="top">
@@ -247,7 +248,7 @@ footer .wrap{padding-block:56px 32px;display:flex;flex-direction:column;gap:28px
       <h1><span class="ln"><span>Michael Barillari, Broker</span></span></h1>
       <p class="fade">RE/MAX Premier The OP Team, selling homes in Vaughan, Woodbridge, Kleinburg, Toronto and Caledon.</p>
       <form class="search fade" id="searchForm" aria-label="Search listings">
-        <div><label for="s-area">Area</label><select id="s-area"><option value="woodbridge">Woodbridge</option><option value="vaughan">Vaughan</option><option value="king-city-nobleton">King &amp; Nobleton</option><option value="toronto">Toronto</option><option value="">All GTA</option></select></div>
+        <div class="sq"><label for="s-q">Search</label><input id="s-q" type="search" enterkeyhint="search" autocomplete="off" placeholder="Address, MLS®, city or area"></div>
         <div><label for="s-price">Max price</label><select id="s-price"><option value="">Any price</option><option value="1000000">$1,000,000</option><option value="1500000">$1,500,000</option><option value="2000000">$2,000,000</option><option value="3000000">$3,000,000</option></select></div>
         <div><label for="s-beds">Bedrooms</label><select id="s-beds"><option value="">Any</option><option value="2">2+</option><option value="3">3+</option><option value="4">4+</option></select></div>
         <button class="btn" type="submit">Search homes</button>
@@ -461,7 +462,7 @@ footer .wrap{padding-block:56px 32px;display:flex;flex-direction:column;gap:28px
 
   var mb=document.getElementById('mbtn'),mn=document.getElementById('mainnav');mb.addEventListener('click',function(){var o=mn.classList.toggle('open');document.body.classList.toggle('menu-open',o);mb.setAttribute('aria-expanded',o);mb.textContent=o?'Close':'Menu';top.classList.add('solid');});
   // forms
-  document.getElementById('searchForm').addEventListener('submit',function(e){e.preventDefault();var q=new URLSearchParams();[['area','s-area'],['max','s-price'],['beds','s-beds']].forEach(function(x){var v=document.getElementById(x[1]).value;if(v)q.set(x[0],v);});location.href='/listings/'+(q.toString()?'?'+q:'');});
+  document.getElementById('searchForm').addEventListener('submit',function(e){e.preventDefault();var q=new URLSearchParams();[['q','s-q'],['max','s-price'],['beds','s-beds']].forEach(function(x){var v=document.getElementById(x[1]).value;if(v)q.set(x[0],v);});location.href='/listings/'+(q.toString()?'?'+q:'');});
   document.getElementById('askForm').addEventListener('submit',function(e){e.preventDefault();var q=document.getElementById('ask');var t=q.value.trim();q.value='';if(window.askMika){t?askMika(t):openMika();}});
 })();
 </script>

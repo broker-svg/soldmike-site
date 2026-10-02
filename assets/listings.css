@@ -205,3 +205,24 @@
 @media (max-width:600px){.ld .all{grid-template-columns:1fr}}
 .ld-loading{padding-block:120px;text-align:center;color:var(--muted)}
 @media (prefers-reduced-motion:reduce){.ld .slide,.ld .slide img,.card.lc .ph img{transition:none!important}}
+
+/* ---------- search box + layout (Oct 2) ---------- */
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.sbox{display:flex;align-items:center;gap:10px;border:2px solid var(--navy);border-radius:8px;padding:6px 6px 6px 16px;background:var(--white);margin-bottom:12px;box-shadow:0 10px 30px -18px rgba(20,24,51,.4)}
+.sbox svg{width:22px;height:22px;color:var(--muted);flex:none}
+.sbox input{flex:1;min-width:0;height:48px;border:0;background:none;font-size:19px;color:var(--ink);outline:none}
+.sbox input::-webkit-search-cancel-button{cursor:pointer}
+.sbox .btn{min-height:48px;flex:none}
+.ls .filters{margin-bottom:18px}
+.lsband .wrap{max-width:2200px}
+.hidemap{display:none;min-height:44px;margin-left:auto}
+@media (min-width:1100px){.hidemap{display:inline-flex}}
+@media (min-width:1600px){
+  .ls-wrap,.ls-wrap[data-view]{grid-template-columns:minmax(0,2fr) minmax(0,1fr)}
+  .ls-wrap .lgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media (min-width:1100px){
+  .ls-wrap.nomap,.ls-wrap.nomap[data-view]{grid-template-columns:1fr}
+  .ls-wrap.nomap .ls-mapcol{display:none}
+  .ls-wrap.nomap .lgrid{grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
+}

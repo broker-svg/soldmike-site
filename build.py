@@ -144,7 +144,7 @@ def live_grid(area, n=3):
 
 # ---------- page writer ----------
 SITEMAP = []
-LISTING_HEAD = '<link rel="stylesheet" href="/assets/listings.css?v=10">'
+LISTING_HEAD = '<link rel="stylesheet" href="/assets/listings.css?v=11">'
 LEAFLET_HEAD = '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">'
 LEAFLET_JS = '<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" defer></script>'
 LISTING_JS = '<script src="/assets/listings.js?v=3" defer></script>'
@@ -185,7 +185,10 @@ PRICES = [500000, 750000, 1000000, 1250000, 1500000, 2000000, 2500000, 3000000, 
 P('/listings/',
   lambda: hero([('Home', '/'), ('Search homes', '/listings/')], 'Homes for sale in Vaughan & the GTA', 'MLS® listings from Toronto to King and Caledon, refreshed every day. Save the ones you like and Michael can show you any of them.'),
   lambda: band(
-    '<div class="ls" data-listings><form class="filters" id="lsForm" aria-label="Search listings" onsubmit="return false">'
+    '<div class="ls" data-listings><form id="lsForm" aria-label="Search listings" role="search">'
+    '<div class="sbox"><label for="f-q" class="sr">Search</label><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>'
+    '<input id="f-q" name="q" type="search" enterkeyhint="search" autocomplete="off" placeholder="Address, MLS®, city or area"><button class="btn" type="submit">Search</button></div>'
+    '<div class="filters">'
     + sel('area', 'Area', AREA_OPTS)
     + sel('lease', 'For', [('', 'Sale'), ('1', 'Rent')])
     + sel('type', 'Type', [('', 'Any type'), ('detached', 'Detached'), ('semi', 'Semi-detached'), ('town', 'Townhouse'), ('condo', 'Condo apartment'), ('other', 'Other')], True)
@@ -194,17 +197,17 @@ P('/listings/',
     + sel('beds', 'Beds', [('', 'Any')] + [(str(b), '%d+' % b) for b in range(1, 6)])
     + sel('baths', 'Baths', [('', 'Any')] + [(str(b), '%d+' % b) for b in range(1, 5)], True)
     + sel('sort', 'Sort', [('new', 'Newest'), ('plow', 'Price, low to high'), ('phigh', 'Price, high to low')], True)
-    + '<button type="button" class="btn ghost xfb" onclick="this.form.classList.toggle(\'all\');this.textContent=this.form.classList.contains(\'all\')?\'Fewer filters\':\'More filters\'">More filters</button></form>'
-    '<div class="ls-bar"><p id="lsInfo" aria-live="polite"></p><div class="viewt" role="group" aria-label="View"><button type="button" data-view="list" aria-pressed="true">List</button><button type="button" data-view="map" aria-pressed="false">Map</button></div></div>'
+    + '<button type="button" class="btn ghost xfb" onclick="var f=this.parentNode;f.classList.toggle(\'all\');this.textContent=f.classList.contains(\'all\')?\'Fewer filters\':\'More filters\'">More filters</button></div></form>'
+    '<div class="ls-bar"><p id="lsInfo" aria-live="polite"></p><button type="button" class="btn ghost hidemap" id="lsHide">Hide map</button><div class="viewt" role="group" aria-label="View"><button type="button" data-view="list" aria-pressed="true">List</button><button type="button" data-view="map" aria-pressed="false">Map</button></div></div>'
     '<div class="ls-wrap" id="lsWrap" data-view="list"><div class="ls-listcol"><div class="lgrid" id="lsList"></div><button class="btn navy" id="lsMore" type="button" hidden>Show more homes</button></div>'
     '<div class="ls-mapcol"><div><div id="lsMap" role="region" aria-label="Map of results"></div><button class="btn navy" id="lsArea" type="button" hidden>Search this map area</button>'
     '<p style="margin:10px 0 0;font-size:14px"><button type="button" id="lsClearArea" style="border:0;background:none;padding:0;color:var(--navy);font-weight:600;cursor:pointer;text-decoration:underline">Clear map area</button></p></div></div></div>'
     '<div class="rca-row"><a class="btn ghost" href="/saved/">Your saved homes</a><a href="https://www.realtor.ca/en" target="_blank" rel="noopener"><img src="https://www.realtor.ca/images/en-ca/powered_by_realtor.svg" width="125" alt="Powered by REALTOR.ca"></a></div>'
-    + CREA_NOTE + '</div>'),
+    + CREA_NOTE + '</div>', 'lsband'),
   title='Homes for Sale in Vaughan, Woodbridge & the GTA | SoldMike',
   desc='Search MLS® listings in Vaughan, Woodbridge, Kleinburg, King, Caledon and Toronto, refreshed daily. Map search, saved homes and showings with Michael Barillari.',
   trail=[('Search homes', '/listings/')],
-  head=LISTING_HEAD + LEAFLET_HEAD, js=LISTING_JS + LEAFLET_JS + '<script src="/assets/search.js?v=1" defer></script>')
+  head=LISTING_HEAD + LEAFLET_HEAD, js=LISTING_JS + LEAFLET_JS + '<script src="/assets/search.js?v=2" defer></script>')
 
 P('/listings/home/',
   '<div class="ld" id="ld" data-listings><p class="ld-loading">Loading this home…</p></div>',

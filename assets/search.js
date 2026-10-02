@@ -3,7 +3,7 @@
   var SM=window.SM, esc=SM.esc;
   var form=document.getElementById('lsForm'), list=document.getElementById('lsList'), info=document.getElementById('lsInfo'), more=document.getElementById('lsMore');
   var mapEl=document.getElementById('lsMap'), areaBtn=document.getElementById('lsArea'), wrap=document.getElementById('lsWrap');
-  var FIELDS=['area','lease','type','min','max','beds','baths','sort'];
+  var FIELDS=['q','area','lease','type','min','max','beds','baths','sort'];
   var state={page:0,items:[],bbox:''}, map=null, layer=null, moved=false;
 
   // filters <-> URL
@@ -29,13 +29,13 @@
       var shown=state.items.length;
       info.innerHTML=r.total?('<b>'+(r.capped?'1,000+':r.total.toLocaleString('en-CA'))+'</b> '+(r.total===1?'home':'homes')+(r.total>100?' · showing the first '+Math.min(100,r.total)+'. Narrow your search to see the rest.':'')):'';
       more.hidden=!(shown<r.shown);
-      if(reset)pins();
+      if(reset){if(r.pins)drawPins(r.pins);else pins();}
     }).catch(function(s){
       list.innerHTML='<p class="empty">'+(s===403?'Too many searches in a row. Please wait a minute and try again.':'Search is not responding right now. Please try again shortly, or call Michael at 647-694-3109.')+'</p>';
     });
   }
-  form.addEventListener('submit',function(e){e.preventDefault();run(true);});
-  form.addEventListener('change',function(e){if(e.target.name==='area')state.bbox='';run(true);});
+  form.addEventListener('submit',function(e){e.preventDefault();state.bbox='';var q=form.elements.q;if(q)q.blur();run(true);});
+  form.addEventListener('change',function(e){if(e.target.name==='q')return;if(e.target.name==='area')state.bbox='';run(true);});
   more.addEventListener('click',function(){state.page++;run(false);});
 
   // ---------- map (Leaflet + OpenStreetMap), pins = the same first 100 results ----------
@@ -46,12 +46,17 @@
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18,attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'}).addTo(map);
     layer=L.layerGroup().addTo(map);
     map.on('moveend',function(){if(moved)areaBtn.hidden=false;moved=true;});
-    pins();
+    if(lastPins)drawPins(lastPins);else pins();
   }
+  var lastPins=null;
   function pins(){
     if(!map)return;
-    var p=params();
-    SM.get('/api/pins?'+p.toString()).then(function(r){
+    SM.get('/api/pins?'+params().toString()).then(function(r){drawPins(r.pins);}).catch(function(){});
+  }
+  function drawPins(list){
+    lastPins=list;
+    if(!map)return;
+    (function(r){
       layer.clearLayers();
       var b=[];
       r.pins.forEach(function(x){
@@ -64,7 +69,7 @@
       moved=false;
       if(b.length&&!state.bbox)map.fitBounds(b,{padding:[30,30],maxZoom:14});
       areaBtn.hidden=true;
-    }).catch(function(){});
+    })({pins:list});
   }
   areaBtn.addEventListener('click',function(){
     var b=map.getBounds();
@@ -80,7 +85,13 @@
     toggles.forEach(function(x){x.setAttribute('aria-pressed',x===t);});
     if(v==='map'){initMap();setTimeout(function(){map&&map.invalidateSize();},60);}
   });});
-  if(matchMedia('(min-width: 1100px)').matches)initMap();
+  var hide=document.getElementById('lsHide');
+  if(hide){
+    var setHide=function(on){wrap.classList.toggle('nomap',on);hide.textContent=on?'Show map':'Hide map';SM.store('sm_nomap',on);if(!on){initMap();setTimeout(function(){map&&map.invalidateSize();},60);}};
+    hide.addEventListener('click',function(){setHide(!wrap.classList.contains('nomap'));});
+    if(SM.store('sm_nomap'))setHide(true);
+  }
+  if(matchMedia('(min-width: 1100px)').matches&&!wrap.classList.contains('nomap'))initMap();
 
   run(true);
 })();
