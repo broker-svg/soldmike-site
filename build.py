@@ -479,11 +479,13 @@ for sl, a, ar, p, d, s in CASES:
       trail=[('Results', '/results/'), (a, '/results/%s/' % sl)])
 
 P('/reviews/',
-  lambda: hero([('Home', '/'), ('Reviews', '/reviews/')], 'What clients say', 'Real reviews from buyers and sellers, in their words.'),
+  lambda: hero([('Home', '/'), ('Reviews', '/reviews/')], 'What clients say', 'Real Google reviews of The OP Team, Michael\u2019s team at RE/MAX Premier, in the clients\u2019 own words.'),
+  lambda: band('<div style="display:flex;flex-wrap:wrap;gap:16px 28px;align-items:center;justify-content:space-between"><div><div style="font-family:var(--display);font-weight:800;font-size:56px;line-height:1;color:var(--navy)">4.9 <span style="color:var(--red)">★</span></div><p style="margin:6px 0 0;color:var(--muted)">The OP Team on Google, from 125 reviews</p></div>'
+               '<a class="btn" href="https://www.google.com/maps/place/The+OP+Team/data=!4m2!3m1!1s0x882b2f5d27d9d35d:0x7678e686b4e8701b" target="_blank" rel="noopener">Read all 125 reviews on Google</a></div>', 'tint'),
   lambda: band('<div class="grid3">' + ''.join('<figure class="rv" style="margin:0;padding-top:18px;border-top:3px solid var(--red);display:flex;flex-direction:column;gap:12px"><div style="color:var(--red);letter-spacing:3px" aria-label="5 stars">★★★★★</div><blockquote style="margin:0;font-size:19px">"[Real Google review %d: names Michael, the neighbourhood and what he did]"</blockquote><figcaption style="color:var(--muted);font-weight:600">[Client name], [Area]</figcaption></figure>' % i for i in range(1, 7)) + '</div><div style="margin-top:28px">' +
-               todo('Paste in your best Google reviews word for word (real reviews only)', 'Google rating and review count for the schema markup', 'Link to your Google Business Profile reviews') + '</div>'),
+               todo('Michael picks his favourite Google reviews of The OP Team; Claude adds them word for word (first name + last initial, area)') + '</div>'),
   lambda: cta('Ready to be the next review?', 'Start with a free home value or a buyer consultation.'),
-  title='Client Reviews | Michael Barillari, SoldMike', desc='Reviews of Michael Barillari, Broker, RE/MAX Premier The OP Team, from buyers and sellers in Vaughan and Woodbridge.',
+  title='Client Reviews | Michael Barillari, SoldMike', desc='Google reviews of The OP Team at RE/MAX Premier (4.9 stars, 125 reviews) from buyers and sellers in Vaughan and Woodbridge.',
   trail=[('Reviews', '/reviews/')])
 
 P('/market-reports/',
