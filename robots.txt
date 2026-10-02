@@ -1,6 +1,8 @@
 User-agent: *
 Allow: /
 Disallow: /saved/
+Disallow: /alerts/
+Disallow: /leads/
 
 User-agent: GPTBot
 Allow: /

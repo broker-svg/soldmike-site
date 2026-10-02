@@ -107,7 +107,7 @@
       sb.disabled=true; sb.textContent='Sending…';
       var convo=[].map.call(log.querySelectorAll('.m'),function(m){return (m.classList.contains('me')?'Visitor: ':'Mika: ')+m.textContent;}).join(' | ').slice(-1500);
       fetch(FUB,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({firstName:parts[0],lastName:parts.slice(1).join(' '),email:isMail?c:'',phone:isMail?'':c,message:'[Chat with Mika] Topic: '+topic+'. Conversation: '+convo+' (page: '+location.pathname+')',property:'soldmike.com, Chat'})})
-        .then(function(r){return r.json();}).then(function(r){if(!r.success)throw 0;try{localStorage.setItem('sm_lead',JSON.stringify({firstName:parts[0],lastName:parts.slice(1).join(' '),email:isMail?c:'',phone:isMail?'':c}));}catch(x){}f.remove();bot('Thanks, '+parts[0]+'. Michael has your message and will be in touch shortly. Anything else I can help with?');})
+        .then(function(r){return r.json();}).then(function(r){if(!r.success)throw 0;try{localStorage.setItem('sm_lead',JSON.stringify({firstName:parts[0],lastName:parts.slice(1).join(' '),email:isMail?c:'',phone:isMail?'':c}));}catch(x){}if(window.smLeadLog)smLeadLog({firstName:parts[0],lastName:parts.slice(1).join(' '),email:isMail?c:'',phone:isMail?'':c,source:'Mika chat',page:location.pathname});f.remove();bot('Thanks, '+parts[0]+'. Michael has your message and will be in touch shortly. Anything else I can help with?');})
         .catch(function(){sb.disabled=false;sb.textContent='Have Michael follow up';bot('That did not go through. You can call or text Michael directly at 647-694-3109.');});
     };
     log.appendChild(f);scroll();setTimeout(function(){f.elements.name.focus();},50);

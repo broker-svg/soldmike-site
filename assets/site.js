@@ -1,5 +1,8 @@
 (function(){
   var FUB='https://dawn-sun-5ae8.broker-e2c.workers.dev';
+  // the site's own lead list (leads page); listings Worker
+  var LAPI=/^(localhost|127\.0\.0\.1)$/.test(location.hostname)?'http://localhost:8787':'https://soldmike-listings.broker-e2c.workers.dev';
+  window.smLeadLog=function(l){try{fetch(LAPI+'/api/lead',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(l)}).catch(function(){});}catch(x){}};
   var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // mobile menu + dropdowns
@@ -57,6 +60,7 @@
         if(!r.success) throw 0;
         // remember the lead in this browser so the listing pages can log their views/saves in FUB
         try{localStorage.setItem('sm_lead',JSON.stringify({firstName:parts[0],lastName:parts.slice(1).join(' '),email:v('email'),phone:v('phone')}));}catch(x){}
+        smLeadLog({firstName:parts[0],lastName:parts.slice(1).join(' '),email:v('email'),phone:v('phone'),source:f.dataset.lead,page:location.pathname});
         var done=f.dataset.done||'Sent. Michael will be in touch shortly.'; f.reset(); msg.className='msg'; msg.textContent=done; btn.textContent=t; btn.disabled=false; sentPopup(done);
       }).catch(function(){
         msg.className='msg err'; msg.textContent='That did not go through. Call or text Michael at 647-694-3109.'; btn.textContent=t; btn.disabled=false;

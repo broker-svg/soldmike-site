@@ -161,7 +161,7 @@ def page(path, title, desc, trail, body, schema=None, noindex=False, head='', js
            '<meta property="og:type" content="website"><meta property="og:title" content="%s"><meta property="og:description" content="%s"><meta property="og:url" content="%s%s"><meta property="og:image" content="%s/hero.jpg">'
            '%s<link rel="icon" href="/logo.png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
            '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Barlow:wght@400;500;600&display=swap">'
-           '<link rel="stylesheet" href="/assets/site.css?v=5">%s%s</head><body>%s<main id="main">%s</main>%s<script src="/assets/site.js?v=5" defer></script>%s<script src="/assets/chat.js?v=6" defer></script></body></html>'
+           '<link rel="stylesheet" href="/assets/site.css?v=5">%s%s</head><body>%s<main id="main">%s</main>%s<script src="/assets/site.js?v=6" defer></script>%s<script src="/assets/chat.js?v=7" defer></script></body></html>'
            ) % (e(title), e(desc), SITE, path, e(title), e(desc), SITE, path, SITE,
                 '<meta name="robots" content="noindex">' if noindex else '',
                 ''.join('<script type="application/ld+json">%s</script>' % json.dumps(s, ensure_ascii=False) for s in sch), head,
@@ -601,6 +601,35 @@ P('/terms/',
       'Calculators and estimates on this site are for information only and are not financial, legal or mortgage advice.') + '<div style="margin-top:20px">' + todo('Have the brokerage review these terms') + '</div>', narrow=True),
   title='Terms of Use | SoldMike', desc='Terms of use for soldmike.com, including the CREA listing content terms.', trail=[('Terms', '/terms/')], noindex=True)
 
+# ---------- new-listing alerts (each visitor's own link from the alert email) ----------
+ALERTS_JS = """<script>
+(function(){
+  function go(){var SM=window.SM;if(!SM){return setTimeout(go,50);}
+    var q=new URLSearchParams(location.search),t=q.get('t')||'',s=q.get('s')||'',box=document.getElementById('alBox'),h=document.getElementById('alHead');
+    if(!t){h.textContent='This page opens from your new-listing email.';return;}
+    SM.get('/api/alerts/get?t='+encodeURIComponent(t)+'&s='+encodeURIComponent(s)).then(function(j){
+      h.textContent=(j.first?j.first+', here are ':'Here are ')+'the new listings that match your search.';
+      document.getElementById('alLabel').textContent=j.search?j.search.label:'';
+      SM.cards(box,j.items,'No new matches yet. We check every morning and email you when something new comes up.');
+      var st=document.getElementById('alStop');
+      if(j.unsub||!j.search||!j.search.active){st.innerHTML='<p>New-listing emails are off for you. Want them back? <a href="/contact/">Let Michael know</a>.</p>';return;}
+      st.hidden=false;
+      document.getElementById('alStopBtn').onclick=function(){var b=this;b.disabled=true;
+        SM.post('/api/alerts/stop',{t:t}).then(function(r){if(!r.ok)throw 0;st.innerHTML='<p><b>Done.</b> You will not get any more new-listing emails from this site.</p>';}).catch(function(){b.disabled=false;alert('That did not go through. Please try again or email '+'"""+EMAIL+"""'+'.');});};
+    }).catch(function(){h.textContent='This link has expired.';box.innerHTML='<p><a class="btn" href="/listings/">Search all homes</a></p>';});
+  }
+  go();
+})();
+</script>"""
+P('/alerts/',
+  lambda: hero([('Home', '/'), ('Your new listings', '/alerts/')], 'Your new listings', '<span id="alHead">Loading…</span>'),
+  lambda: band('<p id="alLabel" style="font-weight:600;color:var(--navy);margin:0 0 18px"></p><div class="lgrid" id="alBox"></div>'
+      '<div class="rca-row"><a class="btn ghost" href="/listings/">Search all homes</a><a href="https://www.realtor.ca/en" target="_blank" rel="noopener"><img src="https://www.realtor.ca/images/en-ca/powered_by_realtor.svg" width="125" alt="Powered by REALTOR.ca"></a></div>'
+      '<div id="alStop" hidden style="margin-top:28px;padding-top:20px;border-top:1px solid var(--line)"><p>Don’t want these emails any more?</p><button class="btn ghost" type="button" id="alStopBtn">Stop new-listing emails</button></div>'
+      + CREA_NOTE, 'lsband'),
+  title='Your New Listings | SoldMike', desc='New listings that match your saved search.', trail=[('Your new listings', '/alerts/')], noindex=True,
+  head=LISTING_HEAD, js=LISTING_JS + ALERTS_JS)
+
 # ---------- homepage menu (index.html is hand-edited; its menu comes from NAV so it always matches) ----------
 def home_nav():
     out = []
@@ -620,14 +649,14 @@ PAGE = '/404'
 page404 = ('<!doctype html><html lang="en-CA"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Page not found | SoldMike</title><meta name="robots" content="noindex">'
            '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=Barlow:wght@400;600&display=swap"><link rel="stylesheet" href="/assets/site.css?v=5"></head><body>'
            + header('/404') + '<main id="main">' + hero([('Home', '/'), ('Not found', '/404')], 'That page has moved', 'The page you were looking for is not here. Try one of these instead.') +
-           band(cards([('/listings/', 'Search homes', 'Every MLS® listing'), ('/sell/home-value/', 'Home value', 'What your home is worth'), ('/neighbourhoods/', 'Neighbourhoods', 'Area guides'), ('/contact/', 'Contact', 'Talk to Michael')])) + '</main>' + footer() + '<script src="/assets/site.js?v=4" defer></script><script src="/assets/chat.js?v=5" defer></script></body></html>')
+           band(cards([('/listings/', 'Search homes', 'Every MLS® listing'), ('/sell/home-value/', 'Home value', 'What your home is worth'), ('/neighbourhoods/', 'Neighbourhoods', 'Area guides'), ('/contact/', 'Contact', 'Talk to Michael')])) + '</main>' + footer() + '<script src="/assets/site.js?v=6" defer></script><script src="/assets/chat.js?v=7" defer></script></body></html>')
 open('404.html', 'w', encoding='utf-8').write(page404)
 
 today = date.today().isoformat()
 urls = ['/'] + SITEMAP
 open('sitemap.xml', 'w').write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
                                ''.join('  <url><loc>%s%s</loc><lastmod>%s</lastmod></url>\n' % (SITE, u, today) for u in urls) + '</urlset>\n')
-open('robots.txt', 'w').write('User-agent: *\nAllow: /\nDisallow: /saved/\n\nUser-agent: GPTBot\nAllow: /\n\nUser-agent: OAI-SearchBot\nAllow: /\n\nUser-agent: ClaudeBot\nAllow: /\n\nUser-agent: PerplexityBot\nAllow: /\n\nUser-agent: Google-Extended\nAllow: /\n\nSitemap: %s/sitemap.xml\n' % SITE)
+open('robots.txt', 'w').write('User-agent: *\nAllow: /\nDisallow: /saved/\nDisallow: /alerts/\nDisallow: /leads/\n\nUser-agent: GPTBot\nAllow: /\n\nUser-agent: OAI-SearchBot\nAllow: /\n\nUser-agent: ClaudeBot\nAllow: /\n\nUser-agent: PerplexityBot\nAllow: /\n\nUser-agent: Google-Extended\nAllow: /\n\nSitemap: %s/sitemap.xml\n' % SITE)
 
 with open('CONTENT-TODO.md', 'w') as f:
     f.write('# soldmike.com content to write\n\nGenerated by build.py on %s. Every yellow "Content to write" box on the site is listed here, page by page.\n\n' % today)
