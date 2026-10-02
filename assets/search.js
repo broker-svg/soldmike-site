@@ -4,7 +4,7 @@
   var form=document.getElementById('lsForm'), list=document.getElementById('lsList'), info=document.getElementById('lsInfo'), more=document.getElementById('lsMore');
   var mapEl=document.getElementById('lsMap'), areaBtn=document.getElementById('lsArea'), wrap=document.getElementById('lsWrap');
   var FIELDS=['q','area','lease','type','min','max','beds','baths','sort'];
-  var state={page:0,items:[],bbox:''}, map=null, layer=null, moved=false;
+  var state={page:0,items:[],bbox:''}, map=null, layer=null, auto=true;
 
   // filters <-> URL
   var qs=new URLSearchParams(location.search);
@@ -45,7 +45,9 @@
     map=L.map(mapEl,{scrollWheelZoom:false,zoomControl:true}).setView([43.84,-79.55],10);
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18,attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'}).addTo(map);
     layer=L.layerGroup().addTo(map);
-    map.on('moveend',function(){if(moved)areaBtn.hidden=false;moved=true;});
+    // only show "Search this map area" after the visitor moves the map, not when we zoom to the results
+    map.on('moveend',function(){if(!auto)areaBtn.hidden=false;});
+    setTimeout(function(){auto=false;},1200);
     if(lastPins)drawPins(lastPins);else pins();
   }
   var lastPins=null;
@@ -66,8 +68,9 @@
         });
         m.addTo(layer);b.push([x.lat,x.lng]);
       });
-      moved=false;
+      auto=true;
       if(b.length&&!state.bbox)map.fitBounds(b,{padding:[30,30],maxZoom:14});
+      setTimeout(function(){auto=false;},1200);
       areaBtn.hidden=true;
     })({pins:list});
   }

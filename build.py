@@ -207,7 +207,7 @@ P('/listings/',
   title='Homes for Sale in Vaughan, Woodbridge & the GTA | SoldMike',
   desc='Search MLS® listings in Vaughan, Woodbridge, Kleinburg, King, Caledon and Toronto, refreshed daily. Map search, saved homes and showings with Michael Barillari.',
   trail=[('Search homes', '/listings/')],
-  head=LISTING_HEAD + LEAFLET_HEAD, js=LISTING_JS + LEAFLET_JS + '<script src="/assets/search.js?v=2" defer></script>')
+  head=LISTING_HEAD + LEAFLET_HEAD, js=LISTING_JS + LEAFLET_JS + '<script src="/assets/search.js?v=3" defer></script>')
 
 P('/listings/home/',
   '<div class="ld" id="ld" data-listings><p class="ld-loading">Loading this home…</p></div>',
