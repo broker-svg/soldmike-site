@@ -64,7 +64,7 @@
       h+='<section class="stage" id="stage" tabindex="0" aria-roledescription="carousel" aria-label="Photos. Use left and right arrow keys to browse.">'
         +'<div id="slides">'+slides+'</div><div class="credit">'+tags+'</div><div class="caption" id="cap"></div>'
         +(N>1?'<button class="arrow prev" id="prev" type="button" aria-label="Previous photo">'+ARW+'</button><button class="arrow next" id="next" type="button" aria-label="Next photo">'+ARW2+'</button>':'')
-        +'<div class="hud"><div class="left"><button class="pill" id="openAll" type="button">'+GRID+'View all '+N+' photos</button><a class="pill" href="#location">'+PIN+'Map</a></div><div class="count" aria-live="polite"><span id="n">1</span> / '+N+'</div></div></section>'
+        +'<div class="hud"><div class="left"><button class="pill" id="openAll" type="button" aria-label="View all '+N+' photos" title="View all '+N+' photos">'+GRID+'</button><a class="pill" href="#location" aria-label="Map" title="Map">'+PIN+'</a></div><div class="count" aria-live="polite"><span id="n">1</span> / '+N+'</div></div></section>'
         +'<nav class="rail" aria-label="Photo thumbnails"><ol id="rail">'+rail+'</ol></nav>';
     }
     h+='<div class="wrap"><div class="title"><div>'+(N?'':'<div class="tags">'+tags+'</div>')

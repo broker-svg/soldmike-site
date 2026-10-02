@@ -144,7 +144,7 @@ def live_grid(area, n=3):
 
 # ---------- page writer ----------
 SITEMAP = []
-LISTING_HEAD = '<link rel="stylesheet" href="/assets/listings.css?v=9">'
+LISTING_HEAD = '<link rel="stylesheet" href="/assets/listings.css?v=10">'
 LEAFLET_HEAD = '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">'
 LEAFLET_JS = '<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" defer></script>'
 LISTING_JS = '<script src="/assets/listings.js?v=3" defer></script>'
@@ -210,7 +210,7 @@ P('/listings/home/',
   '<div class="ld" id="ld" data-listings><p class="ld-loading">Loading this home…</p></div>',
   title='Home for sale | SoldMike', desc='MLS® listing details, photos and showings with Michael Barillari, Broker.',
   trail=[('Search homes', '/listings/'), ('Listing', '/listings/home/')],
-  head=LISTING_HEAD + LEAFLET_HEAD, js=LISTING_JS + LEAFLET_JS + '<script src="/assets/home.js?v=6" defer></script>', noindex=False)
+  head=LISTING_HEAD + LEAFLET_HEAD, js=LISTING_JS + LEAFLET_JS + '<script src="/assets/home.js?v=7" defer></script>', noindex=False)
 
 P('/saved/',
   lambda: hero([('Home', '/'), ('Saved homes', '/saved/')], 'Your saved homes and searches', 'Create a free account to save homes, save searches and get new matches the morning they hit the market.'),
