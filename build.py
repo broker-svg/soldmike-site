@@ -456,7 +456,7 @@ for slug, name, intro, photo, pockets in HOODS:
 # RESULTS
 # =====================================================================
 CASES = [
-    ('226-via-borghese', '226 Via Borghese St', 'Vellore Village, Vaughan', '$1.69M', '140', '[X]%'),
+    ('226-via-borghese', '226 Via Borghese St', 'Vellore Village, Vaughan', '$1.69M', '', '[X]%'),
     ('49-walter-proctor', '49 Walter Proctor Rd', 'East Gwillimbury', '[$X,XXX,XXX]', '[X]', '[X]%'),
     ('179-lio-ave', '179 Lio Ave', 'Woodbridge', '[$X,XXX,XXX]', '[X]', '[X]%'),
 ]
@@ -472,7 +472,7 @@ P('/results/',
 for sl, a, ar, p, d, s in CASES:
     P('/results/%s/' % sl,
       lambda a=a, ar=ar, sl=sl, p=p: hero([('Home', '/'), ('Results', '/results/'), (a, '/results/%s/' % sl)], 'How we sold %s' % a, '%s · Sold for %s' % (e(ar), p)),
-      lambda d=d, s=s, p=p, ar=ar: band('<div class="two"><div class="stack"><h2>The numbers</h2>' + kv([('Sold for', p), ('Days on market', d), ('Sale vs list', s), ('Area', ar), ('Property type', '[Detached]')]) + '</div><div class="stack"><h2>The story</h2>' +
+      lambda d=d, s=s, p=p, ar=ar: band('<div class="two"><div class="stack"><h2>The numbers</h2>' + kv([r for r in [('Sold for', p), ('Days on market', d), ('Sale vs list', s), ('Area', ar), ('Property type', '[Detached]')] if r[1]]) + '</div><div class="stack"><h2>The story</h2>' +
           todo('The challenge (for example: listed before and did not sell, tough market, unique home)', 'What we did: pricing, staging, media, offer strategy', 'The result in one sentence, then a quote from the seller', '2 to 4 photos from the shoot') + '</div></div>'),
       lambda: cta('Selling a home like this?', 'Get a price range and the plan we would use.'),
       title='How We Sold %s, %s | SoldMike' % (a, ar), desc='Case study: how Michael Barillari sold %s in %s.' % (a, ar),
