@@ -522,7 +522,8 @@ P('/results/',
   lambda: hero([('Home', '/'), ('Results', '/results/')], 'Recent sales', 'What sold, how fast, and what we did to get it there.'),
   lambda: band('<div class="tbl"><table><thead><tr><th scope="col">Home</th><th scope="col">Area</th><th scope="col">Sold for</th><th scope="col">Days</th><th scope="col">Sale vs list</th><th scope="col"></th></tr></thead><tbody>' +
                ''.join('<tr class="rv"><td class="big">%s</td><td>%s</td><td class="sold">%s</td><td>%s</td><td>%s</td><td><a href="/results/%s/">Case study</a></td></tr>' % (e(a), e(ar), *[('' if unfinished(v) else v) for v in (p, d, s)], sl) for sl, a, ar, p, d, s in CASES) +
-               '</tbody></table></div>' + '<div style="margin-top:24px">' + todo('Add every sale from the last 24 months with verified days on market and sale-to-list % (RECO: accurate and provable)', 'Sold data on the site likely needs the TRREB VOW feed; until then enter sales by hand') + '</div>'),
+               '</tbody></table></div>'),
+  lambda: band('<div style="display:flex;flex-wrap:wrap;gap:16px 28px;align-items:center;justify-content:space-between"><div><h2 style="margin:0 0 6px">See all of our recent sales</h2><p style="margin:0;color:var(--muted);max-width:60ch">The full, up-to-date list of homes The OP Team has sold, with prices, is on our sold listings page. A free sign-up is needed to see sold prices.</p></div><a class="btn" href="https://soldmike.ca/sellers/team-sold-listings" target="_blank" rel="noopener">See all recent sales</a></div>', 'tint'),
   lambda: cta('Want results like these?', 'It starts with pricing your home from real sales.'),
   title='Recent Home Sales in Vaughan & Woodbridge | SoldMike', desc='Homes sold by Michael Barillari and The OP Team in Vaughan, Woodbridge and York Region, with days on market and how we did it.',
   trail=[('Results', '/results/')])
