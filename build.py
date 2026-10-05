@@ -494,7 +494,7 @@ for slug, name, intro, photo, pockets in HOODS:
       lambda name=name, slug=slug: band(head_block('Living in %s' % name) + living(slug, name), narrow=True),
       lambda name=name, qs=qs: band(head_block('%s questions, answered' % name) + faq(qs), 'tint'),
       lambda name=name: cta('Own in %s? See what it is worth.' % name, 'A price range based on real sales on your street.'),
-      title='%s Homes for Sale & Neighbourhood Guide | SoldMike' % name, desc=intro[:155],
+      title='%s Homes for Sale & Area Guide | SoldMike' % name, desc=intro[:155],
       trail=[('Neighbourhoods', '/neighbourhoods/'), (name, path)], head=LISTING_HEAD, js=LISTING_JS,
       schema=[{'@context': 'https://schema.org', '@type': 'Place', 'name': name + ', Ontario', 'address': {'@type': 'PostalAddress', 'addressLocality': name.split(' & ')[0], 'addressRegion': 'ON', 'addressCountry': 'CA'}}])
 
@@ -533,7 +533,7 @@ for sl, a, ar, p, d, s in CASES:
       lambda d=d, s=s, p=p, ar=ar, sl=sl: band('<div class="two"><div class="stack"><h2>The numbers</h2>' + kv([r for r in [('Sold for', p), ('Days on market', d), ('Sale vs list', s), ('Area', ar), ('Property type', '[Detached]')] if r[1]]) + '</div><div class="stack"><h2>The story</h2>' +
           prose('<h3>The challenge</h3>', STORIES[sl][0], '<h3>What we did</h3>', STORIES[sl][1], '<h3>The result</h3>', STORIES[sl][2]) + todo('2 to 4 photos from the shoot', 'Final sale price and days on market') + '</div></div>'),
       lambda: cta('Selling a home like this?', 'Get a price range and the plan we would use.'),
-      title='How We Sold %s, %s | SoldMike' % (a, ar), desc='Case study: how Michael Barillari sold %s in %s.' % (a, ar),
+      title='How We Sold %s | SoldMike' % a, desc='Case study: how Michael Barillari sold %s in %s.' % (a, ar),
       trail=[('Results', '/results/'), (a, '/results/%s/' % sl)])
 
 P('/reviews/',
@@ -637,7 +637,7 @@ P('/about/',
       todo('A short personal story: how you started and what you do differently', 'Awards (verifiable)', 'A personal line: family, community, what you do outside work') + '</div></div>'),
   lambda: band(cards([('/about/the-op-team/', 'The OP Team', 'Who you work with'), ('/videos/', 'Videos', 'Market updates and neighbourhood tours'), ('/reviews/', 'Reviews', 'What clients say'), ('/join/', 'Join the team', 'Getting started as a realtor')]), 'tint'),
   lambda: cta('Talk to Michael', 'Buying, selling or just have a question. Call or text %s.' % PHONE, 'contact'),
-  title='Michael Barillari, Broker | SOLDMIKE | RE/MAX Premier The OP Team', desc='Michael Barillari, Broker with RE/MAX Premier The OP Team, licensed since 2011. ABR, SRS, RENE. Serving Vaughan, Woodbridge, Kleinburg, King, Caledon and Toronto.',
+  title='Michael Barillari, Broker | SOLDMIKE | RE/MAX Premier The OP Team', desc='Michael Barillari, Broker, RE/MAX Premier The OP Team, licensed since 2011. ABR, SRS, RENE. Serving Vaughan, Woodbridge, Kleinburg, King, Caledon and Toronto.',
   trail=[('About', '/about/')],
   schema=[{'@context': 'https://schema.org', '@type': 'Person', 'name': 'Michael Barillari', 'jobTitle': 'Broker', 'worksFor': {'@type': 'Organization', 'name': BROKERAGE}, 'url': SITE + '/about/', 'image': SITE + '/mike.png', 'knowsLanguage': ['English', 'Italian'], 'hasCredential': [{'@type': 'EducationalOccupationalCredential', 'name': n} for n in DESIGNATION_NAMES], 'sameAs': PROFILES}])
 
