@@ -52,7 +52,7 @@ def faq_schema(qs):
 
 # ---------- building blocks ----------
 NAV = [
-    ('Buy', [('/listings/', 'Search homes'), ('/buy/', 'Buying with us'), ('/buy/buyer-guide/', 'Buyer guide: 15 steps'), ('/free-guide/', 'Free PDF guides'), ('/buy/pre-construction/', 'Pre-construction'), ('/saved/', 'Saved homes & searches'), ('/open-house/', 'Open houses')]),
+    ('Buy', [('/listings/', 'Search homes'), ('/listings/our-listings/', 'Our listings'), ('/listings/re-max-premier/', 'RE/MAX Premier listings'), ('/buy/', 'Buying with us'), ('/buy/buyer-guide/', 'Buyer guide: 15 steps'), ('/free-guide/', 'Free PDF guides'), ('/buy/pre-construction/', 'Pre-construction'), ('/saved/', 'Saved homes & searches'), ('/open-house/', 'Open houses')]),
     ('Sell', [('/sell/home-value/', "What's my home worth?"), ('/sell/', 'Selling with us'), ('/sell/seller-guide/', 'Seller guide: 15 steps'), ('/free-guide/', 'Free PDF guides'), ('/sell/cost-to-sell-vaughan/', 'Cost to sell calculator'), ('/sell/how-we-market/', 'How we market your home'), ('/sell/pre-listing/', 'Pre-listing package')]),
     ('Neighbourhoods', [('/neighbourhoods/', 'All neighbourhoods')] + [('/neighbourhoods/%s/' % s, n) for s, n in [('woodbridge', 'Woodbridge'), ('vellore', 'Vellore Village'), ('kleinburg', 'Kleinburg'), ('maple', 'Maple'), ('caledon-bolton', 'Caledon & Bolton'), ('king-city-nobleton', 'King City & Nobleton'), ('sharon-east-gwillimbury', 'Sharon & East Gwillimbury'), ('toronto', 'Toronto')]]),
     ('Results', [('https://soldmike.ca/sellers/team-sold-listings', 'Recent sales'), ('/results/', 'Case studies'), ('/reviews/', 'Client reviews'), ('/market-reports/', 'Market reports')]),
@@ -179,7 +179,7 @@ SITEMAP = []
 LISTING_HEAD = '<link rel="stylesheet" href="/assets/listings.css?v=11">'
 LEAFLET_HEAD = '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">'
 LEAFLET_JS = '<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" defer></script>'
-LISTING_JS = '<script src="/assets/listings.js?v=5" defer></script><script src="/assets/account.js?v=3" defer></script>'
+LISTING_JS = '<script src="/assets/listings.js?v=5" defer></script><script src="/assets/account.js?v=4" defer></script>'
 
 def page(path, title, desc, trail, body, schema=None, noindex=False, head='', js=''):
     global PAGE
@@ -214,10 +214,12 @@ AREA_OPTS = [('', 'All areas'), ('woodbridge', 'Woodbridge'), ('vellore', 'Vello
 def sel(name, label, opts, extra=False):
     return '<div%s><label' % (' class="xf"' if extra else '') + ' for="f-%s">%s</label><select id="f-%s" name="%s">%s</select></div>' % (name, label, name, name, ''.join('<option value="%s">%s</option>' % (v, e(t)) for v, t in opts))
 PRICES = [500000, 750000, 1000000, 1250000, 1500000, 2000000, 2500000, 3000000, 5000000]
-def SEARCH_BLOCK():
+def SEARCH_BLOCK(fixed=None, empty=''):
     # full search (box, filters, results, map); used on /listings/ and /buy/
     return (
     '<div class="ls" data-listings><form id="lsForm" aria-label="Search listings" role="search">'
+    + ''.join('<input type="hidden" name="%s" value="%s">' % (k, v) for k, v in (fixed or {}).items())
+    + 
     '<div class="sbox"><label for="f-q" class="sr">Search</label><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>'
     '<input id="f-q" name="q" type="search" enterkeyhint="search" autocomplete="off" placeholder="Address, MLS®, city or area"><button class="btn" type="submit">Search</button></div>'
     '<div class="filters">'
@@ -231,11 +233,11 @@ def SEARCH_BLOCK():
     + sel('sort', 'Sort', [('new', 'Newest'), ('plow', 'Price, low to high'), ('phigh', 'Price, high to low')], True)
     + '<button type="button" class="btn ghost xfb" onclick="var f=this.parentNode;f.classList.toggle(\'all\');this.textContent=f.classList.contains(\'all\')?\'Fewer filters\':\'More filters\'">More filters</button></div></form>'
     '<div class="ls-bar"><p id="lsInfo" aria-live="polite"></p><button type="button" class="btn ghost hidemap" id="lsHide">Hide map</button><div class="viewt" role="group" aria-label="View"><button type="button" data-view="list" aria-pressed="true">List</button><button type="button" data-view="map" aria-pressed="false">Map</button></div></div>'
-    '<div class="ls-wrap" id="lsWrap" data-view="list"><div class="ls-listcol"><div class="lgrid" id="lsList"></div><button class="btn navy" id="lsMore" type="button" hidden>Show more homes</button></div>'
+    '<div class="ls-wrap" id="lsWrap" data-view="list"><div class="ls-listcol"><div class="lgrid" id="lsList"__EMPTY__></div><button class="btn navy" id="lsMore" type="button" hidden>Show more homes</button></div>'
     '<div class="ls-mapcol"><div><div id="lsMap" role="region" aria-label="Map of results"></div><button class="btn navy" id="lsArea" type="button" hidden>Search this map area</button>'
     '<p style="margin:10px 0 0;font-size:14px"><button type="button" id="lsClearArea" style="border:0;background:none;padding:0;color:var(--navy);font-weight:600;cursor:pointer;text-decoration:underline">Clear map area</button></p></div></div></div>'
     '<div class="rca-row"><a class="btn ghost" href="/saved/">Your saved homes</a><a href="https://www.realtor.ca/en" target="_blank" rel="noopener"><img src="https://www.realtor.ca/images/en-ca/powered_by_realtor.svg" width="125" alt="Powered by REALTOR.ca"></a></div>'
-    + CREA_NOTE + '</div>')
+    + CREA_NOTE + '</div>').replace('__EMPTY__', (' data-empty="%s"' % e(empty)) if empty else '')
 
 P('/listings/',
   lambda: hero([('Home', '/'), ('Search homes', '/listings/')], 'Homes for sale in Vaughan & the GTA', 'MLS® listings from Toronto to King and Caledon, refreshed every day. Save the ones you like and Michael can show you any of them.'),
@@ -244,7 +246,23 @@ P('/listings/',
   title='Homes for Sale in Vaughan, Woodbridge & the GTA | SoldMike',
   desc='Search MLS® listings in Vaughan, Woodbridge, Kleinburg, King, Caledon and Toronto, refreshed daily. Map search, saved homes and showings with Michael Barillari.',
   trail=[('Search homes', '/listings/')],
-  head=LISTING_HEAD + LEAFLET_HEAD, js=LISTING_JS + LEAFLET_JS + '<script src="/assets/search.js?v=3" defer></script>')
+  head=LISTING_HEAD + LEAFLET_HEAD, js=LISTING_JS + LEAFLET_JS + '<script src="/assets/search.js?v=4" defer></script>')
+
+P('/listings/our-listings/',
+  lambda: hero([('Home', '/'), ('Search homes', '/listings/'), ('Our listings', '/listings/our-listings/')], 'Our listings', 'Homes listed by Michael Barillari and RE/MAX Premier The OP Team, updated every day. Book a showing or ask Michael anything about them.'),
+  lambda: band(SEARCH_BLOCK({'mine': '1'}, 'No homes listed by The OP Team match right now. New listings show up here automatically.'), 'lsband'),
+  title='Our Listings | Michael Barillari, RE/MAX Premier The OP Team',
+  desc='Homes for sale listed by Michael Barillari and RE/MAX Premier The OP Team in Vaughan and the GTA, updated every day.',
+  trail=[('Search homes', '/listings/'), ('Our listings', '/listings/our-listings/')],
+  head=LISTING_HEAD + LEAFLET_HEAD, js=LISTING_JS + LEAFLET_JS + '<script src="/assets/search.js?v=4" defer></script>')
+
+P('/listings/re-max-premier/',
+  lambda: hero([('Home', '/'), ('Search homes', '/listings/'), ('RE/MAX Premier listings', '/listings/re-max-premier/')], 'RE/MAX Premier listings', 'Every home listed by RE/MAX Premier Inc., Brokerage, updated every day. Michael can show you any of them.'),
+  lambda: band(SEARCH_BLOCK({'brk': '1'}, 'No RE/MAX Premier listings match these filters. Try another area or price range.'), 'lsband'),
+  title='RE/MAX Premier Listings in Vaughan & the GTA | SoldMike',
+  desc='Homes for sale listed by RE/MAX Premier Inc., Brokerage, in Vaughan and the GTA, updated every day. Book a showing with Michael Barillari.',
+  trail=[('Search homes', '/listings/'), ('RE/MAX Premier listings', '/listings/re-max-premier/')],
+  head=LISTING_HEAD + LEAFLET_HEAD, js=LISTING_JS + LEAFLET_JS + '<script src="/assets/search.js?v=4" defer></script>')
 
 P('/listings/home/',
   '<div class="ld" id="ld" data-listings><p class="ld-loading">Loading this home…</p></div>',
@@ -267,7 +285,7 @@ document.addEventListener('DOMContentLoaded',function(){
     box.innerHTML='<div class="acct"><div><h2>Hi'+(a.me.first?' '+esc(a.me.first):'')+'</h2><p>Signed in as <b>'+esc(a.me.email)+'</b>. Your saved homes and searches follow you to any device.</p></div><button class="btn ghost" type="button" id="soBtn">Sign out</button></div>';
     document.getElementById('soBtn').onclick=function(){SM.signOut();render();};
     var ss=a.searches.filter(function(s){return s.active;});
-    sl.innerHTML=ss.length?ss.map(function(s){return '<div class="srow"><div><b>'+esc(s.label)+'</b><small>'+(a.me.alerts?'New matches by email':'No emails')+'</small></div><a class="btn ghost" href="/listings/?'+qs(s.q)+'">View</a><button class="btn ghost" type="button" data-rm="'+s.id+'">Remove</button></div>';}).join('')
+    sl.innerHTML=ss.length?ss.map(function(s){return '<div class="srow"><div><b>'+esc(s.label)+'</b><small>'+(a.me.alerts?'New matches by email':'No emails')+'</small></div><a class="btn ghost" href="/listings/'+(s.q.mine?'our-listings/':s.q.brk?'re-max-premier/':'')+'?'+qs(s.q)+'">View</a><button class="btn ghost" type="button" data-rm="'+s.id+'">Remove</button></div>';}).join('')
       :'<p class="empty">No saved searches yet. On the <a href="/listings/">search page</a>, set your filters and tap <b>Save this search</b>.</p>';
     [].forEach.call(sl.querySelectorAll('[data-rm]'),function(btn){btn.onclick=function(){SM.accountCall('/api/me/search/remove',{id:+btn.dataset.rm}).then(SM.accountApply);};});
     homes();
@@ -299,7 +317,7 @@ P('/buy/',
   lambda: cta('Start with a 20-minute call', 'Tell us what you need, your budget and timing. We set up your search the same day.', 'buyer'),
   title='Buying a Home in Vaughan & Woodbridge | SoldMike', desc='How Michael Barillari and The OP Team help buyers in Vaughan, Woodbridge and the GTA find, win and close on the right home.',
   trail=[('Buy', '/buy/')],
-  head=LISTING_HEAD + LEAFLET_HEAD, js=LISTING_JS + LEAFLET_JS + '<script src="/assets/search.js?v=3" defer></script>')
+  head=LISTING_HEAD + LEAFLET_HEAD, js=LISTING_JS + LEAFLET_JS + '<script src="/assets/search.js?v=4" defer></script>')
 
 BUY_STEPS = [
     ('Know your why', 'More space, a better school, a shorter commute. Your reason decides what to look for and what to skip.'),

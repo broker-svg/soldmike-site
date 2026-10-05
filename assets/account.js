@@ -76,8 +76,8 @@
   function describe(q){var t=LABEL[q.type]||(q.lease==='1'?'Rentals':'Homes');var area=document.querySelector('#f-area option[value="'+(q.area||'')+'"]');
     var m=function(n){n=+n;return n>=1e6?'$'+(+(n/1e6).toFixed(2))+'M':'$'+Math.round(n/1000)+'K';};
     var b=[t+' in '+(q.area&&area?area.textContent:'all areas')];if(q.min&&q.max)b.push(m(q.min)+' to '+m(q.max));else if(q.min)b.push('from '+m(q.min));else if(q.max)b.push('up to '+m(q.max));
-    if(q.beds)b.push(q.beds+'+ beds');if(q.baths)b.push(q.baths+'+ baths');return b.join(', ');}
-  function current(){var f=document.getElementById('lsForm'),q={};if(!f)return q;['area','lease','type','min','max','beds','baths'].forEach(function(k){var e=f.elements[k];if(e&&e.value)q[k]=e.value;});return q;}
+    if(q.beds)b.push(q.beds+'+ beds');if(q.baths)b.push(q.baths+'+ baths');if(q.mine)b[0]='OP Team listings: '+b[0];else if(q.brk)b[0]='RE/MAX Premier listings: '+b[0];return b.join(', ');}
+  function current(){var f=document.getElementById('lsForm'),q={};if(!f)return q;['area','lease','type','min','max','beds','baths','mine','brk'].forEach(function(k){var e=f.elements[k];if(e&&e.value)q[k]=e.value;});return q;}
   SM.saveSearch=function(){
     ensure('Sign in to save this search and get new matches by email.').then(function(){
       var q=current(),d=dlg('<h2>Save this search</h2><p><b style="color:#1D2870">'+esc(describe(q))+'</b></p>'

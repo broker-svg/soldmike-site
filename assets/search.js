@@ -3,7 +3,7 @@
   var SM=window.SM, esc=SM.esc;
   var form=document.getElementById('lsForm'), list=document.getElementById('lsList'), info=document.getElementById('lsInfo'), more=document.getElementById('lsMore');
   var mapEl=document.getElementById('lsMap'), areaBtn=document.getElementById('lsArea'), wrap=document.getElementById('lsWrap');
-  var FIELDS=['q','area','lease','type','min','max','beds','baths','sort'];
+  var FIELDS=['q','area','lease','type','min','max','beds','baths','sort','mine','brk'];
   var state={page:0,items:[],bbox:''}, map=null, layer=null, auto=true;
 
   // filters <-> URL
@@ -25,7 +25,7 @@
     more.hidden=true;
     SM.get('/api/search?'+p.toString()).then(function(r){
       state.items=state.items.concat(r.items);
-      SM.cards(list,state.items,'No homes match these filters. Try a wider price range or another area.');
+      SM.cards(list,state.items,list.dataset.empty||'No homes match these filters. Try a wider price range or another area.');
       var shown=state.items.length;
       info.innerHTML=r.total?('<b>'+(r.capped?'1,000+':r.total.toLocaleString('en-CA'))+'</b> '+(r.total===1?'home':'homes')+(r.total>100?' · showing the first '+Math.min(100,r.total)+'. Narrow your search to see the rest.':'')):'';
       more.hidden=!(shown<r.shown);
