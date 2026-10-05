@@ -852,7 +852,7 @@ open('sitemap.xml', 'w').write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset 
 # AI crawlers may read the guides and answers, never the listing pages (CREA DDF Rules 5(k) anti-scraping; PropTx: no listing data to AI)
 AI_BOTS_OPEN = ['GPTBot', 'OAI-SearchBot', 'ChatGPT-User', 'ClaudeBot', 'Claude-SearchBot', 'Claude-User', 'PerplexityBot', 'Perplexity-User', 'Google-Extended', 'Applebot-Extended']
 AI_BOTS_BLOCKED = ['CCBot', 'Bytespider', 'meta-externalagent', 'Amazonbot', 'cohere-ai', 'Diffbot', 'Timpibot', 'AI2Bot']
-LISTING_PATHS = ['/homes/', '/listings/', '/saved/', '/alerts/', '/leads/', '/admin/']
+LISTING_PATHS = ['/homes/', '/listings/', '/saved/', '/alerts/', '/leads/', '/admin/', '/hq/']
 robots = 'User-agent: *\nAllow: /\n' + ''.join('Disallow: %s\n' % p for p in LISTING_PATHS[2:]) + '\n'
 robots += ''.join('User-agent: %s\n' % b for b in AI_BOTS_OPEN) + 'Allow: /\n' + ''.join('Disallow: %s\n' % p for p in LISTING_PATHS) + '\n'
 robots += ''.join('User-agent: %s\n' % b for b in AI_BOTS_BLOCKED) + 'Disallow: /\n\n'

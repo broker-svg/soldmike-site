@@ -4,6 +4,7 @@ Disallow: /saved/
 Disallow: /alerts/
 Disallow: /leads/
 Disallow: /admin/
+Disallow: /hq/
 
 User-agent: GPTBot
 User-agent: OAI-SearchBot
@@ -22,6 +23,7 @@ Disallow: /saved/
 Disallow: /alerts/
 Disallow: /leads/
 Disallow: /admin/
+Disallow: /hq/
 
 User-agent: CCBot
 User-agent: Bytespider
