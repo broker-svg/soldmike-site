@@ -26,6 +26,10 @@ HOMES_LIVE = True  # True once soldmike.com runs through Cloudflare and /homes/ 
 e = html.escape
 
 # ---------- schema ----------
+def ext(u):
+    """Links to other websites (soldmike.ca, TorontoPropertyMedia.ca, ...) open in a new tab."""
+    return ' target="_blank" rel="noopener"' if u.startswith('http') else ''
+
 def agent_schema():
     return {
         '@context': 'https://schema.org', '@type': 'RealEstateAgent', '@id': SITE + '/#michael',
@@ -68,7 +72,7 @@ def header(path):
             out.append('<a href="%s" target="_blank" rel="noopener">%s</a>' % (items, e(label)))
             continue
         cur = any(path.startswith(u) and u != '/' for u, _ in items)
-        links = ''.join('<a href="%s"%s>%s</a>' % (u, ' aria-current="page"' if u == path else '', e(t)) for u, t in items)
+        links = ''.join('<a href="%s"%s>%s</a>' % (u, ' aria-current="page"' if u == path else ext(u), e(t)) for u, t in items)
         out.append('<div class="dd"><button type="button" aria-expanded="false"%s>%s</button><div class="menu">%s</div></div>'
                    % (' style="color:var(--red)"' if cur else '', label, links))
     return ('<a class="skip" href="#main">Skip to content</a>'
@@ -77,7 +81,7 @@ def header(path):
             '<nav class="nav" id="nav" aria-label="Main">%s<a class="btn" href="/sell/home-value/">Home value</a></nav></div></header>') % ''.join(out)
 
 def footer():
-    cols = ''.join('<div><strong>%s</strong>%s</div>' % (l, ''.join('<a href="%s">%s</a>' % (u, e(t)) for u, t in items[:5])) for l, items in NAV[:4] if not isinstance(items, str))
+    cols = ''.join('<div><strong>%s</strong>%s</div>' % (l, ''.join('<a href="%s"%s>%s</a>' % (u, ext(u), e(t)) for u, t in items[:5])) for l, items in NAV[:4] if not isinstance(items, str))
     return ('<footer><div class="wrap"><div class="fcols">'
             '<div><img src="/logo-soldmike-white.png" alt="RE/MAX Premier The OP Team, SoldMike" style="width:220px;height:auto">'
             '<span>Michael Barillari, Broker, SOLDMIKE. %s Independently owned and operated.</span>'
@@ -826,7 +830,7 @@ def home_nav():
         if isinstance(items, str):
             out.append('<a href="%s" target="_blank" rel="noopener">%s</a>' % (items, e(label)))
             continue
-        links = ''.join('<a href="%s">%s</a>' % (u, e(t)) for u, t in items)
+        links = ''.join('<a href="%s"%s>%s</a>' % (u, ext(u), e(t)) for u, t in items)
         out.append('<div class="dd"><button type="button" aria-expanded="false">%s</button><div class="menu">%s</div></div>' % (label, links))
     return '<nav class="nav" id="mainnav" aria-label="Main">%s<a class="btn" href="/sell/home-value/">Home value</a></nav>' % ''.join(out)
 idx = open('index.html', encoding='utf-8').read()
