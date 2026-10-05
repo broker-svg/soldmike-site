@@ -53,9 +53,9 @@ def faq_schema(qs):
 # ---------- building blocks ----------
 NAV = [
     ('Buy', [('/listings/', 'Search homes'), ('/buy/', 'Buying with us'), ('/buy/buyer-guide/', 'Buyer guide: 15 steps'), ('/free-guide/', 'Free PDF guides'), ('/buy/pre-construction/', 'Pre-construction'), ('/saved/', 'Saved homes & searches'), ('/open-house/', 'Open houses')]),
-    ('Sell', [('/sell/home-value/', "What's my home worth?"), ('/sell/', 'Selling with us'), ('/sell/seller-guide/', 'Seller guide: 15 steps'), ('/free-guide/', 'Free PDF guides'), ('/sell/cost-to-sell-vaughan/', 'Cost to sell calculator'), ('/sell/how-we-market/', 'How we market your home')]),
+    ('Sell', [('/sell/home-value/', "What's my home worth?"), ('/sell/', 'Selling with us'), ('/sell/seller-guide/', 'Seller guide: 15 steps'), ('/free-guide/', 'Free PDF guides'), ('/sell/cost-to-sell-vaughan/', 'Cost to sell calculator'), ('/sell/how-we-market/', 'How we market your home'), ('/sell/pre-listing/', 'Pre-listing package')]),
     ('Neighbourhoods', [('/neighbourhoods/', 'All neighbourhoods')] + [('/neighbourhoods/%s/' % s, n) for s, n in [('woodbridge', 'Woodbridge'), ('vellore', 'Vellore Village'), ('kleinburg', 'Kleinburg'), ('maple', 'Maple'), ('caledon-bolton', 'Caledon & Bolton'), ('king-city-nobleton', 'King City & Nobleton'), ('sharon-east-gwillimbury', 'Sharon & East Gwillimbury'), ('toronto', 'Toronto')]]),
-    ('Results', [('/results/', 'Recent sales'), ('/reviews/', 'Client reviews'), ('/market-reports/', 'Market reports')]),
+    ('Results', [('https://soldmike.ca/sellers/team-sold-listings', 'Recent sales'), ('/results/', 'Case studies'), ('/reviews/', 'Client reviews'), ('/market-reports/', 'Market reports')]),
     ('Questions', [('/questions/', 'All questions'), ('/questions/buying/', 'Buyer questions'), ('/questions/selling/', 'Seller questions')]),
     ('TorontoPropertyMedia.ca', 'https://torontopropertymedia.ca/'),
     ('About', [('/about/', 'Michael Barillari'), ('/about/the-op-team/', 'The OP Team'), ('/videos/', 'Videos'), ('/join/', 'Join the team'), ('/contact/', 'Contact')]),
@@ -352,7 +352,7 @@ P('/sell/',
       ('/sell/seller-guide/', 'Seller guide', 'The 15 steps from your why to closing day'),
       ('/sell/cost-to-sell-vaughan/', 'Cost to sell', 'See what you walk away with'),
       ('/sell/how-we-market/', 'How we market', 'Photos, drone, video and twilight by Toronto Property Media'),
-      ('/results/', 'Recent sales', 'What sold, how fast, and how we did it'),
+      ('/results/', 'Case studies', 'How we sold three homes, start to finish'),
   ])),
   lambda: band(head_block('Why sellers choose Michael') + '<div class="cards">' + ''.join('<div class="rv" style="background:var(--white);padding:26px 22px;display:flex;flex-direction:column;gap:10px"><b style="font-family:var(--display);font-size:22px;text-transform:uppercase;color:var(--navy)">%s</b><span style="color:var(--muted)">%s</span></div>' % (e(t), e(d)) for t, d in [
       ('2,000+ transactions of experience', 'Michael and The OP Team have handled more than 2,000 transactions combined. That experience shows up in pricing, negotiation and the details that keep a deal together.'),
@@ -429,6 +429,8 @@ P('/sell/cost-to-sell-vaughan/',
   title='Cost to Sell a House in Vaughan, Ontario (Calculator) | SoldMike', desc='Calculate the cost of selling a house in Vaughan: commission, HST, legal fees and mortgage payout, and see your net proceeds.',
   trail=[('Sell', '/sell/'), ('Cost to sell', '/sell/cost-to-sell-vaughan/')], schema=[faq_schema(COST_QS)])
 
+LAUNCH = [('Pricing meeting', 'We pull the recent sales on your street, set the list price and decide on an offer date or offers any time.'), ('Prep', 'A short list of repairs, paint and decluttering, plus a staging consultation.'), ('Media day', 'Toronto Property Media shoots photos, drone, video, twilight and a floor plan.'), ('Coming soon', 'Your home is teased on social media, to our buyer list and to the agent network before it hits the MLS®.'), ('MLS® go-live', 'The listing goes live with the full photo set and video.'), ('Launch week', 'Social ads, an email to our buyer list, open houses and agent showings, with feedback after every showing.'), ('Offer review', 'We compare every offer on price, deposit, conditions and closing date, not just the top number.'), ('Weekly updates', 'You get an update every week until the deal is firm, then we coordinate everything through closing.')]
+
 P('/sell/how-we-market/',
   lambda: hero([('Home', '/'), ('Sell', '/sell/'), ('How we market', '/sell/how-we-market/')], 'How we market your home', 'Our own production company, Toronto Property Media, shoots every listing: photos, drone, video, twilight and floor plans.', '/l4.jpg'),
   lambda: band('<div class="grid3">%s</div>' % ''.join(
@@ -439,9 +441,9 @@ P('/sell/how-we-market/',
                          ('/hero.jpg', 'Aerial flyover of Woodbridge', 'Video', 'Cinematic tours for MLS®, YouTube and social'),
                          ('/lp/15.jpg', 'Covered patio', 'Lifestyle', 'Show how it feels to live there'),
                          ('/lp/12.jpg', 'Ensuite with freestanding tub', 'Details', 'The finishes buyers pay for')])),
-  lambda: band(head_block('Your launch plan', 'The same eight steps for every listing.') + steps([('Pricing meeting', 'We pull the recent sales on your street, set the list price and decide on an offer date or offers any time.'), ('Prep', 'A short list of repairs, paint and decluttering, plus a staging consultation.'), ('Media day', 'Toronto Property Media shoots photos, drone, video, twilight and a floor plan.'), ('Coming soon', 'Your home is teased on social media, to our buyer list and to the agent network before it hits the MLS®.'), ('MLS® go-live', 'The listing goes live with the full photo set and video.'), ('Launch week', 'Social ads, an email to our buyer list, open houses and agent showings, with feedback after every showing.'), ('Offer review', 'We compare every offer on price, deposit, conditions and closing date, not just the top number.'), ('Weekly updates', 'You get an update every week until the deal is firm, then we coordinate everything through closing.')]) + todo('Link one full listing video (YouTube)', 'Before/after staging example'), 'tint'),
+  lambda: band(head_block('Your launch plan', 'The same eight steps for every listing.') + steps(LAUNCH) + todo('Link one full listing video (YouTube)', 'Before/after staging example'), 'tint'),
   lambda: cta('See what your home could look like', "Get your home's value and a walk-through of our marketing plan."),
-  title='How We Market Your Home: Photos, Drone & Video | SoldMike', schema=[{'@context': 'https://schema.org', '@type': 'HowTo', 'name': 'How we launch a listing', 'step': [{'@type': 'HowToStep', 'position': i + 1, 'name': t, 'text': d} for i, (t, d) in enumerate([('Pricing meeting', 'We pull the recent sales on your street, set the list price and decide on an offer date or offers any time.'), ('Prep', 'A short list of repairs, paint and decluttering, plus a staging consultation.'), ('Media day', 'Toronto Property Media shoots photos, drone, video, twilight and a floor plan.'), ('Coming soon', 'Your home is teased on social media, to our buyer list and to the agent network before it hits the MLS®.'), ('MLS® go-live', 'The listing goes live with the full photo set and video.'), ('Launch week', 'Social ads, an email to our buyer list, open houses and agent showings, with feedback after every showing.'), ('Offer review', 'We compare every offer on price, deposit, conditions and closing date, not just the top number.'), ('Weekly updates', 'You get an update every week until the deal is firm, then we coordinate everything through closing.')])]}], desc='Every SoldMike listing gets professional photos, drone, video and twilight shots from Toronto Property Media.',
+  title='How We Market Your Home: Photos, Drone & Video | SoldMike', schema=[{'@context': 'https://schema.org', '@type': 'HowTo', 'name': 'How we launch a listing', 'step': [{'@type': 'HowToStep', 'position': i + 1, 'name': t, 'text': d} for i, (t, d) in enumerate(LAUNCH)]}], desc='Every SoldMike listing gets professional photos, drone, video and twilight shots from Toronto Property Media.',
   trail=[('Sell', '/sell/'), ('How we market', '/sell/how-we-market/')])
 
 # =====================================================================
@@ -519,14 +521,14 @@ STORIES = {
                     'The sellers were very happy with how smooth the process was and excited to move on to their next chapter.'),
 }
 P('/results/',
-  lambda: hero([('Home', '/'), ('Results', '/results/')], 'Recent sales', 'What sold, how fast, and what we did to get it there.'),
+  lambda: hero([('Home', '/'), ('Results', '/results/')], 'Case studies', 'How we sold three homes, and what we did when it got hard.'),
   lambda: band('<div class="tbl"><table><thead><tr><th scope="col">Home</th><th scope="col">Area</th><th scope="col">Sold for</th><th scope="col">Days</th><th scope="col">Sale vs list</th><th scope="col"></th></tr></thead><tbody>' +
                ''.join('<tr class="rv"><td class="big">%s</td><td>%s</td><td class="sold">%s</td><td>%s</td><td>%s</td><td><a href="/results/%s/">Case study</a></td></tr>' % (e(a), e(ar), *[('' if unfinished(v) else v) for v in (p, d, s)], sl) for sl, a, ar, p, d, s in CASES) +
                '</tbody></table></div>'),
   lambda: band('<div style="display:flex;flex-wrap:wrap;gap:16px 28px;align-items:center;justify-content:space-between"><div><h2 style="margin:0 0 6px">See all of our recent sales</h2><p style="margin:0;color:var(--muted);max-width:60ch">The full, up-to-date list of homes The OP Team has sold, with prices, is on our sold listings page. A free sign-up is needed to see sold prices.</p></div><a class="btn" href="https://soldmike.ca/sellers/team-sold-listings" target="_blank" rel="noopener">See all recent sales</a></div>', 'tint'),
   lambda: cta('Want results like these?', 'It starts with pricing your home from real sales.'),
   title='Recent Home Sales in Vaughan & Woodbridge | SoldMike', desc='Homes sold by Michael Barillari and The OP Team in Vaughan, Woodbridge and York Region, with days on market and how we did it.',
-  trail=[('Results', '/results/')])
+  trail=[('Case studies', '/results/')])
 
 for sl, a, ar, p, d, s in CASES:
     P('/results/%s/' % sl,
@@ -751,6 +753,47 @@ P('/alerts/',
       + CREA_NOTE, 'lsband'),
   title='Your New Listings | SoldMike', desc='New listings that match your saved search.', trail=[('Your new listings', '/alerts/')], noindex=True,
   head=LISTING_HEAD, js=LISTING_JS + ALERTS_JS)
+
+# ---------- pre-listing package (send to sellers before the listing appointment) ----------
+PRELIST_VIDEO = ''  # YouTube video ID for Michael's intro video, e.g. 'dQw4w9WgXcQ'; the video block shows once set
+def tiles(rows):
+    return '<div class="cards">' + ''.join('<div class="rv" style="background:var(--white);padding:26px 22px;display:flex;flex-direction:column;gap:10px"><b style="font-family:var(--display);font-size:22px;text-transform:uppercase;color:var(--navy)">%s</b><span style="color:var(--muted)">%s</span></div>' % (e(t), d) for t, d in rows) + '</div>'
+def statrow(rows):
+    return '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:24px">' + ''.join('<div><div style="font-family:var(--display);font-weight:800;font-size:52px;line-height:1;color:var(--navy)">%s</div><p style="margin:6px 0 0;color:var(--muted)">%s</p></div>' % (n, e(t)) for n, t in rows) + '</div>'
+P('/sell/pre-listing/',
+  lambda: hero([('Home', '/'), ('Sell', '/sell/'), ('Pre-listing package', '/sell/pre-listing/')], 'Your home, presented by SoldMike', 'Everything you should know before we meet: who we are, how we price, how we launch, and how we win you the best offer.', '/lp/1.jpg'),
+  lambda: band(statrow([('2,000+', 'transactions, Michael and The OP Team combined'), ('4.9<span style="color:var(--red)">★</span>', 'Google rating for The OP Team, 125 reviews'), ('2011', 'Michael licensed and selling in Vaughan since'), ('RENE', 'Real Estate Negotiation Expert, plus SRS and ABR®')]) + '<p class="fine" style="margin-top:16px">Transactions: The OP Team and Michael Barillari combined, as of October 2026. Google rating as of October 2026.</p>'),
+  lambda: band(head_block('A message from Michael') + '<div style="position:relative;padding-top:56.25%%;border-radius:8px;overflow:hidden"><iframe src="https://www.youtube-nocookie.com/embed/%s" title="Michael Barillari introduces his selling plan" style="position:absolute;inset:0;width:100%%;height:100%%;border:0" allow="encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe></div>' % PRELIST_VIDEO, narrow=True) if PRELIST_VIDEO else '',
+  lambda: band(head_block('What matters most in your sale', 'We start with you. These four answers shape the whole plan.') + tiles([
+      ('Your ideal price', 'What you hope to get, and what you need to net after costs. We will show you what the market supports.'),
+      ('Your timing', 'When you want to move, and whether you are buying at the same time.'),
+      ('Your why', 'Moving up, downsizing, relocating or settling an estate. Your reason sets the strategy.'),
+      ('Your concerns', 'Showings with kids or pets, tenants, repairs, privacy. Tell us, and we plan around it.')]), 'tint'),
+  lambda: band(head_block('The SoldMike advantage') + tiles([
+      ('Our own media company', 'Toronto Property Media shoots every listing: photos, drone, cinematic video, twilight and floor plans. No outsourcing, no waiting.'),
+      ('Pricing from real sales', 'We price from the homes that actually sold near you, adjusted for size, lot, finishes and parking. Not from online estimates.'),
+      ('Negotiation training', 'Michael is a Real Estate Negotiation Expert (RENE) and Seller Representative Specialist (SRS). Offer night is where that pays off.'),
+      ('Prep and staging', 'A clear prep list, a staging consultation and help finding trades, so your home shows at its best.'),
+      ('Every buyer followed up', 'Every inquiry, showing and open house visitor goes into our system and gets a fast reply, so no buyer slips through.')])),
+  lambda: band(head_block('Your 8-step launch plan', 'The same plan for every listing, from our first meeting to closing day.') + steps(LAUNCH), 'tint'),
+  lambda: band(head_block('How your home will look', 'Most buyers see your home online first, so your photos are your first showing.') + '<div class="grid3">%s</div>' % ''.join(
+      '<figure class="card rv" style="margin:0"><div class="ph"><img src="%s" alt="%s" loading="lazy"></div><figcaption class="meta"><div class="addr">%s</div><div class="specs">%s</div></figcaption></figure>' % (i, e(a), e(t), e(d))
+      for i, a, t, d in [('/lp/1.jpg', 'Stone home at dusk', 'Twilight', 'The shot that stops the scroll'), ('/lp/2.jpg', 'Aerial view of a street', 'Drone', 'The lot, the street and what is nearby'), ('/lp/7.jpg', 'Bright kitchen', 'Interiors', 'Wide, bright and true to the room')]) +
+      '<p style="margin-top:20px"><a class="btn ghost" href="/sell/how-we-market/">See how we market a home</a> <a class="btn ghost" href="https://torontopropertymedia.ca/" target="_blank" rel="noopener">Toronto Property Media</a></p>'),
+  lambda: band('<div class="two"><div class="stack">' + prose('<h2>How we price your home</h2>',
+      'We look at the homes that sold closest to yours in the last few months, what is for sale right now (your competition), how fast homes are selling and the time of year.',
+      'You get a price range, the comparable sales behind it, and our recommended list price and strategy. Then we show you what you walk away with after costs.',
+      '<p><a class="btn" href="/sell/home-value/">Get your home value</a> <a class="btn ghost" href="/sell/cost-to-sell-vaughan/">Cost to sell calculator</a></p>') + '</div><div class="stack">' + prose('<h2>How we win the best offer</h2>',
+      'Offer date or offers any time: we choose based on your home and the market that week, and we plan ahead for early bully offers.',
+      'We compare every offer on price, deposit, conditions and closing date, not just the top number, and negotiate the terms that matter to you.',
+      'You get feedback after every showing, an update every week until the deal is firm, and Michael with you on offer night.') + '</div></div>', 'tint'),
+  lambda: band(head_block('Homes we have sold', 'Real sales, and what we did when it got hard.') + cards([('/results/%s/' % sl, a, ar) for sl, a, ar, _, _, _ in CASES]) +
+      '<p style="margin-top:20px"><a class="btn ghost" href="https://soldmike.ca/sellers/team-sold-listings" target="_blank" rel="noopener">See all recent sales</a> <a class="btn ghost" href="/reviews/">Read client reviews</a></p>'),
+  lambda: band('<div class="two"><div class="stack">' + prose('<h2>Take the seller guide with you</h2>', 'All 15 steps of selling in Vaughan, with a checklist for each one, in a free 10-page PDF.') + '</div>' + form('guide', '-pl', 'Selling a home in Vaughan') + '</div>', 'tint'),
+  lambda: cta("Let's get your home SOLDMIKE", 'Book your listing consultation. Call or text Michael at %s, or send your address and we will be in touch today.' % PHONE),
+  title='Pre-Listing Package: How We Sell Your Home | SoldMike', desc='Before we meet: who we are, how we price, the 8-step launch plan, media by Toronto Property Media, offer strategy and real sales by Michael Barillari.',
+  trail=[('Sell', '/sell/'), ('Pre-listing package', '/sell/pre-listing/')])
+
 
 # ---------- homepage menu (index.html is hand-edited; its menu comes from NAV so it always matches) ----------
 def home_nav():
