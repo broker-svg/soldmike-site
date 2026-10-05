@@ -24,7 +24,7 @@
 
 
   // centred confirmation after a form is sent
-  function sentPopup(text){
+  function sentPopup(text,dl){
     var d=document.getElementById('sentDlg');
     if(!d){
       var st=document.createElement('style');
@@ -37,6 +37,8 @@
       d.addEventListener('click',function(e){if(e.target===d)d.close();});
     }
     document.getElementById('sentP').textContent=text.replace(/^Sent\.\s*/,'');
+    var dla=document.getElementById('sentDl'); if(!dla){dla=document.createElement('a');dla.id='sentDl';dla.target='_blank';dla.rel='noopener';dla.textContent='Download the guide (PDF)';dla.style.cssText='margin-top:10px;min-height:48px;padding:0 28px;border-radius:4px;background:#1D2870;color:#fff;font:600 17px Barlow,system-ui,sans-serif;display:inline-flex;align-items:center;text-decoration:none';d.querySelector('.in').insertBefore(dla,d.querySelector('.in button'));}
+    dla.hidden=!dl; if(dl)dla.href=dl;
     if(d.showModal){d.showModal();}else{d.setAttribute('open','');}
   }
 
@@ -61,7 +63,11 @@
         // remember the lead in this browser so the listing pages can log their views/saves in FUB
         try{localStorage.setItem('sm_lead',JSON.stringify({firstName:parts[0],lastName:parts.slice(1).join(' '),email:v('email'),phone:v('phone')}));}catch(x){}
         smLeadLog({firstName:parts[0],lastName:parts.slice(1).join(' '),email:v('email'),phone:v('phone'),source:f.dataset.lead,page:location.pathname});
-        var done=f.dataset.done||'Sent. Michael will be in touch shortly.'; f.reset(); msg.className='msg'; msg.textContent=done; btn.textContent=t; btn.disabled=false; sentPopup(done);
+        var done=f.dataset.done||'Sent. Michael will be in touch shortly.', dl=null;
+        if(f.dataset.dl){try{dl=JSON.parse(f.dataset.dl)[v('which')]||null;}catch(x){}}
+        f.reset(); msg.className='msg'; msg.textContent=done; btn.textContent=t; btn.disabled=false;
+        if(dl){var a=document.createElement('a');a.className='btn';a.href=dl;a.target='_blank';a.rel='noopener';a.textContent='Download the guide (PDF)';a.style.marginTop='10px';msg.appendChild(document.createElement('br'));msg.appendChild(a);}
+        sentPopup(done,dl);
       }).catch(function(){
         msg.className='msg err'; msg.textContent='That did not go through. Call or text Michael at 647-694-3109.'; btn.textContent=t; btn.disabled=false;
       });

@@ -52,8 +52,8 @@ def faq_schema(qs):
 
 # ---------- building blocks ----------
 NAV = [
-    ('Buy', [('/listings/', 'Search homes'), ('/buy/', 'Buying with us'), ('/buy/buyer-guide/', 'Buyer guide: 15 steps'), ('/buy/pre-construction/', 'Pre-construction'), ('/saved/', 'Saved homes & searches'), ('/open-house/', 'Open houses')]),
-    ('Sell', [('/sell/home-value/', "What's my home worth?"), ('/sell/', 'Selling with us'), ('/sell/seller-guide/', 'Seller guide: 15 steps'), ('/sell/cost-to-sell-vaughan/', 'Cost to sell calculator'), ('/sell/how-we-market/', 'How we market your home')]),
+    ('Buy', [('/listings/', 'Search homes'), ('/buy/', 'Buying with us'), ('/buy/buyer-guide/', 'Buyer guide: 15 steps'), ('/free-guide/', 'Free PDF guides'), ('/buy/pre-construction/', 'Pre-construction'), ('/saved/', 'Saved homes & searches'), ('/open-house/', 'Open houses')]),
+    ('Sell', [('/sell/home-value/', "What's my home worth?"), ('/sell/', 'Selling with us'), ('/sell/seller-guide/', 'Seller guide: 15 steps'), ('/free-guide/', 'Free PDF guides'), ('/sell/cost-to-sell-vaughan/', 'Cost to sell calculator'), ('/sell/how-we-market/', 'How we market your home')]),
     ('Neighbourhoods', [('/neighbourhoods/', 'All neighbourhoods')] + [('/neighbourhoods/%s/' % s, n) for s, n in [('woodbridge', 'Woodbridge'), ('vellore', 'Vellore Village'), ('kleinburg', 'Kleinburg'), ('maple', 'Maple'), ('caledon-bolton', 'Caledon & Bolton'), ('king-city-nobleton', 'King City & Nobleton'), ('sharon-east-gwillimbury', 'Sharon & East Gwillimbury'), ('toronto', 'Toronto')]]),
     ('Results', [('/results/', 'Recent sales'), ('/reviews/', 'Client reviews'), ('/market-reports/', 'Market reports')]),
     ('Questions', [('/questions/', 'All questions'), ('/questions/buying/', 'Buyer questions'), ('/questions/selling/', 'Seller questions')]),
@@ -137,16 +137,19 @@ def faq(qs):
     return '<div class="faq">%s</div>' % out
 
 FORMS = {
-    'value': ('Home value request', 'Send me my home value', [('full', 'address', 'Property address', 'text', 'Street, city'), ('', 'name', 'Your name', 'text', ''), ('', 'phone', 'Phone', 'tel', ''), ('full', 'email', 'Email', 'email', ''), ('full', 'plan', "I'm planning to", ['Sell in the next 3 months', 'Sell in 3 to 12 months', 'Sell and buy', 'Just curious'], '')], 'Sent. Michael will send your price range with the comparable sales attached.'),
+    'value': ('Home value request', 'Send me my home value', [('full', 'address', 'Property address', 'text', 'Street, city'), ('', 'name', 'Your name', 'text', ''), ('', 'phone', 'Phone', 'tel', ''), ('full', 'email', 'Email', 'email', ''), ('full', 'plan', "I'm planning to", ['Sell in the next 3 months', 'Sell in 3 to 12 months', 'Sell and buy', 'Just curious'], ''), ('full', 'when', 'How would you like it?', ['Email me my price range (within 24 hours)', 'Call me right away to talk it through'], '')], 'Sent. Michael will send your price range within 24 hours, or call you right away if you asked for a call.'),
     'contact': ('Contact', 'Send message', [('', 'name', 'Your name', 'text', ''), ('', 'phone', 'Phone', 'tel', ''), ('full', 'email', 'Email', 'email', ''), ('full', 'topic', 'I want to', ['Buy a home', 'Sell a home', 'Buy and sell', 'Ask a question', 'Talk about joining the team'], ''), ('full', 'message', 'Message', 'area', '')], 'Sent. Michael will reply today.'),
     'buyer': ('Buyer consultation', 'Book a buyer consultation', [('', 'name', 'Your name', 'text', ''), ('', 'phone', 'Phone', 'tel', ''), ('full', 'email', 'Email', 'email', ''), ('', 'area', 'Area', ['Woodbridge', 'Vaughan', 'Kleinburg', 'King', 'Caledon', 'Toronto', 'Not sure yet'], ''), ('', 'budget', 'Budget', ['Under $1M', '$1M to $1.5M', '$1.5M to $2M', '$2M to $3M', '$3M+'], '')], 'Sent. Michael will call you to set up a time.'),
     'precon': ('Pre-construction list', 'Get the VIP list', [('', 'name', 'Your name', 'text', ''), ('', 'phone', 'Phone', 'tel', ''), ('full', 'email', 'Email', 'email', ''), ('full', 'type', 'Interested in', ['Condo', 'Townhome', 'Detached', 'Investment'], '')], "You're on the list. Michael will send new launches as they come up."),
-    'guide': ('Free guide', 'Send me the guide', [('', 'name', 'Your name', 'text', ''), ('', 'email', 'Email', 'email', ''), ('full', 'which', 'Which guide', ['Selling in Vaughan', 'Buying your first home', 'Moving up to a bigger home'], '')], 'Sent. Check your inbox.'),
+    'guide': ('Free guide', 'Get the free guide', [('', 'name', 'Your name', 'text', ''), ('', 'email', 'Email', 'email', ''), ('full', 'which', 'Which guide', ['Selling a home in Vaughan', 'Buying a home in Vaughan'], '')], 'Sent. Your guide is ready to download.'),
     'join': ('Join the team', "Let's talk", [('', 'name', 'Your name', 'text', ''), ('', 'phone', 'Phone', 'tel', ''), ('full', 'email', 'Email', 'email', ''), ('full', 'stage', 'Where are you at', ['Thinking about getting licensed', 'In the licensing courses', 'Newly licensed', 'Licensed and looking for a new team'], '')], 'Sent. Michael will reach out to set up a coffee.'),
     'report': ('Market report', 'Email me the monthly report', [('', 'name', 'Your name', 'text', ''), ('', 'email', 'Email', 'email', ''), ('full', 'area', 'Area', ['Vaughan', 'Woodbridge', 'Kleinburg', 'King', 'Caledon', 'East Gwillimbury'], '')], "Done. You'll get the next report on the 5th."),
 }
-def form(kind, uid=''):
+GUIDES = {'Selling a home in Vaughan': '/guides/selling-a-home-in-vaughan.pdf', 'Buying a home in Vaughan': '/guides/buying-a-home-in-vaughan.pdf'}
+def form(kind, uid='', pick=None):
     lead, btn, fields, done = FORMS[kind]
+    if pick:  # preselect and lock one option (e.g. the seller guide on the seller guide page)
+        fields = [(sp, n, l, [pick] if n == 'which' else t, ph) for sp, n, l, t, ph in fields]
     out = ''
     for span, name, label, typ, ph in fields:
         fid = '%s-%s%s' % (kind, name, uid)
@@ -159,7 +162,8 @@ def form(kind, uid=''):
             auto = {'name': 'name', 'email': 'email', 'phone': 'tel'}.get(name, 'off')
             ctl = '<input id="%s" name="%s" type="%s" autocomplete="%s" data-label="%s"%s>' % (fid, name, typ, auto, e(label), ' placeholder="%s"' % e(ph) if ph else '')
         out += '<div%s><label for="%s">%s</label>%s</div>' % (cls, fid, e(label), ctl)
-    return ('<form class="form" data-lead="%s" data-done="%s" aria-label="%s">%s<button class="btn full" type="submit">%s</button>'
+    dl = ' data-dl="%s"' % e(json.dumps(GUIDES)) if kind == 'guide' else ''
+    return ('<form class="form" data-lead="%s" data-done="%s"' + dl + ' aria-label="%s">%s<button class="btn full" type="submit">%s</button>'
             '<p class="msg full" role="status"></p><p class="fine full">By sending, I agree to be contacted by RE/MAX Premier The OP Team by call, text and email. To opt out, reply STOP or click unsubscribe.</p></form>') % (e(lead), e(done), e(lead), out, e(btn))
 
 def cta(h, p, kind='value'):
@@ -185,7 +189,7 @@ def page(path, title, desc, trail, body, schema=None, noindex=False, head='', js
            '<meta property="og:type" content="website"><meta property="og:title" content="%s"><meta property="og:description" content="%s"><meta property="og:url" content="%s%s"><meta property="og:image" content="%s/hero.jpg">'
            '%s<link rel="icon" href="/logo.png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
            '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Barlow:wght@400;500;600&display=swap">'
-           '<link rel="stylesheet" href="/assets/site.css?v=8">%s%s</head><body>%s<main id="main">%s</main>%s<script src="/assets/site.js?v=8" defer></script>%s<script src="/assets/chat.js?v=7" defer></script></body></html>'
+           '<link rel="stylesheet" href="/assets/site.css?v=8">%s%s</head><body>%s<main id="main">%s</main>%s<script src="/assets/site.js?v=9" defer></script>%s<script src="/assets/chat.js?v=7" defer></script></body></html>'
            ) % (e(title), e(desc), SITE, path, e(title), e(desc), SITE, path, SITE,
                 '<meta name="robots" content="noindex">' if noindex else '',
                 ''.join('<script type="application/ld+json">%s</script>' % json.dumps(s, ensure_ascii=False) for s in sch), head,
@@ -317,7 +321,7 @@ BUY_STEPS = [
 P('/buy/buyer-guide/',
   lambda: hero([('Home', '/'), ('Buy', '/buy/'), ('Buyer guide', '/buy/buyer-guide/')], 'Buying a home in Ontario: the 15 steps', 'The full process from deciding to buy to getting the keys, in the order it actually happens.'),
   lambda: band(steps(BUY_STEPS)),
-  lambda: band(todo('Turn each step into its own short page or video (the Tuesday post series already has the 15 titles)', 'Add a downloadable PDF version as a lead magnet'), 'tint', narrow=True),
+  lambda: band('<div class="two"><div class="stack">' + prose('<h2>Take it with you</h2>', 'Get all 15 steps as a free 10-page PDF, with a checklist for every step and a page for your notes.') + '</div>' + form('guide', '-bg', 'Buying a home in Vaughan') + '</div>', 'tint'),
   lambda: cta('Questions about a step?', 'Michael answers buyers personally, usually the same day.', 'contact'),
   title='How to Buy a Home in Ontario: 15 Steps | SoldMike', desc='The 15 steps of buying a home in Vaughan and the GTA, from pre-approval and closing costs to offers, conditions and closing day.',
   trail=[('Buy', '/buy/'), ('Buyer guide', '/buy/buyer-guide/')],
@@ -370,11 +374,11 @@ P('/sell/home-value/',
   lambda: band(head_block('Questions sellers ask first') + faq([
       ('How accurate is an online home value?', 'Often off by tens of thousands of dollars, because it cannot see inside your home or know which nearby sales are truly comparable. A local agent pricing from recent sales is more reliable.'),
       ('Does asking for a value commit me to anything?', 'No. You get the price range and the comparables. What you do with them is up to you.'),
-      ('How long does it take?', '[Your real turnaround, for example same day or within 24 hours]'),
+      ('How long does it take?', 'Usually within 24 hours, often the same day. If you would rather talk now, ask for a call and Michael can walk you through a price range over the phone right away.'),
   ]), 'tint'),
   title="What's My Home Worth? Free Home Value in Vaughan | SoldMike", desc='Get a free price range for your Vaughan, Woodbridge or Kleinburg home, based on real recent sales near you.',
   trail=[('Sell', '/sell/'), ('Home value', '/sell/home-value/')],
-  schema=[faq_schema([('How accurate is an online home value?', 'Often off by tens of thousands of dollars, because it cannot see inside your home or know which nearby sales are truly comparable. A local agent pricing from recent sales is more reliable.'), ('Does asking for a value commit me to anything?', 'No. You get the price range and the comparables. What you do with them is up to you.')])])
+  schema=[faq_schema([('How accurate is an online home value?', 'Often off by tens of thousands of dollars, because it cannot see inside your home or know which nearby sales are truly comparable. A local agent pricing from recent sales is more reliable.'), ('Does asking for a value commit me to anything?', 'No. You get the price range and the comparables. What you do with them is up to you.'), ('How long does it take?', 'Usually within 24 hours, often the same day. If you would rather talk now, ask for a call and Michael can walk you through a price range over the phone right away.')])])
 
 SELL_STEPS = [
     ('Know your why', 'Moving up, downsizing, relocating. Your reason sets the timeline and the strategy.'),
@@ -396,7 +400,7 @@ SELL_STEPS = [
 P('/sell/seller-guide/',
   lambda: hero([('Home', '/'), ('Sell', '/sell/'), ('Seller guide', '/sell/seller-guide/')], 'Selling a home in Ontario: the 15 steps', 'Everything that happens between deciding to sell and handing over the keys, in order.'),
   lambda: band(steps(SELL_STEPS)),
-  lambda: band(todo('Turn each step into its own short page or video (the Thursday post series already has the 15 titles)', 'Add a downloadable PDF version as a lead magnet'), 'tint', narrow=True),
+  lambda: band('<div class="two"><div class="stack">' + prose('<h2>Take it with you</h2>', 'Get all 15 steps as a free 10-page PDF, with a checklist for every step and a page for your notes.') + '</div>' + form('guide', '-sg', 'Selling a home in Vaughan') + '</div>', 'tint'),
   lambda: cta("Start with your home's value", 'Step 3 is pricing it right. We can do that for you this week.'),
   title='How to Sell a Home in Ontario: 15 Steps | SoldMike', desc='The 15 steps of selling a home in Vaughan and the GTA, from pricing and staging to offers, conditions and closing day.',
   trail=[('Sell', '/sell/'), ('Seller guide', '/sell/seller-guide/')],
@@ -435,9 +439,9 @@ P('/sell/how-we-market/',
                          ('/hero.jpg', 'Aerial flyover of Woodbridge', 'Video', 'Cinematic tours for MLS®, YouTube and social'),
                          ('/lp/15.jpg', 'Covered patio', 'Lifestyle', 'Show how it feels to live there'),
                          ('/lp/12.jpg', 'Ensuite with freestanding tub', 'Details', 'The finishes buyers pay for')])),
-  lambda: band(head_block('Your launch plan') + todo('Your real launch checklist: staging, media day, MLS® go-live, social, email to buyer list, agent network, open houses', 'Link one full listing video (YouTube)', 'Before/after staging example'), 'tint'),
+  lambda: band(head_block('Your launch plan', 'The same eight steps for every listing.') + steps([('Pricing meeting', 'We pull the recent sales on your street, set the list price and decide on an offer date or offers any time.'), ('Prep', 'A short list of repairs, paint and decluttering, plus a staging consultation.'), ('Media day', 'Toronto Property Media shoots photos, drone, video, twilight and a floor plan.'), ('Coming soon', 'Your home is teased on social media, to our buyer list and to the agent network before it hits the MLS®.'), ('MLS® go-live', 'The listing goes live with the full photo set and video.'), ('Launch week', 'Social ads, an email to our buyer list, open houses and agent showings, with feedback after every showing.'), ('Offer review', 'We compare every offer on price, deposit, conditions and closing date, not just the top number.'), ('Weekly updates', 'You get an update every week until the deal is firm, then we coordinate everything through closing.')]) + todo('Link one full listing video (YouTube)', 'Before/after staging example'), 'tint'),
   lambda: cta('See what your home could look like', "Get your home's value and a walk-through of our marketing plan."),
-  title='How We Market Your Home: Photos, Drone & Video | SoldMike', desc='Every SoldMike listing gets professional photos, drone, video and twilight shots from Toronto Property Media.',
+  title='How We Market Your Home: Photos, Drone & Video | SoldMike', schema=[{'@context': 'https://schema.org', '@type': 'HowTo', 'name': 'How we launch a listing', 'step': [{'@type': 'HowToStep', 'position': i + 1, 'name': t, 'text': d} for i, (t, d) in enumerate([('Pricing meeting', 'We pull the recent sales on your street, set the list price and decide on an offer date or offers any time.'), ('Prep', 'A short list of repairs, paint and decluttering, plus a staging consultation.'), ('Media day', 'Toronto Property Media shoots photos, drone, video, twilight and a floor plan.'), ('Coming soon', 'Your home is teased on social media, to our buyer list and to the agent network before it hits the MLS®.'), ('MLS® go-live', 'The listing goes live with the full photo set and video.'), ('Launch week', 'Social ads, an email to our buyer list, open houses and agent showings, with feedback after every showing.'), ('Offer review', 'We compare every offer on price, deposit, conditions and closing date, not just the top number.'), ('Weekly updates', 'You get an update every week until the deal is firm, then we coordinate everything through closing.')])]}], desc='Every SoldMike listing gets professional photos, drone, video and twilight shots from Toronto Property Media.',
   trail=[('Sell', '/sell/'), ('How we market', '/sell/how-we-market/')])
 
 # =====================================================================
@@ -499,9 +503,21 @@ for slug, name, intro, photo, pockets in HOODS:
 # =====================================================================
 CASES = [
     ('226-via-borghese', '226 Via Borghese St', 'Vellore Village, Vaughan', '$1.69M', '', '[X]%'),
-    ('49-walter-proctor', '49 Walter Proctor Rd', 'East Gwillimbury', '[$X,XXX,XXX]', '[X]', '[X]%'),
-    ('179-lio-ave', '179 Lio Ave', 'Woodbridge', '[$X,XXX,XXX]', '[X]', '[X]%'),
+    ('49-walter-proctor', '49 Walter Proctor Rd', 'East Gwillimbury', '[$X,XXX,XXX]', '[X]', 'Over asking'),
+    ('2-la-maria-lane', '2 La Maria Lane', 'Maple, Vaughan', '[$X,XXX,XXX]', '[X]', '[X]%'),
 ]
+# the story of each sale: (challenge, what we did, result)
+STORIES = {
+    '49-walter-proctor': ('The family was selling and buying at the same time, so they needed a strong sale and a smart purchase, with the timing of both lined up.',
+                          'We priced the home from recent sales in East Gwillimbury and launched it with full media to draw as many buyers as possible in the first week. On the purchase side, Michael negotiated hard on the home they were buying so they did not overpay.',
+                          'The home sold over asking, and the family bought their next home on strong terms. They enjoyed the whole experience so much that they recorded a video testimonial for us.'),
+    '226-via-borghese': ('The buyer side on this deal was combative from the first offer, pushing hard on price and terms.',
+                         'Michael stayed firm, kept the negotiation on the facts and protected the sellers on every point that mattered, from price to conditions and closing.',
+                         'The home sold for $1.69M on the best terms available for the sellers, and they were very happy with how we handled a tough negotiation.'),
+    '2-la-maria-lane': ('The home was tenant-occupied, which can make a sale slow and stressful for an owner.',
+                    'We guided the sellers through having the tenants move out properly, then got the home cleaned up, prepared and staged before the photos and launch.',
+                    'The sellers were very happy with how smooth the process was and excited to move on to their next chapter.'),
+}
 P('/results/',
   lambda: hero([('Home', '/'), ('Results', '/results/')], 'Recent sales', 'What sold, how fast, and what we did to get it there.'),
   lambda: band('<div class="tbl"><table><thead><tr><th scope="col">Home</th><th scope="col">Area</th><th scope="col">Sold for</th><th scope="col">Days</th><th scope="col">Sale vs list</th><th scope="col"></th></tr></thead><tbody>' +
@@ -514,11 +530,11 @@ P('/results/',
 for sl, a, ar, p, d, s in CASES:
     P('/results/%s/' % sl,
       lambda a=a, ar=ar, sl=sl, p=p: hero([('Home', '/'), ('Results', '/results/'), (a, '/results/%s/' % sl)], 'How we sold %s' % a, e(ar) + ('' if unfinished(p) else ' · Sold for %s' % p)),
-      lambda d=d, s=s, p=p, ar=ar: band('<div class="two"><div class="stack"><h2>The numbers</h2>' + kv([r for r in [('Sold for', p), ('Days on market', d), ('Sale vs list', s), ('Area', ar), ('Property type', '[Detached]')] if r[1]]) + '</div><div class="stack"><h2>The story</h2>' +
-          todo('The challenge (for example: listed before and did not sell, tough market, unique home)', 'What we did: pricing, staging, media, offer strategy', 'The result in one sentence, then a quote from the seller', '2 to 4 photos from the shoot') + '</div></div>'),
+      lambda d=d, s=s, p=p, ar=ar, sl=sl: band('<div class="two"><div class="stack"><h2>The numbers</h2>' + kv([r for r in [('Sold for', p), ('Days on market', d), ('Sale vs list', s), ('Area', ar), ('Property type', '[Detached]')] if r[1]]) + '</div><div class="stack"><h2>The story</h2>' +
+          prose('<h3>The challenge</h3>', STORIES[sl][0], '<h3>What we did</h3>', STORIES[sl][1], '<h3>The result</h3>', STORIES[sl][2]) + todo('2 to 4 photos from the shoot', 'Final sale price and days on market') + '</div></div>'),
       lambda: cta('Selling a home like this?', 'Get a price range and the plan we would use.'),
       title='How We Sold %s, %s | SoldMike' % (a, ar), desc='Case study: how Michael Barillari sold %s in %s.' % (a, ar),
-      trail=[('Results', '/results/'), (a, '/results/%s/' % sl)], noindex=True)  # until the story is written
+      trail=[('Results', '/results/'), (a, '/results/%s/' % sl)])
 
 P('/reviews/',
   lambda: hero([('Home', '/'), ('Reviews', '/reviews/')], 'What clients say', 'Real Google reviews of The OP Team, Michael\u2019s team at RE/MAX Premier, in the clients\u2019 own words.'),
@@ -561,6 +577,10 @@ BUY_QS = [
     ('How long does it take to buy a house?', 'Most buyers take one to three months to find the right home, then 30 to 90 days to close. Getting pre-approved before you start saves time, and a firm deal can close in about 30 days if your lender and lawyer are ready.'),
     ('Do I need a home inspection?', 'Yes, for almost every resale home. An inspection usually costs $400 to $700 in the GTA and takes two to three hours. When there is an offer date, buyers often inspect before it so they can make a firm offer.'),
     ('What is a status certificate?', 'A package from a condo corporation showing its finances, reserve fund, rules and any lawsuits. Buyers usually make their offer conditional on their lawyer reviewing it.'),
+    ('How much deposit do I need when I buy a house in Ontario?', 'In the GTA, a deposit of about 5% of the price is common, usually due within 24 hours of your offer being accepted. It is held in trust by the listing brokerage and counts toward your down payment on closing.'),
+    ('How much is land transfer tax on a $1.5 million home in Vaughan?', 'About $26,475. Ontario charges 0.5% on the first $55,000, 1% up to $250,000, 1.5% up to $400,000 and 2% up to $2 million. First-time buyers can get up to $4,000 of that refunded. In Toronto you also pay a municipal land transfer tax of about the same amount.'),
+    ('Can I back out of buying a house in Ontario?', 'Not once the deal is firm. Resale homes have no cooling-off period, so your conditions (financing, inspection, status certificate) are your way out, and only until their deadlines. New condos bought from a builder are the exception, with a 10-day cooling-off period.'),
+    ('What is the mortgage stress test?', 'Lenders check that you could still afford your payments at a higher rate: currently the greater of 5.25% or your mortgage rate plus 2%. It lowers how much you can borrow, so get pre-approved before you start looking.'),
     ('Does it cost me anything to use a buyer agent?', "Usually nothing out of pocket. In most sales, the seller's brokerage offers to pay the buyer's brokerage from the sale proceeds. Since December 1, 2023, buyers sign a written buyer representation agreement that sets the commission, and if the seller offers less than that amount, the buyer may owe the difference. Michael goes through this with you before you see a single home."),
 ]
 SELL_QS = [
@@ -572,6 +592,10 @@ SELL_QS = [
     ('What renovations add the most value before selling?', 'Paint, lighting and small repairs return the most. Fresh neutral paint, bright modern light fixtures, fixing leaky taps, cracked tiles and worn caulking, and a tidy front yard cost little and change how buyers see the home. Big projects like a new kitchen rarely pay back their full cost right before a sale.'),
     ('How long does it take to sell a house in Vaughan?', '[Average days on market in the first sentence, from TRREB data.]'),
     ('Can I sell my house while I still have a mortgage?', 'Yes. Your lawyer pays out the mortgage from the sale proceeds on closing day. Ask your lender about any prepayment penalty first.'),
+    ('Do I need a lawyer to sell my house in Ontario?', 'Yes. A real estate lawyer transfers the title to the buyer, pays out your mortgage from the sale proceeds and handles the closing funds. Hire one as soon as your deal is firm.'),
+    ('What is a bully offer?', 'An offer sent before the seller\u2019s offer date, usually strong and open for only a few hours, to try to buy the home before other buyers compete. The seller can accept it, counter it or ignore it and wait for the offer date.'),
+    ('Do I pay capital gains tax when I sell my home?', 'Usually not on your principal residence: the principal residence exemption generally covers the gain on the home you live in. Investment and rental properties are taxable, so talk to your accountant before you sell one.'),
+    ('Can I sell my house with tenants in it?', 'Yes. The tenancy carries on with the new owner unless the buyer, or a close family member, will move in. In that case the tenant gets an N12 notice with at least 60 days, ending on the last day of a rental period, and one month\u2019s rent as compensation. We plan the timing with you before listing.'),
     ('What happens if my home does not sell?', 'We change something: usually the price, the presentation or the plan. If a home sits, buyers are telling us the price does not match what they see. We review showing feedback, compare against what sold nearby, refresh the photos and description, and decide together whether to adjust the price or relaunch.'),
     ('Why choose a local Vaughan realtor?', 'A local realtor knows the streets, the recent sales and the buyers in your area, which means sharper pricing and better negotiation. Michael has been licensed since December 2011, works out of the RE/MAX Premier office on Rutherford Road in Vaughan, and his own media company, Toronto Property Media, shoots every listing.'),
 ]
@@ -659,10 +683,12 @@ P('/contact/',
   trail=[('Contact', '/contact/')])
 
 P('/free-guide/',
-  lambda: hero([('Home', '/'), ('Free guide', '/free-guide/')], 'Free guide: selling your home in Vaughan', 'The full plan we use to sell homes in Vaughan, from pricing to closing, in one PDF.'),
-  lambda: band('<div class="two"><div class="stack">' + todo('Create the PDF lead magnet (can reuse the 15 seller steps)', 'Connect delivery: the form adds the lead to FUB; FUB action plan emails the PDF') + '</div>' + form('guide') + '</div>'),
-  noindex=True,  # thin until written
-  title='Free Guide to Selling Your Home in Vaughan | SoldMike', desc='Download the free guide to selling your home in Vaughan.', trail=[('Free guide', '/free-guide/')])
+  lambda: hero([('Home', '/'), ('Free guide', '/free-guide/')], 'Free guides to buying and selling in Vaughan', 'The full plan we use with our clients, step by step, in a 10-page PDF you can keep.'),
+  lambda: band('<div class="two"><div class="stack">' + prose('<h2>What is inside</h2>',
+      '<b>Selling a home in Vaughan:</b> the 15 steps from pricing and prep to offers and closing day, with what you walk away with and how we launch a listing.',
+      '<b>Buying a home in Vaughan:</b> the 15 steps from pre-approval and closing costs to winning the offer and getting your keys.',
+      'Every step has a checklist, plus Michael\u2019s tips from selling in Vaughan since 2011.') + '</div>' + form('guide') + '</div>'),
+  title='Free Guides: Buying and Selling a Home in Vaughan | SoldMike', desc='Download free step-by-step PDF guides to buying and selling a home in Vaughan, with a checklist for every step.', trail=[('Free guide', '/free-guide/')])
 
 P('/privacy/',
   lambda: hero([('Home', '/'), ('Privacy', '/privacy/')], 'Privacy policy', 'How we collect, use and protect your personal information.'),
@@ -744,7 +770,7 @@ PAGE = '/404'
 page404 = ('<!doctype html><html lang="en-CA"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Page not found | SoldMike</title><meta name="robots" content="noindex">'
            '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=Barlow:wght@400;600&display=swap"><link rel="stylesheet" href="/assets/site.css?v=8"></head><body>'
            + header('/404') + '<main id="main">' + hero([('Home', '/'), ('Not found', '/404')], 'That page has moved', 'The page you were looking for is not here. Try one of these instead.') +
-           band(cards([('/listings/', 'Search homes', 'Every MLS® listing'), ('/sell/home-value/', 'Home value', 'What your home is worth'), ('/neighbourhoods/', 'Neighbourhoods', 'Area guides'), ('/contact/', 'Contact', 'Talk to Michael')])) + '</main>' + footer() + '<script src="/assets/site.js?v=8" defer></script><script src="/assets/chat.js?v=7" defer></script></body></html>')
+           band(cards([('/listings/', 'Search homes', 'Every MLS® listing'), ('/sell/home-value/', 'Home value', 'What your home is worth'), ('/neighbourhoods/', 'Neighbourhoods', 'Area guides'), ('/contact/', 'Contact', 'Talk to Michael')])) + '</main>' + footer() + '<script src="/assets/site.js?v=9" defer></script><script src="/assets/chat.js?v=7" defer></script></body></html>')
 open('404.html', 'w', encoding='utf-8').write(page404)
 
 today = date.today().isoformat()
