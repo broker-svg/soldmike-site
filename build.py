@@ -179,7 +179,7 @@ SITEMAP = []
 LISTING_HEAD = '<link rel="stylesheet" href="/assets/listings.css?v=11">'
 LEAFLET_HEAD = '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">'
 LEAFLET_JS = '<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" defer></script>'
-LISTING_JS = '<script src="/assets/listings.js?v=5" defer></script><script src="/assets/account.js?v=4" defer></script>'
+LISTING_JS = '<script src="/assets/listings.js?v=5" defer></script><script src="/assets/account.js?v=5" defer></script>'
 
 def page(path, title, desc, trail, body, schema=None, noindex=False, head='', js=''):
     global PAGE
@@ -246,23 +246,23 @@ P('/listings/',
   title='Homes for Sale in Vaughan, Woodbridge & the GTA | SoldMike',
   desc='Search MLS® listings in Vaughan, Woodbridge, Kleinburg, King, Caledon and Toronto, refreshed daily. Map search, saved homes and showings with Michael Barillari.',
   trail=[('Search homes', '/listings/')],
-  head=LISTING_HEAD + LEAFLET_HEAD, js=LISTING_JS + LEAFLET_JS + '<script src="/assets/search.js?v=4" defer></script>')
+  head=LISTING_HEAD + LEAFLET_HEAD, js=LISTING_JS + LEAFLET_JS + '<script src="/assets/search.js?v=5" defer></script>')
 
 P('/listings/our-listings/',
   lambda: hero([('Home', '/'), ('Search homes', '/listings/'), ('Our listings', '/listings/our-listings/')], 'Our listings', 'Homes listed by Michael Barillari and RE/MAX Premier The OP Team, updated every day. Book a showing or ask Michael anything about them.'),
-  lambda: band(SEARCH_BLOCK({'mine': '1'}, 'No homes listed by The OP Team match right now. New listings show up here automatically.'), 'lsband'),
+  lambda: band(SEARCH_BLOCK({'team': '1'}, 'No homes listed by The OP Team match right now. New listings show up here automatically.'), 'lsband'),
   title='Our Listings | Michael Barillari, RE/MAX Premier The OP Team',
   desc='Homes for sale listed by Michael Barillari and RE/MAX Premier The OP Team in Vaughan and the GTA, updated every day.',
   trail=[('Search homes', '/listings/'), ('Our listings', '/listings/our-listings/')],
-  head=LISTING_HEAD + LEAFLET_HEAD, js=LISTING_JS + LEAFLET_JS + '<script src="/assets/search.js?v=4" defer></script>')
+  head=LISTING_HEAD + LEAFLET_HEAD, js=LISTING_JS + LEAFLET_JS + '<script src="/assets/search.js?v=5" defer></script>')
 
 P('/listings/re-max-premier/',
-  lambda: hero([('Home', '/'), ('Search homes', '/listings/'), ('RE/MAX Premier listings', '/listings/re-max-premier/')], 'RE/MAX Premier listings', 'Every home listed by RE/MAX Premier Inc., Brokerage, updated every day. Michael can show you any of them.'),
+  lambda: hero([('Home', '/'), ('Search homes', '/listings/'), ('RE/MAX Premier listings', '/listings/re-max-premier/')], 'RE/MAX Premier listings', 'Every home listed by RE/MAX Premier, The OP Team included, updated every day. Michael can show you any of them.'),
   lambda: band(SEARCH_BLOCK({'brk': '1'}, 'No RE/MAX Premier listings match these filters. Try another area or price range.'), 'lsband'),
   title='RE/MAX Premier Listings in Vaughan & the GTA | SoldMike',
   desc='Homes for sale listed by RE/MAX Premier Inc., Brokerage, in Vaughan and the GTA, updated every day. Book a showing with Michael Barillari.',
   trail=[('Search homes', '/listings/'), ('RE/MAX Premier listings', '/listings/re-max-premier/')],
-  head=LISTING_HEAD + LEAFLET_HEAD, js=LISTING_JS + LEAFLET_JS + '<script src="/assets/search.js?v=4" defer></script>')
+  head=LISTING_HEAD + LEAFLET_HEAD, js=LISTING_JS + LEAFLET_JS + '<script src="/assets/search.js?v=5" defer></script>')
 
 P('/listings/home/',
   '<div class="ld" id="ld" data-listings><p class="ld-loading">Loading this home…</p></div>',
@@ -285,7 +285,7 @@ document.addEventListener('DOMContentLoaded',function(){
     box.innerHTML='<div class="acct"><div><h2>Hi'+(a.me.first?' '+esc(a.me.first):'')+'</h2><p>Signed in as <b>'+esc(a.me.email)+'</b>. Your saved homes and searches follow you to any device.</p></div><button class="btn ghost" type="button" id="soBtn">Sign out</button></div>';
     document.getElementById('soBtn').onclick=function(){SM.signOut();render();};
     var ss=a.searches.filter(function(s){return s.active;});
-    sl.innerHTML=ss.length?ss.map(function(s){return '<div class="srow"><div><b>'+esc(s.label)+'</b><small>'+(a.me.alerts?'New matches by email':'No emails')+'</small></div><a class="btn ghost" href="/listings/'+(s.q.mine?'our-listings/':s.q.brk?'re-max-premier/':'')+'?'+qs(s.q)+'">View</a><button class="btn ghost" type="button" data-rm="'+s.id+'">Remove</button></div>';}).join('')
+    sl.innerHTML=ss.length?ss.map(function(s){return '<div class="srow"><div><b>'+esc(s.label)+'</b><small>'+(a.me.alerts?'New matches by email':'No emails')+'</small></div><a class="btn ghost" href="/listings/'+(s.q.team||s.q.mine?'our-listings/':s.q.brk?'re-max-premier/':'')+'?'+qs(s.q)+'">View</a><button class="btn ghost" type="button" data-rm="'+s.id+'">Remove</button></div>';}).join('')
       :'<p class="empty">No saved searches yet. On the <a href="/listings/">search page</a>, set your filters and tap <b>Save this search</b>.</p>';
     [].forEach.call(sl.querySelectorAll('[data-rm]'),function(btn){btn.onclick=function(){SM.accountCall('/api/me/search/remove',{id:+btn.dataset.rm}).then(SM.accountApply);};});
     homes();
@@ -317,7 +317,7 @@ P('/buy/',
   lambda: cta('Start with a 20-minute call', 'Tell us what you need, your budget and timing. We set up your search the same day.', 'buyer'),
   title='Buying a Home in Vaughan & Woodbridge | SoldMike', desc='How Michael Barillari and The OP Team help buyers in Vaughan, Woodbridge and the GTA find, win and close on the right home.',
   trail=[('Buy', '/buy/')],
-  head=LISTING_HEAD + LEAFLET_HEAD, js=LISTING_JS + LEAFLET_JS + '<script src="/assets/search.js?v=4" defer></script>')
+  head=LISTING_HEAD + LEAFLET_HEAD, js=LISTING_JS + LEAFLET_JS + '<script src="/assets/search.js?v=5" defer></script>')
 
 BUY_STEPS = [
     ('Know your why', 'More space, a better school, a shorter commute. Your reason decides what to look for and what to skip.'),

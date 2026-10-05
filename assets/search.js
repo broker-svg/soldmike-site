@@ -3,7 +3,7 @@
   var SM=window.SM, esc=SM.esc;
   var form=document.getElementById('lsForm'), list=document.getElementById('lsList'), info=document.getElementById('lsInfo'), more=document.getElementById('lsMore');
   var mapEl=document.getElementById('lsMap'), areaBtn=document.getElementById('lsArea'), wrap=document.getElementById('lsWrap');
-  var FIELDS=['q','area','lease','type','min','max','beds','baths','sort','mine','brk'];
+  var FIELDS=['q','area','lease','type','min','max','beds','baths','sort','mine','brk','team'];
   var state={page:0,items:[],bbox:''}, map=null, layer=null, auto=true;
 
   // filters <-> URL
@@ -92,7 +92,7 @@
   if(hide){
     var setHide=function(on){wrap.classList.toggle('nomap',on);hide.textContent=on?'Show map':'Hide map';SM.store('sm_nomap',on);if(!on){initMap();setTimeout(function(){map&&map.invalidateSize();},60);}};
     hide.addEventListener('click',function(){setHide(!wrap.classList.contains('nomap'));});
-    if(SM.store('sm_nomap'))setHide(true);
+    if(SM.store('sm_nomap')!==false)setHide(true); // map starts hidden; a visitor who opens it keeps it open
   }
   if(matchMedia('(min-width: 1100px)').matches&&!wrap.classList.contains('nomap'))initMap();
 
