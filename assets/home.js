@@ -3,13 +3,14 @@
    listing, CREA photos as supplied. "Ask Michael" / "Book a showing" go straight to Follow Up Boss. */
 (function(){
   var SM=window.SM, esc=SM.esc, root=document.getElementById('ld');
-  var id=new URLSearchParams(location.search).get('id')||'';
+  var id=(root&&root.dataset.id)||new URLSearchParams(location.search).get('id')||''; // /homes/ pages carry the id in the HTML
   var ARW='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>';
   var ARW2='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>';
   var GRID='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>';
   var PIN='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>';
   var HOODS=[['vellore','Vellore Village',[43.815,43.875,-79.60,-79.525]],['kleinburg','Kleinburg',[43.82,43.90,-79.67,-79.59]],['maple','Maple',[43.83,43.88,-79.53,-79.46]],['woodbridge','Woodbridge',[43.76,43.86,-79.66,-79.52]],['king-city-nobleton','King City & Nobleton',[43.89,44.02,-79.72,-79.48]]];
 
+  if(root&&root.dataset.gone)return; // /homes/ page for a listing that is off the market: already written by the server
   if(!/^[\w-]{1,30}$/.test(id)){gone();return;}
   SM.get('/api/listing?id='+encodeURIComponent(id)+'&u='+encodeURIComponent(SM.uid())).then(function(l){
     if(l.gone){gone();return;}
@@ -42,7 +43,7 @@
     var place=[l.community,l.city,'Ontario'].filter(Boolean).join(', ');
     document.title=(l.addr?l.addr+', '+l.city:place)+' | '+SM.priceText(l)+' | SoldMike';
     var md=document.querySelector('meta[name=description]');if(md)md.setAttribute('content',[l.beds&&l.beds+' bed',l.baths&&l.baths+' bath',l.type,'for '+(l.lease?'rent':'sale')+' in '+l.city,'MLS® '+l.mls].filter(Boolean).join(' · '));
-    var cn=document.querySelector('link[rel=canonical]');if(cn)cn.href='https://soldmike.com'+SM.link(id);
+    var cn=document.querySelector('link[rel=canonical]');if(cn)cn.href='https://soldmike.com'+SM.link(id,l);
 
     var slides='',rail='',all='';
     P.forEach(function(p,i){

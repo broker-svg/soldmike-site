@@ -25,7 +25,10 @@
   SM.priceText=function(l){if(l.price==null)return 'Price on request';return SM.money(l.price)+(l.lease?'/'+(String(l.freq||'month').toLowerCase().replace(/^monthly$/,'month')):'');};
   SM.addrText=function(l){return l.addr?l.addr+', '+l.city:(l.community?l.community+', ':'')+l.city;};
   SM.isNew=function(l){return l.listed&&(Date.now()-Date.parse(l.listed))<7*864e5;};
-  SM.link=function(id){return '/listings/home/?id='+encodeURIComponent(id);};
+  // one page per listing at /homes/<address-city>-<key>/ (served by the Worker); turned on once soldmike.com runs through Cloudflare
+  SM.HOMES=false;
+  SM.slug=function(l){var b=l.addr?l.addr+' '+l.city:'mls '+(l.mls||'')+' '+l.city;return b.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,80)+'-'+String(l.id).toLowerCase();};
+  SM.link=function(id,l){return SM.HOMES&&l&&l.city?'/homes/'+SM.slug(l)+'/':'/listings/home/?id='+encodeURIComponent(id);};
   SM.rca=function(url,w){return '<a class="rca" href="'+esc(url)+'" target="_blank" rel="noopener" aria-label="View this listing on REALTOR.ca"><img src="'+RCA_LOGO+'" width="'+(w||90)+'" alt="Powered by REALTOR.ca" loading="lazy"></a>';};
 
   // ---------- saved homes ----------
@@ -53,7 +56,7 @@
 
   // ---------- result card (brokerage + REALTOR.ca logo on every card) ----------
   SM.card=function(l){
-    var href=SM.link(l.id), specs=[];
+    var href=SM.link(l.id,l), specs=[];
     if(l.beds!=null&&l.beds!=='')specs.push(esc(l.beds)+' bed');
     if(l.baths!=null)specs.push(esc(l.baths)+' bath');
     if(l.type)specs.push(esc(l.type));
