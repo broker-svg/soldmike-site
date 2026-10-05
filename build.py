@@ -346,10 +346,12 @@ P('/sell/',
       ('/sell/how-we-market/', 'How we market', 'Photos, drone, video and twilight by Toronto Property Media'),
       ('/results/', 'Recent sales', 'What sold, how fast, and how we did it'),
   ])),
-  lambda: band(head_block('Why sellers choose Michael') + todo(
-      'Your selling numbers: average days on market and sale-to-list %, verified from MLS (RECO requires provable stats)',
-      '3 short reasons sellers pick you: pricing, in-house media, offer strategy',
-      'One seller quote with name and neighbourhood'), 'tint'),
+  lambda: band(head_block('Why sellers choose Michael') + '<div class="cards">' + ''.join('<div class="rv" style="background:var(--white);padding:26px 22px;display:flex;flex-direction:column;gap:10px"><b style="font-family:var(--display);font-size:22px;text-transform:uppercase;color:var(--navy)">%s</b><span style="color:var(--muted)">%s</span></div>' % (e(t), e(d)) for t, d in [
+      ('2,000+ transactions of experience', 'Michael and The OP Team have handled more than 2,000 transactions combined. That experience shows up in pricing, negotiation and the details that keep a deal together.'),
+      ('Sell for more', 'Michael is a Real Estate Negotiation Expert (RENE). Priced right and launched well, homes draw multiple offers: 32 Highland Park Blvd in Markham sold $210K over asking.'),
+      ('Sell faster', 'A strong launch brings buyers in the first week: 6 days in Markham, 15 days in Vaughan, 21 days for a $3.5M home in Toronto.'),
+      ('Show your pride of ownership', 'Our own production team, Toronto Property Media, shoots every listing with photos, drone, video and twilight, so your home looks the way you know it.'),
+  ]) + '</div><p style="margin-top:18px"><a href="/results/" style="font-weight:600">See recent sales</a></p>' + todo('One seller quote with name and neighbourhood'), 'tint'),
   lambda: cta("What's your home worth today?", 'Tell us the address. Michael sends a price range based on real recent sales near you, no obligation.'),
   title='Sell Your Home in Vaughan & Woodbridge | SoldMike', desc='Sell your Vaughan or Woodbridge home with Michael Barillari: pricing from real sales, in-house photo, drone and video, and a launch plan built for offers.',
   trail=[('Sell', '/sell/')])
