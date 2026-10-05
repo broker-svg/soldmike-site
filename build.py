@@ -22,7 +22,7 @@ PROFILES = [
     'https://www.linkedin.com/in/soldmike/',
 ]
 SHOW_TODOS = False
-HOMES_LIVE = False  # True once soldmike.com runs through Cloudflare and /homes/ listing pages are served by the Worker  # unfinished content stays out of the public pages; CONTENT-TODO.md still lists it
+HOMES_LIVE = True  # True once soldmike.com runs through Cloudflare and /homes/ listing pages are served by the Worker  # unfinished content stays out of the public pages; CONTENT-TODO.md still lists it
 e = html.escape
 
 # ---------- schema ----------
@@ -175,7 +175,7 @@ SITEMAP = []
 LISTING_HEAD = '<link rel="stylesheet" href="/assets/listings.css?v=11">'
 LEAFLET_HEAD = '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">'
 LEAFLET_JS = '<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" defer></script>'
-LISTING_JS = '<script src="/assets/listings.js?v=4" defer></script><script src="/assets/account.js?v=3" defer></script>'
+LISTING_JS = '<script src="/assets/listings.js?v=5" defer></script><script src="/assets/account.js?v=3" defer></script>'
 
 def page(path, title, desc, trail, body, schema=None, noindex=False, head='', js=''):
     global PAGE
@@ -246,7 +246,7 @@ P('/listings/home/',
   '<div class="ld" id="ld" data-listings><p class="ld-loading">Loading this home…</p></div>',
   title='Home for sale | SoldMike', desc='MLS® listing details, photos and showings with Michael Barillari, Broker.',
   trail=[('Search homes', '/listings/'), ('Listing', '/listings/home/')],
-  head=LISTING_HEAD + LEAFLET_HEAD, js=LISTING_JS + LEAFLET_JS + '<script src="/assets/home.js?v=8" defer></script>', noindex=True)  # shell for /listings/home/?id= and the Worker's /homes/ pages (the Worker strips this noindex)
+  head=LISTING_HEAD + LEAFLET_HEAD, js=LISTING_JS + LEAFLET_JS + '<script src="/assets/home.js?v=9" defer></script>', noindex=True)  # shell for /listings/home/?id= and the Worker's /homes/ pages (the Worker strips this noindex)
 
 SAVED_JS = """<script>
 document.addEventListener('DOMContentLoaded',function(){

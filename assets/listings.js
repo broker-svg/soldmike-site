@@ -26,7 +26,7 @@
   SM.addrText=function(l){return l.addr?l.addr+', '+l.city:(l.community?l.community+', ':'')+l.city;};
   SM.isNew=function(l){return l.listed&&(Date.now()-Date.parse(l.listed))<7*864e5;};
   // one page per listing at /homes/<address-city>-<key>/ (served by the Worker); turned on once soldmike.com runs through Cloudflare
-  SM.HOMES=false;
+  SM.HOMES=true;
   SM.slug=function(l){var b=l.addr?l.addr+' '+l.city:'mls '+(l.mls||'')+' '+l.city;return b.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,80)+'-'+String(l.id).toLowerCase();};
   SM.link=function(id,l){return SM.HOMES&&l&&l.city?'/homes/'+SM.slug(l)+'/':'/listings/home/?id='+encodeURIComponent(id);};
   SM.rca=function(url,w){return '<a class="rca" href="'+esc(url)+'" target="_blank" rel="noopener" aria-label="View this listing on REALTOR.ca"><img src="'+RCA_LOGO+'" width="'+(w||90)+'" alt="Powered by REALTOR.ca" loading="lazy"></a>';};
