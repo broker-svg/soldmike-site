@@ -291,9 +291,7 @@ P('/buy/',
       ('/buy/pre-construction/', 'Pre-construction', 'New launches and VIP pricing'),
       ('/questions/buying/', 'Buyer questions', 'Straight answers to what buyers ask us'),
   ])),
-  lambda: band(head_block('Why buyers work with Michael') + todo(
-      '3 to 4 short reasons buyers choose you (local knowledge, offer strategy, negotiation, TPM media for when they sell)',
-      'One real buyer story: area, what they wanted, how you won it'), 'tint'),
+  lambda: band(head_block('Why buyers work with Michael') + '<div class="cards">' + ''.join('<div class="rv" style="background:var(--white);padding:26px 22px;display:flex;flex-direction:column;gap:10px"><b style="font-family:var(--display);font-size:22px;text-transform:uppercase;color:var(--navy)">%s</b><span style="color:var(--muted)">%s</span></div>' % (e(t), e(d)) for t, d in [('Local since 2011', 'Michael has helped buyers in Vaughan, Woodbridge, Kleinburg, King and Caledon since 2011. He knows the streets, the schools and what homes really sell for.'), ('Accredited Buyer Representative', 'Michael holds the ABR® designation, training focused on representing buyers, not sellers.'), ('Offers that win', 'As a Real Estate Negotiation Expert (RENE), Michael builds offers that stand out on offer night and protects you when you negotiate one-on-one.'), ('A team behind you', 'The OP Team brings 2,000+ transactions of combined experience, plus pre-construction access and help in English and Italian.')]) + '</div>' + todo('One real buyer story: area, what they wanted, how you won it'), 'tint'),
   lambda: cta('Start with a 20-minute call', 'Tell us what you need, your budget and timing. We set up your search the same day.', 'buyer'),
   title='Buying a Home in Vaughan & Woodbridge | SoldMike', desc='How Michael Barillari and The OP Team help buyers in Vaughan, Woodbridge and the GTA find, win and close on the right home.',
   trail=[('Buy', '/buy/')],
@@ -330,7 +328,12 @@ P('/buy/pre-construction/',
   lambda: band('<div class="two"><div class="stack">' + prose(
       'Buying pre-construction means buying from a builder before the home is built, often years ahead of closing. The price is set today, deposits are spread out, and you choose finishes.',
       'It also comes with risks: closing delays, development charges, assignment rules and HST on new homes. We walk you through the agreement before you sign.') +
-      todo('Current projects you can offer access to (name, builder, location, price from, deposit structure)', 'Your pre-construction track record or partnerships', 'Note: the 10-day cooling-off period for new condos in Ontario') +
+      prose('<h2>What to know before you sign</h2>',
+            '<b>You have 10 days to change your mind on a new condo.</b> Under section 73 of Ontario\u2019s Condominium Act, buyers of a new condo from a builder can cancel within 10 calendar days of receiving the signed agreement and the disclosure documents, and get their deposit back. This does not apply to resale homes or assignments.',
+            '<b>Deposits are protected, up to a limit.</b> Tarion protects deposits on new condos up to $20,000, and the Condominium Act requires deposits above that to be held in trust or secured. Freehold homes have their own Tarion deposit protection limits.',
+            '<b>Check the builder.</b> Every new-home builder in Ontario must be licensed by the Home Construction Regulatory Authority (HCRA). You can look them up in the Ontario Builder Directory before you sign.',
+            '<b>Watch the closing costs.</b> New homes can add development charges, utility hook-ups and HST adjustments at closing. We read the agreement with you and your lawyer so there are no surprises.') +
+      todo('Current projects you can offer access to (name, builder, location, price from, deposit structure)', 'Your pre-construction track record or partnerships') +
       '</div>' + form('precon') + '</div>'),
   title='Pre-Construction Homes in Vaughan & York Region | SoldMike', desc='VIP access to new pre-construction condos, towns and detached homes in Vaughan and York Region.',
   trail=[('Buy', '/buy/'), ('Pre-construction', '/buy/pre-construction/')])
@@ -616,9 +619,15 @@ P('/about/',
 
 P('/about/the-op-team/',
   lambda: hero([('Home', '/'), ('About', '/about/'), ('The OP Team', '/about/the-op-team/')], 'The OP Team', 'RE/MAX Premier The OP Team Inc., Brokerage.'),
-  lambda: band(todo('What The OP Team is and how the team works for clients', 'Team members: photo, name, role, one line each', 'Team results (verifiable)', 'Link to theopteam.ca'), narrow=True),
+  lambda: band(prose(
+      'The OP Team is a real estate team at RE/MAX Premier in Vaughan, led by Nick Oppedisano and Angela Oppedisano. The team helps buyers, sellers and investors across Toronto, York, Peel, Durham, Simcoe and Halton Hills.',
+      'Together, Michael Barillari and The OP Team have more than 2,000 transactions of combined experience, and The OP Team holds a 4.9-star Google rating from 125 reviews.',
+      '<h2>What the team does</h2>',
+      '<ul><li>Selling homes, with in-house photos, drone, video and twilight by Toronto Property Media</li><li>Buying resale and pre-construction homes</li><li>Leasing and investment properties</li><li>Free home valuations</li></ul>',
+      'Their tagline says it best: <i>Put us on your lawn, your house will be gone!</i>',
+      '<p><a class="btn ghost" href="https://theopteam.ca/" target="_blank" rel="noopener">Visit theopteam.ca</a> <a class="btn ghost" href="/reviews/">Read client reviews</a></p>') +
+      todo('Team members: photo, name, role, one line each'), narrow=True),
   lambda: cta('Work with the team', 'Start with Michael. He brings in the right people at each step.', 'contact'),
-  noindex=True,  # thin until written
   title='The OP Team | RE/MAX Premier | SoldMike', desc='RE/MAX Premier The OP Team Inc., Brokerage: the team behind SoldMike in Vaughan and Woodbridge.',
   trail=[('About', '/about/'), ('The OP Team', '/about/the-op-team/')])
 
@@ -631,8 +640,13 @@ P('/videos/',
 
 P('/join/',
   lambda: hero([('Home', '/'), ('Join the team', '/join/')], 'Getting started as a realtor', 'Thinking about a career in real estate, or licensed and looking for a team? Here is how we help new agents get going.'),
-  lambda: band('<div class="two"><div class="stack">' + prose('<h2>What you get</h2>') + todo('What new agents get: training, leads, media, systems, mentorship', 'How to get licensed in Ontario (Humber courses, RECO registration) in a short list', 'What success looks like in year one') + '</div>' + form('join') + '</div>'),
-  noindex=True,  # thin until written
+  lambda: band('<div class="two"><div class="stack">' + prose('<h2>How to get licensed in Ontario</h2>',
+      '<ol><li><b>Take the pre-registration program.</b> The Ontario Real Estate Salesperson Program (delivered by Humber Polytechnic and partner colleges) has five courses and two simulations, to be finished within 24 months.</li>'
+      '<li><b>Join a brokerage and register with RECO</b> within 12 months of finishing. This is where The OP Team comes in.</li>'
+      '<li><b>Finish the post-registration (articling) courses</b> within your first 24 months as a registered salesperson.</li></ol>',
+      'Most people finish the courses in 9 to 18 months while working. Budget roughly $4,500 to $5,500 for tuition and exams.',
+      '<h2>Why start with The OP Team</h2>',
+      'You learn from agents with 2,000+ transactions of combined experience, at a RE/MAX office in Vaughan, with in-house media from Toronto Property Media for your listings. Michael started in 2011 and is happy to talk about what the first year really looks like.') + todo('What new agents get: training, leads, media, systems, mentorship (confirm specifics)', 'What success looks like in year one') + '</div>' + form('join') + '</div>'),
   title='Join The OP Team | Getting Started as a Realtor | SoldMike', desc='Thinking about becoming a realtor in Ontario or looking for a new team? Join The OP Team at RE/MAX Premier.',
   trail=[('Join the team', '/join/')])
 
