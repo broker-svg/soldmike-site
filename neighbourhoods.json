@@ -1,0 +1,718 @@
+{
+ "kleinburg": {
+  "schools": [
+   [
+    "Kleinburg Public School",
+    "Public (York Region DSB), JK to Grade 8, on Islington Avenue next to the McMichael gallery."
+   ],
+   [
+    "Pope Francis Catholic Elementary School",
+    "Catholic (York Catholic DSB), JK to Grade 8, on Secord Avenue."
+   ],
+   [
+    "Emily Carr Secondary School",
+    "Public high school serving part of Kleinburg."
+   ],
+   [
+    "King City Secondary School",
+    "Public high school for other Kleinburg addresses. Check your address with YRDSB's Find My School tool."
+   ]
+  ],
+  "parks": [
+   [
+    "McMichael Canadian Art Collection",
+    "Gallery just south of the village core, known for its Group of Seven collection."
+   ],
+   [
+    "Bindertwine Park",
+    "Kleinburg's largest park, in the East Humber River valley east of the village."
+   ],
+   [
+    "Humber River trails",
+    "Forested valley trails for hiking and biking around the village."
+   ],
+   [
+    "Kortright Centre for Conservation",
+    "Nature and conservation centre on the East Humber River, a short drive south."
+   ],
+   [
+    "William Granger Greenway",
+    "Part of the Humber trail system, linking south toward Boyd Conservation Area."
+   ]
+  ],
+  "shopping": [
+   [
+    "Islington Avenue village core",
+    "Historic main street with local shops, cafés and restaurants."
+   ],
+   [
+    "The Doctor's House",
+    "Well-known restaurant and event venue in the village."
+   ],
+   [
+    "Nashville Road and Major Mackenzie Drive",
+    "Everyday services for the newer Kleinburg-Nashville neighbourhoods."
+   ],
+   [
+    "Vaughan Mills",
+    "Large indoor mall at Highway 400 and Rutherford Road, a short drive away."
+   ]
+  ],
+  "commute": "Kleinburg sits near Highway 27 and Major Mackenzie Drive. Highway 427 now runs north to Major Mackenzie Drive (opened in 2021), giving a fast route to Highway 407 and Highway 401. York Region Transit buses serve the area, and Vaughan Metropolitan Centre, the north end of TTC Line 1, is a short drive away. The closest GO train is Maple GO on the Barrie line.",
+  "changing": [
+   [
+    "Highway 427 extension",
+    "In 2026 Ontario began looking for builders to extend Highway 427 north from Major Mackenzie Drive to the future Highway 413."
+   ],
+   [
+    "Kleinburg-Nashville growth",
+    "New subdivisions and parks are planned or under way west of the village."
+   ]
+  ],
+  "pockets": [
+   [
+    "Kleinburg village core",
+    "Walkable historic main street. Suits buyers who want character and village life."
+   ],
+   [
+    "Nashville",
+    "Quiet hamlet next to Kleinburg. Suits buyers who want space with services nearby."
+   ],
+   [
+    "Kleinburg-Nashville subdivisions",
+    "Newer homes near Nashville Road and Major Mackenzie. Suits families wanting a newer house."
+   ]
+  ],
+  "family_answer": "Yes. Kleinburg has public and Catholic elementary schools right in the village, plus trails along the Humber River, Bindertwine Park and the McMichael gallery close to home. New parks are planned as the Kleinburg-Nashville area grows.",
+  "commute_answer": "By car, take Highway 427 south from Major Mackenzie Drive to Highway 407 or Highway 401, then into the city. By transit, get to Vaughan Metropolitan Centre station and ride TTC Line 1 south to Union Station."
+ },
+ "maple": {
+  "schools": [
+   [
+    "Maple Creek Public School",
+    "Public (York Region DSB), JK to Grade 8, on Hawker Road."
+   ],
+   [
+    "Mackenzie Glen Public School",
+    "Public (York Region DSB) elementary school."
+   ],
+   [
+    "St. David Catholic Elementary School",
+    "Catholic (York Catholic DSB) elementary school."
+   ],
+   [
+    "Father John Kelly Catholic Elementary School",
+    "Catholic (York Catholic DSB) elementary school."
+   ],
+   [
+    "Maple High School",
+    "Public (York Region DSB) secondary school."
+   ],
+   [
+    "St. Joan of Arc Catholic High School",
+    "Catholic (York Catholic DSB) secondary school."
+   ]
+  ],
+  "parks": [
+   [
+    "Maple Community Centre and Library",
+    "On Keele Street, with a pool, arena, gym and library, renovated in 2022."
+   ],
+   [
+    "Canada's Wonderland",
+    "Amusement park on the south edge of Maple."
+   ],
+   [
+    "Eagle's Nest Golf Club",
+    "Public golf course built on the former Keele Valley landfill."
+   ]
+  ],
+  "shopping": [
+   [
+    "Maple village core",
+    "Local shops and services around Keele Street and Major Mackenzie Drive."
+   ],
+   [
+    "Vaughan Mills",
+    "Large indoor mall at Highway 400 and Rutherford Road."
+   ],
+   [
+    "Promenade Shopping Centre",
+    "Mall serving Maple and Thornhill."
+   ]
+  ],
+  "commute": "Highway 400 runs through Maple with interchanges at Major Mackenzie Drive and Rutherford Road. Maple GO Station on Station Street is on the Barrie line, with trains about every 15 to 30 minutes in the morning rush. YRT routes 26 Maple, 20 Jane, 107 Keele, 85 Rutherford and 4 Major Mackenzie serve the area, and route 26 connects to Vaughan Metropolitan Centre on TTC Line 1.",
+  "changing": [
+   [
+    "Barrie line expansion at Maple GO",
+    "Metrolinx is adding a second track, new platforms and more parking toward all-day, two-way GO service."
+   ]
+  ],
+  "pockets": [
+   [
+    "Maple village core",
+    "Older homes near Keele and Major Mackenzie. Suits buyers who want to walk to the GO train."
+   ],
+   [
+    "Hope and Teston",
+    "Northern Maple. Suits buyers wanting a quieter, more open setting."
+   ],
+   [
+    "Sherwood",
+    "On the Maple and Concord border. Suits buyers wanting quick access to Highway 400 and Vaughan Mills."
+   ]
+  ],
+  "family_answer": "Yes. Maple has public and Catholic elementary and high schools, the Maple Community Centre and Library with a pool and arena, and Canada's Wonderland next door. Highway 400 and Maple GO make commuting easy for working parents.",
+  "commute_answer": "By car, take Highway 400 south from Major Mackenzie Drive or Rutherford Road. By transit, take the Barrie line GO train from Maple GO to Union Station, or YRT route 26 to Vaughan Metropolitan Centre and TTC Line 1 downtown."
+ },
+ "caledon-bolton": {
+  "schools": [
+   [
+    "James Bolton Public School",
+    "Public (Peel DSB) elementary school in Bolton."
+   ],
+   [
+    "Ellwood Memorial Public School",
+    "Public (Peel DSB) elementary school in Bolton."
+   ],
+   [
+    "Allan Drive Middle School",
+    "Public (Peel DSB), Grades 6 to 8."
+   ],
+   [
+    "Holy Family Elementary School",
+    "Catholic (Dufferin-Peel Catholic DSB), JK to Grade 8, on Allan Drive."
+   ],
+   [
+    "St. John Paul II Catholic Elementary School",
+    "Catholic (Dufferin-Peel Catholic DSB) on Bolton Heights Road."
+   ],
+   [
+    "Humberview Secondary School",
+    "Bolton's public high school, with French Immersion."
+   ],
+   [
+    "St. Michael Catholic Secondary School",
+    "Bolton's Catholic high school."
+   ]
+  ],
+  "parks": [
+   [
+    "Albion Hills Conservation Park",
+    "TRCA park where the Humber Valley Heritage Trail meets the Caledon Trailway."
+   ],
+   [
+    "Humber Valley Heritage Trail",
+    "About 15 km of trail from Albion Hills through Bolton toward Kleinburg."
+   ],
+   [
+    "Caledon Trailway",
+    "Multi-use trail linking Palgrave, Caledon East, Inglewood and Terra Cotta."
+   ],
+   [
+    "Caledon East Community Complex",
+    "Two arenas, meeting rooms and a banquet hall on Old Church Road."
+   ]
+  ],
+  "shopping": [
+   [
+    "Downtown Bolton",
+    "Historic Queen Street and King Street core with local shops and restaurants."
+   ],
+   [
+    "Queen Street South",
+    "Bolton's main commercial corridor with plazas and everyday shopping."
+   ],
+   [
+    "Caledon East village",
+    "Small village core on Old Church Road."
+   ]
+  ],
+  "commute": "Bolton is about 50 km northwest of downtown Toronto. Highway 427 is about 9 km southeast and Highway 400 about 14 km east, with Highway 50 and Highway 9 running through the area. Brampton Transit route 41 serves Bolton, and GO buses connect Caledon to the Kitchener line.",
+  "changing": [
+   [
+    "Highway 413",
+    "Construction began in Caledon in 2025 on the new highway linking Highway 400 and Highway 401/407 in Halton."
+   ],
+   [
+    "New Caledon East Public School",
+    "Peel DSB broke ground in December 2024, with opening planned for September 2026."
+   ],
+   [
+    "Caledon growth plan",
+    "The town's Official Plan expects the population to grow from about 80,000 to 300,000 over 30 years."
+   ]
+  ],
+  "pockets": [
+   [
+    "Bolton",
+    "Caledon's largest community. Suits families wanting a walkable downtown and newer subdivisions."
+   ],
+   [
+    "Caledon East",
+    "Small village with trails and a community complex. Suits buyers wanting quiet."
+   ],
+   [
+    "Palgrave",
+    "Rural hamlet on the Caledon Trailway. Suits buyers wanting acreage."
+   ],
+   [
+    "Mayfield West",
+    "Newer community in south Caledon. Suits commuters heading toward Brampton."
+   ]
+  ],
+  "family_answer": "Yes. Bolton has public and Catholic elementary schools, a middle school and two high schools, Humberview and St. Michael. Trails like the Humber Valley Heritage Trail and nearby Albion Hills give families room outdoors.",
+  "commute_answer": "Most people drive, taking Highway 427 or Highway 400 south toward Toronto. Brampton Transit route 41 serves Bolton, and Caledon has GO bus connections to the Kitchener line."
+ },
+ "king-city-nobleton": {
+  "schools": [
+   [
+    "King City Public School",
+    "Public (York Region DSB) elementary school."
+   ],
+   [
+    "Nobleton Public School",
+    "Public (York Region DSB) elementary school."
+   ],
+   [
+    "Holy Name Catholic School",
+    "Catholic (York Catholic DSB) elementary school in King City."
+   ],
+   [
+    "St. Mary Catholic School",
+    "Catholic (York Catholic DSB) elementary school in Nobleton."
+   ],
+   [
+    "King City Secondary School",
+    "Public high school on King Road serving all of King Township."
+   ],
+   [
+    "Villanova College",
+    "Independent Catholic school, Grades 4 to 12."
+   ],
+   [
+    "The Country Day School",
+    "Independent co-ed day school, founded in 1972."
+   ]
+  ],
+  "parks": [
+   [
+    "King City Memorial Park",
+    "Ball diamonds, soccer fields, playgrounds and tennis courts."
+   ],
+   [
+    "Nobleton Community Centre and Arena",
+    "Ice pad, hall and meeting rooms on Old King Road."
+   ],
+   [
+    "Cold Creek Conservation Area",
+    "Hiking and nature trails in King Township."
+   ],
+   [
+    "King City Trail",
+    "Valley trail along the Humber River for walking and cross-country skiing."
+   ]
+  ],
+  "shopping": [
+   [
+    "King Road, King City",
+    "Main retail strip between Keele and Dufferin streets."
+   ],
+   [
+    "Nobleton plazas",
+    "Newer plazas on King Road with everyday shopping."
+   ],
+   [
+    "Schomberg Main Street",
+    "Historic main street with specialty shops and cafés."
+   ]
+  ],
+  "commute": "King City is about 40 km north of downtown Toronto, with Highway 400 at King Road (exit 43). King City GO Station on the Barrie line is the township's train station, and Metrolinx is adding a second platform, a pedestrian bridge and more parking for future all-day service. GO buses serve Nobleton and King City.",
+  "changing": [
+   [
+    "King City GO Station upgrades",
+    "New west platform, pedestrian bridge and parking as part of Barrie line GO expansion."
+   ]
+  ],
+  "pockets": [
+   [
+    "King City",
+    "The township's largest village, with the GO station. Suits commuters who want village living."
+   ],
+   [
+    "Nobleton",
+    "Small town with an arena and plazas. Suits families wanting a close-knit community and big lots."
+   ],
+   [
+    "Schomberg",
+    "Historic main street village. Suits buyers wanting a walkable small-town feel."
+   ],
+   [
+    "Kettleby and the countryside",
+    "Rural hamlets and estates. Suits buyers wanting acreage and quiet."
+   ]
+  ],
+  "family_answer": "Yes. King City and Nobleton each have public and Catholic elementary schools, King City Secondary serves the whole township, and private options include Villanova College and The Country Day School. The township also has over 100 km of public trails.",
+  "commute_answer": "Drive south on Highway 400 from King Road, or take the Barrie line GO train from King City GO to Union Station."
+ },
+ "sharon-east-gwillimbury": {
+  "schools": [
+   [
+    "Sharon Public School",
+    "Public (York Region DSB), JK to Grade 8, first opened in 1858."
+   ],
+   [
+    "Queensville Elementary School",
+    "Public (York Region DSB), opened in 2025, JK to Grade 8 with YMCA child care."
+   ],
+   [
+    "Holland Landing Public School",
+    "Public (York Region DSB) elementary school."
+   ],
+   [
+    "Mount Albert Public School",
+    "Public (York Region DSB) elementary school."
+   ],
+   [
+    "Our Lady of Good Counsel Catholic Elementary School",
+    "Catholic (York Catholic DSB) elementary school in Sharon."
+   ],
+   [
+    "High school in Newmarket",
+    "East Gwillimbury has no high school yet; students attend Newmarket schools such as Huron Heights. Check boundaries with YRDSB."
+   ]
+  ],
+  "parks": [
+   [
+    "Sharon Temple National Historic Site",
+    "Built from 1825 to 1832 by the Children of Peace, now a museum."
+   ],
+   [
+    "Rogers Reservoir Conservation Area",
+    "68 hectares on the East Holland River, on the Nokiidaa Trail."
+   ],
+   [
+    "East Gwillimbury Sports Complex",
+    "Arenas on Mount Albert Road in Sharon."
+   ],
+   [
+    "Town parks",
+    "More than 40 parks, gardens and sports fields across the town."
+   ]
+  ],
+  "shopping": [
+   [
+    "Green Lane Centre",
+    "Yonge Street and Green Lane, with Loblaws, Michaels and PetSmart."
+   ],
+   [
+    "Upper Canada Mall",
+    "Large enclosed mall on Yonge Street in Newmarket."
+   ]
+  ],
+  "commute": "Highway 404 runs north to Woodbine Avenue near Ravenshoe Road, and Yonge Street and Green Lane link to Newmarket. East Gwillimbury GO Station on Green Lane is on the Barrie line, with weekday trains to Union Station taking about an hour. Newmarket GO is also close by.",
+  "changing": [
+   [
+    "New schools in Queensville",
+    "Queensville Elementary opened in 2025, and a new Catholic elementary school is planned for September 2027."
+   ],
+   [
+    "York Region sewage works",
+    "New sewer and pumping station work in East Gwillimbury, scheduled for 2028 to 2030, to support growth."
+   ]
+  ],
+  "pockets": [
+   [
+    "Sharon",
+    "Historic village with the Sharon Temple and sports complex. Suits buyers wanting quiet and heritage character."
+   ],
+   [
+    "Queensville",
+    "Growing community with new schools. Suits families wanting newer homes."
+   ],
+   [
+    "Holland Landing",
+    "On the East Holland River. Suits buyers who love the outdoors and the water."
+   ],
+   [
+    "Mount Albert",
+    "Village of about 4,900. Suits buyers wanting a small-town, rural feel."
+   ]
+  ],
+  "family_answer": "Yes. East Gwillimbury has public and Catholic elementary schools in each village, including the new Queensville Elementary that opened in 2025, plus the Sharon Temple, Rogers Reservoir and more than 40 town parks. High school is in nearby Newmarket.",
+  "commute_answer": "Take the Barrie line GO train from East Gwillimbury GO or Newmarket GO to Union Station, about an hour. By car, take Highway 404 south."
+ },
+ "toronto": {
+  "schools": [
+   [
+    "Four school boards",
+    "Toronto has English public (TDSB) and Catholic (TCDSB) boards, plus the French boards Viamonde and MonAvenir."
+   ],
+   [
+    "Toronto District School Board",
+    "Canada's largest board, with about 470 elementary and 110 secondary schools."
+   ]
+  ],
+  "parks": [
+   [
+    "High Park",
+    "About 161 hectares with Grenadier Pond, trails and a zoo."
+   ],
+   [
+    "James Gardens",
+    "Public garden on the Humber River in Etobicoke."
+   ],
+   [
+    "Humber River Recreation Trail",
+    "Popular west-end trail for walkers and cyclists."
+   ],
+   [
+    "Humber Bay Park",
+    "Etobicoke waterfront park with meadows and lake views."
+   ]
+  ],
+  "shopping": [
+   [
+    "Bloor West Village",
+    "Over 400 shops, restaurants and services between Jane Street and Ellis Park Road."
+   ],
+   [
+    "The Junction",
+    "Dundas Street West strip of patios and independent shops."
+   ],
+   [
+    "CF Sherway Gardens",
+    "Etobicoke mall near Highway 427 and the QEW."
+   ],
+   [
+    "Yorkdale Shopping Centre",
+    "At Highway 401 and Allen Road, next to Yorkdale subway station."
+   ]
+  ],
+  "commute": "Subway Line 1 serves Yorkdale and the northwest, and Line 2 serves Bloor West Village. UP Express runs from Union to Pearson every 15 minutes, stopping at Bloor and Weston. GO's Milton and Lakeshore West lines serve Kipling, Mimico and Long Branch. Line 6 Finch West and Line 5 Eglinton are now open, and the Gardiner, QEW, 401 and 427 handle drivers.",
+  "changing": [
+   [
+    "Line 6 Finch West",
+    "Opened December 2025: 18 stops from Finch West station to Humber College."
+   ],
+   [
+    "Line 5 Eglinton",
+    "The Eglinton Crosstown opened to riders in February 2026."
+   ],
+   [
+    "Ontario Line",
+    "Under construction, with tunnelling under way and opening expected in the early 2030s."
+   ]
+  ],
+  "pockets": [
+   [
+    "Humber Valley Village",
+    "Etobicoke, near James Gardens. Suits families wanting larger homes and green space."
+   ],
+   [
+    "Bloor West Village",
+    "Walkable shopping street with subway access. Suits families wanting a village feel in the city."
+   ],
+   [
+    "The Junction",
+    "Lively and walkable. Suits buyers who want patios and independent shops."
+   ],
+   [
+    "Etobicoke waterfront (Humber Bay)",
+    "Condos by the lake. Suits buyers wanting lake views and quick highway access."
+   ],
+   [
+    "Humber Summit",
+    "Northwest Toronto beside Vaughan. Suits buyers wanting Toronto close to Woodbridge."
+   ]
+  ],
+  "family_answer": "Yes. Toronto's west end has big parks like High Park and James Gardens, the Humber River trail, four publicly funded school boards and walkable main streets like Bloor West Village and The Junction.",
+  "commute_answer": "From the west end, take subway Line 2 or Line 1 downtown, or a GO train from Kipling, Mimico or Long Branch to Union Station. UP Express from Bloor or Weston reaches Union in a few stops."
+ },
+ "woodbridge": {
+  "schools": [
+   [
+    "Woodbridge Public School",
+    "Public (York Region DSB) elementary school."
+   ],
+   [
+    "Pine Grove Public School",
+    "Public (York Region DSB) elementary school."
+   ],
+   [
+    "St. Margaret Mary Catholic Elementary School",
+    "Catholic (York Catholic DSB) elementary school in western Woodbridge."
+   ],
+   [
+    "Emily Carr Secondary School",
+    "Public high school on Rutherford Road, offering French and Italian courses."
+   ],
+   [
+    "Holy Cross Catholic Academy",
+    "Catholic high school on Martin Grove Road and an IB World School."
+   ],
+   [
+    "Woodbridge College",
+    "Public high school in the Woodbridge core."
+   ]
+  ],
+  "parks": [
+   [
+    "Boyd Conservation Park",
+    "TRCA park on Islington Avenue for picnics and hiking along the Humber."
+   ],
+   [
+    "Kortright Centre for Conservation",
+    "325 hectares of woodland and trails on Pine Valley Drive."
+   ],
+   [
+    "Woodbridge Pool and Memorial Arena",
+    "Indoor arena, pool and community hall on Highway 7."
+   ],
+   [
+    "Woodbridge Fairgrounds",
+    "Home of the Woodbridge Fall Fair since 1847."
+   ]
+  ],
+  "shopping": [
+   [
+    "Woodbridge Avenue",
+    "The traditional downtown, with cafés, restaurants and shops between Islington and Kipling."
+   ],
+   [
+    "Market Lane Shopping Centre",
+    "Local shops, services and food markets on Woodbridge Avenue."
+   ],
+   [
+    "Vaughan Mills",
+    "Large indoor mall near Highway 400, a short drive east."
+   ]
+  ],
+  "commute": "Woodbridge sits between Highway 400 and Highway 27, with Highway 7 running through it and Highway 407 just south. The closest GO trains are Rutherford and Maple on the Barrie line, and GO buses also serve the area. YRT routes connect to Vaughan Metropolitan Centre and Pioneer Village stations on TTC Line 1.",
+  "changing": [
+   [
+    "Barrie line GO expansion",
+    "Metrolinx is adding a second track and station upgrades at Maple GO toward all-day, two-way service."
+   ],
+   [
+    "Highway 427 extension and Highway 413",
+    "Ontario is moving ahead in 2026 with extending Highway 427 north and building the Highway 413 east section."
+   ],
+   [
+    "Cortellucci Vaughan Hospital",
+    "Opened in 2021 on Major Mackenzie Drive, Vaughan's first hospital."
+   ]
+  ],
+  "pockets": [
+   [
+    "Sonoma Heights",
+    "1990s and 2000s homes near Islington and Major Mackenzie. Suits families wanting detached homes and townhomes."
+   ],
+   [
+    "Islington Woods",
+    "Larger lots and bigger homes. Suits move-up buyers wanting space."
+   ],
+   [
+    "Weston Downs",
+    "Executive homes on premium lots. Suits buyers wanting a larger home and garage."
+   ],
+   [
+    "Woodbridge core",
+    "Walkable older village around Woodbridge Avenue, with condos nearby. Suits buyers wanting a main street."
+   ],
+   [
+    "Vellore Village",
+    "Newer homes at Weston and Rutherford. Suits families wanting a newer house."
+   ]
+  ],
+  "family_answer": "Yes. Woodbridge has many public and Catholic schools, including Holy Cross Catholic Academy, an IB World School, plus Boyd Conservation Park, the Kortright Centre and the Woodbridge Pool and Memorial Arena close to home. Woodbridge Avenue and Market Lane cover everyday shopping.",
+  "commute_answer": "By car, take Highway 400 or Highway 427 south toward downtown Toronto. By transit, take YRT to Vaughan Metropolitan Centre or Pioneer Village and ride TTC Line 1, or take the Barrie line GO train from Rutherford or Maple."
+ },
+ "vellore": {
+  "schools": [
+   [
+    "Vellore Woods Public School",
+    "Public (York Region DSB) elementary school."
+   ],
+   [
+    "Pierre Berton Public School",
+    "Public (York Region DSB) elementary school."
+   ],
+   [
+    "St. Emily Catholic Elementary School",
+    "Catholic (York Catholic DSB) on Vellore Woods Boulevard."
+   ],
+   [
+    "Emily Carr Secondary School",
+    "Public high school on Rutherford Road."
+   ],
+   [
+    "Tommy Douglas Secondary School",
+    "Public high school on Major Mackenzie Drive, opened in 2015."
+   ]
+  ],
+  "parks": [
+   [
+    "Vellore Village Community Centre",
+    "Pool with water slide, gym, fitness centre and outdoor rink on Villa Royale Avenue."
+   ],
+   [
+    "Vellore Woods Park",
+    "Walking paths, playground, basketball court and three ponds."
+   ],
+   [
+    "Matthew Park",
+    "Running track, ball diamond and tennis courts."
+   ],
+   [
+    "Kortright Centre for Conservation",
+    "325 hectares of trails a short drive south."
+   ]
+  ],
+  "shopping": [
+   [
+    "Weston Road and Rutherford Road",
+    "Plazas with grocery stores, banks and restaurants."
+   ],
+   [
+    "Major Mackenzie Drive at Highway 400",
+    "Big-box shopping with Walmart and Home Depot."
+   ],
+   [
+    "Vaughan Mills",
+    "Large indoor mall at the east edge of the community."
+   ]
+  ],
+  "commute": "Vellore Village sits just west of Highway 400, with access at Rutherford Road, Major Mackenzie Drive and Teston Road. The nearest GO trains are Rutherford and Maple on the Barrie line. YRT routes connect to Vaughan Mills Terminal and on to Pioneer Village and Vaughan Metropolitan Centre stations on TTC Line 1.",
+  "changing": [
+   [
+    "Barrie line GO expansion",
+    "Metrolinx is adding a second track and station upgrades at Maple GO toward all-day, two-way service."
+   ],
+   [
+    "Highway 427 extension and Highway 413",
+    "Ontario is moving ahead in 2026 with extending Highway 427 north and building the Highway 413 east section."
+   ],
+   [
+    "Cortellucci Vaughan Hospital",
+    "Opened in 2021 on Major Mackenzie Drive, Vaughan's first hospital."
+   ]
+  ],
+  "pockets": [
+   [
+    "Vellore Village",
+    "Newer homes near Weston and Rutherford. Suits families wanting modern homes near the community centre."
+   ],
+   [
+    "Vellore Woods",
+    "Townhomes and detached homes. Suits buyers wanting parks and ponds close by."
+   ],
+   [
+    "Sonoma Heights",
+    "Next door in Woodbridge. Suits families wanting established detached homes."
+   ]
+  ],
+  "family_answer": "Yes. Vellore Village has a community centre with a pool and rink, parks like Vellore Woods Park and Matthew Park, public and Catholic elementary schools close by, and Tommy Douglas and Emily Carr for high school.",
+  "commute_answer": "By car, take Highway 400 south toward downtown Toronto. By transit, take YRT to Vaughan Metropolitan Centre or Pioneer Village and ride TTC Line 1, or take the Barrie line GO train from Rutherford or Maple."
+ }
+}

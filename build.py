@@ -12,6 +12,16 @@ ADDRESS = {'street': '3550 Rutherford Rd, Unit 80', 'city': 'Vaughan', 'region':
 BROKERAGE = 'RE/MAX Premier The OP Team Inc., Brokerage'
 AREAS = ['Vaughan', 'Woodbridge', 'Kleinburg', 'Maple', 'Caledon', 'King', 'East Gwillimbury', 'Toronto']
 TODOS = []
+LICENSED = 'December 2011'
+DESIGNATION_NAMES = ['ABR® (Accredited Buyer Representative)', 'SRS (Seller Representative Specialist)', 'RENE (Real Estate Negotiation Expert)', 'Accredited GreenBroker® – Commercial']
+PROFILES = [
+    'https://www.google.com/maps/place/data=!4m2!3m1!1s0x882b2ffe673f1b5d:0x97e6bee0f5d0c849',  # Google Business Profile
+    'https://www.remax.ca/on/michael-barillari-101747-ag',
+    'https://www.realtor.ca/agent/1949177/michael-barillari-3550-rutherford-rd-80-vaughan-ontario-l4h3t8',
+    'https://rankmyagent.com/michaelbarillari',
+    'https://www.linkedin.com/in/soldmike/',
+]
+SHOW_TODOS = False  # unfinished content stays out of the public pages; CONTENT-TODO.md still lists it
 e = html.escape
 
 # ---------- schema ----------
@@ -26,7 +36,9 @@ def agent_schema():
                     'addressRegion': ADDRESS['region'], 'postalCode': ADDRESS['postal'], 'addressCountry': 'CA'},
         'areaServed': [{'@type': 'City', 'name': a} for a in AREAS],
         'parentOrganization': {'@type': 'RealEstateAgent', 'name': BROKERAGE},
-        'sameAs': ['https://www.google.com/maps/place/data=!4m2!3m1!1s0x882b2ffe673f1b5d:0x97e6bee0f5d0c849'],  # Google Business Profile; add Instagram, YouTube, LinkedIn, Realtor.ca when Michael sends them
+        'knowsLanguage': ['English', 'Italian'],
+        'hasCredential': [{'@type': 'EducationalOccupationalCredential', 'name': n} for n in DESIGNATION_NAMES],
+        'sameAs': PROFILES,
     }
 
 def crumbs_schema(trail):
@@ -83,6 +95,8 @@ def hero(trail, h1, lede, photo=None):
 PAGE = None
 def todo(*items):
     TODOS.append((PAGE, items))
+    if not SHOW_TODOS:
+        return ''
     li = ''.join('<li>%s</li>' % e(i) for i in items)
     return '<div class="todo"><strong>Content to write</strong><ul>%s</ul></div>' % li
 
@@ -96,19 +110,28 @@ def prose(*ps):
     return '<div class="prose">%s</div>' % ''.join(p if p.startswith('<') else '<p>%s</p>' % p for p in ps)
 
 def cards(items):
+    items = [(u, t, s if not unfinished(s) else '') for u, t, s in items if not unfinished(t)]
     return '<div class="cards">%s</div>' % ''.join('<a href="%s" class="rv"><b>%s</b><span>%s</span></a>' % (u, e(t), e(s)) for u, t, s in items)
 
 def steps(items):
     return '<ol class="steps">%s</ol>' % ''.join('<li class="rv"><div><b>%s</b><p>%s</p></div></li>' % (e(t), e(d)) for t, d in items)
 
+def unfinished(v):
+    return '[' in v
+
 def kv(rows):
+    rows = [(a, b) for a, b in rows if not unfinished(b)]
     out = '<dl class="kv">%s</dl>' % ''.join('<div><dt>%s</dt><dd>%s</dd></div>' % (e(a), e(b)) for a, b in rows)
     return out.replace('LIVECOUNT', '<span data-area-count="%s">…</span>' % (PAGE or '').strip('/').split('/')[-1])
 
 def faq(qs):
     out = ''
+    for q, a in qs:
+        if a.startswith('['):
+            todo('Answer: ' + q)
+    qs = [(q, a) for q, a in qs if not a.startswith('[')]
     for i, (q, a) in enumerate(qs):
-        body = todo('Answer: ' + q) if a.startswith('[') else '<p>%s</p>' % a
+        body = '<p>%s</p>' % a
         out += '<details%s><summary>%s<span class="plus" aria-hidden="true">+</span></summary><div class="a">%s</div></details>' % (' open' if i == 0 else '', e(q), body)
     return '<div class="faq">%s</div>' % out
 
@@ -414,6 +437,17 @@ P('/sell/how-we-market/',
 # =====================================================================
 # NEIGHBOURHOODS
 # =====================================================================
+HOOD_INFO = json.load(open('neighbourhoods.json', encoding='utf-8'))  # schools, parks, commute etc. per area
+
+def living(slug, name):
+    d = HOOD_INFO.get(slug)
+    if not d:
+        return todo('Schools, parks, shopping, commute, what is changing')
+    def lst(rows):
+        return '<ul>%s</ul>' % ''.join('<li><b>%s</b>: %s</li>' % (e(a), e(b)) for a, b in rows)
+    return prose('<h3>Schools</h3>', lst(d['schools']), '<h3>Parks and recreation</h3>', lst(d['parks']), '<h3>Shopping and dining</h3>', lst(d['shopping']),
+                 '<h3>Getting around</h3>', e(d['commute']), '<h3>What is changing</h3>', lst(d['changing'])) + '<p class="fine">School boundaries change; confirm your address with the school board before you buy.</p>'
+
 HOODS = [
     ('woodbridge', 'Woodbridge', 'Woodbridge is a family-focused community in the City of Vaughan, known for its strong Italian-Canadian roots, the Humber River trails and quick access to Highways 400, 407 and 427.', '/hero.jpg', ['Vellore Village', 'Sonoma Heights', 'East Woodbridge', 'Elder Mills', 'Islington Woods', 'Woodbridge Core']),
     ('vellore', 'Vellore Village', 'Vellore Village is in northwest Woodbridge, in the City of Vaughan, made up mostly of newer family subdivisions with parks, schools and quick access to Highway 400.', '/l1.jpg', ['[Pocket 1]', '[Pocket 2]', '[Pocket 3]']),
@@ -426,26 +460,28 @@ HOODS = [
 ]
 P('/neighbourhoods/',
   lambda: hero([('Home', '/'), ('Neighbourhoods', '/neighbourhoods/')], 'Neighbourhood guides', "Prices, schools, streets and what's selling, one page per community.", '/aerial.jpg'),
-  lambda: band(cards([('/neighbourhoods/%s/' % s, n, ', '.join(p for p in pk if not p.startswith('['))[:60] or 'Guide') for s, n, _, _, pk in HOODS])),
+  lambda: band(cards([('/neighbourhoods/%s/' % s, n, ', '.join(p for p, _ in HOOD_INFO[s]['pockets'][:3]) if s in HOOD_INFO else 'Guide') for s, n, _, _, pk in HOODS])),
   lambda: cta('Not sure which area fits?', 'Tell us what matters most and we will shortlist the neighbourhoods for you.', 'buyer'),
   title='Vaughan & GTA Neighbourhood Guides | SoldMike', desc='Guides to Woodbridge, Vellore, Kleinburg, Maple, Caledon, King City, Nobleton, Sharon and Toronto: prices, schools and what is selling.',
   trail=[('Neighbourhoods', '/neighbourhoods/')])
 
 for slug, name, intro, photo, pockets in HOODS:
     path = '/neighbourhoods/%s/' % slug
-    qs = [('Is %s a good place to raise a family?' % name, '[Answer yes or no in the first sentence, then schools, parks and community.]'),
+    info = HOOD_INFO.get(slug, {})
+    pockets = [p for p, _ in info['pockets']] if info else pockets
+    qs = [('Is %s a good place to raise a family?' % name, info.get('family_answer', '[Answer yes or no in the first sentence, then schools, parks and community.]')),
           ('How much is a detached home in %s?' % name, '[Price range in the first sentence, from recent sales.]'),
           ('How long does it take to sell a house in %s?' % name, '[Average days on market in the first sentence, then what speeds it up.]'),
-          ('How do I get to downtown Toronto from %s?' % name, '[Drive and transit options in the first sentence.]')]
+          ('How do I get to downtown Toronto from %s?' % name, info.get('commute_answer', '[Drive and transit options in the first sentence.]'))]
     P(path,
-      lambda name=name, intro=intro, photo=photo, slug=slug: hero([('Home', '/'), ('Neighbourhoods', '/neighbourhoods/'), (name, '/neighbourhoods/%s/' % slug)], '%s homes for sale & market guide' % name, e(intro) + '<br><small style="color:var(--pale)">Written by Michael Barillari, Broker · Updated [month, year]</small>', photo),
-      lambda name=name, pockets=pockets: band('<div class="two"><div class="stack"><h2>%s at a glance</h2>' % e(name) + kv([
+      lambda name=name, intro=intro, photo=photo, slug=slug: hero([('Home', '/'), ('Neighbourhoods', '/neighbourhoods/'), (name, '/neighbourhoods/%s/' % slug)], '%s homes for sale & market guide' % name, e(intro) + '<br><small style="color:var(--pale)">Written by Michael Barillari, Broker · Updated %s</small>' % date.today().strftime('%B %Y'), photo),
+      lambda name=name, pockets=pockets, slug=slug: band('<div class="two"><div class="stack"><h2>%s at a glance</h2>' % e(name) + kv([
           ('Average sold price, last 90 days', '[$X,XXX,XXX]'), ('Average days on market', '[X] days'), ('Homes for sale right now', 'LIVECOUNT'),
           ('Most common home type', '[Detached]'), ('Homes the OP Team has sold here', '[X]')]) +
-          '</div><div class="stack"><h2>Pockets of %s</h2>' % e(name) + cards([('/listings/', p, '[One line on who it suits]') for p in pockets]) + '</div></div>'),
+          '</div><div class="stack"><h2>Pockets of %s</h2>' % e(name) + cards([('/listings/?area=%s' % slug, p, w) for p, w in (HOOD_INFO[slug]['pockets'] if slug in HOOD_INFO else [(p, '') for p in pockets])]) + '</div></div>'),
       lambda name=name, slug=slug: band(head_block('For sale in %s' % name, 'The newest MLS® listings, refreshed every day.') + live_grid(slug, 6) +
           '<div class="rca-row"><a class="btn navy" href="/listings/?area=%s">See all %s listings</a><a href="https://www.realtor.ca/en" target="_blank" rel="noopener"><img src="https://www.realtor.ca/images/en-ca/powered_by_realtor.svg" width="125" alt="Powered by REALTOR.ca"></a></div>' % (slug, e(name)) + CREA_NOTE, 'tint'),
-      lambda name=name: band(head_block('Living in %s' % name) + todo('Schools (public, Catholic, French) and what they are known for', 'Parks, trails and community centres', 'Shopping, restaurants and places locals love', 'Commute: highways, GO, TTC/YRT', 'What is changing: new builds, transit, development') , narrow=True),
+      lambda name=name, slug=slug: band(head_block('Living in %s' % name) + living(slug, name), narrow=True),
       lambda name=name, qs=qs: band(head_block('%s questions, answered' % name) + faq(qs), 'tint'),
       lambda name=name: cta('Own in %s? See what it is worth.' % name, 'A price range based on real sales on your street.'),
       title='%s Homes for Sale & Neighbourhood Guide | SoldMike' % name, desc=intro[:155],
@@ -463,7 +499,7 @@ CASES = [
 P('/results/',
   lambda: hero([('Home', '/'), ('Results', '/results/')], 'Recent sales', 'What sold, how fast, and what we did to get it there.'),
   lambda: band('<div class="tbl"><table><thead><tr><th scope="col">Home</th><th scope="col">Area</th><th scope="col">Sold for</th><th scope="col">Days</th><th scope="col">Sale vs list</th><th scope="col"></th></tr></thead><tbody>' +
-               ''.join('<tr class="rv"><td class="big">%s</td><td>%s</td><td class="sold">%s</td><td>%s</td><td>%s</td><td><a href="/results/%s/">Case study</a></td></tr>' % (e(a), e(ar), p, d, s, sl) for sl, a, ar, p, d, s in CASES) +
+               ''.join('<tr class="rv"><td class="big">%s</td><td>%s</td><td class="sold">%s</td><td>%s</td><td>%s</td><td><a href="/results/%s/">Case study</a></td></tr>' % (e(a), e(ar), *[('' if unfinished(v) else v) for v in (p, d, s)], sl) for sl, a, ar, p, d, s in CASES) +
                '</tbody></table></div>' + '<div style="margin-top:24px">' + todo('Add every sale from the last 24 months with verified days on market and sale-to-list % (RECO: accurate and provable)', 'Sold data on the site likely needs the TRREB VOW feed; until then enter sales by hand') + '</div>'),
   lambda: cta('Want results like these?', 'It starts with pricing your home from real sales.'),
   title='Recent Home Sales in Vaughan & Woodbridge | SoldMike', desc='Homes sold by Michael Barillari and The OP Team in Vaughan, Woodbridge and York Region, with days on market and how we did it.',
@@ -471,12 +507,12 @@ P('/results/',
 
 for sl, a, ar, p, d, s in CASES:
     P('/results/%s/' % sl,
-      lambda a=a, ar=ar, sl=sl, p=p: hero([('Home', '/'), ('Results', '/results/'), (a, '/results/%s/' % sl)], 'How we sold %s' % a, '%s · Sold for %s' % (e(ar), p)),
+      lambda a=a, ar=ar, sl=sl, p=p: hero([('Home', '/'), ('Results', '/results/'), (a, '/results/%s/' % sl)], 'How we sold %s' % a, e(ar) + ('' if unfinished(p) else ' · Sold for %s' % p)),
       lambda d=d, s=s, p=p, ar=ar: band('<div class="two"><div class="stack"><h2>The numbers</h2>' + kv([r for r in [('Sold for', p), ('Days on market', d), ('Sale vs list', s), ('Area', ar), ('Property type', '[Detached]')] if r[1]]) + '</div><div class="stack"><h2>The story</h2>' +
           todo('The challenge (for example: listed before and did not sell, tough market, unique home)', 'What we did: pricing, staging, media, offer strategy', 'The result in one sentence, then a quote from the seller', '2 to 4 photos from the shoot') + '</div></div>'),
       lambda: cta('Selling a home like this?', 'Get a price range and the plan we would use.'),
       title='How We Sold %s, %s | SoldMike' % (a, ar), desc='Case study: how Michael Barillari sold %s in %s.' % (a, ar),
-      trail=[('Results', '/results/'), (a, '/results/%s/' % sl)])
+      trail=[('Results', '/results/'), (a, '/results/%s/' % sl)], noindex=True)  # until the story is written
 
 P('/reviews/',
   lambda: hero([('Home', '/'), ('Reviews', '/reviews/')], 'What clients say', 'Real Google reviews of The OP Team, Michael\u2019s team at RE/MAX Premier, in the clients\u2019 own words.'),
@@ -490,8 +526,9 @@ P('/reviews/',
 
 P('/market-reports/',
   lambda: hero([('Home', '/'), ('Market reports', '/market-reports/')], 'Vaughan market reports', 'Every month on the 5th: what sold, for how much, how fast, and what it means for you.'),
-  lambda: band('<div class="two"><div class="stack">' + cards([('/market-reports/vaughan-october-2026/', 'October 2026', 'Vaughan market report')]) +
+  lambda: band('<div class="two"><div class="stack">' + prose('<h2>Get the report by email</h2>', 'Each month we break down what sold in Vaughan, Woodbridge, Kleinburg, King and Caledon, for how much and how fast, and what it means if you are buying or selling. Sign up and the next report comes straight to your inbox.') +
                todo('Publish one report on the 5th of every month: average price, sales, new listings, days on market, sale-to-list, by area', 'Embed or link the matching YouTube market update') + '</div>' + form('report') + '</div>'),
+  noindex=True,  # until the first report is published
   title='Vaughan Real Estate Market Reports | SoldMike', desc='Monthly Vaughan and Woodbridge real estate market reports: prices, sales, days on market and what it means for buyers and sellers.',
   trail=[('Market reports', '/market-reports/')])
 
@@ -500,6 +537,7 @@ P('/market-reports/vaughan-october-2026/',
   lambda: band('<div class="stack">' + kv([('Average sold price', '[$X,XXX,XXX]'), ('Change vs last year', '[X]%'), ('Homes sold', '[X]'), ('New listings', '[X]'), ('Average days on market', '[X]'), ('Average sale-to-list', '[X]%')]) +
                todo('Lead with the one-sentence answer: is it a buyer’s or seller’s market this month and why', 'Breakdown by Woodbridge, Kleinburg, Maple, Vellore', 'What it means for buyers / for sellers', 'Source: TRREB Market Watch') + '</div>', narrow=True),
   lambda: cta('What does this mean for your home?', 'Get a price range from this month’s sales.'),
+  noindex=True,  # numbers still to come from Michael
   title='Vaughan Real Estate Market Report, October 2026 | SoldMike', desc='Vaughan real estate market update for October 2026: average price, sales, days on market and sale-to-list ratio.',
   trail=[('Market reports', '/market-reports/'), ('October 2026', '/market-reports/vaughan-october-2026/')],
   schema=[{'@context': 'https://schema.org', '@type': 'Article', 'headline': 'Vaughan real estate market: October 2026', 'author': {'@id': SITE + '/#michael'}}])
@@ -509,27 +547,27 @@ P('/market-reports/vaughan-october-2026/',
 # =====================================================================
 BUY_QS = [
     ('How much do I need for a down payment in Ontario?', 'At least 5% of the first $500,000 and 10% of the portion between $500,000 and $1.5 million. Homes priced at $1.5 million or more need 20% down.'),
-    ('What closing costs should buyers budget for?', 'Land transfer tax (plus the municipal tax in Toronto), legal fees, title insurance, adjustments for prepaid property tax, and home inspection. [Add a typical total for a Vaughan home.]'),
-    ('Do first-time buyers get a land transfer tax rebate?', '[Answer in the first sentence: Ontario and Toronto first-time buyer rebates and their current maximums.]'),
-    ('Should I buy first or sell first?', '[Answer in the first sentence, then the trade-offs.]'),
-    ('How do bidding wars work in Ontario?', '[Answer in the first sentence: offer dates, registered offers, escalation not allowed, how to compete.]'),
-    ('Is it better to buy pre-construction or resale?', '[Answer in the first sentence, then the trade-offs.]'),
-    ('How long does it take to buy a house?', '[Answer in the first sentence: search time plus a typical 30 to 90 day closing.]'),
-    ('Do I need a home inspection?', '[Answer in the first sentence, then when and how much.]'),
+    ('What closing costs should buyers budget for?', 'Plan for about 2% of the purchase price on top of your down payment. Most of it is Ontario land transfer tax (about $22,500 on a $1.3 million home in Vaughan), plus legal fees, title insurance, a home inspection and adjustments for property tax the seller prepaid. Toronto buyers also pay the municipal land transfer tax, which roughly doubles the tax.'),
+    ('Do first-time buyers get a land transfer tax rebate?', 'Yes. Ontario refunds up to $4,000 of the provincial land transfer tax, and the City of Toronto refunds up to $4,475 of its municipal tax, so a first-time buyer in Toronto can save up to $8,475. You must never have owned a home anywhere in the world and must move in within nine months. Your lawyer claims the refund at closing.'),
+    ('Should I buy first or sell first?', 'In most cases, sell first, or line up both closings for the same day. Selling first tells you exactly how much you can spend and avoids carrying two homes. Buying first gives you time to find the right home but can force a rushed sale; if you do, ask your lender about a bridge loan to cover the gap.'),
+    ('How do bidding wars work in Ontario?', 'When a seller sets an offer date, every buyer sends their best offer by that date and the seller can accept, sign back or turn down any of them. Since December 1, 2023, sellers in Ontario may choose to share the details of competing offers, but many still do not. To compete, come in with a strong price, a solid deposit and as few conditions as possible, with your financing and inspection sorted before the offer date.'),
+    ('Is it better to buy pre-construction or resale?', 'It depends on when you need to move. Resale lets you move in within months, see exactly what you are buying and avoid construction delays. Pre-construction spreads out the deposit and gets you a brand-new home, but closings can be delayed for years and you may pay extra development charges at closing. Buyers who need a home soon usually do better with resale.'),
+    ('How long does it take to buy a house?', 'Most buyers take one to three months to find the right home, then 30 to 90 days to close. Getting pre-approved before you start saves time, and a firm deal can close in about 30 days if your lender and lawyer are ready.'),
+    ('Do I need a home inspection?', 'Yes, for almost every resale home. An inspection usually costs $400 to $700 in the GTA and takes two to three hours. When there is an offer date, buyers often inspect before it so they can make a firm offer.'),
     ('What is a status certificate?', 'A package from a condo corporation showing its finances, reserve fund, rules and any lawsuits. Buyers usually make their offer conditional on their lawyer reviewing it.'),
-    ('Does it cost me anything to use a buyer agent?', '[Answer in the first sentence: how buyer agent compensation works in Ontario today.]'),
+    ('Does it cost me anything to use a buyer agent?', "Usually nothing out of pocket. In most sales, the seller's brokerage offers to pay the buyer's brokerage from the sale proceeds. Since December 1, 2023, buyers sign a written buyer representation agreement that sets the commission, and if the seller offers less than that amount, the buyer may owe the difference. Michael goes through this with you before you see a single home."),
 ]
 SELL_QS = [
     ('How much is my Woodbridge home worth?', 'It depends most on what similar homes on nearby streets sold for in the last few months. We pull those sales and send you a price range with the comparables attached.'),
-    ('When is the best time to sell in Vaughan?', '[Answer in the first sentence, then the reasoning, backed by local numbers.]'),
+    ('When is the best time to sell in Vaughan?', 'Spring, from March to early June, usually brings the most buyers in Vaughan, with a second, smaller wave in September and October. Families want to move before the new school year, so both listings and sales rise in spring. The best time for you also depends on how many similar homes are for sale; fewer listings in winter can mean less competition for your home.'),
     ('What does it cost to sell a house in Ontario?', 'The main costs are real estate commission plus 13% HST on it, legal fees, and paying out your mortgage, including any penalty. Sellers do not pay land transfer tax.'),
-    ('Should I stage my home?', '[Answer in the first sentence, then cost and what it changes.]'),
-    ('Should I hold an offer date or take offers any time?', '[Answer in the first sentence, then when each works.]'),
-    ('What renovations add the most value before selling?', '[Answer in the first sentence: paint, lighting, small repairs vs big renos.]'),
+    ('Should I stage my home?', 'Yes, in most cases. Staged homes photograph better and help buyers picture living there, and most buyers see your home online before they see it in person. Cost ranges from a few hundred dollars for a consultation using your own furniture to several thousand for a vacant home. Michael tells you which rooms matter most.'),
+    ('Should I hold an offer date or take offers any time?', 'Hold an offer date when you expect several buyers, and take offers any time when the market is slower or the home is one of a kind. An offer date, usually about a week after listing, gives every buyer time to see the home and can create competition. If few buyers are active it can backfire, so we look at showings and the market that week before deciding.'),
+    ('What renovations add the most value before selling?', 'Paint, lighting and small repairs return the most. Fresh neutral paint, bright modern light fixtures, fixing leaky taps, cracked tiles and worn caulking, and a tidy front yard cost little and change how buyers see the home. Big projects like a new kitchen rarely pay back their full cost right before a sale.'),
     ('How long does it take to sell a house in Vaughan?', '[Average days on market in the first sentence, from TRREB data.]'),
     ('Can I sell my house while I still have a mortgage?', 'Yes. Your lawyer pays out the mortgage from the sale proceeds on closing day. Ask your lender about any prepayment penalty first.'),
-    ('What happens if my home does not sell?', '[Answer in the first sentence, then what we change: price, media, strategy.]'),
-    ('Why choose a local Vaughan realtor?', '[Answer in the first sentence, then local results.]'),
+    ('What happens if my home does not sell?', 'We change something: usually the price, the presentation or the plan. If a home sits, buyers are telling us the price does not match what they see. We review showing feedback, compare against what sold nearby, refresh the photos and description, and decide together whether to adjust the price or relaunch.'),
+    ('Why choose a local Vaughan realtor?', 'A local realtor knows the streets, the recent sales and the buyers in your area, which means sharper pricing and better negotiation. Michael has been licensed since December 2011, works out of the RE/MAX Premier office on Rutherford Road in Vaughan, and his own media company, Toronto Property Media, shoots every listing.'),
 ]
 P('/questions/',
   lambda: hero([('Home', '/'), ('Questions', '/questions/')], 'Questions buyers and sellers ask us', 'Straight answers, with the answer in the first sentence.'),
@@ -560,31 +598,38 @@ DESIGNATIONS = ('<div class="desig white" aria-label="Designations">'
 P('/about/',
   lambda: hero([('Home', '/'), ('About', '/about/')], 'Michael Barillari, Broker', 'SOLDMIKE. RE/MAX Premier The OP Team, Vaughan & Woodbridge.'),
   lambda: band('<div class="person"><div><div class="pic"><img src="/mike.png" alt="Michael Barillari"></div>' + DESIGNATIONS + '</div><div class="stack">' + prose(
-      'Michael Barillari is a Broker with RE/MAX Premier The OP Team, helping buyers and sellers across Vaughan, Woodbridge, Kleinburg, King, Caledon and Toronto.',
-      'He also runs Toronto Property Media, which shoots the photos, drone, video and twilight images for every listing he sells.') +
-      todo('Your story in 3 short paragraphs: how you started, why real estate, what you do differently', 'Credentials: Broker licence year, designations, awards (verifiable)', 'Languages spoken', 'A personal line: family, community, what you do outside work') + '</div></div>'),
+      'Michael Barillari is a Broker with RE/MAX Premier The OP Team in Vaughan. Licensed since %s, he helps buyers and sellers across Vaughan, Woodbridge, Kleinburg, King, Caledon, Toronto and the rest of the GTA.' % LICENSED,
+      'He works with first-time buyers, growing families, luxury and estate homes, investors and commercial clients. His approach is friendly, fair and firm: honest advice on price, strong negotiation, and a marketing plan built around how buyers actually search today.',
+      'Michael holds the ABR® (Accredited Buyer Representative), SRS (Seller Representative Specialist) and RENE (Real Estate Negotiation Expert) designations, and is an Accredited GreenBroker® for commercial property. He speaks English and Italian.',
+      'He brings a passion for architecture and development to every home he prices and markets, and he runs Toronto Property Media, which shoots the photos, drone, video and twilight images for every listing he sells.',
+      '<h2>Find Michael online</h2>',
+      '<p><a href="%s" target="_blank" rel="noopener">Google</a> · <a href="%s" target="_blank" rel="noopener">RE/MAX</a> · <a href="%s" target="_blank" rel="noopener">REALTOR.ca</a> · <a href="%s" target="_blank" rel="noopener">RankMyAgent (5.0 stars, 14 reviews)</a> · <a href="%s" target="_blank" rel="noopener">LinkedIn</a></p>' % tuple(PROFILES)) +
+      todo('A short personal story: how you started and what you do differently', 'Awards (verifiable)', 'A personal line: family, community, what you do outside work') + '</div></div>'),
   lambda: band(cards([('/about/the-op-team/', 'The OP Team', 'Who you work with'), ('/videos/', 'Videos', 'Market updates and neighbourhood tours'), ('/reviews/', 'Reviews', 'What clients say'), ('/join/', 'Join the team', 'Getting started as a realtor')]), 'tint'),
   lambda: cta('Talk to Michael', 'Buying, selling or just have a question. Call or text %s.' % PHONE, 'contact'),
-  title='Michael Barillari, Broker | SOLDMIKE | RE/MAX Premier The OP Team', desc='Michael Barillari, Broker, SOLDMIKE. RE/MAX Premier The OP Team, serving Vaughan, Woodbridge, Kleinburg, King, Caledon and Toronto.',
+  title='Michael Barillari, Broker | SOLDMIKE | RE/MAX Premier The OP Team', desc='Michael Barillari, Broker with RE/MAX Premier The OP Team, licensed since 2011. ABR, SRS, RENE. Serving Vaughan, Woodbridge, Kleinburg, King, Caledon and Toronto.',
   trail=[('About', '/about/')],
-  schema=[{'@context': 'https://schema.org', '@type': 'Person', 'name': 'Michael Barillari', 'jobTitle': 'Broker', 'worksFor': {'@type': 'Organization', 'name': BROKERAGE}, 'url': SITE + '/about/', 'image': SITE + '/mike.png'}])
+  schema=[{'@context': 'https://schema.org', '@type': 'Person', 'name': 'Michael Barillari', 'jobTitle': 'Broker', 'worksFor': {'@type': 'Organization', 'name': BROKERAGE}, 'url': SITE + '/about/', 'image': SITE + '/mike.png', 'knowsLanguage': ['English', 'Italian'], 'hasCredential': [{'@type': 'EducationalOccupationalCredential', 'name': n} for n in DESIGNATION_NAMES], 'sameAs': PROFILES}])
 
 P('/about/the-op-team/',
   lambda: hero([('Home', '/'), ('About', '/about/'), ('The OP Team', '/about/the-op-team/')], 'The OP Team', 'RE/MAX Premier The OP Team Inc., Brokerage.'),
   lambda: band(todo('What The OP Team is and how the team works for clients', 'Team members: photo, name, role, one line each', 'Team results (verifiable)', 'Link to theopteam.ca'), narrow=True),
   lambda: cta('Work with the team', 'Start with Michael. He brings in the right people at each step.', 'contact'),
+  noindex=True,  # thin until written
   title='The OP Team | RE/MAX Premier | SoldMike', desc='RE/MAX Premier The OP Team Inc., Brokerage: the team behind SoldMike in Vaughan and Woodbridge.',
   trail=[('About', '/about/'), ('The OP Team', '/about/the-op-team/')])
 
 P('/videos/',
   lambda: hero([('Home', '/'), ('Videos', '/videos/')], 'Videos', 'Market updates, neighbourhood tours and listing films from Michael and Toronto Property Media.', '/hero.jpg'),
   lambda: band(todo('Link the YouTube channel once it launches', 'Feature 3 videos: a monthly market update, a neighbourhood tour, a listing film', 'Title each by area so AI tools can quote them (for example "Woodbridge market update, October 2026")'), narrow=True),
+  noindex=True,  # thin until written
   title='Real Estate Videos: Vaughan Market Updates & Tours | SoldMike', desc='Vaughan market updates, neighbourhood tours and listing videos from Michael Barillari.',
   trail=[('Videos', '/videos/')])
 
 P('/join/',
   lambda: hero([('Home', '/'), ('Join the team', '/join/')], 'Getting started as a realtor', 'Thinking about a career in real estate, or licensed and looking for a team? Here is how we help new agents get going.'),
   lambda: band('<div class="two"><div class="stack">' + prose('<h2>What you get</h2>') + todo('What new agents get: training, leads, media, systems, mentorship', 'How to get licensed in Ontario (Humber courses, RECO registration) in a short list', 'What success looks like in year one') + '</div>' + form('join') + '</div>'),
+  noindex=True,  # thin until written
   title='Join The OP Team | Getting Started as a Realtor | SoldMike', desc='Thinking about becoming a realtor in Ontario or looking for a new team? Join The OP Team at RE/MAX Premier.',
   trail=[('Join the team', '/join/')])
 
@@ -592,13 +637,14 @@ P('/contact/',
   lambda: hero([('Home', '/'), ('Contact', '/contact/')], 'Contact Michael', 'Call or text %s, email %s, or send a message below.' % (PHONE, EMAIL)),
   lambda: band('<div class="two">' + form('contact') + '<div class="stack">' + kv([('Call or text', PHONE), ('Email', EMAIL), ('Office', '%s, %s' % (ADDRESS['street'], ADDRESS['city'])), ('Brokerage', 'RE/MAX Premier The OP Team')]) +
                '<a class="btn ghost" href="https://www.google.com/maps/search/%s" target="_blank" rel="noopener" style="align-self:flex-start">Open the office in Google Maps</a>' % (ADDRESS['street'] + ' ' + ADDRESS['city']).replace(' ', '+') +
-               todo('Confirm the one office address to use everywhere (3550 Rutherford Rd Unit 80 vs Unit 43 on the RE/MAX page)', 'Office hours') + '</div></div>'),
+               todo('Office hours') + '</div></div>'),
   title='Contact Michael Barillari | SoldMike', desc='Contact Michael Barillari, Broker, RE/MAX Premier The OP Team. Call or text %s.' % PHONE,
   trail=[('Contact', '/contact/')])
 
 P('/free-guide/',
   lambda: hero([('Home', '/'), ('Free guide', '/free-guide/')], 'Free guide: selling your home in Vaughan', 'The full plan we use to sell homes in Vaughan, from pricing to closing, in one PDF.'),
   lambda: band('<div class="two"><div class="stack">' + todo('Create the PDF lead magnet (can reuse the 15 seller steps)', 'Connect delivery: the form adds the lead to FUB; FUB action plan emails the PDF') + '</div>' + form('guide') + '</div>'),
+  noindex=True,  # thin until written
   title='Free Guide to Selling Your Home in Vaughan | SoldMike', desc='Download the free guide to selling your home in Vaughan.', trail=[('Free guide', '/free-guide/')])
 
 P('/privacy/',
