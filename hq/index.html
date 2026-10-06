@@ -164,6 +164,7 @@ pre.code{background:#0F1430;color:#E6E9F7;border-radius:10px;padding:12px;font-s
 .pp b{font-weight:600;overflow-wrap:anywhere}
 .pp .meta{grid-column:1;display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-size:14px;color:var(--muted)}
 .pp .pb{grid-row:1/3;grid-column:2;display:flex;gap:6px;align-items:center}
+.lnkb{background:none;border:0;padding:0;color:var(--navy);font-weight:600;cursor:pointer;font-size:inherit;text-decoration:underline}
 .pbtn{background:#fff;cursor:pointer;font-family:inherit;color:var(--navy)}.pbtn[aria-pressed="true"]{background:#E7F4EC;border-color:#B9DEC6;color:var(--green)}
 
 /* to-do */
@@ -718,7 +719,7 @@ dialog::backdrop{background:rgba(20,24,51,.6)}
   function cmaBtn(p){return '<button type="button" class="go pbtn" data-cma="'+p.id+'" aria-pressed="'+!!p.cma+'" title="'+(p.cma?'Remove from CMA list':'Add to CMA list')+'">'+(p.cma?'CMA ✓':'+ CMA')+'</button>';}
   function people(){
     var el=$('people'),tab=S.list;el.innerHTML='<p class="empty">Loading…</p>';
-    var d=S.actDays||14,url=tab==='active'?'active?days='+d:'tagged?tab='+tab;
+    var d=S.actDays||14,url=(tab==='active'?'active?days='+d:'tagged?tab='+tab)+(S.showHidden?'&all=1':'');
     getJ(url).then(function(j){
       if(tab!==S.list)return;
       (S.fcount=S.fcount||{})[tab]=tab==='active'?j.people.length:(j.total||j.people.length);followTabs();
@@ -741,7 +742,9 @@ dialog::backdrop{background:rgba(20,24,51,.6)}
         if(j.total>L.length)note+=' Showing '+L.length+' of '+j.total+'.';
         h+='<p class="muted" style="font-size:13px;margin:8px 0 0">'+note+'</p>';
       }
+      if(j.hidden||S.showHidden)h+='<p class="muted" style="font-size:13px;margin:4px 0 0">'+(S.showHidden?'Showing everyone, including pond, other agents and leases. <button type="button" class="lnkb" id="hidT">Hide them again</button>':j.hidden+' lease / pond / other-agent lead'+(j.hidden===1?'':'s')+' hidden. <button type="button" class="lnkb" id="hidT">Show</button>')+'</p>';
       el.innerHTML=h;
+      if($('hidT'))$('hidT').onclick=function(){S.showHidden=!S.showHidden;S.actAll=false;people();};
       [].forEach.call(el.querySelectorAll('[data-d]'),function(b){b.onclick=function(){S.actDays=+b.dataset.d;S.actAll=false;people();};});
       if($('actMore'))$('actMore').onclick=function(){S.actAll=true;people();};
       [].forEach.call(el.querySelectorAll('[data-done]'),function(b){b.onclick=function(){var row=b.closest('.pp');row.style.opacity=.4;
