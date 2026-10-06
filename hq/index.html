@@ -280,7 +280,7 @@ dialog::backdrop{background:rgba(20,24,51,.6)}
   </section>
   <section class="card" id="outlook"><div class="hd"><h2>Next 3 days</h2></div><div class="days" id="days"></div></section>
   <section class="card" id="brief"><div class="hd"><h2>Check this</h2><span class="sub" id="briefSub"></span></div><div id="briefBody"></div></section>
-  <section class="card" id="follow"><div class="hd"><h2>Follow-ups</h2><span class="sub">Longest since contact first</span></div><div class="tabs" id="listTabs"></div><div id="people"><p class="empty">Loading…</p></div></section>
+  <section class="card" id="follow"><div class="hd"><h2>Follow-ups</h2></div><div class="tabs" id="listTabs"></div><div id="people"><p class="empty">Loading…</p></div></section>
   <section class="card" id="todo"><div class="hd"><h2>Follow Up Boss tasks</h2><span class="sub" id="todoSub"></span></div><div class="tabs tk" id="fbTabs"></div><div id="todoList"></div></section>
   <section class="card" id="drive"><div class="hd"><h2>Daily Drive</h2></div><div id="driveBody"></div></section>
   <section class="card" id="projects"><div class="hd"><h2>Projects</h2><span class="sub" id="projSub"></span><button class="btn sm navy" type="button" id="newProj">+ New project</button></div><div class="tabs" id="projTabs"></div><div class="pgrid" id="projGrid"></div></section>
@@ -500,7 +500,7 @@ dialog::backdrop{background:rgba(20,24,51,.6)}
   function fail(e){if(e==='pin')return askPin().then(load);toast(typeof e==='string'?e:'Could not save. Check the connection.');}
 
   // ---------- state ----------
-  var S={today:'',days:[],data:null,cal:[],wx:null,lists:SM.store('hq_lists')||{},list:SM.store('hq_list')||0,projTab:SM.store('hq_ptab')||'all',projects:[],loadedAt:0,gt:null,rem:null,tkTab:SM.store('hq_tktab')||'all',tkAll:false,routine:SM.store('hq_routine')===true,evs:[],evo:[],fT:SM.store('hq_ft')!==false,fO:SM.store('hq_fo')===true,bT:SM.store('hq_bt')!==false,bO:SM.store('hq_bo')!==false,fbAll:false};
+  var S={today:'',days:[],data:null,cal:[],wx:null,lists:SM.store('hq_lists')||{},list:SM.store('hq_list2')||'active',projTab:SM.store('hq_ptab')||'all',projects:[],loadedAt:0,gt:null,rem:null,tkTab:SM.store('hq_tktab')||'all',tkAll:false,routine:SM.store('hq_routine')===true,evs:[],evo:[],fT:SM.store('hq_ft')!==false,fO:SM.store('hq_fo')===true,bT:SM.store('hq_bt')!==false,bO:SM.store('hq_bo')!==false,fbAll:false};
   function log(k,v){S.data.logs[k]=v;return post('log',{day:S.today,k:k,v:v}).catch(fail);}
 
   // ---------- header ----------
@@ -703,20 +703,37 @@ dialog::backdrop{background:rgba(20,24,51,.6)}
   }
 
   // ---------- follow-ups ----------
+  function listName(id){return id==='active'?'Active':String(S.lists[id]||('List '+id)).replace(/ To Revive$/i,'');}
   function followTabs(){
-    var ids=S.data.settings.lists;if(!S.list||ids.indexOf(S.list)<0)S.list=ids[0];
-    $('listTabs').innerHTML=ids.map(function(id){return '<button type="button" data-l="'+id+'" aria-pressed="'+(id===S.list)+'">'+esc(S.lists[id]||('List '+id))+'</button>';}).join('');
-    [].forEach.call($('listTabs').querySelectorAll('button'),function(b){b.onclick=function(){S.list=+b.dataset.l;SM.store('hq_list',S.list);followTabs();people();};});
+    var ids=['active'].concat(S.data.settings.lists);if(!S.list||ids.indexOf(S.list)<0)S.list='active';
+    $('listTabs').innerHTML=ids.map(function(id){return '<button type="button" data-l="'+id+'" aria-pressed="'+(id===S.list)+'">'+esc(listName(id))+'</button>';}).join('');
+    [].forEach.call($('listTabs').querySelectorAll('button'),function(b){b.onclick=function(){S.list=b.dataset.l==='active'?'active':+b.dataset.l;SM.store('hq_list2',S.list);followTabs();people();};});
   }
+  function contactChip(last){
+    var days=last?Math.floor((Date.now()-Date.parse(last.replace(' ','T')+(/[zZ]$/.test(last)?'':'Z')))/864e5):null;
+    return days==null?'<span class="chip red">Never contacted</span>':'<span class="chip '+(days>30?'red':days>14?'amber':'green')+'">Last contact '+ago(last)+'</span>';
+  }
+  function personRow(p,extra){return '<div class="pp"><b>'+esc(p.name||'No name')+'</b><a class="go" href="'+esc(fubLink(p.id))+'" target="_blank" rel="noopener">Open in FUB</a><div class="meta">'+(extra||'')+contactChip(p.last)+(p.stage?'<span class="chip">'+esc(p.stage)+'</span>':'')+(p.phone?'<span>'+esc(p.phone)+'</span>':'')+'</div></div>';}
   function people(){
     var el=$('people');el.innerHTML='<p class="empty">Loading…</p>';
+    if(S.list==='active'){
+      var d=S.actDays||14;
+      getJ('active?days='+d).then(function(j){
+        var inq=j.people.filter(function(p){return p.kind==='inquiry';}),brw=j.people.filter(function(p){return p.kind==='browsing';});
+        var h='<div class="tabs" style="margin:0 0 6px;gap:6px">'+[7,14,30].map(function(n){return '<button type="button" data-d="'+n+'" aria-pressed="'+(n===d)+'" style="min-height:32px;padding:0 12px;font-size:13px">'+n+' days</button>';}).join('')+'</div>';
+        var row=function(p){return personRow(p,'<span class="chip '+(p.kind==='inquiry'?'red':'amber')+'">'+(p.kind==='inquiry'?'Inquiry':'Browsing')+' · active '+ago(p.active)+'</span>'+(p.hot?'<span class="chip red">Hot</span>':''));};
+        if(inq.length)h+='<div class="sec">Inquiries · '+inq.length+'</div>'+inq.map(row).join('');
+        if(brw.length)h+='<div class="sec">Browsing · '+brw.length+'</div>'+brw.slice(0,S.actAll?999:12).map(row).join('')+(brw.length>12&&!S.actAll?'<button type="button" class="more" id="actMore">Show all '+brw.length+'</button>':'');
+        if(!j.people.length)h+='<p class="empty">No active leads in the last '+d+' days.</p>';
+        h+='<p class="muted" style="font-size:13px;margin:8px 0 0">From your Active Lead Automation: tagged <b>Appoinment</b> (inquiry) or <b>Searching</b> (browsing), with activity in the last '+d+' days.</p>';
+        el.innerHTML=h;
+        [].forEach.call(el.querySelectorAll('[data-d]'),function(b){b.onclick=function(){S.actDays=+b.dataset.d;S.actAll=false;people();};});
+        if($('actMore'))$('actMore').onclick=function(){S.actAll=true;people();};
+      }).catch(function(e){if(e==='pin')return fail(e);el.innerHTML='<p class="err" style="font-size:15px">Could not load active leads ('+esc(e)+').</p>';});
+      return;
+    }
     getJ('leads?list='+S.list).then(function(j){
-      if(!j.people.length){el.innerHTML='<p class="empty">Nobody on this list right now.</p>';return;}
-      el.innerHTML=j.people.map(function(p){
-        var days=p.last?Math.floor((Date.now()-Date.parse(p.last.replace(' ','T')+'Z'))/864e5):null;
-        var c=days==null?'<span class="chip red">Never contacted</span>':'<span class="chip '+(days>30?'red':days>14?'amber':'green')+'">Last contact '+ago(p.last)+'</span>';
-        return '<div class="pp"><b>'+esc(p.name||'No name')+'</b><a class="go" href="'+esc(fubLink(p.id))+'" target="_blank" rel="noopener">Open in FUB</a><div class="meta">'+c+(p.stage?'<span class="chip">'+esc(p.stage)+'</span>':'')+(p.phone?'<span>'+esc(p.phone)+'</span>':'')+'</div></div>';
-      }).join('');
+      el.innerHTML=j.people.length?j.people.map(function(p){return personRow(p);}).join(''):'<p class="empty">Nobody on this list right now.</p>';
     }).catch(function(e){if(e==='pin')return fail(e);el.innerHTML='<p class="err" style="font-size:15px">Could not load this Smart List ('+esc(e)+').</p>';});
   }
 
