@@ -95,6 +95,13 @@ a{color:var(--navy)}
 .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
 .tabs button{min-height:40px;padding:0 16px;border-radius:20px;border:1px solid var(--line);background:#fff;font-weight:600;font-size:15px;cursor:pointer}
 .tabs button[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:#fff}
+.tabs.tk{gap:6px;margin-bottom:6px}.tabs.tk button{min-height:36px;padding:0 12px;font-size:14px}
+.tabs button .n{display:inline-block;min-width:20px;margin-left:4px;padding:0 6px;border-radius:10px;background:var(--mist);color:var(--ink);font-size:12px;line-height:18px}
+.tabs button[aria-pressed="true"] .n{background:rgba(255,255,255,.2);color:#fff}
+.src{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:4px;vertical-align:1px}
+.more{width:100%;margin-top:6px;min-height:40px;border:1px dashed var(--line);border-radius:10px;background:none;font-weight:600;font-size:15px;color:var(--navy);cursor:pointer}
+pre.code{background:#0F1430;color:#E6E9F7;border-radius:10px;padding:12px;font-size:12px;line-height:1.45;overflow:auto;max-height:220px;margin:0;white-space:pre}
+.copyrow{display:flex;gap:8px;align-items:center}.copyrow input{flex:1;min-width:0;font-size:13px!important}
 
 /* today */
 .tcols{display:grid;grid-template-columns:1.25fr 1fr;gap:24px}
@@ -262,7 +269,7 @@ dialog::backdrop{background:rgba(20,24,51,.6)}
 <main class="wrap"><div class="grid">
   <section class="card" id="today"><div class="hd"><h2>Today</h2><span class="sub" id="todaySub"></span></div>
     <div class="tcols"><div><div class="sec">Schedule</div><div id="sched"><p class="empty">Loading…</p></div></div>
-    <div><div class="sec">Follow Up Boss tasks</div><div id="tasks"><p class="empty">Loading…</p></div><div class="sec">My to-dos today</div><div id="todayTodos"></div></div></div>
+    <div><div class="sec">Tasks &amp; reminders</div><div class="tabs tk" id="tkTabs"></div><div id="tasks"><p class="empty">Loading…</p></div><div class="sec">My to-dos today</div><div id="todayTodos"></div></div></div>
   </section>
   <section class="card" id="outlook"><div class="hd"><h2>Next 3 days</h2></div><div class="days" id="days"></div></section>
   <section class="card" id="brief"><div class="hd"><h2>Check this</h2><span class="sub" id="briefSub"></span></div><div id="briefBody"></div></section>
@@ -488,7 +495,7 @@ dialog::backdrop{background:rgba(20,24,51,.6)}
   function fail(e){if(e==='pin')return askPin().then(load);toast(typeof e==='string'?e:'Could not save. Check the connection.');}
 
   // ---------- state ----------
-  var S={today:'',days:[],data:null,cal:[],wx:null,lists:SM.store('hq_lists')||{},list:SM.store('hq_list')||0,projTab:SM.store('hq_ptab')||'all',projects:[],loadedAt:0};
+  var S={today:'',days:[],data:null,cal:[],wx:null,lists:SM.store('hq_lists')||{},list:SM.store('hq_list')||0,projTab:SM.store('hq_ptab')||'all',projects:[],loadedAt:0,gt:null,rem:null,tkTab:SM.store('hq_tktab')||'all',tkAll:false};
   function log(k,v){S.data.logs[k]=v;return post('log',{day:S.today,k:k,v:v}).catch(fail);}
 
   // ---------- header ----------
@@ -552,28 +559,68 @@ dialog::backdrop{background:rgba(20,24,51,.6)}
     if(f.error)h+='<p class="err" style="font-size:15px">Follow Up Boss: '+esc(f.error)+'</p>';
     $('sched').innerHTML=h;
 
-    var tk=(f.overdue||[]).map(function(t){t.late=1;return t;}).concat(b.tasks);
-    var seen={};tk=tk.filter(function(t){if(seen[t.id])return false;seen[t.id]=1;return true;});
-    $('tasks').innerHTML=tk.length?tk.map(taskRow).join(''):'<p class="empty">No Follow Up Boss tasks due today.</p>';
-    bindTasks($('tasks'));
+    var nTask=taskPanel();
     var mine=S.data.todos.filter(function(t){return !t.done&&t.due&&t.due<=S.today;});
     $('todayTodos').innerHTML=mine.length?mine.map(todoRow).join(''):'<p class="empty">Nothing due. Add one in To-do.</p>';
     bindTodos($('todayTodos'));
-    var nAppt=timed.length,nTask=tk.length;
-    $('todaySub').textContent=nAppt+' on the calendar · '+nTask+' task'+(nTask===1?'':'s')+((f.overdue||[]).length?' · '+f.overdue.length+' overdue':'');
+    var nAppt=timed.length;
+    $('todaySub').textContent=nAppt+' on the calendar · '+nTask+' due today or overdue';
+  }
+  // ---------- tasks & reminders (FUB, Google Tasks, Reminders) ----------
+  var SRC={fub:['Follow Up Boss','#D7141E'],g:['Google Tasks','#1A73E8'],rem:['Reminders','#F29900']};
+  function hasTime(iso){if(!iso||/^\d{4}-\d{2}-\d{2}$/.test(iso))return false;var d=new Date(iso);return d.getHours()+d.getMinutes()>0;}
+  function allTasks(){
+    var f=S.data.fub||{},L=[],seen={};
+    (f.overdue||[]).concat(f.tasks||[]).forEach(function(t){if(seen[t.id])return;seen[t.id]=1;
+      L.push({src:'fub',id:t.id,title:t.name||t.type,who:t.who,type:t.type&&t.type!==t.name?t.type:'',day:dayKeyOf(t.due),time:hasTime(t.due)?Date.parse(t.due):null,person:t.person});});
+    ((S.gt&&S.gt.items)||[]).forEach(function(t){L.push({src:'g',id:t.id,list:t.list,title:t.title,who:t.listName,day:t.due?t.due.slice(0,10):'',time:null});});
+    ((S.rem&&S.rem.items)||[]).forEach(function(t){L.push({src:'rem',id:t.id,title:t.title,who:t.list,day:t.due?dayKeyOf(t.due):'',time:hasTime(t.due)?Date.parse(t.due):null,flag:t.flag});});
+    L.forEach(function(x){x.late=x.day&&x.day<S.today;});
+    L.sort(function(a,b){return (!a.day-!b.day)||String(a.day).localeCompare(String(b.day))||((a.time||0)-(b.time||0));});
+    return L;
+  }
+  function taskPanel(){
+    var L=allTasks(),due=L.filter(function(x){return x.day&&x.day<=S.today;});
+    var tabs=[['all','All',due],['fub','FUB',L.filter(function(x){return x.src==='fub';})],['g','Google',L.filter(function(x){return x.src==='g';})],['rem','Reminders',L.filter(function(x){return x.src==='rem';})]];
+    $('tkTabs').innerHTML=tabs.map(function(x){return '<button type="button" data-k="'+x[0]+'" aria-pressed="'+(S.tkTab===x[0])+'">'+x[1]+'<span class="n">'+x[2].length+'</span></button>';}).join('');
+    [].forEach.call($('tkTabs').querySelectorAll('button'),function(b){b.onclick=function(){S.tkTab=b.dataset.k;S.tkAll=false;SM.store('hq_tktab',S.tkTab);taskPanel();};});
+    var cur=tabs.filter(function(x){return x[0]===S.tkTab;})[0]||tabs[0],items=cur[2],h='';
+    if(S.tkTab==='g'&&S.gt&&S.gt.setup)h='<p class="empty">Google Tasks isn\'t connected yet. Open <b>Settings → Google Tasks</b>.</p>';
+    else if(S.tkTab==='g'&&S.gt&&S.gt.error)h='<p class="err" style="font-size:15px">'+esc(S.gt.error)+'</p>';
+    else if(S.tkTab==='rem'&&S.rem&&S.rem.setup)h='<p class="empty">Reminders aren\'t connected yet. Open <b>Settings → Reminders</b>.</p>';
+    else{
+      if(S.tkTab==='rem'&&S.rem&&S.rem.at)h+='<p class="muted" style="font-size:13px;margin:0 0 4px">Updated from your iPhone '+(ymd(new Date(S.rem.at))===S.today?'at ':'on '+DOWS[new Date(S.rem.at).getDay()].slice(0,3)+' ')+tm(S.rem.at)+'</p>';
+      var shown=S.tkAll?items:items.slice(0,10);
+      h+=shown.length?shown.map(taskRow).join(''):'<p class="empty">'+(S.tkTab==='all'?'Nothing due today or overdue. Nice.':'Nothing open here.')+'</p>';
+      if(items.length>shown.length)h+='<button type="button" class="more" id="tkMore">Show all '+items.length+'</button>';
+      else if(S.tkAll&&items.length>10)h+='<button type="button" class="more" id="tkLess">Show 10</button>';
+    }
+    $('tasks').innerHTML=h;
+    if($('tkMore'))$('tkMore').onclick=function(){S.tkAll=true;taskPanel();};
+    if($('tkLess'))$('tkLess').onclick=function(){S.tkAll=false;taskPanel();};
+    bindTasks($('tasks'),items);
+    return due.length;
   }
   function taskRow(t){
-    var when=t.due&&!/^\d{4}-\d{2}-\d{2}$/.test(t.due)&&new Date(t.due).getHours()+new Date(t.due).getMinutes()?tm(t.due):'';
-    if(t.late)when='Overdue · '+(dayKeyOf(t.due)===S.today?when:MONS[fromYmd(dayKeyOf(t.due)).getMonth()].slice(0,3)+' '+fromYmd(dayKeyOf(t.due)).getDate());
-    return '<div class="task" data-task="'+t.id+'"><input class="ck" type="checkbox" aria-label="Mark done"><div class="nm">'+esc(t.name||t.type)+'<small>'
-      +[t.type&&t.type!==t.name?'<span class="chip navy">'+esc(t.type)+'</span>':'',t.who?esc(t.who):'',when?'<span'+(t.late?' style="color:var(--red);font-weight:600"':'')+'>'+esc(when)+'</span>':''].filter(Boolean).join(' · ')
+    var d=t.day?fromYmd(t.day):null,when='';
+    if(d)when=t.day===S.today?(t.time?tm(t.time):'Today'):t.day===S.days[1]?'Tomorrow'+(t.time?' '+tm(t.time):''):DOWS[d.getDay()].slice(0,3)+' '+MONS[d.getMonth()].slice(0,3)+' '+d.getDate();
+    if(t.late)when='Overdue · '+when;
+    return '<div class="task" data-src="'+t.src+'" data-id="'+esc(t.id)+'"><input class="ck" type="checkbox" aria-label="Mark done"><div class="nm">'+esc(t.title)+'<small>'
+      +['<span class="src" style="background:'+SRC[t.src][1]+'" title="'+SRC[t.src][0]+'"></span>'+(t.type?esc(t.type):SRC[t.src][0].split(' ')[0]),t.who?esc(t.who):'',when?'<span'+(t.late?' style="color:var(--red);font-weight:600"':'')+'>'+esc(when)+'</span>':''].filter(Boolean).join(' · ')
       +'</small></div>'+(t.person?'<a class="go" href="'+esc(fubLink(t.person))+'" target="_blank" rel="noopener">FUB</a>':'<span></span>')+'</div>';
   }
-  function bindTasks(el){[].forEach.call(el.querySelectorAll('[data-task] .ck'),function(c){c.onchange=function(){
-    var row=c.closest('.task'),id=+row.dataset.task;row.classList.toggle('done',c.checked);
-    post('task',{id:id,done:c.checked}).then(function(){toast(c.checked?'Done in Follow Up Boss':'Reopened in Follow Up Boss');
-      if(c.checked){['tasks','overdue'].forEach(function(k){S.data.fub[k]=(S.data.fub[k]||[]).filter(function(t){return t.id!==id;});});setTimeout(function(){today();outlook();},900);}})
-      .catch(function(e){c.checked=!c.checked;row.classList.toggle('done',c.checked);fail(e);});};});}
+  function bindTasks(el,items){[].forEach.call(el.querySelectorAll('[data-src] .ck'),function(c){c.onchange=function(){
+    var row=c.closest('.task'),src=row.dataset.src,id=row.dataset.id,t=items.filter(function(x){return x.src===src&&String(x.id)===id;})[0];if(!t)return;
+    row.classList.toggle('done',c.checked);
+    var call=src==='fub'?post('task',{id:+id,done:c.checked}):src==='g'?post('gtask',{list:t.list,id:id,done:c.checked}):post('reminder',{id:id,title:t.title,done:c.checked});
+    call.then(function(){
+      toast(src==='rem'?'Done. Your iPhone ticks it off at its next sync.':src==='g'?'Done in Google Tasks':'Done in Follow Up Boss');
+      if(!c.checked)return;
+      if(src==='fub')['tasks','overdue'].forEach(function(k){S.data.fub[k]=(S.data.fub[k]||[]).filter(function(x){return String(x.id)!==id;});});
+      if(src==='g')S.gt.items=S.gt.items.filter(function(x){return x.id!==id;});
+      if(src==='rem')S.rem.items=S.rem.items.filter(function(x){return x.id!==id;});
+      setTimeout(function(){today();outlook();},900);
+    }).catch(function(e){c.checked=!c.checked;row.classList.toggle('done',c.checked);fail(e);});};});}
 
   // ---------- next 3 days ----------
   function outlook(){
@@ -584,6 +631,7 @@ dialog::backdrop{background:rgba(20,24,51,.6)}
       var items=b.ev.slice(0,8).map(function(e){return '<li><b>'+(e.allDay?'All day':tm(e.start))+'</b><span style="--c:'+esc(e.c||'#1D2870')+'">'+esc(e.title)+'</span></li>';}).join('');
       var more=b.ev.length>8?'<li><b></b><span class="muted">+'+(b.ev.length-8)+' more</span></li>':'';
       var cnt=[];if(b.tasks.length)cnt.push('<span class="chip navy">'+b.tasks.length+' FUB task'+(b.tasks.length===1?'':'s')+'</span>');
+      var gr=allTasks().filter(function(x){return x.src!=='fub'&&x.day===day;});if(gr.length)cnt.push('<span class="chip amber">'+gr.length+' task'+(gr.length===1?'':'s')+' / reminder'+(gr.length===1?'':'s')+'</span>');
       var td=b.todos.filter(function(t){return !t.done;});if(td.length)cnt.push('<span class="chip">'+td.length+' to-do'+(td.length===1?'':'s')+'</span>');
       var wo=WEEK[d.getDay()];cnt.push('<span class="chip green">'+esc(wo.name)+'</span>');
       return '<div class="day"><h3>'+(i===0?'Tomorrow':DOWS[d.getDay()])+' <small>'+(i===0?DOWS[d.getDay()].slice(0,3)+' ':'')+MONS[d.getMonth()].slice(0,3)+' '+d.getDate()+'</small><span class="wxs">'+esc(wx)+'</span></h3>'
@@ -778,11 +826,14 @@ dialog::backdrop{background:rgba(20,24,51,.6)}
         +'<form id="calF" class="dl" style="padding:0;gap:10px"><div class="two"><label>Name<input name="name" placeholder="Broker, TPM, Personal…" required></label><label>Colour<select name="color">'+COLORS.map(function(c,i){return '<option value="'+c+'">'+['Navy','Red','Green','Amber','Purple','Teal'][i]+'</option>';}).join('')+'</select></label></div>'
         +'<label>Secret address in iCal format<input name="url" placeholder="https://calendar.google.com/calendar/ical/…/basic.ics" required autocomplete="off"></label><button class="btn navy" type="submit">Add calendar</button></form>'
         +'<div class="help">How to get the address (computer, once per calendar):<ol><li>Open Google Calendar → gear → <b>Settings</b>.</li><li>On the left, click the calendar (e.g. 1.Broker@soldmike).</li><li>Scroll to <b>Integrate calendar</b> → copy <b>Secret address in iCal format</b>.</li><li>Paste it here. Skip the "Follow Up Boss" calendars: those appointments already come straight from FUB.</li></ol>The address stays on your server and is never shown here again.</div>'
+        +'<div class="sec">Google Tasks</div><div id="gtS"><p class="empty">Loading…</p></div>'
+        +'<div class="sec">Reminders (iPhone)</div><div id="remS"><p class="empty">Loading…</p></div>'
         +'<div class="sec">Follow-up tabs (Smart Lists, up to 4)</div><div id="sl"><p class="empty">Loading…</p></div>'
         +'<div class="sec">This device</div><button class="btn ghost sm" type="button" id="lock">Lock (forget PIN)</button>');
       [].forEach.call(document.querySelectorAll('[data-rm]'),function(b){b.onclick=function(){if(!confirm('Remove this calendar?'))return;post('settings',{removeCal:+b.dataset.rm}).then(function(j){st=S.data.settings=j.settings;render();loadCals();}).catch(fail);};});
       $('calF').onsubmit=function(e){e.preventDefault();var f=new FormData(this);post('settings',{addCal:{name:f.get('name'),color:f.get('color'),url:String(f.get('url')).trim()}}).then(function(j){st=S.data.settings=j.settings;render();loadCals();toast('Calendar added');}).catch(fail);};
       $('lock').onclick=function(){SM.store('sm_oh_pin','');location.reload();};
+      getJ('sync-info').then(function(si){syncSettings(si);}).catch(function(){$('gtS').innerHTML=$('remS').innerHTML='<p class="err">Could not load.</p>';});
       getJ('smartlists').then(function(j){
         j.lists.forEach(function(l){S.lists[l.id]=l.name;});SM.store('hq_lists',S.lists);
         $('sl').innerHTML=j.lists.map(function(l){return '<label class="drv"><input class="ck" type="checkbox" value="'+l.id+'"'+(st.lists.indexOf(l.id)>=0?' checked':'')+'><div>'+esc(l.name)+'</div></label>';}).join('');
@@ -795,6 +846,53 @@ dialog::backdrop{background:rgba(20,24,51,.6)}
     render();
   }
 
+  function copyRow(id,val){return '<div class="copyrow"><input id="'+id+'" readonly value="'+esc(val)+'"><button type="button" class="btn ghost sm" data-copy="'+id+'">Copy</button></div>';}
+  function bindCopy(el){[].forEach.call(el.querySelectorAll('[data-copy]'),function(b){b.onclick=function(){var i=$(b.dataset.copy);i.select();
+    (navigator.clipboard?navigator.clipboard.writeText(i.value):Promise.reject()).then(function(){toast('Copied');},function(){document.execCommand('copy');toast('Copied');});};});}
+  function gScript(tok){return `// SoldMike HQ: lets soldmike.com/hq/ read your Google Tasks and tick them done.
+const TOKEN = '${tok}';
+function doGet(e) {
+  const p = e.parameter || {};
+  if (p.t !== TOKEN) return out({ error: 'no' });
+  if (p.a === 'done') {
+    Tasks.Tasks.patch(p.done === '1' ? { status: 'completed' } : { status: 'needsAction', completed: null }, p.list, p.id);
+    return out({ ok: true });
+  }
+  const items = [];
+  (Tasks.Tasklists.list({ maxResults: 100 }).items || []).forEach(function (l) {
+    let page;
+    do {
+      const r = Tasks.Tasks.list(l.id, { showCompleted: false, showHidden: false, maxResults: 100, pageToken: page });
+      (r.items || []).forEach(function (t) {
+        if (t.title) items.push({ id: t.id, list: l.id, listName: l.title, title: t.title, due: t.due || null });
+      });
+      page = r.nextPageToken;
+    } while (page);
+  });
+  return out({ items: items });
+}
+function out(o) {
+  return ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON);
+}`;}
+  function syncSettings(si){
+    var g=$('gtS'),r=$('remS');if(!g)return;
+    g.innerHTML=(si.gtasks?'<p style="margin:0 0 8px"><span class="chip green">Connected</span></p>':'')
+      +'<div class="help">'+(si.gtasks?'To reconnect, repeat these steps.':'One-time setup on a computer (about 5 minutes):')+'<ol><li>Go to <b>script.google.com</b> (signed in as broker@) → <b>New project</b>. Name it <b>SoldMike HQ Tasks</b>.</li>'
+      +'<li>Delete what\'s there and paste the code below (Copy button).</li><li>Left side: <b>Services +</b> → <b>Google Tasks API</b> → Add.</li>'
+      +'<li><b>Deploy → New deployment</b> → gear → <b>Web app</b>. Execute as: <b>Me</b>. Who has access: <b>Anyone</b>. Deploy, then allow access.</li><li>Copy the <b>Web app URL</b> and paste it below.</li></ol></div>'
+      +'<pre class="code" id="gcode"></pre><button type="button" class="btn ghost sm" id="gcopy">Copy code</button>'
+      +'<form id="gtF" class="copyrow" style="margin-top:10px"><input name="u" placeholder="https://script.google.com/macros/s/…/exec" autocomplete="off" style="min-height:44px;border:1px solid var(--line);border-radius:10px;padding:0 12px"><button class="btn navy sm" type="submit">Save</button></form>';
+    $('gcode').textContent=gScript(si.token);
+    $('gcopy').onclick=function(){var c=gScript(si.token);(navigator.clipboard?navigator.clipboard.writeText(c):Promise.reject()).then(function(){toast('Code copied');},function(){toast('Select the code and copy it');});};
+    $('gtF').onsubmit=function(e){e.preventDefault();post('settings',{gtasksUrl:this.u.value}).then(function(){toast('Google Tasks saved');S.data.settings.gtasks=true;loadExtra();getJ('sync-info').then(syncSettings);}).catch(fail);};
+    var base=SM.api+'/sync/reminders';
+    r.innerHTML=(S.rem&&S.rem.at?'<p style="margin:0 0 8px"><span class="chip green">Last update '+tm(S.rem.at)+(ymd(new Date(S.rem.at))===S.today?'':' · '+DOWS[new Date(S.rem.at).getDay()])+'</span></p>':'')
+      +'<p class="help" style="margin-bottom:8px">Your iPhone Shortcut uses these two addresses. Open this page on your iPhone to copy them. Keep them private.</p>'
+      +'<label style="font-weight:600;font-size:14px">1 · Done list (Get Contents of URL)</label>'+copyRow('remDone',base+'/done?f=text&t='+si.token)
+      +'<label style="font-weight:600;font-size:14px;margin-top:8px;display:block">2 · Send reminders (POST)</label>'+copyRow('remSync',base+'?t='+si.token);
+    bindCopy(r);
+  }
+
   // ---------- load ----------
   function loadCals(){
     var cals=S.data.settings.calendars,ws=fromYmd(S.days[0]).getTime(),we=addDays(fromYmd(S.days[0]),4).getTime();
@@ -802,6 +900,11 @@ dialog::backdrop{background:rgba(20,24,51,.6)}
     return Promise.all(cals.map(function(c,i){return api('cal?i='+i).then(function(r){return r.text();}).then(function(t){
       return calEvents(t,ws,we).map(function(e){e.color=c.color;e.cal=c.name;return e;});}).catch(function(){toast('Could not read calendar "'+c.name+'"');return [];});}))
       .then(function(all){S.cal=[].concat.apply([],all);today();outlook();});
+  }
+  function loadExtra(){
+    getJ('gtasks').then(function(j){S.gt=j;}).catch(function(e){if(e==='pin')return;S.gt={error:'Google Tasks: '+e};})
+      .then(function(){return getJ('reminders');}).then(function(j){if(j)S.rem=j;}).catch(function(){})
+      .then(function(){if(S.data){today();outlook();}});
   }
   function load(){
     var now=new Date();S.today=ymd(now);S.days=[0,1,2,3].map(function(i){return ymd(addDays(now,i));});
@@ -812,7 +915,7 @@ dialog::backdrop{background:rgba(20,24,51,.6)}
     return getJ('day?today='+S.today+'&from='+encodeURIComponent(from)+'&to='+encodeURIComponent(to)+'&drive='+DRIVE.length).then(function(d){
       S.data=d;S.loadedAt=Date.now();
       today();outlook();brief();renderTodos();drive();workout();meals();followTabs();people();
-      loadCals();
+      loadCals();loadExtra();
       if(!S.lists[S.data.settings.lists[0]])getJ('smartlists').then(function(j){j.lists.forEach(function(l){S.lists[l.id]=l.name;});SM.store('hq_lists',S.lists);followTabs();}).catch(function(){});
       return getJ('items').then(function(j){
         if(j.items.length){S.projects=j.items;projects();return;}
