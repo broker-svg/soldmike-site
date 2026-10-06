@@ -555,7 +555,7 @@ dialog::backdrop{background:rgba(20,24,51,.6)}
       h+='<div class="ev'+cls+'"><div class="tm">'+tm(e.start)+(e.end>e.start?'<small>'+tm(e.end)+'</small>':'')+'</div><div class="ti" style="--c:'+esc(e.c||'#1D2870')+'">'+esc(e.title)+'<small>'+esc(e.sub||'')+(e.sub?' · ':'')+esc(e.src||'')+who+'</small></div></div>';
     });
     if(timed.length&&!placed)h+='<div class="nowline">Done for the day · '+tm(now)+'</div>';
-    if(!b.ev.length)h+='<p class="empty">Nothing on the calendar today.'+(S.data.settings.calendars.length?'':' Add your Google calendars in Settings.')+'</p>';
+    if(!b.ev.length)h+='<p class="empty">Nothing on the calendar today.'+''+'</p>';
     if(f.error)h+='<p class="err" style="font-size:15px">Follow Up Boss: '+esc(f.error)+'</p>';
     $('sched').innerHTML=h;
 
@@ -822,16 +822,14 @@ dialog::backdrop{background:rgba(20,24,51,.6)}
     var st=S.data.settings;
     function render(){
       dialog('<h2>Settings</h2>'
-        +'<div class="sec">Google calendars</div>'+(st.calendars.length?st.calendars.map(function(c,i){return '<div class="cal"><i style="background:'+esc(c.color)+'"></i><div><b>'+esc(c.name)+'</b><small>'+esc(c.hint)+'</small></div><button class="x" type="button" data-rm="'+i+'" aria-label="Remove">×</button></div>';}).join(''):'<p class="empty">None yet. Follow Up Boss appointments already show without this.</p>')
-        +'<form id="calF" class="dl" style="padding:0;gap:10px"><div class="two"><label>Name<input name="name" placeholder="Broker, TPM, Personal…" required></label><label>Colour<select name="color">'+COLORS.map(function(c,i){return '<option value="'+c+'">'+['Navy','Red','Green','Amber','Purple','Teal'][i]+'</option>';}).join('')+'</select></label></div>'
-        +'<label>Secret address in iCal format<input name="url" placeholder="https://calendar.google.com/calendar/ical/…/basic.ics" required autocomplete="off"></label><button class="btn navy" type="submit">Add calendar</button></form>'
-        +'<div class="help">How to get the address (computer, once per calendar):<ol><li>Open Google Calendar → gear → <b>Settings</b>.</li><li>On the left, click the calendar (e.g. 1.Broker@soldmike).</li><li>Scroll to <b>Integrate calendar</b> → copy <b>Secret address in iCal format</b>.</li><li>Paste it here. Skip the "Follow Up Boss" calendars: those appointments already come straight from FUB.</li></ol>The address stays on your server and is never shown here again.</div>'
+        +'<div class="sec">Google calendars</div><div id="gcS"><p class="empty">Loading…</p></div>'
+        +(st.calendars.length?'<p class="muted" style="font-size:14px;margin:8px 0 0">Older calendar links (busy only). Remove them:</p>'+st.calendars.map(function(c,i){return '<div class="cal"><i style="background:'+esc(c.color)+'"></i><div><b>'+esc(c.name)+'</b><small>'+esc(c.hint)+'</small></div><button class="x" type="button" data-rm="'+i+'" aria-label="Remove">×</button></div>';}).join(''):'')
         +'<div class="sec">Google Tasks</div><div id="gtS"><p class="empty">Loading…</p></div>'
         +'<div class="sec">Reminders (iPhone)</div><div id="remS"><p class="empty">Loading…</p></div>'
         +'<div class="sec">Follow-up tabs (Smart Lists, up to 4)</div><div id="sl"><p class="empty">Loading…</p></div>'
         +'<div class="sec">This device</div><button class="btn ghost sm" type="button" id="lock">Lock (forget PIN)</button>');
       [].forEach.call(document.querySelectorAll('[data-rm]'),function(b){b.onclick=function(){if(!confirm('Remove this calendar?'))return;post('settings',{removeCal:+b.dataset.rm}).then(function(j){st=S.data.settings=j.settings;render();loadCals();}).catch(fail);};});
-      $('calF').onsubmit=function(e){e.preventDefault();var f=new FormData(this);post('settings',{addCal:{name:f.get('name'),color:f.get('color'),url:String(f.get('url')).trim()}}).then(function(j){st=S.data.settings=j.settings;render();loadCals();toast('Calendar added');}).catch(fail);};
+      gcalSettings();
       $('lock').onclick=function(){SM.store('sm_oh_pin','');location.reload();};
       getJ('sync-info').then(function(si){syncSettings(si);}).catch(function(){$('gtS').innerHTML=$('remS').innerHTML='<p class="err">Could not load.</p>';});
       getJ('smartlists').then(function(j){
@@ -894,12 +892,41 @@ function out(o) {
   }
 
   // ---------- load ----------
+  var GDEF=/^\d+\.|Broker Sch|Work Schedule|Kleinburg/i, GSKIP=/Follow Up Boss/i;
+  function gEvents(){
+    var from=fromYmd(S.days[0]).toISOString(),to=addDays(fromYmd(S.days[0]),4).toISOString();
+    return getJ('gevents?from='+encodeURIComponent(from)+'&to='+encodeURIComponent(to)).then(function(j){
+      if(j.cals.length)return j;
+      // first time: pick the work calendars (names starting with a number, Broker / Work Schedule), never the FUB ones
+      return getJ('gcals').then(function(g){
+        if(g.setup||g.selected)return j;
+        var sel=g.cals.filter(function(c){return GDEF.test(c.name)&&!GSKIP.test(c.name);}).map(function(c){return {id:c.id,name:c.name.trim(),color:c.color};});
+        return sel.length?post('settings',{gcalSel:sel}).then(gEvents):j;
+      });
+    }).then(function(j){var by={};j.cals.forEach(function(c){by[c.id]=c;});
+      return j.events.map(function(e){var c=by[e.cal]||{},all=e.allDay;
+        var st=all?fromYmd(e.start).getTime():Date.parse(e.start),en=all?fromYmd(e.end).getTime():Date.parse(e.end);
+        return {title:e.title||'(no title)',loc:e.loc||'',start:st,end:en,allDay:all,color:c.color||'#1D2870',cal:c.name||'Google'};});
+    }).catch(function(e){if(e!=='pin')toast('Could not read Google Calendar');return [];});
+  }
   function loadCals(){
     var cals=S.data.settings.calendars,ws=fromYmd(S.days[0]).getTime(),we=addDays(fromYmd(S.days[0]),4).getTime();
-    if(!cals.length){S.cal=[];today();outlook();return Promise.resolve();}
-    return Promise.all(cals.map(function(c,i){return api('cal?i='+i).then(function(r){return r.text();}).then(function(t){
-      return calEvents(t,ws,we).map(function(e){e.color=c.color;e.cal=c.name;return e;});}).catch(function(){toast('Could not read calendar "'+c.name+'"');return [];});}))
-      .then(function(all){S.cal=[].concat.apply([],all);today();outlook();});
+    var ics=cals.map(function(c,i){return api('cal?i='+i).then(function(r){return r.text();}).then(function(t){
+      return calEvents(t,ws,we).map(function(e){e.color=c.color;e.cal=c.name;return e;});}).catch(function(){return [];});});
+    return Promise.all(ics.concat([gEvents()])).then(function(all){S.cal=[].concat.apply([],all);today();outlook();});
+  }
+  function gcalSettings(){
+    var el=$('gcS');if(!el)return;
+    getJ('gcals').then(function(g){
+      if(g.setup){el.innerHTML='<p class="empty">Connect Google Tasks below first; calendars use the same Google script.</p>';return;}
+      var sel=(g.selected||[]).map(function(c){return c.id;});
+      el.innerHTML='<p class="muted" style="font-size:14px;margin:0 0 4px">Tick the calendars to show. Leave the Follow Up Boss ones off (those come straight from FUB).</p>'
+        +g.cals.map(function(c){return '<label class="drv"><input class="ck" type="checkbox" value="'+esc(c.id)+'"'+(sel.indexOf(c.id)>=0?' checked':'')+'><div><span class="src" style="background:'+esc(c.color)+'"></span>'+esc(c.name)+'</div></label>';}).join('');
+      [].forEach.call(el.querySelectorAll('input'),function(x){x.onchange=function(){
+        var ids=[].map.call(el.querySelectorAll('input:checked'),function(i){return i.value;});
+        var s2=g.cals.filter(function(c){return ids.indexOf(c.id)>=0;}).map(function(c){return {id:c.id,name:c.name.trim(),color:c.color};});
+        post('settings',{gcalSel:s2}).then(function(){loadCals();}).catch(fail);};});
+    }).catch(function(){el.innerHTML='<p class="err">Could not load your calendars.</p>';});
   }
   function loadExtra(){
     getJ('gtasks').then(function(j){S.gt=j;}).catch(function(e){if(e==='pin')return;S.gt={error:'Google Tasks: '+e};})
