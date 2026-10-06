@@ -163,7 +163,8 @@ pre.code{background:#0F1430;color:#E6E9F7;border-radius:10px;padding:12px;font-s
 .pp:first-of-type{border-top:0}
 .pp b{font-weight:600;overflow-wrap:anywhere}
 .pp .meta{grid-column:1;display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-size:14px;color:var(--muted)}
-.pp .go{grid-row:1/3;grid-column:2}
+.pp .pb{grid-row:1/3;grid-column:2;display:flex;gap:6px;align-items:center}
+.pbtn{background:#fff;cursor:pointer;font-family:inherit;color:var(--navy)}.pbtn[aria-pressed="true"]{background:#E7F4EC;border-color:#B9DEC6;color:var(--green)}
 
 /* to-do */
 .add{display:grid;grid-template-columns:1fr auto auto;gap:8px;margin-bottom:10px}
@@ -703,38 +704,52 @@ dialog::backdrop{background:rgba(20,24,51,.6)}
   }
 
   // ---------- follow-ups ----------
-  function listName(id){return id==='active'?'Active':String(S.lists[id]||('List '+id)).replace(/ To Revive$/i,'');}
+  var FTABS=[['active','Active'],['appointments','Appointments'],['cma','CMA'],['searching','Searching'],['daily','Daily']];
   function followTabs(){
-    var ids=['active'].concat(S.data.settings.lists);if(!S.list||ids.indexOf(S.list)<0)S.list='active';
-    $('listTabs').innerHTML=ids.map(function(id){return '<button type="button" data-l="'+id+'" aria-pressed="'+(id===S.list)+'">'+esc(listName(id))+'</button>';}).join('');
-    [].forEach.call($('listTabs').querySelectorAll('button'),function(b){b.onclick=function(){S.list=b.dataset.l==='active'?'active':+b.dataset.l;SM.store('hq_list2',S.list);followTabs();people();};});
+    if(!FTABS.some(function(x){return x[0]===S.list;}))S.list='active';
+    $('listTabs').innerHTML=FTABS.map(function(x){return '<button type="button" data-l="'+x[0]+'" aria-pressed="'+(x[0]===S.list)+'">'+x[1]+(S.fcount&&S.fcount[x[0]]!=null?'<span class="n">'+S.fcount[x[0]]+'</span>':'')+'</button>';}).join('');
+    [].forEach.call($('listTabs').querySelectorAll('button'),function(b){b.onclick=function(){S.list=b.dataset.l;S.actAll=false;SM.store('hq_list2',S.list);followTabs();people();};});
   }
   function contactChip(last){
-    var days=last?Math.floor((Date.now()-Date.parse(last.replace(' ','T')+(/[zZ]$/.test(last)?'':'Z')))/864e5):null;
+    var days=last?Math.floor((Date.now()-Date.parse(last.replace(' ','T')+(/[zZ]|[+-]\d\d:?\d\d$/.test(last)?'':'Z')))/864e5):null;
     return days==null?'<span class="chip red">Never contacted</span>':'<span class="chip '+(days>30?'red':days>14?'amber':'green')+'">Last contact '+ago(last)+'</span>';
   }
-  function personRow(p,extra){return '<div class="pp"><b>'+esc(p.name||'No name')+'</b><a class="go" href="'+esc(fubLink(p.id))+'" target="_blank" rel="noopener">Open in FUB</a><div class="meta">'+(extra||'')+contactChip(p.last)+(p.stage?'<span class="chip">'+esc(p.stage)+'</span>':'')+(p.phone?'<span>'+esc(p.phone)+'</span>':'')+'</div></div>';}
+  function personRow(p,extra,btns){return '<div class="pp" data-p="'+p.id+'"><b>'+esc(p.name||'No name')+'</b><div class="pb">'+(btns||'')+'<a class="go" href="'+esc(fubLink(p.id))+'" target="_blank" rel="noopener">FUB</a></div><div class="meta">'+(extra||'')+contactChip(p.last)+(p.stage?'<span class="chip">'+esc(p.stage)+'</span>':'')+(p.phone?'<span>'+esc(p.phone)+'</span>':'')+'</div></div>';}
+  function cmaBtn(p){return '<button type="button" class="go pbtn" data-cma="'+p.id+'" aria-pressed="'+!!p.cma+'" title="'+(p.cma?'Remove from CMA list':'Add to CMA list')+'">'+(p.cma?'CMA ✓':'+ CMA')+'</button>';}
   function people(){
-    var el=$('people');el.innerHTML='<p class="empty">Loading…</p>';
-    if(S.list==='active'){
-      var d=S.actDays||14;
-      getJ('active?days='+d).then(function(j){
+    var el=$('people'),tab=S.list;el.innerHTML='<p class="empty">Loading…</p>';
+    var d=S.actDays||14,url=tab==='active'?'active?days='+d:'tagged?tab='+tab;
+    getJ(url).then(function(j){
+      if(tab!==S.list)return;
+      (S.fcount=S.fcount||{})[tab]=tab==='active'?j.people.length:(j.total||j.people.length);followTabs();
+      var limit=S.actAll?999:12,h='';
+      var more=function(n){return n>limit?'<button type="button" class="more" id="actMore">Show all '+n+'</button>':'';};
+      if(tab==='active'){
+        h+='<div class="tabs" style="margin:0 0 6px;gap:6px">'+[7,14,30].map(function(n){return '<button type="button" data-d="'+n+'" aria-pressed="'+(n===d)+'" style="min-height:32px;padding:0 12px;font-size:13px">'+n+' days</button>';}).join('')+'</div>';
         var inq=j.people.filter(function(p){return p.kind==='inquiry';}),brw=j.people.filter(function(p){return p.kind==='browsing';});
-        var h='<div class="tabs" style="margin:0 0 6px;gap:6px">'+[7,14,30].map(function(n){return '<button type="button" data-d="'+n+'" aria-pressed="'+(n===d)+'" style="min-height:32px;padding:0 12px;font-size:13px">'+n+' days</button>';}).join('')+'</div>';
-        var row=function(p){return personRow(p,'<span class="chip '+(p.kind==='inquiry'?'red':'amber')+'">'+(p.kind==='inquiry'?'Inquiry':'Browsing')+' · active '+ago(p.active)+'</span>'+(p.hot?'<span class="chip red">Hot</span>':''));};
+        var row=function(p){return personRow(p,'<span class="chip '+(p.kind==='inquiry'?'red':'amber')+'">'+(p.kind==='inquiry'?'Inquiry':'Browsing')+' · active '+ago(p.active)+'</span>'+(p.hot?'<span class="chip red">Hot</span>':''),
+          '<button type="button" class="go pbtn" data-done="'+p.id+'" title="Followed up: hide until they\'re active again">Done</button>'+cmaBtn(p));};
         if(inq.length)h+='<div class="sec">Inquiries · '+inq.length+'</div>'+inq.map(row).join('');
-        if(brw.length)h+='<div class="sec">Browsing · '+brw.length+'</div>'+brw.slice(0,S.actAll?999:12).map(row).join('')+(brw.length>12&&!S.actAll?'<button type="button" class="more" id="actMore">Show all '+brw.length+'</button>':'');
-        if(!j.people.length)h+='<p class="empty">No active leads in the last '+d+' days.</p>';
-        h+='<p class="muted" style="font-size:13px;margin:8px 0 0">From your Active Lead Automation: tagged <b>Appoinment</b> (inquiry) or <b>Searching</b> (browsing), with activity in the last '+d+' days.</p>';
-        el.innerHTML=h;
-        [].forEach.call(el.querySelectorAll('[data-d]'),function(b){b.onclick=function(){S.actDays=+b.dataset.d;S.actAll=false;people();};});
-        if($('actMore'))$('actMore').onclick=function(){S.actAll=true;people();};
-      }).catch(function(e){if(e==='pin')return fail(e);el.innerHTML='<p class="err" style="font-size:15px">Could not load active leads ('+esc(e)+').</p>';});
-      return;
-    }
-    getJ('leads?list='+S.list).then(function(j){
-      el.innerHTML=j.people.length?j.people.map(function(p){return personRow(p);}).join(''):'<p class="empty">Nobody on this list right now.</p>';
-    }).catch(function(e){if(e==='pin')return fail(e);el.innerHTML='<p class="err" style="font-size:15px">Could not load this Smart List ('+esc(e)+').</p>';});
+        if(brw.length)h+='<div class="sec">Browsing · '+brw.length+'</div>'+brw.slice(0,limit).map(row).join('')+more(brw.length);
+        if(!j.people.length)h+='<p class="empty">Nobody active in the last '+d+' days who isn\'t marked Done.</p>';
+        h+='<p class="muted" style="font-size:13px;margin:8px 0 0"><b>Done</b> hides a lead until they\'re active again.</p>';
+      }else{
+        var L=j.people;
+        var row2=function(p){return personRow(p,(p.label?'<span class="chip navy">'+esc(p.label)+'</span>':'')+(p.active&&tab!=='daily'?'<span class="chip">active '+ago(p.active)+'</span>':'')+(p.hot?'<span class="chip red">Hot</span>':''),cmaBtn(p));};
+        h+=L.length?L.slice(0,limit).map(row2).join('')+more(L.length):'<p class="empty">'+(tab==='cma'?'Nobody on your CMA list yet. Tap <b>+ CMA</b> on anyone in the other tabs to add them.':'Nobody here right now.')+'</p>';
+        var note={appointments:'Tagged Appoinment in Follow Up Boss, newest activity first.',cma:'People to ask for a CMA (tag CMA). Longest since contact first.',searching:'Tagged Searching, newest activity first.',daily:'Tagged Daily (Buyer) or Daily Seller (Seller), longest since contact first.'}[tab];
+        if(j.total>L.length)note+=' Showing '+L.length+' of '+j.total+'.';
+        h+='<p class="muted" style="font-size:13px;margin:8px 0 0">'+note+'</p>';
+      }
+      el.innerHTML=h;
+      [].forEach.call(el.querySelectorAll('[data-d]'),function(b){b.onclick=function(){S.actDays=+b.dataset.d;S.actAll=false;people();};});
+      if($('actMore'))$('actMore').onclick=function(){S.actAll=true;people();};
+      [].forEach.call(el.querySelectorAll('[data-done]'),function(b){b.onclick=function(){var row=b.closest('.pp');row.style.opacity=.4;
+        post('dismiss',{id:+b.dataset.done,on:true}).then(function(){row.remove();toast('Marked done. They\'ll come back if they\'re active again.');}).catch(function(e){row.style.opacity=1;fail(e);});};});
+      [].forEach.call(el.querySelectorAll('[data-cma]'),function(b){b.onclick=function(){var on=b.getAttribute('aria-pressed')!=='true';b.disabled=true;
+        post('tag',{id:+b.dataset.cma,tag:'CMA',on:on}).then(function(){b.setAttribute('aria-pressed',on);b.textContent=on?'CMA ✓':'+ CMA';b.disabled=false;toast(on?'Added to your CMA list (tag CMA in FUB)':'Removed from your CMA list');
+          if(tab==='cma'&&!on)b.closest('.pp').remove();if(S.fcount)delete S.fcount.cma;}).catch(function(e){b.disabled=false;fail(e);});};});
+    }).catch(function(e){if(e==='pin')return fail(e);el.innerHTML='<p class="err" style="font-size:15px">Could not load this list ('+esc(e)+').</p>';});
   }
 
   // ---------- Follow Up Boss tasks card ----------
@@ -870,20 +885,11 @@ dialog::backdrop{background:rgba(20,24,51,.6)}
         +(st.calendars.length?'<p class="muted" style="font-size:14px;margin:8px 0 0">Older calendar links (busy only). Remove them:</p>'+st.calendars.map(function(c,i){return '<div class="cal"><i style="background:'+esc(c.color)+'"></i><div><b>'+esc(c.name)+'</b><small>'+esc(c.hint)+'</small></div><button class="x" type="button" data-rm="'+i+'" aria-label="Remove">×</button></div>';}).join(''):'')
         +'<div class="sec">Google Tasks</div><div id="gtS"><p class="empty">Loading…</p></div>'
         +'<div class="sec">Reminders (iPhone)</div><div id="remS"><p class="empty">Loading…</p></div>'
-        +'<div class="sec">Follow-up tabs (Smart Lists, up to 4)</div><div id="sl"><p class="empty">Loading…</p></div>'
         +'<div class="sec">This device</div><button class="btn ghost sm" type="button" id="lock">Lock (forget PIN)</button>');
       [].forEach.call(document.querySelectorAll('[data-rm]'),function(b){b.onclick=function(){if(!confirm('Remove this calendar?'))return;post('settings',{removeCal:+b.dataset.rm}).then(function(j){st=S.data.settings=j.settings;render();loadCals();}).catch(fail);};});
       gcalSettings();
       $('lock').onclick=function(){SM.store('sm_oh_pin','');location.reload();};
       getJ('sync-info').then(function(si){syncSettings(si);}).catch(function(){$('gtS').innerHTML=$('remS').innerHTML='<p class="err">Could not load.</p>';});
-      getJ('smartlists').then(function(j){
-        j.lists.forEach(function(l){S.lists[l.id]=l.name;});SM.store('hq_lists',S.lists);
-        $('sl').innerHTML=j.lists.map(function(l){return '<label class="drv"><input class="ck" type="checkbox" value="'+l.id+'"'+(st.lists.indexOf(l.id)>=0?' checked':'')+'><div>'+esc(l.name)+'</div></label>';}).join('');
-        [].forEach.call($('sl').querySelectorAll('input'),function(c){c.onchange=function(){
-          var ids=[].map.call($('sl').querySelectorAll('input:checked'),function(x){return +x.value;});
-          if(ids.length>4){c.checked=false;toast('Up to 4 tabs');return;}if(!ids.length){c.checked=true;return;}
-          post('settings',{lists:ids}).then(function(j2){st=S.data.settings=j2.settings;followTabs();people();}).catch(fail);};});
-      }).catch(function(){$('sl').innerHTML='<p class="err">Could not load Smart Lists.</p>';});
     }
     render();
   }
@@ -992,7 +998,6 @@ function out(o) {
       S.data=d;S.loadedAt=Date.now();
       today();outlook();brief();renderTodos();drive();workout();meals();followTabs();people();
       loadCals();loadExtra();
-      if(!S.lists[S.data.settings.lists[0]])getJ('smartlists').then(function(j){j.lists.forEach(function(l){S.lists[l.id]=l.name;});SM.store('hq_lists',S.lists);followTabs();}).catch(function(){});
       return getJ('items').then(function(j){
         if(j.items.length){S.projects=j.items;projects();return;}
         return post('seed',{items:SEED}).then(function(){return getJ('items');}).then(function(j2){S.projects=j2.items;projects();});
