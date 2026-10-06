@@ -96,7 +96,8 @@ a{color:var(--navy)}
 .tabs button{min-height:40px;padding:0 16px;border-radius:20px;border:1px solid var(--line);background:#fff;font-weight:600;font-size:15px;cursor:pointer}
 .tabs button[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:#fff}
 .tabs.tk{gap:6px;margin-bottom:6px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;align-items:center}.tabs.tk::-webkit-scrollbar{display:none}.tabs.tk button{min-height:34px;padding:0 10px;font-size:14px;flex:none}
-.tabs.tk .gap{flex:1;min-width:4px}.tabs.tk button.tg{border-style:dashed}.tabs.tk button.tg[aria-pressed="true"]{border-style:solid;background:var(--ink);border-color:var(--ink)}
+.tabs.tk .gap{flex:1;min-width:4px}
+.sech{display:flex;align-items:center;gap:8px}.sech .tabs{margin:0 0 0 auto;font-family:var(--body);text-transform:none;letter-spacing:0;font-weight:600}.sech .gap{display:none}.tabs.tk button.tg{border-style:dashed}.tabs.tk button.tg[aria-pressed="true"]{border-style:solid;background:var(--ink);border-color:var(--ink)}
 .tabs button .n{display:inline-block;min-width:20px;margin-left:4px;padding:0 6px;border-radius:10px;background:var(--mist);color:var(--ink);font-size:12px;line-height:18px}
 .tabs button[aria-pressed="true"] .n{background:rgba(255,255,255,.2);color:#fff}
 .src{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:4px;vertical-align:1px}
@@ -275,7 +276,7 @@ dialog::backdrop{background:rgba(20,24,51,.6)}
 <main class="wrap"><div class="grid">
   <section class="card" id="today"><div class="hd"><h2>Today</h2><span class="sub" id="todaySub"></span><button type="button" class="rt" id="rtBtn" aria-pressed="false">Routine <b>Off</b></button></div>
     <div class="tcols"><div><div class="sec">Schedule</div><div id="sched"><p class="empty">Loading…</p></div></div>
-    <div><div class="sec">Tasks &amp; reminders</div><div class="tabs tk" id="tkTabs"></div><div id="tasks"><p class="empty">Loading…</p></div></div></div>
+    <div><div class="sec sech">Tasks &amp; reminders<span class="tabs tk" id="tkTg"></span></div><div class="tabs tk" id="tkTabs"></div><div id="tasks"><p class="empty">Loading…</p></div></div></div>
   </section>
   <section class="card" id="outlook"><div class="hd"><h2>Next 3 days</h2></div><div class="days" id="days"></div></section>
   <section class="card" id="brief"><div class="hd"><h2>Check this</h2><span class="sub" id="briefSub"></span></div><div id="briefBody"></div></section>
@@ -612,9 +613,10 @@ dialog::backdrop{background:rgba(20,24,51,.6)}
     var src=function(k){return L.filter(function(x){return x.src===k;});};
     var tabs=[['all','All',L],['fub','FUB',src('fub')],['g','Google',src('g')],['rem','Reminders',src('rem')]];
     if(L0.some(function(x){return x.src==='mine';}))tabs.push(['mine','Mine',src('mine')]);
-    $('tkTabs').innerHTML=tabs.map(function(x){return '<button type="button" data-k="'+x[0]+'" aria-pressed="'+(S.tkTab===x[0])+'">'+x[1]+'<span class="n">'+x[2].length+'</span></button>';}).join('')+toggles(S.fT,S.fO,lateN,['fT','fO']);
+    $('tkTabs').innerHTML=tabs.map(function(x){return '<button type="button" data-k="'+x[0]+'" aria-pressed="'+(S.tkTab===x[0])+'">'+x[1]+'<span class="n">'+x[2].length+'</span></button>';}).join('');
+    $('tkTg').innerHTML=toggles(S.fT,S.fO,lateN,['fT','fO']);
     [].forEach.call($('tkTabs').querySelectorAll('[data-k]'),function(b){b.onclick=function(){S.tkTab=b.dataset.k;S.tkAll=false;SM.store('hq_tktab',S.tkTab);taskPanel();};});
-    [].forEach.call($('tkTabs').querySelectorAll('[data-t]'),function(b){b.onclick=function(){var k=b.dataset.t;S[k]=!S[k];SM.store('hq_'+k.toLowerCase(),S[k]);S.tkAll=false;taskPanel();};});
+    [].forEach.call($('tkTg').querySelectorAll('[data-t]'),function(b){b.onclick=function(){var k=b.dataset.t;S[k]=!S[k];SM.store('hq_'+k.toLowerCase(),S[k]);S.tkAll=false;taskPanel();};});
     var cur=tabs.filter(function(x){return x[0]===S.tkTab;})[0]||tabs[0],items=cur[2],h='';
     if(S.tkTab==='g'&&S.gt&&S.gt.setup)h='<p class="empty">Google Tasks isn\'t connected yet. Open <b>Settings → Google Tasks</b>.</p>';
     else if(S.tkTab==='g'&&S.gt&&S.gt.error)h='<p class="err" style="font-size:15px">'+esc(S.gt.error)+'</p>';
