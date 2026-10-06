@@ -115,6 +115,11 @@ pre.code{background:#0F1430;color:#E6E9F7;border-radius:10px;padding:12px;font-s
 .ev .ti{font-weight:600;border-left:4px solid var(--c,var(--navy));padding-left:10px;overflow-wrap:anywhere}
 .ev .ti small{display:block;color:var(--muted);font-weight:400;font-size:15px}
 .ev.past{opacity:.5}
+.ev .ti{cursor:pointer}.ev.rtn .ti{border-left-style:dashed;color:var(--muted)}.ev.rtn .ti small{display:none}
+.rt{min-height:36px;padding:0 14px;border-radius:18px;border:1px solid var(--line);background:#fff;font-size:14px;font-weight:600;cursor:pointer;color:var(--muted)}
+.rt b{color:var(--ink)}.rt[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:var(--pale)}.rt[aria-pressed="true"] b{color:#fff}
+.rtline{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--muted);padding:6px 0;border-top:1px dashed var(--line)}.rtline button{background:none;border:0;color:var(--navy);font-weight:600;cursor:pointer;font-size:14px;padding:0}
+.day li{cursor:pointer}
 .ev.now .tm{color:var(--red)}
 .nowline{display:flex;align-items:center;gap:8px;color:var(--red);font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.05em}
 .nowline::after{content:"";flex:1;height:2px;background:var(--red)}
@@ -267,7 +272,7 @@ dialog::backdrop{background:rgba(20,24,51,.6)}
 <nav class="jump" aria-label="Jump to"><a href="#today">Today</a><a href="#outlook">Next 3 days</a><a href="#follow">Follow-ups</a><a href="#todo">To-do</a><a href="#drive">Daily Drive</a><a href="#projects">Projects</a><a href="#workout">Workout</a><a href="#meals">Meals</a></nav>
 
 <main class="wrap"><div class="grid">
-  <section class="card" id="today"><div class="hd"><h2>Today</h2><span class="sub" id="todaySub"></span></div>
+  <section class="card" id="today"><div class="hd"><h2>Today</h2><span class="sub" id="todaySub"></span><button type="button" class="rt" id="rtBtn" aria-pressed="false">Routine <b>Off</b></button></div>
     <div class="tcols"><div><div class="sec">Schedule</div><div id="sched"><p class="empty">Loading…</p></div></div>
     <div><div class="sec">Tasks &amp; reminders</div><div class="tabs tk" id="tkTabs"></div><div id="tasks"><p class="empty">Loading…</p></div><div class="sec">My to-dos today</div><div id="todayTodos"></div></div></div>
   </section>
@@ -495,7 +500,7 @@ dialog::backdrop{background:rgba(20,24,51,.6)}
   function fail(e){if(e==='pin')return askPin().then(load);toast(typeof e==='string'?e:'Could not save. Check the connection.');}
 
   // ---------- state ----------
-  var S={today:'',days:[],data:null,cal:[],wx:null,lists:SM.store('hq_lists')||{},list:SM.store('hq_list')||0,projTab:SM.store('hq_ptab')||'all',projects:[],loadedAt:0,gt:null,rem:null,tkTab:SM.store('hq_tktab')||'all',tkAll:false};
+  var S={today:'',days:[],data:null,cal:[],wx:null,lists:SM.store('hq_lists')||{},list:SM.store('hq_list')||0,projTab:SM.store('hq_ptab')||'all',projects:[],loadedAt:0,gt:null,rem:null,tkTab:SM.store('hq_tktab')||'all',tkAll:false,routine:SM.store('hq_routine')===true,evs:[],evo:[]};
   function log(k,v){S.data.logs[k]=v;return post('log',{day:S.today,k:k,v:v}).catch(fail);}
 
   // ---------- header ----------
@@ -526,6 +531,10 @@ dialog::backdrop{background:rgba(20,24,51,.6)}
 
   // ---------- day buckets ----------
   function dayKeyOf(iso){if(!iso)return '';if(/^\d{4}-\d{2}-\d{2}$/.test(iso))return iso;return ymd(new Date(iso));}
+  // routine = calendars marked routine in Settings (Work Schedule by default) + event names marked routine
+  function quiet(){return (S.data&&S.data.settings.quiet)||[];}
+  function normT(s){return String(s||'').trim().toLowerCase();}
+  function isRoutine(e){return !!e.calRoutine||quiet().indexOf(normT(e.title))>=0;}
   function bucket(day){
     var f=S.data&&S.data.fub||{},ds=fromYmd(day).getTime(),de=addDays(fromYmd(day),1).getTime();
     var ev=[];
@@ -533,11 +542,25 @@ dialog::backdrop{background:rgba(20,24,51,.6)}
       if(a.allDay?dayKeyOf(a.start)===day:(s<de&&Math.max(e,s+1)>ds))ev.push({title:a.title,sub:[a.location,(a.who||[]).map(function(w){return w.name;}).join(', ')].filter(Boolean).join(' · '),start:s,end:e,allDay:a.allDay,c:'#D7141E',src:'FUB',person:(a.who||[])[0]});});
     S.cal.forEach(function(x){if(x.start<de&&Math.max(x.end,x.start+1)>ds){
       if(ev.some(function(y){return !y.allDay&&Math.abs(y.start-x.start)<6e4&&y.title.toLowerCase()===String(x.title).toLowerCase();}))return;
-      ev.push({title:x.title,sub:x.loc,start:x.start,end:x.end,allDay:x.allDay,c:x.color,src:x.cal});}});
+      ev.push({title:x.title,sub:x.loc,start:x.start,end:x.end,allDay:x.allDay,c:x.color,src:x.cal,calRoutine:x.routine});}});
     ev.sort(function(a,b){return (b.allDay-a.allDay)||(a.start-b.start);});
     var tasks=(f.tasks||[]).filter(function(t){return dayKeyOf(t.due)===day;}).sort(function(a,b){return String(a.due).localeCompare(String(b.due));});
     var todos=(S.data?S.data.todos:[]).filter(function(t){return t.due===day;});
-    return {ev:ev,tasks:tasks,todos:todos};
+    ev.forEach(function(e){e.rtn=isRoutine(e);});
+    var rn=ev.filter(function(e){return e.rtn;}).length;
+    if(!S.routine)ev=ev.filter(function(e){return !e.rtn;});
+    return {ev:ev,tasks:tasks,todos:todos,routineN:rn};
+  }
+  function toggleRoutine(){S.routine=!S.routine;SM.store('hq_routine',S.routine);today();outlook();}
+  $('rtBtn').onclick=toggleRoutine;
+  function eventInfo(e){
+    if(!e)return;
+    var byName=quiet().indexOf(normT(e.title))>=0;
+    dialog('<h2>'+esc(e.title)+'</h2><p class="muted" style="margin:-6px 0 0">'+(e.allDay?'All day':tm(e.start)+(e.end>e.start?' – '+tm(e.end):''))+' · '+esc(e.src||'')+(e.sub?'<br>'+esc(e.sub):'')+'</p>'
+      +(e.calRoutine?'<p class="help">This whole calendar ('+esc(e.src)+') is set as routine. Change that in Settings → Google calendars.</p>'
+        :'<p class="help">Routine events fold away when <b>Routine</b> is Off. Every event with this exact name counts, including repeats.</p><div class="acts"><span></span><button class="btn '+(byName?'ghost':'navy')+'" type="button" id="qBtn">'+(byName?'Show it normally again':'Treat "'+esc(e.title)+'" as routine')+'</button></div>'));
+    if($('qBtn'))$('qBtn').onclick=function(){var q=quiet().filter(function(x){return x!==normT(e.title);});if(!byName)q.push(normT(e.title));
+      post('settings',{quiet:q}).then(function(j){S.data.settings.quiet=j.settings.quiet;closeDlg();today();outlook();toast(byName?'Back to normal':'Marked as routine');}).catch(fail);};
   }
   function fubLink(id){return S.data.fubApp+'/2/people/view/'+id;}
 
@@ -545,19 +568,24 @@ dialog::backdrop{background:rgba(20,24,51,.6)}
   function today(){
     var b=bucket(S.today),now=Date.now(),f=S.data.fub||{};
     var timed=b.ev.filter(function(e){return !e.allDay;}),all=b.ev.filter(function(e){return e.allDay;});
-    var h='';
+    var h='';S.evs=[];
+    $('rtBtn').setAttribute('aria-pressed',S.routine);$('rtBtn').innerHTML='Routine <b>'+(S.routine?'On':'Off')+'</b>'+(b.routineN?' · '+b.routineN:'');
     if(all.length)h+='<div class="allday">'+all.map(function(e){return '<span style="border-color:'+esc(e.c||'#1D2870')+'">'+esc(e.title)+'</span>';}).join('')+'</div>';
     var placed=false;
     timed.forEach(function(e){
       if(!placed&&e.start>now){h+='<div class="nowline">Now · '+tm(now)+'</div>';placed=true;}
       var cls=e.end<now?' past':(e.start<=now?' now':'');
       var who=e.person?' <a href="'+esc(fubLink(e.person.id))+'" target="_blank" rel="noopener">open in FUB</a>':'';
-      h+='<div class="ev'+cls+'"><div class="tm">'+tm(e.start)+(e.end>e.start?'<small>'+tm(e.end)+'</small>':'')+'</div><div class="ti" style="--c:'+esc(e.c||'#1D2870')+'">'+esc(e.title)+'<small>'+esc(e.sub||'')+(e.sub?' · ':'')+esc(e.src||'')+who+'</small></div></div>';
+      S.evs.push(e);
+      h+='<div class="ev'+cls+(e.rtn?' rtn':'')+'" data-ev="'+(S.evs.length-1)+'"><div class="tm">'+tm(e.start)+(e.end>e.start?'<small>'+tm(e.end)+'</small>':'')+'</div><div class="ti" style="--c:'+esc(e.c||'#1D2870')+'">'+esc(e.title)+'<small>'+esc(e.sub||'')+(e.sub?' · ':'')+esc(e.src||'')+who+'</small></div></div>';
     });
     if(timed.length&&!placed)h+='<div class="nowline">Done for the day · '+tm(now)+'</div>';
-    if(!b.ev.length)h+='<p class="empty">Nothing on the calendar today.'+''+'</p>';
+    if(!b.ev.length)h+='<p class="empty">Nothing on the calendar today'+(b.routineN&&!S.routine?' (besides routine)':'')+'.</p>';
+    if(b.routineN&&!S.routine)h+='<div class="rtline">'+b.routineN+' routine block'+(b.routineN===1?'':'s')+' hidden · <button type="button" class="rtshow">Show</button></div>';
     if(f.error)h+='<p class="err" style="font-size:15px">Follow Up Boss: '+esc(f.error)+'</p>';
     $('sched').innerHTML=h;
+    [].forEach.call($('sched').querySelectorAll('.rtshow'),function(x){x.onclick=toggleRoutine;});
+    [].forEach.call($('sched').querySelectorAll('[data-ev] .ti'),function(x){x.onclick=function(ev){if(ev.target.closest('a'))return;eventInfo(S.evs[+x.parentNode.dataset.ev]);};});
 
     var nTask=taskPanel();
     var mine=S.data.todos.filter(function(t){return !t.done&&t.due&&t.due<=S.today;});
@@ -624,15 +652,17 @@ dialog::backdrop{background:rgba(20,24,51,.6)}
 
   // ---------- next 3 days ----------
   function outlook(){
+    if(S.data)S.evo=[];
     if(!S.data)return;
     $('days').innerHTML=S.days.slice(1).map(function(day,i){
       var d=fromYmd(day),b=bucket(day),hol=holidayOn(day),wx='';
       if(S.wx&&S.wx.daily){var k=S.wx.daily.time.indexOf(day);if(k>=0)wx=Math.round(S.wx.daily.temperature_2m_max[k])+'° '+(WMO[S.wx.daily.weather_code[k]]||'');}
-      var items=b.ev.slice(0,8).map(function(e){return '<li><b>'+(e.allDay?'All day':tm(e.start))+'</b><span style="--c:'+esc(e.c||'#1D2870')+'">'+esc(e.title)+'</span></li>';}).join('');
+      var items=b.ev.slice(0,8).map(function(e){S.evo.push(e);return '<li data-eo="'+(S.evo.length-1)+'"><b>'+(e.allDay?'All day':tm(e.start))+'</b><span style="--c:'+esc(e.c||'#1D2870')+'">'+esc(e.title)+'</span></li>';}).join('');
       var more=b.ev.length>8?'<li><b></b><span class="muted">+'+(b.ev.length-8)+' more</span></li>':'';
       var cnt=[];if(b.tasks.length)cnt.push('<span class="chip navy">'+b.tasks.length+' FUB task'+(b.tasks.length===1?'':'s')+'</span>');
       var gr=allTasks().filter(function(x){return x.src!=='fub'&&x.day===day;});if(gr.length)cnt.push('<span class="chip amber">'+gr.length+' task'+(gr.length===1?'':'s')+' / reminder'+(gr.length===1?'':'s')+'</span>');
       var td=b.todos.filter(function(t){return !t.done;});if(td.length)cnt.push('<span class="chip">'+td.length+' to-do'+(td.length===1?'':'s')+'</span>');
+      if(b.routineN&&!S.routine)cnt.push('<span class="chip">'+b.routineN+' routine hidden</span>');
       var wo=WEEK[d.getDay()];cnt.push('<span class="chip green">'+esc(wo.name)+'</span>');
       return '<div class="day"><h3>'+(i===0?'Tomorrow':DOWS[d.getDay()])+' <small>'+(i===0?DOWS[d.getDay()].slice(0,3)+' ':'')+MONS[d.getMonth()].slice(0,3)+' '+d.getDate()+'</small><span class="wxs">'+esc(wx)+'</span></h3>'
         +(hol?'<div class="hol2"><span class="chip '+(hol.stat?'red':'amber')+'">'+esc(hol.name)+(hol.stat?' · stat':'')+'</span></div>':'')
@@ -640,6 +670,7 @@ dialog::backdrop{background:rgba(20,24,51,.6)}
         +(b.tasks.length?'<ul>'+b.tasks.slice(0,4).map(function(t){return '<li><b>Task</b><span style="--c:#9AA3C7">'+esc(t.name||t.type)+(t.who?' · '+esc(t.who):'')+'</span></li>';}).join('')+'</ul>':'')
         +'<div class="cnt">'+cnt.join('')+'</div></div>';
     }).join('');
+    [].forEach.call($('days').querySelectorAll('[data-eo]'),function(x){x.onclick=function(){eventInfo(S.evo[+x.dataset.eo]);};});
   }
 
   // ---------- briefing ----------
@@ -900,13 +931,13 @@ function out(o) {
       // first time: pick the work calendars (names starting with a number, Broker / Work Schedule), never the FUB ones
       return getJ('gcals').then(function(g){
         if(g.setup||g.selected)return j;
-        var sel=g.cals.filter(function(c){return GDEF.test(c.name)&&!GSKIP.test(c.name);}).map(function(c){return {id:c.id,name:c.name.trim(),color:c.color};});
+        var sel=g.cals.filter(function(c){return GDEF.test(c.name)&&!GSKIP.test(c.name);}).map(function(c){return {id:c.id,name:c.name.trim(),color:c.color,routine:/Work Schedule/i.test(c.name)};});
         return sel.length?post('settings',{gcalSel:sel}).then(gEvents):j;
       });
     }).then(function(j){var by={};j.cals.forEach(function(c){by[c.id]=c;});
       return j.events.map(function(e){var c=by[e.cal]||{},all=e.allDay;
         var st=all?fromYmd(e.start).getTime():Date.parse(e.start),en=all?fromYmd(e.end).getTime():Date.parse(e.end);
-        return {title:e.title||'(no title)',loc:e.loc||'',start:st,end:en,allDay:all,color:c.color||'#1D2870',cal:c.name||'Google'};});
+        return {title:e.title||'(no title)',loc:e.loc||'',start:st,end:en,allDay:all,color:c.color||'#1D2870',cal:c.name||'Google',routine:c.routine!=null?!!c.routine:/Work Schedule/i.test(c.name||'')};});
     }).catch(function(e){if(e!=='pin')toast('Could not read Google Calendar');return [];});
   }
   function loadCals(){
@@ -919,13 +950,19 @@ function out(o) {
     var el=$('gcS');if(!el)return;
     getJ('gcals').then(function(g){
       if(g.setup){el.innerHTML='<p class="empty">Connect Google Tasks below first; calendars use the same Google script.</p>';return;}
-      var sel=(g.selected||[]).map(function(c){return c.id;});
-      el.innerHTML='<p class="muted" style="font-size:14px;margin:0 0 4px">Tick the calendars to show. Leave the Follow Up Boss ones off (those come straight from FUB).</p>'
-        +g.cals.map(function(c){return '<label class="drv"><input class="ck" type="checkbox" value="'+esc(c.id)+'"'+(sel.indexOf(c.id)>=0?' checked':'')+'><div><span class="src" style="background:'+esc(c.color)+'"></span>'+esc(c.name)+'</div></label>';}).join('');
-      [].forEach.call(el.querySelectorAll('input'),function(x){x.onchange=function(){
-        var ids=[].map.call(el.querySelectorAll('input:checked'),function(i){return i.value;});
-        var s2=g.cals.filter(function(c){return ids.indexOf(c.id)>=0;}).map(function(c){return {id:c.id,name:c.name.trim(),color:c.color};});
-        post('settings',{gcalSel:s2}).then(function(){loadCals();}).catch(fail);};});
+      var sel={};(g.selected||[]).forEach(function(c){sel[c.id]=c;});
+      function rt(c){var s=sel[c.id];return s?(s.routine!=null?!!s.routine:/Work Schedule/i.test(c.name)):false;}
+      el.innerHTML='<p class="muted" style="font-size:14px;margin:0 0 4px">Tick the calendars to show. <b>Routine</b> calendars fold away when Routine is Off. Leave the Follow Up Boss ones off (those come straight from FUB).</p>'
+        +g.cals.map(function(c){return '<div class="drv" style="align-items:center"><input class="ck" type="checkbox" value="'+esc(c.id)+'"'+(sel[c.id]?' checked':'')+' aria-label="Show '+esc(c.name)+'"><div style="flex:1"><span class="src" style="background:'+esc(c.color)+'"></span>'+esc(c.name)+'</div>'
+          +'<button type="button" class="rt" data-r="'+esc(c.id)+'" aria-pressed="'+rt(c)+'"'+(sel[c.id]?'':' hidden')+'>Routine</button></div>';}).join('');
+      function save(){
+        var s2=g.cals.filter(function(c){return el.querySelector('input[value="'+CSS.escape(c.id)+'"]').checked;})
+          .map(function(c){return {id:c.id,name:c.name.trim(),color:c.color,routine:el.querySelector('[data-r="'+CSS.escape(c.id)+'"]').getAttribute('aria-pressed')==='true'};});
+        sel={};s2.forEach(function(c){sel[c.id]=c;});
+        post('settings',{gcalSel:s2}).then(function(){loadCals();}).catch(fail);
+      }
+      [].forEach.call(el.querySelectorAll('input'),function(x){x.onchange=function(){el.querySelector('[data-r="'+CSS.escape(x.value)+'"]').hidden=!x.checked;save();};});
+      [].forEach.call(el.querySelectorAll('[data-r]'),function(x){x.onclick=function(){x.setAttribute('aria-pressed',x.getAttribute('aria-pressed')!=='true');save();};});
     }).catch(function(){el.innerHTML='<p class="err">Could not load your calendars.</p>';});
   }
   function loadExtra(){
