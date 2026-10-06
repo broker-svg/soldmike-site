@@ -41,13 +41,13 @@ a{color:var(--navy)}
 .bar button.spin svg{animation:spin 1s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 @media (max-width:560px){.hide-sm{display:none}}
-.hero{background:linear-gradient(180deg,var(--navy) 0%,var(--navy2) 100%);color:#fff;padding:6px 16px 26px}
+.hero{background:linear-gradient(180deg,var(--navy) 0%,var(--navy2) 100%);color:#fff;padding:0 16px 14px}
 .hero .in{max-width:1440px;margin:0 auto;display:grid;grid-template-columns:1.3fr 1fr 1.2fr;gap:24px;align-items:end}
-.hero .dow{font-family:var(--display);font-weight:800;font-size:64px;line-height:.85;text-transform:uppercase;letter-spacing:.01em}
-.hero .date{font-size:22px;color:var(--pale);margin-top:6px}
-.hol{display:inline-flex;align-items:center;gap:8px;margin-top:12px;padding:5px 12px;border-radius:20px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);font-size:15px}
+.hero .dow{font-family:var(--display);font-weight:800;font-size:44px;line-height:.85;text-transform:uppercase;letter-spacing:.01em}
+.hero .date{font-size:17px;color:var(--pale);margin-top:2px}
+.hol{display:inline-flex;align-items:center;gap:8px;margin-top:6px;padding:3px 10px;border-radius:20px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);font-size:15px}
 .hol i{width:8px;height:8px;border-radius:50%;background:var(--red);flex:none}
-.clock{font-family:var(--display);font-weight:700;font-size:56px;line-height:.9;font-variant-numeric:tabular-nums}
+.clock{font-family:var(--display);font-weight:700;font-size:40px;line-height:.9;font-variant-numeric:tabular-nums}
 .clock small{font-size:24px;margin-left:4px}
 .wx{color:var(--pale);font-size:17px;margin-top:8px}
 .wx b{color:#fff}
@@ -66,18 +66,18 @@ a{color:var(--navy)}
 .wrap{max-width:1440px;margin:0 auto;padding:20px 16px 60px}
 .grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:20px;
   grid-template-areas:"today today today today today today today today out out out out" "brief brief brief brief brief brief brief brief out out out out"
-  "fol fol fol fol fol todo todo todo todo drive drive drive" "proj proj proj proj proj proj proj proj proj proj proj proj" "work work work work work work meal meal meal meal meal meal"}
+  "fol fol fol fol fol todo todo todo todo drive drive drive" "work work work work work work meal meal meal meal meal meal" "proj proj proj proj proj proj proj proj proj proj proj proj"}
 #today{grid-area:today}#outlook{grid-area:out}#brief{grid-area:brief}#follow{grid-area:fol}#todo{grid-area:todo}#drive{grid-area:drive}#projects{grid-area:proj}#workout{grid-area:work}#meals{grid-area:meal}
 @media (max-width:1180px){
-  .grid{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-areas:"today today" "out out" "brief brief" "fol todo" "drive drive" "proj proj" "work meal"}
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-areas:"today today" "out out" "brief brief" "fol todo" "drive drive" "work meal" "proj proj"}
   #outlook .days{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
   .hero .in{grid-template-columns:1fr 1fr}.hero .mon{grid-column:1/-1}
 }
 @media (max-width:780px){
-  .grid{grid-template-columns:minmax(0,1fr);grid-template-areas:"today" "out" "brief" "fol" "todo" "drive" "proj" "work" "meal"}
+  .grid{grid-template-columns:minmax(0,1fr);grid-template-areas:"today" "out" "brief" "fol" "todo" "drive" "work" "meal" "proj"}
   #outlook .days{display:flex;flex-direction:column}
   .jump{display:flex}
-  .hero .in{grid-template-columns:1fr;gap:16px}.hero .dow{font-size:52px}.clock{font-size:44px}
+  .hero .in{grid-template-columns:1fr;gap:10px}.hero .dow{font-size:38px}.clock{font-size:34px}
   .bar b{display:none}.bar{grid-template-columns:auto 1fr}
 }
 .card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:0 24px 60px -34px rgba(20,24,51,.4);min-width:0;scroll-margin-top:70px}
@@ -95,7 +95,8 @@ a{color:var(--navy)}
 .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
 .tabs button{min-height:40px;padding:0 16px;border-radius:20px;border:1px solid var(--line);background:#fff;font-weight:600;font-size:15px;cursor:pointer}
 .tabs button[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:#fff}
-.tabs.tk{gap:6px;margin-bottom:6px}.tabs.tk button{min-height:36px;padding:0 12px;font-size:14px}
+.tabs.tk{gap:6px;margin-bottom:6px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;align-items:center}.tabs.tk::-webkit-scrollbar{display:none}.tabs.tk button{min-height:34px;padding:0 10px;font-size:14px;flex:none}
+.tabs.tk .gap{flex:1;min-width:4px}.tabs.tk button.tg{border-style:dashed}.tabs.tk button.tg[aria-pressed="true"]{border-style:solid;background:var(--ink);border-color:var(--ink)}
 .tabs button .n{display:inline-block;min-width:20px;margin-left:4px;padding:0 6px;border-radius:10px;background:var(--mist);color:var(--ink);font-size:12px;line-height:18px}
 .tabs button[aria-pressed="true"] .n{background:rgba(255,255,255,.2);color:#fff}
 .src{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:4px;vertical-align:1px}
@@ -269,19 +270,17 @@ dialog::backdrop{background:rgba(20,24,51,.6)}
   <div><div class="clock" id="hClock"></div><div class="wx" id="hWx"></div></div>
   <div class="mon" id="hMon"></div>
 </div></header>
-<nav class="jump" aria-label="Jump to"><a href="#today">Today</a><a href="#outlook">Next 3 days</a><a href="#follow">Follow-ups</a><a href="#todo">To-do</a><a href="#drive">Daily Drive</a><a href="#projects">Projects</a><a href="#workout">Workout</a><a href="#meals">Meals</a></nav>
+<nav class="jump" aria-label="Jump to"><a href="#today">Today</a><a href="#outlook">Next 3 days</a><a href="#follow">Follow-ups</a><a href="#todo">FUB tasks</a><a href="#drive">Daily Drive</a><a href="#workout">Workout</a><a href="#meals">Meals</a><a href="#projects">Projects</a></nav>
 
 <main class="wrap"><div class="grid">
   <section class="card" id="today"><div class="hd"><h2>Today</h2><span class="sub" id="todaySub"></span><button type="button" class="rt" id="rtBtn" aria-pressed="false">Routine <b>Off</b></button></div>
     <div class="tcols"><div><div class="sec">Schedule</div><div id="sched"><p class="empty">Loading…</p></div></div>
-    <div><div class="sec">Tasks &amp; reminders</div><div class="tabs tk" id="tkTabs"></div><div id="tasks"><p class="empty">Loading…</p></div><div class="sec">My to-dos today</div><div id="todayTodos"></div></div></div>
+    <div><div class="sec">Tasks &amp; reminders</div><div class="tabs tk" id="tkTabs"></div><div id="tasks"><p class="empty">Loading…</p></div></div></div>
   </section>
   <section class="card" id="outlook"><div class="hd"><h2>Next 3 days</h2></div><div class="days" id="days"></div></section>
   <section class="card" id="brief"><div class="hd"><h2>Check this</h2><span class="sub" id="briefSub"></span></div><div id="briefBody"></div></section>
   <section class="card" id="follow"><div class="hd"><h2>Follow-ups</h2><span class="sub">Longest since contact first</span></div><div class="tabs" id="listTabs"></div><div id="people"><p class="empty">Loading…</p></div></section>
-  <section class="card" id="todo"><div class="hd"><h2>To-do</h2><span class="sub" id="todoSub"></span></div>
-    <form class="add" id="addTodo"><input type="text" id="tdText" placeholder="Add a to-do…" autocomplete="off" aria-label="New to-do"><input type="date" id="tdDate" aria-label="Due date"><button class="btn navy" type="submit">Add</button></form>
-    <div id="todoList"></div></section>
+  <section class="card" id="todo"><div class="hd"><h2>Follow Up Boss tasks</h2><span class="sub" id="todoSub"></span></div><div class="tabs tk" id="fbTabs"></div><div id="todoList"></div></section>
   <section class="card" id="drive"><div class="hd"><h2>Daily Drive</h2></div><div id="driveBody"></div></section>
   <section class="card" id="projects"><div class="hd"><h2>Projects</h2><span class="sub" id="projSub"></span><button class="btn sm navy" type="button" id="newProj">+ New project</button></div><div class="tabs" id="projTabs"></div><div class="pgrid" id="projGrid"></div></section>
   <section class="card" id="workout"><div class="hd"><h2>Workout</h2><span class="sub" id="gymSub"></span></div><div id="workBody"></div></section>
@@ -500,7 +499,7 @@ dialog::backdrop{background:rgba(20,24,51,.6)}
   function fail(e){if(e==='pin')return askPin().then(load);toast(typeof e==='string'?e:'Could not save. Check the connection.');}
 
   // ---------- state ----------
-  var S={today:'',days:[],data:null,cal:[],wx:null,lists:SM.store('hq_lists')||{},list:SM.store('hq_list')||0,projTab:SM.store('hq_ptab')||'all',projects:[],loadedAt:0,gt:null,rem:null,tkTab:SM.store('hq_tktab')||'all',tkAll:false,routine:SM.store('hq_routine')===true,evs:[],evo:[]};
+  var S={today:'',days:[],data:null,cal:[],wx:null,lists:SM.store('hq_lists')||{},list:SM.store('hq_list')||0,projTab:SM.store('hq_ptab')||'all',projects:[],loadedAt:0,gt:null,rem:null,tkTab:SM.store('hq_tktab')||'all',tkAll:false,routine:SM.store('hq_routine')===true,evs:[],evo:[],fT:SM.store('hq_ft')!==false,fO:SM.store('hq_fo')===true,bT:SM.store('hq_bt')!==false,bO:SM.store('hq_bo')!==false,fbAll:false};
   function log(k,v){S.data.logs[k]=v;return post('log',{day:S.today,k:k,v:v}).catch(fail);}
 
   // ---------- header ----------
@@ -588,14 +587,14 @@ dialog::backdrop{background:rgba(20,24,51,.6)}
     [].forEach.call($('sched').querySelectorAll('[data-ev] .ti'),function(x){x.onclick=function(ev){if(ev.target.closest('a'))return;eventInfo(S.evs[+x.parentNode.dataset.ev]);};});
 
     var nTask=taskPanel();
-    var mine=S.data.todos.filter(function(t){return !t.done&&t.due&&t.due<=S.today;});
-    $('todayTodos').innerHTML=mine.length?mine.map(todoRow).join(''):'<p class="empty">Nothing due. Add one in To-do.</p>';
-    bindTodos($('todayTodos'));
     var nAppt=timed.length;
-    $('todaySub').textContent=nAppt+' on the calendar · '+nTask+' due today or overdue';
+    $('todaySub').textContent=nAppt+' on the calendar · '+nTask+' task'+(nTask===1?'':'s')+' due today';
   }
   // ---------- tasks & reminders (FUB, Google Tasks, Reminders) ----------
-  var SRC={fub:['Follow Up Boss','#D7141E'],g:['Google Tasks','#1A73E8'],rem:['Reminders','#F29900']};
+  var SRC={fub:['Follow Up Boss','#D7141E'],g:['Google Tasks','#1A73E8'],rem:['Reminders','#F29900'],mine:['My to-do','#1B7A3E']};
+  // Today on: due today (+ overdue if Overdue on). Today off: everything (overdue only if Overdue on).
+  function pick(L,tOn,oOn){return L.filter(function(x){return tOn?(x.day===S.today||(oOn&&x.late)):(oOn||!x.late);});}
+  function toggles(tOn,oOn,lateN,ids){return '<span class="gap"></span><button type="button" class="tg" data-t="'+ids[0]+'" aria-pressed="'+tOn+'">Today</button><button type="button" class="tg" data-t="'+ids[1]+'" aria-pressed="'+oOn+'">Overdue<span class="n">'+lateN+'</span></button>';}
   function hasTime(iso){if(!iso||/^\d{4}-\d{2}-\d{2}$/.test(iso))return false;var d=new Date(iso);return d.getHours()+d.getMinutes()>0;}
   function allTasks(){
     var f=S.data.fub||{},L=[],seen={};
@@ -603,15 +602,19 @@ dialog::backdrop{background:rgba(20,24,51,.6)}
       L.push({src:'fub',id:t.id,title:t.name||t.type,who:t.who,type:t.type&&t.type!==t.name?t.type:'',day:dayKeyOf(t.due),time:hasTime(t.due)?Date.parse(t.due):null,person:t.person});});
     ((S.gt&&S.gt.items)||[]).forEach(function(t){L.push({src:'g',id:t.id,list:t.list,title:t.title,who:t.listName,day:t.due?t.due.slice(0,10):'',time:null});});
     ((S.rem&&S.rem.items)||[]).forEach(function(t){L.push({src:'rem',id:t.id,title:t.title,who:t.list,day:t.due?dayKeyOf(t.due):'',time:hasTime(t.due)?Date.parse(t.due):null,flag:t.flag});});
+    (S.data.todos||[]).filter(function(t){return !t.done;}).forEach(function(t){L.push({src:'mine',id:t.id,title:t.title,day:t.due||'',time:null});});
     L.forEach(function(x){x.late=x.day&&x.day<S.today;});
     L.sort(function(a,b){return (!a.day-!b.day)||String(a.day).localeCompare(String(b.day))||((a.time||0)-(b.time||0));});
     return L;
   }
   function taskPanel(){
-    var L=allTasks(),due=L.filter(function(x){return x.day&&x.day<=S.today;});
-    var tabs=[['all','All',due],['fub','FUB',L.filter(function(x){return x.src==='fub';})],['g','Google',L.filter(function(x){return x.src==='g';})],['rem','Reminders',L.filter(function(x){return x.src==='rem';})]];
-    $('tkTabs').innerHTML=tabs.map(function(x){return '<button type="button" data-k="'+x[0]+'" aria-pressed="'+(S.tkTab===x[0])+'">'+x[1]+'<span class="n">'+x[2].length+'</span></button>';}).join('');
-    [].forEach.call($('tkTabs').querySelectorAll('button'),function(b){b.onclick=function(){S.tkTab=b.dataset.k;S.tkAll=false;SM.store('hq_tktab',S.tkTab);taskPanel();};});
+    var L0=allTasks(),L=pick(L0,S.fT,S.fO),lateN=L0.filter(function(x){return x.late;}).length;
+    var src=function(k){return L.filter(function(x){return x.src===k;});};
+    var tabs=[['all','All',L],['fub','FUB',src('fub')],['g','Google',src('g')],['rem','Reminders',src('rem')]];
+    if(L0.some(function(x){return x.src==='mine';}))tabs.push(['mine','Mine',src('mine')]);
+    $('tkTabs').innerHTML=tabs.map(function(x){return '<button type="button" data-k="'+x[0]+'" aria-pressed="'+(S.tkTab===x[0])+'">'+x[1]+'<span class="n">'+x[2].length+'</span></button>';}).join('')+toggles(S.fT,S.fO,lateN,['fT','fO']);
+    [].forEach.call($('tkTabs').querySelectorAll('[data-k]'),function(b){b.onclick=function(){S.tkTab=b.dataset.k;S.tkAll=false;SM.store('hq_tktab',S.tkTab);taskPanel();};});
+    [].forEach.call($('tkTabs').querySelectorAll('[data-t]'),function(b){b.onclick=function(){var k=b.dataset.t;S[k]=!S[k];SM.store('hq_'+k.toLowerCase(),S[k]);S.tkAll=false;taskPanel();};});
     var cur=tabs.filter(function(x){return x[0]===S.tkTab;})[0]||tabs[0],items=cur[2],h='';
     if(S.tkTab==='g'&&S.gt&&S.gt.setup)h='<p class="empty">Google Tasks isn\'t connected yet. Open <b>Settings → Google Tasks</b>.</p>';
     else if(S.tkTab==='g'&&S.gt&&S.gt.error)h='<p class="err" style="font-size:15px">'+esc(S.gt.error)+'</p>';
@@ -619,7 +622,7 @@ dialog::backdrop{background:rgba(20,24,51,.6)}
     else{
       if(S.tkTab==='rem'&&S.rem&&S.rem.at)h+='<p class="muted" style="font-size:13px;margin:0 0 4px">Updated from your iPhone '+(ymd(new Date(S.rem.at))===S.today?'at ':'on '+DOWS[new Date(S.rem.at).getDay()].slice(0,3)+' ')+tm(S.rem.at)+'</p>';
       var shown=S.tkAll?items:items.slice(0,10);
-      h+=shown.length?shown.map(taskRow).join(''):'<p class="empty">'+(S.tkTab==='all'?'Nothing due today or overdue. Nice.':'Nothing open here.')+'</p>';
+      h+=shown.length?shown.map(taskRow).join(''):'<p class="empty">'+(S.fT?'Nothing due today'+(S.fO?' or overdue':'')+'. Nice.':'Nothing open here.')+'</p>';
       if(items.length>shown.length)h+='<button type="button" class="more" id="tkMore">Show all '+items.length+'</button>';
       else if(S.tkAll&&items.length>10)h+='<button type="button" class="more" id="tkLess">Show 10</button>';
     }
@@ -627,7 +630,20 @@ dialog::backdrop{background:rgba(20,24,51,.6)}
     if($('tkMore'))$('tkMore').onclick=function(){S.tkAll=true;taskPanel();};
     if($('tkLess'))$('tkLess').onclick=function(){S.tkAll=false;taskPanel();};
     bindTasks($('tasks'),items);
-    return due.length;
+    return L0.filter(function(x){return x.day===S.today;}).length;
+  }
+  // bottom card: Follow Up Boss tasks only, same Today / Overdue switches
+  function fubPanel(){
+    var L0=allTasks().filter(function(x){return x.src==='fub';}),items=pick(L0,S.bT,S.bO),lateN=L0.filter(function(x){return x.late;}).length;
+    $('fbTabs').innerHTML='<span class="muted" style="font-size:14px;flex:none">'+items.length+' shown · '+L0.length+' open</span>'+toggles(S.bT,S.bO,lateN,['bT','bO']);
+    [].forEach.call($('fbTabs').querySelectorAll('[data-t]'),function(b){b.onclick=function(){var k=b.dataset.t;S[k]=!S[k];SM.store('hq_'+k.toLowerCase(),S[k]);S.fbAll=false;fubPanel();};});
+    var shown=S.fbAll?items:items.slice(0,12),f=S.data.fub||{};
+    var h=f.error?'<p class="err" style="font-size:15px">Follow Up Boss: '+esc(f.error)+'</p>':shown.length?shown.map(taskRow).join(''):'<p class="empty">No Follow Up Boss tasks '+(S.bT?'due today':'here')+'.</p>';
+    if(items.length>shown.length)h+='<button type="button" class="more" id="fbMore">Show all '+items.length+'</button>';
+    $('todoList').innerHTML=h;
+    if($('fbMore'))$('fbMore').onclick=function(){S.fbAll=true;fubPanel();};
+    bindTasks($('todoList'),items);
+    $('todoSub').textContent=lateN?lateN+' overdue':'';
   }
   function taskRow(t){
     var d=t.day?fromYmd(t.day):null,when='';
@@ -640,14 +656,15 @@ dialog::backdrop{background:rgba(20,24,51,.6)}
   function bindTasks(el,items){[].forEach.call(el.querySelectorAll('[data-src] .ck'),function(c){c.onchange=function(){
     var row=c.closest('.task'),src=row.dataset.src,id=row.dataset.id,t=items.filter(function(x){return x.src===src&&String(x.id)===id;})[0];if(!t)return;
     row.classList.toggle('done',c.checked);
-    var call=src==='fub'?post('task',{id:+id,done:c.checked}):src==='g'?post('gtask',{list:t.list,id:id,done:c.checked}):post('reminder',{id:id,title:t.title,done:c.checked});
+    var call=src==='fub'?post('task',{id:+id,done:c.checked}):src==='g'?post('gtask',{list:t.list,id:id,done:c.checked}):src==='mine'?post('item/done',{id:+id,done:c.checked}):post('reminder',{id:id,title:t.title,done:c.checked});
     call.then(function(){
-      toast(src==='rem'?'Done. Your iPhone ticks it off at its next sync.':src==='g'?'Done in Google Tasks':'Done in Follow Up Boss');
+      toast(src==='rem'?'Done. Your iPhone ticks it off at its next sync.':src==='g'?'Done in Google Tasks':src==='mine'?'Done':'Done in Follow Up Boss');
       if(!c.checked)return;
       if(src==='fub')['tasks','overdue'].forEach(function(k){S.data.fub[k]=(S.data.fub[k]||[]).filter(function(x){return String(x.id)!==id;});});
       if(src==='g')S.gt.items=S.gt.items.filter(function(x){return x.id!==id;});
       if(src==='rem')S.rem.items=S.rem.items.filter(function(x){return x.id!==id;});
-      setTimeout(function(){today();outlook();},900);
+      if(src==='mine')S.data.todos=S.data.todos.filter(function(x){return String(x.id)!==id;});
+      setTimeout(function(){today();outlook();fubPanel();},900);
     }).catch(function(e){c.checked=!c.checked;row.classList.toggle('done',c.checked);fail(e);});};});}
 
   // ---------- next 3 days ----------
@@ -701,31 +718,8 @@ dialog::backdrop{background:rgba(20,24,51,.6)}
     }).catch(function(e){if(e==='pin')return fail(e);el.innerHTML='<p class="err" style="font-size:15px">Could not load this Smart List ('+esc(e)+').</p>';});
   }
 
-  // ---------- to-do ----------
-  function todoRow(t){
-    var late=t.due&&t.due<S.today&&!t.done,d=t.due?fromYmd(t.due):null;
-    var when=!t.due?'':t.due===S.today?'Today':t.due===S.days[1]?'Tomorrow':DOWS[d.getDay()].slice(0,3)+' '+MONS[d.getMonth()].slice(0,3)+' '+d.getDate();
-    return '<div class="task'+(t.done?' done':'')+'" data-todo="'+t.id+'"><input class="ck" type="checkbox"'+(t.done?' checked':'')+' aria-label="Done"><div class="nm">'+esc(t.title)+(when?'<small'+(late?' style="color:var(--red);font-weight:600"':'')+'>'+(late?'Overdue · ':'')+esc(when)+'</small>':'')+'</div><button class="x" type="button" aria-label="Delete">×</button></div>';
-  }
-  function bindTodos(el){
-    [].forEach.call(el.querySelectorAll('[data-todo]'),function(row){
-      var id=+row.dataset.todo,t=S.data.todos.filter(function(x){return x.id===id;})[0];
-      row.querySelector('.ck').onchange=function(){t.done=this.checked?1:0;post('item/done',{id:id,done:t.done}).catch(fail);setTimeout(renderTodos,250);};
-      row.querySelector('.x').onclick=function(){if(!confirm('Delete "'+t.title+'"?'))return;S.data.todos=S.data.todos.filter(function(x){return x.id!==id;});post('item/delete',{id:id}).catch(fail);renderTodos();};
-    });
-  }
-  function renderTodos(){
-    var T=S.data.todos,open=T.filter(function(t){return !t.done;}),done=T.filter(function(t){return t.done;});
-    var groups=[['Overdue',open.filter(function(t){return t.due&&t.due<S.today;})],['Today',open.filter(function(t){return t.due===S.today;})],
-      ['Coming up',open.filter(function(t){return t.due&&t.due>S.today;})],['Anytime',open.filter(function(t){return !t.due;})],['Done today',done]];
-    var h=groups.filter(function(g){return g[1].length;}).map(function(g){return '<div class="sec">'+g[0]+'</div>'+g[1].map(todoRow).join('');}).join('');
-    $('todoList').innerHTML=h||'<p class="empty">All clear. Add what\'s on your mind.</p>';
-    $('todoSub').textContent=open.length+' open';
-    bindTodos($('todoList'));
-    today();outlook();
-  }
-  $('addTodo').onsubmit=function(e){e.preventDefault();var title=$('tdText').value.trim();if(!title)return;var due=$('tdDate').value||null;
-    post('item',{kind:'todo',title:title,due:due}).then(function(j){S.data.todos.push({id:j.id,kind:'todo',title:title,due:due,done:0});$('tdText').value='';renderTodos();}).catch(fail);};
+  // ---------- Follow Up Boss tasks card ----------
+  function renderTodos(){fubPanel();today();outlook();}
 
   // ---------- Daily Drive ----------
   function drive(){
@@ -968,11 +962,10 @@ function out(o) {
   function loadExtra(){
     getJ('gtasks').then(function(j){S.gt=j;}).catch(function(e){if(e==='pin')return;S.gt={error:'Google Tasks: '+e};})
       .then(function(){return getJ('reminders');}).then(function(j){if(j)S.rem=j;}).catch(function(){})
-      .then(function(){if(S.data){today();outlook();}});
+      .then(function(){if(S.data){today();outlook();fubPanel();}});
   }
   function load(){
     var now=new Date();S.today=ymd(now);S.days=[0,1,2,3].map(function(i){return ymd(addDays(now,i));});
-    if(!$('tdDate').value)$('tdDate').value=S.today;
     header();
     var from=fromYmd(S.today).toISOString(),to=addDays(fromYmd(S.today),4).toISOString();
     $('refresh').classList.add('spin');
