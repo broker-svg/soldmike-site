@@ -2,7 +2,7 @@
 """Builds every inner page of soldmike.com from the PAGES data below.
 Run: python3 build.py   (writes <slug>/index.html, sitemap.xml, CONTENT-TODO.md)
 Anything in todo() is content still to write; CONTENT-TODO.md lists them all."""
-import json, os, html
+import json, os, html, re
 from datetime import date
 
 SITE = 'https://soldmike.com'
@@ -185,16 +185,31 @@ LEAFLET_HEAD = '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/l
 LEAFLET_JS = '<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" defer></script>'
 LISTING_JS = '<script src="/assets/listings.js?v=5" defer></script><script src="/assets/account.js?v=5" defer></script>'
 
+# ---------- social share cards (tools/og.py renders og/<slug>.jpg from og/cards.json) ----------
+OG_CARDS = []
+OG_PHOTOS = ['/media/gentle-fox/twilight-street.jpg', '/media/gentle-fox/backyard-twilight.jpg', '/media/gentle-fox/drone-front.jpg', '/media/gentle-fox/kitchen.jpg', '/media/gentle-fox/pool.jpg', '/aerial.jpg']
+OG_SPECIAL = {'/free-guide/': {'layout': 'guides', 'kicker': 'Free download', 'headline': 'The step-by-step guides to buying and selling in Vaughan'}}
+def og_card(path, title, trail, body):
+    """Each page gets its own 1200x630 preview card: page headline over the page's own photo."""
+    slug = path.strip('/').replace('/', '-') or 'home'
+    m = re.search(r"background-image:url\(([^)]+\.jpe?g)\)|<img[^>]+src=\"(/[^\"]+\.jpe?g)\"", body)
+    photo = (m.group(1) or m.group(2)) if m else OG_PHOTOS[sum(map(ord, path)) % len(OG_PHOTOS)]
+    card = {'slug': slug, 'path': path, 'headline': title.split(' | ')[0], 'kicker': trail[1][0] if len(trail) > 2 else (trail[-1][0] if len(trail) > 1 else 'SoldMike'), 'photo': photo, 'layout': 'photo'}
+    card.update(OG_SPECIAL.get(path, {}))
+    OG_CARDS.append(card)
+    return '%s/og/%s.jpg' % (SITE, slug)
+
 def page(path, title, desc, trail, body, schema=None, noindex=False, head='', js=''):
     global PAGE
     sch = [agent_schema(), crumbs_schema(trail)] + (schema or [])
     doc = ('<!doctype html><html lang="en-CA"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">'
            '<title>%s</title><meta name="description" content="%s"><link rel="canonical" href="%s%s">'
-           '<meta property="og:type" content="website"><meta property="og:title" content="%s"><meta property="og:description" content="%s"><meta property="og:url" content="%s%s"><meta property="og:image" content="%s/hero.jpg">'
+           '<meta property="og:type" content="website"><meta property="og:title" content="%s"><meta property="og:description" content="%s"><meta property="og:url" content="%s%s"><meta property="og:image" content="%s">'
+           '<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image">'
            '%s<link rel="icon" href="/logo.png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
            '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Barlow:wght@400;500;600&display=swap">'
            '<link rel="stylesheet" href="/assets/site.css?v=8">%s%s</head><body>%s<main id="main">%s</main>%s<script src="/assets/site.js?v=9" defer></script>%s<script src="/assets/chat.js?v=7" defer></script></body></html>'
-           ) % (e(title), e(desc), SITE, path, e(title), e(desc), SITE, path, SITE,
+           ) % (e(title), e(desc), SITE, path, e(title), e(desc), SITE, path, og_card(path, title, trail, body),
                 '<meta name="robots" content="noindex">' if noindex else '',
                 ''.join('<script type="application/ld+json">%s</script>' % json.dumps(s, ensure_ascii=False) for s in sch), head,
                 header(path), body, footer(), js)
@@ -866,4 +881,7 @@ with open('CONTENT-TODO.md', 'w') as f:
         seen.setdefault(p, []).extend(items)
     for p, items in seen.items():
         f.write('## %s%s\n' % (SITE, p) + ''.join('- [ ] %s\n' % i for i in items) + '\n')
+os.makedirs('og', exist_ok=True)
+OG_CARDS.append({'slug': 'home', 'path': '/', 'headline': 'Selling or buying in Vaughan? Start here', 'kicker': 'Michael Barillari, Broker', 'photo': '/media/gentle-fox/twilight-street.jpg', 'layout': 'photo'})  # index.html is hand-written; its og:image points at og/home.jpg
+json.dump(OG_CARDS, open('og/cards.json', 'w'), indent=1)
 print('pages:', len(SITEMAP), 'todo items:', sum(len(i) for _, i in TODOS))

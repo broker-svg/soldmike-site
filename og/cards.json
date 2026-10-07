@@ -1,0 +1,346 @@
+[
+ {
+  "slug": "listings",
+  "path": "/listings/",
+  "headline": "Homes for Sale in Vaughan, Woodbridge & the GTA",
+  "kicker": "Search homes",
+  "photo": "/aerial.jpg",
+  "layout": "photo"
+ },
+ {
+  "slug": "listings-our-listings",
+  "path": "/listings/our-listings/",
+  "headline": "Our Listings",
+  "kicker": "Search homes",
+  "photo": "/media/gentle-fox/drone-front.jpg",
+  "layout": "photo"
+ },
+ {
+  "slug": "listings-re-max-premier",
+  "path": "/listings/re-max-premier/",
+  "headline": "RE/MAX Premier Listings in Vaughan & the GTA",
+  "kicker": "Search homes",
+  "photo": "/aerial.jpg",
+  "layout": "photo"
+ },
+ {
+  "slug": "listings-home",
+  "path": "/listings/home/",
+  "headline": "Home for sale",
+  "kicker": "Search homes",
+  "photo": "/media/gentle-fox/kitchen.jpg",
+  "layout": "photo"
+ },
+ {
+  "slug": "saved",
+  "path": "/saved/",
+  "headline": "Saved Homes & Searches",
+  "kicker": "Saved homes",
+  "photo": "/media/gentle-fox/backyard-twilight.jpg",
+  "layout": "photo"
+ },
+ {
+  "slug": "buy",
+  "path": "/buy/",
+  "headline": "Buying a Home in Vaughan & Woodbridge",
+  "kicker": "Buy",
+  "photo": "/l1.jpg",
+  "layout": "photo"
+ },
+ {
+  "slug": "buy-buyer-guide",
+  "path": "/buy/buyer-guide/",
+  "headline": "How to Buy a Home in Ontario: 15 Steps",
+  "kicker": "Buy",
+  "photo": "/media/gentle-fox/kitchen.jpg",
+  "layout": "photo"
+ },
+ {
+  "slug": "buy-pre-construction",
+  "path": "/buy/pre-construction/",
+  "headline": "Pre-Construction Homes in Vaughan & York Region",
+  "kicker": "Buy",
+  "photo": "/media/gentle-fox/twilight-street.jpg",
+  "layout": "photo"
+ },
+ {
+  "slug": "sell",
+  "path": "/sell/",
+  "headline": "Sell Your Home in Vaughan & Woodbridge",
+  "kicker": "Sell",
+  "photo": "/lp/1.jpg",
+  "layout": "photo"
+ },
+ {
+  "slug": "sell-home-value",
+  "path": "/sell/home-value/",
+  "headline": "What's My Home Worth? Free Home Value in Vaughan",
+  "kicker": "Sell",
+  "photo": "/media/gentle-fox/twilight-street.jpg",
+  "layout": "photo"
+ },
+ {
+  "slug": "sell-seller-guide",
+  "path": "/sell/seller-guide/",
+  "headline": "How to Sell a Home in Ontario: 15 Steps",
+  "kicker": "Sell",
+  "photo": "/media/gentle-fox/kitchen.jpg",
+  "layout": "photo"
+ },
+ {
+  "slug": "sell-cost-to-sell-vaughan",
+  "path": "/sell/cost-to-sell-vaughan/",
+  "headline": "Cost to Sell a House in Vaughan, Ontario (Calculator)",
+  "kicker": "Sell",
+  "photo": "/media/gentle-fox/pool.jpg",
+  "layout": "photo"
+ },
+ {
+  "slug": "sell-how-we-market",
+  "path": "/sell/how-we-market/",
+  "headline": "How We Market Your Home: Photos, Drone & Video",
+  "kicker": "Sell",
+  "photo": "/media/gentle-fox/backyard-twilight.jpg",
+  "layout": "photo"
+ },
+ {
+  "slug": "neighbourhoods",
+  "path": "/neighbourhoods/",
+  "headline": "Vaughan & GTA Neighbourhood Guides",
+  "kicker": "Neighbourhoods",
+  "photo": "/aerial.jpg",
+  "layout": "photo"
+ },
+ {
+  "slug": "neighbourhoods-woodbridge",
+  "path": "/neighbourhoods/woodbridge/",
+  "headline": "Woodbridge Homes for Sale & Area Guide",
+  "kicker": "Neighbourhoods",
+  "photo": "/hero.jpg",
+  "layout": "photo"
+ },
+ {
+  "slug": "neighbourhoods-vellore",
+  "path": "/neighbourhoods/vellore/",
+  "headline": "Vellore Village Homes for Sale & Area Guide",
+  "kicker": "Neighbourhoods",
+  "photo": "/l1.jpg",
+  "layout": "photo"
+ },
+ {
+  "slug": "neighbourhoods-kleinburg",
+  "path": "/neighbourhoods/kleinburg/",
+  "headline": "Kleinburg Homes for Sale & Area Guide",
+  "kicker": "Neighbourhoods",
+  "photo": "/media/gentle-fox/pool.jpg",
+  "layout": "photo"
+ },
+ {
+  "slug": "neighbourhoods-maple",
+  "path": "/neighbourhoods/maple/",
+  "headline": "Maple Homes for Sale & Area Guide",
+  "kicker": "Neighbourhoods",
+  "photo": "/media/gentle-fox/twilight-street.jpg",
+  "layout": "photo"
+ },
+ {
+  "slug": "neighbourhoods-caledon-bolton",
+  "path": "/neighbourhoods/caledon-bolton/",
+  "headline": "Caledon & Bolton Homes for Sale & Area Guide",
+  "kicker": "Neighbourhoods",
+  "photo": "/media/gentle-fox/pool.jpg",
+  "layout": "photo"
+ },
+ {
+  "slug": "neighbourhoods-king-city-nobleton",
+  "path": "/neighbourhoods/king-city-nobleton/",
+  "headline": "King City & Nobleton Homes for Sale & Area Guide",
+  "kicker": "Neighbourhoods",
+  "photo": "/lp/2.jpg",
+  "layout": "photo"
+ },
+ {
+  "slug": "neighbourhoods-sharon-east-gwillimbury",
+  "path": "/neighbourhoods/sharon-east-gwillimbury/",
+  "headline": "Sharon & East Gwillimbury Homes for Sale & Area Guide",
+  "kicker": "Neighbourhoods",
+  "photo": "/media/gentle-fox/drone-front.jpg",
+  "layout": "photo"
+ },
+ {
+  "slug": "neighbourhoods-toronto",
+  "path": "/neighbourhoods/toronto/",
+  "headline": "Toronto Homes for Sale & Area Guide",
+  "kicker": "Neighbourhoods",
+  "photo": "/media/gentle-fox/pool.jpg",
+  "layout": "photo"
+ },
+ {
+  "slug": "results",
+  "path": "/results/",
+  "headline": "Recent Home Sales in Vaughan & Woodbridge",
+  "kicker": "Case studies",
+  "photo": "/media/gentle-fox/pool.jpg",
+  "layout": "photo"
+ },
+ {
+  "slug": "results-226-via-borghese",
+  "path": "/results/226-via-borghese/",
+  "headline": "How We Sold 226 Via Borghese St",
+  "kicker": "Results",
+  "photo": "/media/gentle-fox/pool.jpg",
+  "layout": "photo"
+ },
+ {
+  "slug": "results-49-walter-proctor",
+  "path": "/results/49-walter-proctor/",
+  "headline": "How We Sold 49 Walter Proctor Rd",
+  "kicker": "Results",
+  "photo": "/media/gentle-fox/drone-front.jpg",
+  "layout": "photo"
+ },
+ {
+  "slug": "results-2-la-maria-lane",
+  "path": "/results/2-la-maria-lane/",
+  "headline": "How We Sold 2 La Maria Lane",
+  "kicker": "Results",
+  "photo": "/aerial.jpg",
+  "layout": "photo"
+ },
+ {
+  "slug": "reviews",
+  "path": "/reviews/",
+  "headline": "Client Reviews",
+  "kicker": "Reviews",
+  "photo": "/media/gentle-fox/kitchen.jpg",
+  "layout": "photo"
+ },
+ {
+  "slug": "market-reports",
+  "path": "/market-reports/",
+  "headline": "Vaughan Real Estate Market Reports",
+  "kicker": "Market reports",
+  "photo": "/media/gentle-fox/twilight-street.jpg",
+  "layout": "photo"
+ },
+ {
+  "slug": "market-reports-vaughan-october-2026",
+  "path": "/market-reports/vaughan-october-2026/",
+  "headline": "Vaughan Real Estate Market Report, October 2026",
+  "kicker": "Market reports",
+  "photo": "/aerial.jpg",
+  "layout": "photo"
+ },
+ {
+  "slug": "questions",
+  "path": "/questions/",
+  "headline": "Real Estate Questions Answered",
+  "kicker": "Questions",
+  "photo": "/aerial.jpg",
+  "layout": "photo"
+ },
+ {
+  "slug": "questions-buying",
+  "path": "/questions/buying/",
+  "headline": "Buyer Questions: Real Estate in Vaughan & Ontario",
+  "kicker": "Questions",
+  "photo": "/media/gentle-fox/pool.jpg",
+  "layout": "photo"
+ },
+ {
+  "slug": "questions-selling",
+  "path": "/questions/selling/",
+  "headline": "Seller Questions: Real Estate in Vaughan & Ontario",
+  "kicker": "Questions",
+  "photo": "/media/gentle-fox/pool.jpg",
+  "layout": "photo"
+ },
+ {
+  "slug": "about",
+  "path": "/about/",
+  "headline": "Michael Barillari, Broker",
+  "kicker": "About",
+  "photo": "/media/gentle-fox/kitchen.jpg",
+  "layout": "photo"
+ },
+ {
+  "slug": "about-the-op-team",
+  "path": "/about/the-op-team/",
+  "headline": "The OP Team",
+  "kicker": "About",
+  "photo": "/media/gentle-fox/kitchen.jpg",
+  "layout": "photo"
+ },
+ {
+  "slug": "videos",
+  "path": "/videos/",
+  "headline": "Real Estate Videos: Vaughan Market Updates & Tours",
+  "kicker": "Videos",
+  "photo": "/hero.jpg",
+  "layout": "photo"
+ },
+ {
+  "slug": "join",
+  "path": "/join/",
+  "headline": "Join The OP Team",
+  "kicker": "Join the team",
+  "photo": "/media/gentle-fox/pool.jpg",
+  "layout": "photo"
+ },
+ {
+  "slug": "contact",
+  "path": "/contact/",
+  "headline": "Contact Michael Barillari",
+  "kicker": "Contact",
+  "photo": "/media/gentle-fox/drone-front.jpg",
+  "layout": "photo"
+ },
+ {
+  "slug": "free-guide",
+  "path": "/free-guide/",
+  "headline": "The step-by-step guides to buying and selling in Vaughan",
+  "kicker": "Free download",
+  "photo": "/media/gentle-fox/kitchen.jpg",
+  "layout": "guides"
+ },
+ {
+  "slug": "privacy",
+  "path": "/privacy/",
+  "headline": "Privacy Policy",
+  "kicker": "Privacy",
+  "photo": "/media/gentle-fox/drone-front.jpg",
+  "layout": "photo"
+ },
+ {
+  "slug": "terms",
+  "path": "/terms/",
+  "headline": "Terms of Use",
+  "kicker": "Terms",
+  "photo": "/media/gentle-fox/backyard-twilight.jpg",
+  "layout": "photo"
+ },
+ {
+  "slug": "alerts",
+  "path": "/alerts/",
+  "headline": "Your New Listings",
+  "kicker": "Your new listings",
+  "photo": "/media/gentle-fox/backyard-twilight.jpg",
+  "layout": "photo"
+ },
+ {
+  "slug": "sell-pre-listing",
+  "path": "/sell/pre-listing/",
+  "headline": "Pre-Listing Package: How We Sell Your Home",
+  "kicker": "Sell",
+  "photo": "/media/gentle-fox/twilight-street.jpg",
+  "layout": "photo"
+ },
+ {
+  "slug": "home",
+  "path": "/",
+  "headline": "Selling or buying in Vaughan? Start here",
+  "kicker": "Michael Barillari, Broker",
+  "photo": "/media/gentle-fox/twilight-street.jpg",
+  "layout": "photo"
+ }
+]
