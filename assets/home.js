@@ -21,6 +21,8 @@
   }).catch(function(){root.innerHTML='<div class="wrap" style="padding-block:80px"><h1>We could not load this home</h1><p>Please refresh, or <a href="/listings/">search all homes</a>.</p></div>';});
 
   function gone(){
+    // off-market/missing listing: tell Google not to index it (otherwise it's a Soft 404)
+    var rb=document.createElement('meta');rb.name='robots';rb.content='noindex';document.head.appendChild(rb);
     document.title='This home is no longer available | SoldMike';
     root.innerHTML='<div class="wrap" style="padding-block:80px;display:flex;flex-direction:column;gap:18px;align-items:flex-start"><h1>This home is no longer on the market</h1><p style="font-size:19px;color:var(--muted);max-width:56ch">It may have sold or been taken off the MLS®. Michael can tell you what it sold for and show you similar homes.</p><div style="display:flex;gap:10px;flex-wrap:wrap"><a class="btn" href="/listings/">Search homes for sale</a><a class="btn ghost" href="/contact/">Ask Michael</a></div></div>';
   }

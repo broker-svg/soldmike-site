@@ -272,7 +272,7 @@ P('/listings/home/',
   '<div class="ld" id="ld" data-listings><p class="ld-loading">Loading this home…</p></div>',
   title='Home for sale | SoldMike', desc='MLS® listing details, photos and showings with Michael Barillari, Broker.',
   trail=[('Search homes', '/listings/'), ('Listing', '/listings/home/')],
-  head=LISTING_HEAD + LEAFLET_HEAD, js=LISTING_JS + LEAFLET_JS + '<script src="/assets/home.js?v=9" defer></script>', noindex=True)  # shell for /listings/home/?id= and the Worker's /homes/ pages (the Worker strips this noindex)
+  head=LISTING_HEAD + LEAFLET_HEAD, js=LISTING_JS + LEAFLET_JS + '<script src="/assets/home.js?v=10" defer></script>', noindex=True)  # shell for /listings/home/?id= and the Worker's /homes/ pages (the Worker strips this noindex)
 
 SAVED_JS = """<script>
 document.addEventListener('DOMContentLoaded',function(){
