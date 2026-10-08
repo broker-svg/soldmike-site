@@ -355,7 +355,7 @@ window.addEventListener('hashchange',function(){var h=location.hash.slice(1);if(
 function load(force){
   var jobs=[];
   if(S.tab==='sellers'||S.tab==='buyers'){var k=S.tab==='sellers'?'s':'b';
-    if(force||!S.board[k])jobs.push(getJ('desk/board?kind='+k).then(function(j){S.board[k]=j;S.tagSync=j.tagSync;S.fubApp=j.fubApp||S.fubApp;}));
+    if(force||!S.board[k])jobs.push(getJ('desk/board?kind='+k+(force?'&pull=1':'')).then(function(j){S.board[k]=j;S.tagSync=j.tagSync;S.fubApp=j.fubApp||S.fubApp;if(j.pulled)toast(j.pulled+' added from your FUB tags');}));
     if(force||!S.inbox)jobs.push(loadInbox());}
   if(S.tab==='marketing'&&(force||!S.content))jobs.push(getJ('desk/content').then(function(j){S.content=j.items;}));
   if(S.tab==='toolkit'&&(force||!S.todos))jobs.push(loadTodos());
@@ -415,7 +415,7 @@ function viewBoard(){
     +'<label class="sw"><input type="checkbox" data-closed="'+kind+'"'+(S.closed[kind]?' checked':'')+'><i></i>Show closed ('+closedN+')</label>'
     +'<button class="btn sm" type="button" data-add="'+kind+'">+ Add '+(kind==='s'?'seller':'buyer')+'</button></div>'
     +(B.liveError?'<p class="err" style="margin-bottom:10px">Follow Up Boss didn’t answer, so phone / last contact may be missing. Try Refresh.</p>':'')
-    +(cards.length?strip+'<div class="board" id="board-'+kind+'">'+cols+'</div>':'<p class="empty">No '+label.toLowerCase()+' yet. Sort a lead from Unsorted, or tap + Add.</p>')
+    +(cards.length?strip+'<div class="board" id="board-'+kind+'">'+cols+'</div>':'<p class="empty">No '+label.toLowerCase()+' yet. People tagged '+(kind==='s'?'Daily Seller or CMA':'Searching or Daily')+' in FUB appear here by themselves. You can also sort a lead from Unsorted, or tap + Add.</p>')
     +(B.archivedCount?'<p style="margin:10px 0 0"><button class="lnkb" type="button" data-archived="'+kind+'">Archived ('+B.archivedCount+')</button></p>':'')+'</section>'
     +(kind==='s'?sellerRes():buyerRes());
 }
