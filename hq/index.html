@@ -275,7 +275,7 @@ dialog::backdrop{background:rgba(20,24,51,.6)}
     <button type="button" id="setBtn">Settings</button>
   </div>
 </div>
-<div class="dtabs"><nav aria-label="Dashboards"><a href="/hq/" aria-current="page">HQ</a><a href="/hq/agents/#sellers">Sellers</a><a href="/hq/agents/#buyers">Buyers</a><a href="/hq/agents/#marketing">Marketing</a><a href="/hq/agents/#toolkit">Toolkit</a></nav></div>
+<div class="dtabs"><nav aria-label="Dashboards"><a href="/hq/" aria-current="page">HQ</a><a href="/hq/agents/#sellers">Sellers</a><a href="/hq/agents/#buyers">Buyers</a><a href="/hq/agents/#marketing">Marketing</a><a href="/hq/agents/#toolkit">Toolkit</a><a href="/hq/agents/#personal">Personal</a></nav></div>
 <header class="hero"><div class="in">
   <div><div class="dow" id="hDow"></div><div class="date" id="hDate"></div><div id="hHol"></div></div>
   <div><div class="clock" id="hClock"></div><div class="wx" id="hWx"></div></div>
@@ -302,6 +302,7 @@ dialog::backdrop{background:rgba(20,24,51,.6)}
 <dialog id="pinDlg"><form method="dialog" id="pinForm" class="dl"><h2>Host only</h2><label for="pinIn">Enter your PIN</label><input id="pinIn" inputmode="numeric" autocomplete="off" type="password"><p class="err" id="pinErr" hidden>Wrong PIN</p><button class="btn" type="submit">Continue</button></form></dialog>
 
 <script src="/assets/listings.js?v=5"></script>
+<script src="/hq/plan.js?v=1"></script>
 <script>
 (function(){
   var SM=window.SM, esc=SM.esc;
@@ -311,46 +312,7 @@ dialog::backdrop{background:rgba(20,24,51,.6)}
   var DRIVE=[
     ['Lead Generation','Start new conversations'],['Follow Up','Work the follow-up list'],['Advance Live Deals','Move every live deal one step'],
     ['Appointments','Set, confirm or hold appointments'],['Content & Marketing','What is going out today'],['Sharpen the Business','Learn, build systems, skills'],['Admin & Email','Inbox and paperwork']];
-  var EX={
-    squat:['Squat','3 × 8','Brace, sit between the hips, knees track over toes.',3],
-    bench:['Bench press','3 × 8','Shoulder blades pinched, bar to mid-chest.',3],
-    dbpress:['Seated DB shoulder press','3 × 10','Ribs down, press straight up, no arch.',3],
-    plank:['Plank','3 × 45 s','Squeeze glutes, straight line head to heel.',3],
-    dead:['Deadlift (RDL or conventional)','3 × 6','Flat back, bar close, push the floor away.',3],
-    pull:['Pull-ups / lat pulldown','3 × 8','Full hang, pull elbows to ribs.',3],
-    row:['DB row','3 × 10 / side','Hand on bench, row to the hip, pause.',3],
-    cable:['Cable rotation','3 × 12 / side','Turn from the hips, arms stay long (golf turn).',3],
-    rdl:['Romanian deadlift','3 × 10','Soft knees, hips back until hamstrings stretch.',3],
-    incline:['Incline press','3 × 8','30° bench, control the way down.',3],
-    split:['Split squat / lunge','3 × 10 / side','Front knee over mid-foot, tall chest.',3],
-    pallof:['Pallof press','3 × 12 / side','Press out and hold; don\'t let the cable turn you.',3],
-    deadbug:['Dead bug','3 × 10 / side','Low back pressed into the floor.',3],
-    sideplank:['Side plank','3 × 30 s / side','Hips high, straight line.',3],
-    birddog:['Bird dog','3 × 10 / side','Reach long, no hip rotation.',3],
-    bridge:['Glute bridge','3 × 12','Squeeze at the top for 2 s.',3],
-    hipflex:['Hip flexor stretch','2 × 45 s / side','Tuck the pelvis, lean gently.',2]
-  };
-  // index = getDay() (0 Sunday)
-  var WEEK=[
-    {name:'Walk or golf',sub:'Active rest · Sunday meal prep',ex:[],free:'Walk 30–60 min or play a round. Then Sunday meal prep (see Today\'s menu).'},
-    {name:'Day A · Push',sub:'Legs, chest, shoulders · ~45 min',ex:['squat','bench','dbpress','plank'],gym:1},
-    {name:'Optional · Walk or range',sub:'Session 4 of 5 (optional)',ex:[],free:'30–45 min brisk walk or a bucket at the range, plus 10 min of stretching. Suggested by Claude to reach 4–5 sessions a week.'},
-    {name:'Day B · Pull',sub:'Back day · ~45 min',ex:['dead','pull','row','cable'],gym:1},
-    {name:'Optional · Core & mobility',sub:'20 min · session 5 of 5 (optional)',ex:['deadbug','sideplank','birddog','bridge','hipflex'],opt:1},
-    {name:'Day C · Athletic / golf',sub:'Full body + rotation · ~45 min',ex:['rdl','incline','split','pallof'],gym:1},
-    {name:'Walk or golf',sub:'Active rest',ex:[],free:'Walk 30–60 min or play golf.'}
-  ];
-  var MEALS=[ // per weekday 0..6: breakfast, lunch, pre-gym snack, dinner
-    ['Protein pancakes + berries','Grilled chicken, brown rice, veg','Cottage cheese + fruit','Steak, roasted veg, small potato'],
-    ['4–5 eggs, whole-grain toast, fruit, black coffee','Grilled chicken, brown rice, greens','Fage 2% + almonds','Salmon, roasted veg, small rice'],
-    ['Greek yogurt 1–1.5 cups, berries, nuts','Roast turkey, gold potato, boiled egg, veg','Shake + banana','Chicken thighs, roasted veg'],
-    ['Veggie omelette, toast, black coffee','Tuna wrap salad + croutons','Fage 2% + almonds','Steak or beef, roasted veg'],
-    ['4–5 eggs, whole-grain toast, Greek yogurt','Chicken or turkey, sweet potato, greens','Cottage cheese + fruit','Lobster + shrimp, veg'],
-    ['Protein shake + berries','Steak, rice, greens','Shake + banana','King crab + scallops, brown rice'],
-    ['Shellfish omelette, toast','Tuna salad + croutons, fruit','Greek yogurt + nuts','Shellfish + pasta, salad']
-  ];
-  var MEAL_LBL=['Breakfast · 7–8 AM','Lunch · 12–1 PM','Pre-gym snack','Dinner'];
-  var PREP=['Batch cook 2 proteins','Portion meals for the week','Hard-boil eggs','Wash and prep greens','Shop: fish, meat, nuts, fruit, protein powder, veg'];
+  var P=window.HQPLAN,EX=P.EX,WEEK=P.WEEK,MEALS=P.MEALS,MEAL_LBL=P.MEAL_LBL,PREP=P.PREP; // plan lives in /hq/plan.js (shared with the Agent Desk)
   var AREA={realestate:['Real Estate','#1D2870'],marketing:['Marketing','#D7141E'],financial:['Financial','#1B7A3E'],personal:['Personal','#9A5B00']};
   var STATUS=['Idea','Started','Beta','Waiting','Done'];
   var V='obsidian://open?vault=2nd%20Brain&file=';
