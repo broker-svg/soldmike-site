@@ -257,6 +257,13 @@ dialog::backdrop{background:rgba(20,24,51,.6)}
 .help{font-size:15px;color:var(--muted);background:var(--mist);border-radius:10px;padding:12px 14px;margin:0}
 .help ol{margin:6px 0 0;padding-left:20px}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:#fff;padding:12px 18px;border-radius:10px;font-size:16px;z-index:50;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+/* tabs to the Agent Desk (Sellers / Buyers / Marketing / Toolkit) */
+.dtabs{background:var(--navy2);border-top:1px solid #3A4799}
+.dtabs nav{max-width:1440px;margin:0 auto;display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;padding:0 12px}
+.dtabs nav::-webkit-scrollbar{display:none}
+.dtabs a{flex:none;display:inline-flex;align-items:center;min-height:52px;padding:0 16px;color:var(--pale);text-decoration:none;font-family:var(--display);font-weight:700;font-size:21px;text-transform:uppercase;letter-spacing:.04em;border-bottom:4px solid transparent}
+.dtabs a[aria-current="page"]{color:#fff;border-bottom-color:var(--red)}
+.dtabs+.hero{padding-top:14px}
 </style>
 </head>
 <body>
@@ -268,6 +275,7 @@ dialog::backdrop{background:rgba(20,24,51,.6)}
     <button type="button" id="setBtn">Settings</button>
   </div>
 </div>
+<div class="dtabs"><nav aria-label="Dashboards"><a href="/hq/" aria-current="page">HQ</a><a href="/hq/agents/#sellers">Sellers</a><a href="/hq/agents/#buyers">Buyers</a><a href="/hq/agents/#marketing">Marketing</a><a href="/hq/agents/#toolkit">Toolkit</a></nav></div>
 <header class="hero"><div class="in">
   <div><div class="dow" id="hDow"></div><div class="date" id="hDate"></div><div id="hHol"></div></div>
   <div><div class="clock" id="hClock"></div><div class="wx" id="hWx"></div></div>

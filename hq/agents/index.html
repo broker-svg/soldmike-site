@@ -1,0 +1,726 @@
+<!doctype html>
+<html lang="en-CA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Agent Desk | SoldMike</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#1D2870">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Desk">
+<link rel="apple-touch-icon" href="/open-house/icon-192.png">
+<link rel="icon" href="/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600&display=swap">
+<style>
+/* Agent Desk: Sellers / Buyers / Marketing / Toolkit next to HQ. Same look as /hq/ (light only). */
+:root{--navy:#1D2870;--navy2:#26338A;--ink:#141833;--red:#D7141E;--mist:#F7F8FB;--line:#DCE0EC;--muted:#545B78;--pale:#C9D0F2;--green:#1B7A3E;--amber:#9A5B00;--white:#fff;
+  --gbg:#E7F4EC;--gln:#B9DEC6;--abg:#FFF4E0;--aln:#F0D6A6;--rbg:#FDECEC;--rln:#F3C1C3;--nbg:#ECEFFB;
+  --display:'Barlow Condensed','Arial Narrow',system-ui,sans-serif;--body:'Barlow',system-ui,-apple-system,'Segoe UI',sans-serif;color-scheme:light}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:var(--mist);color:var(--ink);font-family:var(--body);font-size:18px;line-height:1.45;-webkit-tap-highlight-color:transparent}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--red);outline-offset:2px}
+[hidden]{display:none!important}
+h1,h2,h3{font-family:var(--display);font-weight:800;text-transform:uppercase;line-height:.95;margin:0;text-wrap:balance}
+a{color:var(--navy)}
+.muted{color:var(--muted)}
+.err{color:var(--red);font-weight:600;margin:0}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 20px;border:0;border-radius:10px;background:var(--red);color:var(--white);font-weight:600;font-size:17px;cursor:pointer;text-decoration:none}
+.btn.navy{background:var(--navy)}
+.btn.ghost{background:var(--white);color:var(--ink);border:1px solid var(--line)}
+.btn.sm{min-height:38px;padding:0 14px;font-size:15px;border-radius:8px}
+.btn.danger{background:var(--white);color:var(--red);border:1px solid var(--rln)}
+.chip{display:inline-flex;align-items:center;gap:5px;font-size:13px;font-weight:600;padding:2px 9px;border-radius:20px;background:var(--mist);border:1px solid var(--line);color:var(--muted);white-space:nowrap;text-decoration:none}
+.chip.g{background:var(--gbg);border-color:var(--gln);color:var(--green)}
+.chip.a{background:var(--abg);border-color:var(--aln);color:var(--amber)}
+.chip.r{background:var(--rbg);border-color:var(--rln);color:var(--red)}
+.chip.n{background:var(--nbg);border-color:var(--pale);color:var(--navy)}
+
+.bar{background:var(--navy);color:var(--white);padding:calc(12px + env(safe-area-inset-top,0px)) 16px 12px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px}
+.bar>:last-child{justify-self:end;display:flex;gap:8px}
+.bar img{height:42px;width:auto;display:block}
+.bar b{font-family:var(--display);font-size:24px;text-transform:uppercase;letter-spacing:.04em}
+.bar button{background:none;border:1px solid #4A5592;color:var(--white);border-radius:8px;min-height:40px;padding:0 14px;cursor:pointer;font-size:15px;display:inline-flex;align-items:center;gap:6px}
+.bar button.spin svg{animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (max-width:640px){.bar{grid-template-columns:auto 1fr}.bar b{display:none}.hide-sm{display:none}}
+
+.tabsbar{position:sticky;top:0;z-index:10;background:var(--navy2);border-top:1px solid #3A4799}
+.tabsbar nav{max-width:1440px;margin:0 auto;display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;padding:0 12px}
+.tabsbar nav::-webkit-scrollbar{display:none}
+.tabsbar a{flex:none;display:inline-flex;align-items:center;gap:6px;min-height:52px;padding:0 16px;color:var(--pale);text-decoration:none;font-family:var(--display);font-weight:700;font-size:21px;text-transform:uppercase;letter-spacing:.04em;border-bottom:4px solid transparent}
+.tabsbar a[aria-current="page"]{color:var(--white);border-bottom-color:var(--red)}
+.tabsbar a .n{font-family:var(--body);font-size:12px;font-weight:700;background:var(--red);color:var(--white);border-radius:10px;padding:0 7px;line-height:19px;letter-spacing:0}
+
+.wrap{max-width:1440px;margin:0 auto;padding:20px 16px 80px;display:grid;gap:20px}
+.card{background:var(--white);border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:0 24px 60px -34px rgba(20,24,51,.4);min-width:0}
+.hd{display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.hd h2{font-size:30px;flex:0 1 auto;min-width:0}
+.hd .sub{color:var(--muted);font-size:15px;flex:1 1 180px;min-width:0}
+.sec{font-family:var(--display);font-weight:700;font-size:18px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin:18px 0 8px}
+.empty{color:var(--muted);font-size:16px;padding:6px 0;margin:0}
+.lnkb{background:none;border:0;padding:0;color:var(--navy);font-weight:600;cursor:pointer;font-size:15px;text-decoration:underline}
+@media (max-width:640px){.card{padding:16px}.hd h2{font-size:26px}}
+
+.sw{display:inline-flex;align-items:center;gap:10px;cursor:pointer;font-size:15px;font-weight:600;color:var(--muted);user-select:none;position:relative}
+.sw input{position:absolute;opacity:0;width:1px;height:1px}
+.sw i{width:46px;height:28px;border-radius:14px;background:var(--line);position:relative;transition:background .15s;flex:none}
+.sw i::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:var(--white);box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .15s}
+.sw input:checked+i{background:var(--green)}
+.sw input:checked+i::after{transform:translateX(18px)}
+.sw input:focus-visible+i{outline:3px solid var(--red);outline-offset:2px}
+
+/* inbox */
+.inbox{border:2px dashed var(--pale)}
+.leads{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr));gap:12px}
+.ld{border:1px solid var(--line);border-radius:12px;padding:14px;display:grid;gap:8px;min-width:0;background:var(--mist);align-content:start}
+.ld .top{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.ld b{font-weight:600;font-size:18px}
+.ld .src{font-size:14px;color:var(--muted);overflow-wrap:anywhere}
+.ld .acts{display:flex;gap:8px;flex-wrap:wrap}
+.ld .meta{display:flex;gap:6px;flex-wrap:wrap}
+.selsm{min-height:36px;border:1px solid var(--line);border-radius:8px;background:var(--white);font-size:14px;padding:0 8px}
+
+/* boards */
+.stages{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:0 -4px 12px;padding:2px 4px}
+.stages::-webkit-scrollbar{display:none}
+.stages button{flex:none;min-height:38px;padding:0 12px;border-radius:20px;border:1px solid var(--line);background:var(--white);font-weight:600;font-size:15px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.stages button .n{min-width:20px;padding:0 6px;border-radius:10px;background:var(--mist);font-size:12px;line-height:18px;text-align:center}
+.stages .arrow{flex:none;align-self:center;color:var(--pale);font-weight:700}
+.board{display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:10px;margin:0 -20px;padding-inline:20px;scroll-padding-inline:20px}
+@media (max-width:640px){.board{margin:0 -16px;padding-inline:16px;scroll-padding-inline:16px}}
+.col{flex:none;width:min(330px,calc(100vw - 64px));scroll-snap-align:start;background:var(--mist);border-radius:14px;padding:10px;display:flex;flex-direction:column;gap:10px;align-self:flex-start;border-top:5px solid var(--sc,var(--navy))}
+.col h3{font-size:22px;display:flex;align-items:baseline;gap:8px;padding:4px 4px 0}
+.col h3 small{font-family:var(--body);font-weight:600;font-size:14px;color:var(--muted);text-transform:none}
+.col .grp{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding:0 4px;margin-top:-6px;min-height:16px}
+.col .none{font-size:15px;color:var(--muted);padding:12px 6px;text-align:center;border:1px dashed var(--line);border-radius:10px}
+.pc{background:var(--white);border:1px solid var(--line);border-radius:12px;padding:14px;display:grid;gap:10px;min-width:0}
+.pc .t{display:grid;gap:2px}
+.pc .t b{font-weight:600;font-size:18px;line-height:1.2;overflow-wrap:anywhere}
+.pc .t span{font-size:15px;color:var(--muted);overflow-wrap:anywhere}
+.pc .meta{display:flex;gap:6px;flex-wrap:wrap}
+.pc .kv{display:grid;grid-template-columns:auto minmax(0,1fr);gap:2px 10px;font-size:15px;margin:0}
+.pc .kv dt{color:var(--muted)}
+.pc .kv dd{margin:0;font-weight:500;min-width:0;overflow-wrap:anywhere}
+.pc .note{font-size:15px;overflow-wrap:anywhere;white-space:pre-line}
+.due{display:grid;gap:2px}
+.due .dh{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+.due label{display:flex;gap:10px;align-items:flex-start;font-size:15px;line-height:1.3;cursor:pointer;padding:4px 0}
+.due input{width:20px;height:20px;margin:0;flex:none;accent-color:var(--green)}
+.due input:checked+span{color:var(--muted);text-decoration:line-through}
+.pacts{display:flex;gap:6px;flex-wrap:wrap}
+.pb{min-height:36px;padding:0 12px;border-radius:8px;border:1px solid var(--line);background:var(--white);color:var(--navy);font-weight:600;font-size:14px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.pb::before{content:"";width:8px;height:8px;border-radius:2px;background:currentColor;opacity:.55;flex:none}
+.pb.hot{background:var(--navy);border-color:var(--navy);color:var(--white)}
+.morebtn{background:none;border:0;padding:4px 0;color:var(--navy);font-weight:600;font-size:14px;cursor:pointer;text-decoration:underline;justify-self:start}
+.pfoot{display:flex;gap:8px;align-items:center;border-top:1px dashed var(--line);padding-top:10px;flex-wrap:wrap}
+.pfoot select{flex:1;min-width:120px;min-height:36px;border:1px solid var(--line);border-radius:8px;background:var(--white);font-size:14px;padding:0 8px}
+.pfoot .lk{font-size:14px;font-weight:600;color:var(--navy);background:none;border:1px solid var(--line);border-radius:8px;min-height:36px;padding:0 10px;cursor:pointer;display:inline-flex;align-items:center;text-decoration:none}
+
+/* resources */
+.res{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,250px),1fr));gap:12px}
+.rt{border:1px solid var(--line);border-radius:12px;padding:14px;display:grid;gap:4px;align-content:start;background:var(--white);min-width:0;text-decoration:none;color:var(--ink)}
+.rt:hover{border-color:var(--navy)}
+.rt .k{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.rt b{font-weight:600}
+.rt p{margin:0;font-size:15px;color:var(--muted)}
+details.faq{border-top:1px solid var(--line)}
+details.faq:last-of-type{border-bottom:1px solid var(--line)}
+details.faq summary{cursor:pointer;padding:12px 0;font-weight:600;list-style:none;display:flex;gap:10px;align-items:baseline}
+details.faq summary::-webkit-details-marker{display:none}
+details.faq summary::before{content:"+";font-family:var(--display);font-weight:800;color:var(--red);width:14px;flex:none}
+details.faq[open] summary::before{content:"–"}
+details.faq .a{padding:0 0 14px 24px;font-size:16px;max-width:72ch}
+details.faq .a p{margin:0 0 8px}
+
+/* marketing */
+.mk{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:20px}
+.mk>.card{grid-column:span 6}
+.mk>.wide{grid-column:span 12}
+@media (max-width:900px){.mk{grid-template-columns:minmax(0,1fr)}.mk>.card,.mk>.wide{grid-column:auto}}
+.li{list-style:none;margin:0;padding:0;display:grid}
+.li li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px 0;border-top:1px solid var(--line);font-size:16px}
+.li li:first-child{border-top:0}
+.li li button.it{background:none;border:0;padding:0;text-align:left;cursor:pointer;font-weight:600;color:var(--ink);font-size:16px}
+.li li small{display:block;color:var(--muted);font-size:14px;font-weight:400}
+.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px}
+.cal .d{border:1px solid var(--line);border-radius:10px;padding:8px;min-height:110px;display:grid;align-content:start;gap:6px;background:var(--mist);min-width:0}
+.cal .d.today{border:2px solid var(--red);background:var(--white)}
+.cal .d.past{opacity:.6}
+.cal .d h4{margin:0;font-family:var(--display);font-weight:700;text-transform:uppercase;font-size:17px;display:flex;justify-content:space-between;gap:4px}
+.cal .d h4 span{font-family:var(--body);font-weight:600;font-size:13px;color:var(--muted);text-transform:none}
+.ev{font-size:13px;line-height:1.25;padding:4px 6px;border-radius:6px;background:var(--white);border:0;border-left:4px solid var(--c,var(--navy));overflow-wrap:anywhere;text-align:left;font-family:inherit;color:var(--ink)}
+button.ev{cursor:pointer}
+.ev small{display:block;color:var(--muted)}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:14px;color:var(--muted);margin-top:10px}
+.legend span{display:inline-flex;gap:6px;align-items:center}
+.legend i{width:10px;height:10px;border-radius:2px;background:var(--c)}
+.wkhd{font-family:var(--display);font-weight:700;text-transform:uppercase;color:var(--muted);font-size:16px;letter-spacing:.04em;margin:12px 0 6px}
+.wkhd:first-child{margin-top:0}
+@media (max-width:780px){.cal{grid-template-columns:minmax(0,1fr)}.cal .d{min-height:0}.cal .d.empty-day{display:none}}
+
+/* toolkit */
+.subtabs{display:flex;gap:8px;flex-wrap:wrap}
+.subtabs button{min-height:44px;padding:0 18px;border-radius:22px;border:1px solid var(--line);background:var(--white);font-weight:600;font-size:16px;cursor:pointer}
+.subtabs button[aria-pressed="true"],.stages button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--white)}
+.reader{display:grid;grid-template-columns:260px minmax(0,1fr);gap:20px}
+@media (max-width:900px){.reader{grid-template-columns:minmax(0,1fr)}}
+.slist{display:grid;gap:6px;align-content:start}
+.slist button{text-align:left;min-height:56px;padding:8px 14px;border-radius:10px;border:1px solid var(--line);background:var(--white);cursor:pointer;font-weight:600;font-size:17px;display:grid}
+.slist button small{font-weight:400;color:var(--muted);font-size:14px}
+.slist button[aria-pressed="true"]{border:2px solid var(--navy);background:var(--nbg)}
+@media (max-width:900px){.slist{grid-auto-flow:column;grid-auto-columns:minmax(180px,1fr);overflow-x:auto;padding-bottom:4px}}
+.script{background:var(--white);border:1px solid var(--line);border-radius:14px;padding:20px 24px;min-width:0}
+.script .sz{display:flex;gap:6px;align-items:center;margin-bottom:10px;flex-wrap:wrap}
+.script .sz span{font-size:14px;color:var(--muted);margin-right:auto}
+.script .sz button{min-width:48px;min-height:40px;border-radius:8px;border:1px solid var(--line);background:var(--white);font-weight:700;cursor:pointer}
+.stext{font-size:var(--fs,26px);line-height:1.45;max-width:38ch}
+.stext h3{font-size:1.15em;margin:1.1em 0 .4em;color:var(--navy)}
+.stext h3:first-child{margin-top:0}
+.stext p{margin:0 0 .7em}
+.stext .cue{font-size:.62em;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--red);display:block;margin-top:.6em}
+.search{width:100%;min-height:48px;border:1px solid var(--line);border-radius:10px;padding:0 14px;font-size:17px;background:var(--white);margin-bottom:10px}
+.law .a .form{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 8px}
+.disc{font-size:13px;color:var(--muted);border-top:1px dashed var(--line);padding-top:8px;margin-top:6px}
+.disc b{color:var(--red)}
+.banner{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:flex-start;background:var(--rbg);border:1px solid var(--rln);border-radius:12px;padding:12px 14px;font-size:15px;margin-bottom:12px}
+.banner b{color:var(--red);white-space:nowrap}
+.todo{list-style:none;margin:0;padding:0}
+.todo li{display:flex;gap:12px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+.todo li:first-child{border-top:0}
+.todo label{display:flex;gap:12px;align-items:center;flex:1;min-width:0;cursor:pointer;font-size:17px}
+.todo input[type=checkbox]{width:24px;height:24px;margin:0;flex:none;accent-color:var(--green)}
+.todo input:checked+span{color:var(--muted);text-decoration:line-through}
+.todo span{overflow-wrap:anywhere}
+.todo span small{display:block;font-size:14px;color:var(--muted)}
+.x{background:none;border:0;color:#9BA2BD;font-size:22px;line-height:1;cursor:pointer;padding:4px 8px;border-radius:6px}
+.add{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:8px;margin-top:12px}
+.add input{min-width:0;min-height:48px;border:1px solid var(--line);border-radius:10px;padding:0 12px;background:var(--white);font-size:17px}
+.add input[type=date]{width:160px;font-size:15px}
+@media (max-width:520px){.add{grid-template-columns:minmax(0,1fr) auto}.add input[type=text]{grid-column:1/-1}.add input[type=date]{width:100%}}
+
+/* dialogs */
+dialog{border:0;border-radius:16px;padding:0;width:min(720px,calc(100vw - 24px));max-height:calc(100dvh - 24px);box-shadow:0 30px 60px rgba(10,14,40,.4);color:var(--ink);background:var(--white)}
+dialog::backdrop{background:rgba(20,24,51,.6)}
+.dl{padding:20px;display:grid;gap:14px}
+.dl .dh{display:flex;gap:10px;align-items:flex-start}
+.dl .dh h2{font-size:30px;flex:1;min-width:0}
+.dl .dh p{margin:4px 0 0;font-size:15px;color:var(--muted)}
+.fgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 12px}
+.fgrid .full{grid-column:1/-1}
+@media (max-width:560px){.fgrid{grid-template-columns:minmax(0,1fr)}}
+.fgrid label,.fl{display:grid;gap:4px;font-size:14px;font-weight:600;color:var(--muted);min-width:0}
+.fgrid label em{font-style:normal;color:var(--red)}
+.fgrid input,.fgrid select,.fgrid textarea,.fl input{min-height:46px;border:1px solid var(--line);border-radius:10px;padding:8px 12px;background:var(--white);font-size:17px;color:var(--ink);font-weight:400;width:100%;min-width:0}
+.fgrid textarea{min-height:84px;resize:vertical}
+.pv{display:grid;gap:6px}
+.pv .k{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);display:flex;justify-content:space-between;gap:8px}
+.pv textarea{width:100%;min-height:150px;border:0;border-radius:10px;padding:12px;background:#0F1430;color:#E6E9F7;font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;resize:vertical}
+.dfoot{display:flex;gap:10px;flex-wrap:wrap;position:sticky;bottom:0;background:var(--white);padding:12px 20px calc(16px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line)}
+.dfoot .btn{flex:1}
+.linkbox{border:1px solid var(--line);border-radius:12px;padding:12px;display:grid;gap:8px;background:var(--mist)}
+.linkbox .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.results{display:grid;gap:6px;max-height:260px;overflow:auto}
+.results button{display:grid;text-align:left;gap:2px;padding:8px 12px;border-radius:10px;border:1px solid var(--line);background:var(--white);cursor:pointer;font-weight:600}
+.results button small{font-weight:400;color:var(--muted);font-size:14px}
+.results button:disabled{opacity:.55;cursor:default}
+.tagrow{display:flex;gap:6px;flex-wrap:wrap}
+.tagrow button{min-height:32px;padding:0 10px;border-radius:16px;border:1px dashed var(--line);background:var(--white);font-size:14px;font-weight:600;cursor:pointer}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--white);padding:12px 18px;border-radius:10px;font-size:16px;z-index:50;box-shadow:0 10px 30px rgba(0,0,0,.3);max-width:calc(100vw - 32px)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="bar">
+  <a href="/admin/" aria-label="Back office"><img src="/logo-soldmike-white.png" alt="SoldMike"></a>
+  <b>Agent Desk</b>
+  <div>
+    <button type="button" id="refresh" aria-label="Refresh"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg><span class="hide-sm">Refresh</span></button>
+    <button type="button" id="setBtn">Settings</button>
+  </div>
+</div>
+<div class="tabsbar"><nav aria-label="Dashboards" id="tabnav">
+  <a href="/hq/">HQ</a>
+  <a href="#sellers" data-tab="sellers">Sellers</a>
+  <a href="#buyers" data-tab="buyers">Buyers</a>
+  <a href="#marketing" data-tab="marketing">Marketing</a>
+  <a href="#toolkit" data-tab="toolkit">Toolkit</a>
+</nav></div>
+<main class="wrap" id="main"><p class="empty">Loading…</p></main>
+
+<dialog id="dlg"></dialog>
+<dialog id="pinDlg"><form method="dialog" id="pinForm" class="dl"><h2>Host only</h2><label class="fl" for="pinIn">Enter your PIN<input id="pinIn" inputmode="numeric" autocomplete="off" type="password"></label><p class="err" id="pinErr" hidden>Wrong PIN</p><button class="btn" type="submit">Continue</button></form></dialog>
+
+<script>
+(function(){
+'use strict';
+var API=/^(localhost|127\.0\.0\.1)$/.test(location.hostname)?'http://localhost:8787':'https://soldmike-listings.broker-e2c.workers.dev';
+function $(s,r){return (r||document).querySelector(s);}
+function $$(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s));}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function store(k,v){try{if(v===undefined)return JSON.parse(localStorage.getItem(k)||'null');localStorage.setItem(k,JSON.stringify(v));}catch(e){return null;}}
+function toast(m){var t=document.createElement('div');t.className='toast';t.textContent=m;document.body.appendChild(t);setTimeout(function(){t.remove();},2600);}
+function ymd(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function daysSince(iso){if(!iso)return null;var t=Date.parse(String(iso).replace(' ','T')+(/Z|[+-]\d\d:?\d\d$/.test(iso)?'':'Z'));return isNaN(t)?null:Math.max(0,Math.floor((Date.now()-t)/864e5));}
+function ago(iso){var d=daysSince(iso);if(d==null)return '';if(d===0){var h=Math.floor((Date.now()-Date.parse(iso))/36e5);return h<1?'just now':h+' hr ago';}return d===1?'yesterday':d+' days ago';}
+function fmtDay(s){if(!s)return '';var d=new Date(s+'T12:00:00');return d.toLocaleDateString('en-CA',{weekday:'short',month:'short',day:'numeric'});}
+
+/* ---------- API ---------- */
+function pin(){return store('sm_oh_pin')||'';}
+function api(path,opt){opt=opt||{};opt.headers=Object.assign({'X-OH-Pin':pin(),'Content-Type':'application/json'},opt.headers||{});
+  return fetch(API+'/api/hq/'+path,opt).then(function(r){if(r.status===401)throw 'pin';return r.json().catch(function(){return {};}).then(function(j){if(!r.ok)throw j.error||('Error '+r.status);return j;});});}
+function getJ(p){return api(p);}
+function post(p,b){return api(p,{method:'POST',body:JSON.stringify(b)});}
+function askPin(){return new Promise(function(res){var d=$('#pinDlg'),i=$('#pinIn'),e=$('#pinErr');
+  $('#pinForm').onsubmit=function(ev){ev.preventDefault();store('sm_oh_pin',i.value.trim());getJ('desk/todos').then(function(){d.close();res();}).catch(function(){e.hidden=false;});};
+  if(!d.open)d.showModal();i.focus();});}
+function fail(e){if(e==='pin')return askPin().then(function(){load(true);});toast(typeof e==='string'?e:'Could not reach the server. Check the connection.');}
+
+/* ---------- stages ---------- */
+var SSTAGES=[
+  {k:'talk',n:'Talking',g:'Leads',c:'#9BA2BD',p:['homeeval'],due:['Log the first conversation in FUB','Set a follow-up date','Ask: timing and reason for moving']},
+  {k:'poss',n:'Possibility',g:'Leads',c:'#7C86B8',p:['homeeval','cma'],due:['Send the Home Evaluation','Book a walk-through','Add to Daily Seller list']},
+  {k:'prosp',n:'Prospect',g:'Leads',c:'#4A5592',p:['cma'],due:['Prepare the CMA','Send the pre-listing package','Book the listing presentation']},
+  {k:'soon',n:'Coming Soon',g:'Before listing',c:'#26338A',p:['instructions','cma'],due:['Listing agreement signed','Photos + drone booked','Staging / pre-list clean','Listing instructions to admin','Feature sheet approved']},
+  {k:'sale',n:'For Sale',g:'During',c:'#D7141E',p:['update','offers'],due:['Weekly Listing Update sent','Showing feedback chased','Offer date plan agreed','Price review at day 14']},
+  {k:'sold',n:'Sold, before closing',g:'After sold',c:'#1B7A3E',p:['justsold'],due:['Offer summary filed','Conditions waived / firm','Deposit received','Just Sold post + SOLD sign','Lawyer details exchanged']},
+  {k:'closed',n:'Closed',g:'Done',c:'#545B78',p:['justsold'],due:['Keys handed over','Closing gift sent','Ask for a Google review','Add to past-client nurture']}
+];
+var BSTAGES=[
+  {k:'talk',n:'Talking',g:'Leads',c:'#9BA2BD',p:['followup']},
+  {k:'poss',n:'Possibility',g:'Leads',c:'#7C86B8',p:['followup']},
+  {k:'prosp',n:'Prospect',g:'Leads',c:'#4A5592',p:['listings','followup']},
+  {k:'search',n:'Searching',g:'Active',c:'#26338A',p:['listings']},
+  {k:'show',n:'Showings',g:'Active',c:'#1D2870',p:['showings','listings']},
+  {k:'offer',n:'Offer',g:'Active',c:'#D7141E',p:['cma']},
+  {k:'firm',n:'Firm',g:'Before closing',c:'#1B7A3E',p:['followup']},
+  {k:'closed',n:'Closed',g:'Done',c:'#545B78',p:['followup']}
+];
+function stagesOf(kind){return kind==='s'?SSTAGES:BSTAGES;}
+var LEADSTAGES=['talk','poss','prosp'];
+
+/* ---------- prompts (one per skill) ---------- */
+var F={addr:{l:'Property address',req:1},client:{l:'Client name',req:1},email:{l:'Email'},phone:{l:'Phone'},
+  type:{l:'Property type',opts:['Detached','Semi','Townhouse','Condo','Bungalow']},bb:{l:'Beds / baths',ph:'4 + 1 / 3'},sqft:{l:'Size (sq ft)',ph:'2,400'},notes:{l:'Notes',ta:1,full:1}};
+var PROMPTS={
+  homeeval:{label:'Home Evaluation',skill:'home-evaluation-dashboard',lead:'Build a home evaluation for this seller.',
+    fields:['addr','client','email','phone','type','bb','sqft',{k:'why',l:'Why they asked',opts:['Curious about value','Planning to sell in 6–12 months','Selling soon','Refinancing / estate']},'notes']},
+  cma:{label:'CMA',skill:'cma-generator',lead:'Prepare a CMA.',
+    fields:['addr','client',{k:'purpose',l:'Purpose',opts:['Listing price','Buyer offer price']},'type','bb','sqft',{k:'comps',l:'Comps I picked (MLS® # or addresses)',ta:1,full:1},'notes']},
+  update:{label:'Listing Update',skill:'seller-update',lead:'Write this week’s listing update for my seller.',
+    fields:['addr','client','email',{k:'week',l:'Week of',type:'date'},{k:'show',l:'Showings this week',ph:'6'},{k:'views',l:'Online views',ph:'1,240'},{k:'fb',l:'Showing feedback',ta:1,full:1},'notes']},
+  instructions:{label:'Listing Instructions',skill:'showing-instructions',lead:'Write the listing / showing instructions for this property.',
+    fields:['addr','client','phone',{k:'mls',l:'MLS® #'},{k:'lockbox',l:'Lockbox / access'},{k:'offerdate',l:'Offer date',type:'date'},{k:'rules',l:'Showing rules',ta:1,full:1,ph:'1 hr notice, remove shoes, dog in crate…'}]},
+  offers:{label:'Offer Summary',skill:'offer-review-summary',lead:'Summarize the offers on this listing for my seller.',
+    fields:['addr','client','email',{k:'offerdate',l:'Offer date',type:'date'},{k:'count',l:'Number of offers'},{k:'list',l:'List price'},{k:'detail',l:'Offer details (or say "PDFs attached")',ta:1,full:1}]},
+  justsold:{label:'Just Sold',skill:'soldmike-sold-graphic',lead:'Make the Just Sold graphic and caption.',
+    fields:['addr','client',{k:'price',l:'Sale price (or "undisclosed")'},{k:'dom',l:'Days on market'},{k:'pct',l:'% of asking'},{k:'side',l:'We represented',opts:['Seller','Buyer','Both']}]},
+  listings:{label:'Send Listings',skill:'draft-outreach',lead:'Draft an email sending these listings to my buyer.',
+    fields:['client','email',{k:'area',l:'Areas'},{k:'type',l:'Property type',opts:F.type.opts},{k:'beds',l:'Beds'},{k:'budget',l:'Budget (max)'},{k:'links',l:'Listing links / MLS® #s to send',ta:1,full:1},{k:'must',l:'Must-haves',full:1}]},
+  followup:{label:'Follow-up',skill:'draft-outreach',lead:'Draft a follow-up message.',
+    fields:['client','email','phone',{k:'chan',l:'Send as',opts:['Text','Email','Call notes']},{k:'last',l:'Last contact'},{k:'ctx',l:'What I want to say',ta:1,full:1}]},
+  showings:{label:'Book Showings',skill:'showing-prep',lead:'Plan and book a showing tour.',
+    fields:['client','phone',{k:'day',l:'Date',type:'date'},{k:'window',l:'Time window',ph:'Sat 10 AM – 1 PM'},{k:'homes',l:'Addresses / MLS® #s',ta:1,full:1}]},
+  newsletter:{label:'Newsletter',skill:'soldmike-newsletter',lead:'Build this week’s OP Team newsletter.',
+    fields:[{k:'week',l:'Issue date',type:'date'},{k:'theme',l:'Theme',opts:['Charcoal','Blue / white']},{k:'feature',l:'Featured listing'},{k:'stat',l:'Market stat'},{k:'list',l:'Send to Smart List'},'notes']},
+  social:{label:'Social Post',skill:'soldmike-social-post',lead:'Make a brand social post.',
+    fields:[{k:'topic',l:'Topic',full:1},{k:'plat',l:'Where',opts:['Instagram + Facebook','Instagram only','LinkedIn','All']},{k:'date',l:'Post date',type:'date'},'notes']},
+  doorhanger:{label:'Door Hangers',skill:'door-hanger',lead:'Design a door hanger campaign.',
+    fields:[{k:'kind',l:'Kind',opts:['Just Listed','Just Sold','Market update','Open house']},{k:'addr',l:'Feature address'},{k:'area',l:'Streets / area'},{k:'qty',l:'How many'},'notes']},
+  ytdesc:{label:'YouTube Description',skill:'tpm-youtube-description',lead:'Write the YouTube title options and description.',
+    fields:[{k:'title',l:'Working title',full:1},{k:'link',l:'Video link or file',full:1},{k:'points',l:'Key points',ta:1,full:1}]},
+  thumb:{label:'Thumbnail',skill:'tpm-thumbnail-generator',lead:'Make a YouTube thumbnail.',
+    fields:[{k:'title',l:'Video title',full:1},{k:'words',l:'Words on thumbnail (3–4)'},{k:'photo',l:'Photo of me',opts:['Yes','No']}]},
+  calendar:{label:'Plan Next Week',skill:'schedule',lead:'Plan next week’s brand content.',
+    fields:[{k:'week',l:'Week of',type:'date'},{k:'focus',l:'Focus'},'notes']},
+  lawq:{label:'Ask a L&T Question',skill:'deep-research',lead:'Answer this Ontario landlord & tenant question. Use the current Residential Tenancies Act (including the Sept 21, 2026 changes), name the LTB form, link official sources, and mark it "not legal advice".',
+    fields:[{k:'who',l:'I’m helping',opts:['Landlord client','Tenant client','Buyer of tenanted home','Seller of tenanted home']},{k:'q',l:'Question',ta:1,full:1},{k:'facts',l:'Facts (lease dates, rent, units in building)',ta:1,full:1}]},
+  firstreply:{label:'First Reply',skill:'draft-outreach',lead:'Draft my first reply to this new lead.',
+    fields:['client','email','phone',{k:'src',l:'Where they came from'},{k:'msg',l:'What they said',ta:1,full:1}]}
+};
+
+/* ---------- state ---------- */
+var TABS=['sellers','buyers','marketing','toolkit'];
+var S={tab:TABS.indexOf(location.hash.slice(1))>=0?location.hash.slice(1):(store('desk_tab')||'sellers'),
+  board:{s:null,b:null},inbox:null,inboxDays:store('desk_inbox_days')||14,closed:{s:!!store('desk_closed_s'),b:!!store('desk_closed_b')},
+  content:null,todos:null,tk:store('desk_tk')||'scripts',script:'buyer',fs:store('desk_fs')||26,tagSync:false,fubApp:'https://app.followupboss.com'};
+
+function setTab(t){S.tab=t;store('desk_tab',t);$$('#tabnav a[data-tab]').forEach(function(a){a.setAttribute('aria-current',a.dataset.tab===t?'page':'false');});render();load(false);}
+$$('#tabnav a[data-tab]').forEach(function(a){a.addEventListener('click',function(e){e.preventDefault();history.replaceState(null,'','#'+a.dataset.tab);setTab(a.dataset.tab);window.scrollTo({top:0});});});
+window.addEventListener('hashchange',function(){var h=location.hash.slice(1);if(TABS.indexOf(h)>=0&&h!==S.tab)setTab(h);});
+
+/* load what the current tab needs (force = refresh even if loaded) */
+function load(force){
+  var jobs=[];
+  if(S.tab==='sellers'||S.tab==='buyers'){var k=S.tab==='sellers'?'s':'b';
+    if(force||!S.board[k])jobs.push(getJ('desk/board?kind='+k).then(function(j){S.board[k]=j;S.tagSync=j.tagSync;S.fubApp=j.fubApp||S.fubApp;}));
+    if(force||!S.inbox)jobs.push(loadInbox());}
+  if(S.tab==='marketing'&&(force||!S.content))jobs.push(getJ('desk/content').then(function(j){S.content=j.items;}));
+  if(S.tab==='toolkit'&&(force||!S.todos))jobs.push(loadTodos());
+  if(!jobs.length)return Promise.resolve();
+  var b=$('#refresh');b.classList.add('spin');
+  return Promise.all(jobs).then(render).catch(fail).then(function(){b.classList.remove('spin');});
+}
+function loadInbox(){return getJ('desk/inbox?days='+S.inboxDays).then(function(j){S.inbox=j;badge();}).catch(function(e){if(e==='pin')throw e;S.inbox={error:String(e),people:[]};});}
+function loadTodos(){return getJ('desk/todos?today='+ymd(new Date())).then(function(j){S.todos=j.items;});}
+function badge(){var n=S.inbox&&S.inbox.people?S.inbox.people.length:0;['sellers','buyers'].forEach(function(t){var a=$('#tabnav a[data-tab="'+t+'"]');a.innerHTML=t[0].toUpperCase()+t.slice(1)+(n?' <span class="n" title="Unsorted leads">'+n+'</span>':'');});}
+
+function render(){var m=$('#main');
+  var html=({sellers:viewBoard,buyers:viewBoard,marketing:viewMarketing,toolkit:viewToolkit})[S.tab]();
+  var sx={};$$('.board',m).forEach(function(b){sx[b.id]=b.scrollLeft;});
+  m.innerHTML=html;
+  $$('.board',m).forEach(function(b){if(sx[b.id])b.scrollLeft=sx[b.id];});
+  if(S.tab==='toolkit')afterToolkit();}
+
+/* ---------- helpers ---------- */
+function lastChip(iso){var d=daysSince(iso);if(d==null)return '<span class="chip">No contact logged</span>';var c=d<=3?'g':d<=7?'a':'r';return '<span class="chip '+c+'" title="Last contact in FUB">'+(d===0?'Today':d===1?'1 day ago':d+' days ago')+'</span>';}
+function pbtn(key,ctx,id,hot){return '<button type="button" class="pb'+(hot?' hot':'')+'" data-p="'+key+'" data-ctx="'+ctx+'" data-id="'+(id||'')+'">'+esc(PROMPTS[key].label)+'</button>';}
+function fubUrl(id){return S.fubApp+'/2/people/view/'+id;}
+function cardById(kind,id){var b=S.board[kind];return b&&b.cards.filter(function(c){return c.id===+id;})[0];}
+function liveOf(kind,c){var b=S.board[kind];return (c.fub&&b&&b.live&&b.live[c.fub])||{};}
+
+/* ---------- Unsorted inbox ---------- */
+function inbox(){
+  var I=S.inbox;
+  var head='<div class="hd"><h2>Unsorted</h2><span class="sub">New Follow Up Boss leads not on a board yet</span><select class="selsm" id="inDays" aria-label="How far back">'+[7,14,30].map(function(d){return '<option value="'+d+'"'+(+S.inboxDays===d?' selected':'')+'>Last '+d+' days</option>';}).join('')+'</select></div>';
+  if(!I)return '<section class="card inbox">'+head+'<p class="empty">Loading…</p></section>';
+  if(I.error)return '<section class="card inbox">'+head+'<p class="err">Follow Up Boss didn’t answer ('+esc(I.error)+'). Try Refresh.</p></section>';
+  var rows=I.people.map(function(l){
+    return '<div class="ld"><div class="top"><b>'+esc(l.name||'No name')+'</b><span class="src">'+esc(l.source||'Unknown source')+' · '+esc(ago(l.created))+'</span></div>'
+     +'<div class="src">'+[l.phone,l.email].filter(Boolean).map(esc).join(' · ')+'</div>'
+     +'<div class="meta">'+(l.stage?'<span class="chip n">'+esc(l.stage)+'</span>':'')+l.tags.map(function(t){return '<span class="chip">'+esc(t)+'</span>';}).join('')+'</div>'
+     +'<div class="acts"><button class="btn sm navy" type="button" data-sort="s" data-fub="'+l.id+'">→ Sellers</button><button class="btn sm navy" type="button" data-sort="b" data-fub="'+l.id+'">→ Buyers</button><button class="btn sm ghost" type="button" data-sort="both" data-fub="'+l.id+'">Both</button></div>'
+     +'<div class="acts"><button class="pb" type="button" data-p="firstreply" data-ctx="lead" data-id="'+l.id+'">First Reply</button><a class="pb" href="'+fubUrl(l.id)+'" target="_blank" rel="noopener">Open in FUB</a><button class="lnkb" type="button" data-sort="skip" data-fub="'+l.id+'">Not a lead / skip</button></div></div>';}).join('');
+  return '<section class="card inbox">'+head+(I.people.length?'<div class="leads">'+rows+'</div>':'<p class="empty">All sorted. New FUB leads show up here first.</p>')
+    +(I.hidden?'<p class="empty" style="font-size:14px">'+I.hidden+' hidden (pond, other agent, lease or rental).</p>':'')+'</section>';
+}
+
+/* ---------- boards ---------- */
+function viewBoard(){
+  var kind=S.tab==='sellers'?'s':'b',B=S.board[kind],ST=stagesOf(kind),label=kind==='s'?'Sellers':'Buyers';
+  var top=inbox();
+  if(!B)return top+'<section class="card"><div class="hd"><h2>'+label+'</h2></div><p class="empty">Loading…</p></section>';
+  var cards=B.cards,closedN=cards.filter(function(c){return c.stage==='closed';}).length;
+  var vis=ST.filter(function(st){return st.k!=='closed'||S.closed[kind];});
+  var strip='<div class="stages" role="toolbar" aria-label="Jump to stage">'+vis.map(function(st,i){return (i?'<span class="arrow" aria-hidden="true">›</span>':'')
+    +'<button type="button" data-jump="'+kind+'-'+st.k+'">'+esc(st.n)+' <span class="n">'+cards.filter(function(c){return c.stage===st.k;}).length+'</span></button>';}).join('')+'</div>';
+  var lastG='';
+  var cols=vis.map(function(st){var items=cards.filter(function(c){return c.stage===st.k;});var g=st.g!==lastG?st.g:'';lastG=st.g;
+    return '<div class="col" id="col-'+kind+'-'+st.k+'" style="--sc:'+st.c+'"><h3>'+esc(st.n)+' <small>'+items.length+'</small></h3><div class="grp">'+esc(g)+'</div>'
+      +(items.length?items.map(function(c){return kind==='s'?sellerCard(c,st):buyerCard(c,st);}).join(''):'<div class="none">Nobody here</div>')+'</div>';}).join('');
+  var sub=cards.filter(function(c){return c.stage!=='closed';}).length+' active'+(kind==='b'?' · last contact <span class="chip g">0–3 d</span> <span class="chip a">4–7 d</span> <span class="chip r">8+ d</span>':'');
+  return top+'<section class="card"><div class="hd"><h2>'+label+'</h2><span class="sub">'+sub+'</span>'
+    +'<label class="sw"><input type="checkbox" data-closed="'+kind+'"'+(S.closed[kind]?' checked':'')+'><i></i>Show closed ('+closedN+')</label>'
+    +'<button class="btn sm" type="button" data-add="'+kind+'">+ Add '+(kind==='s'?'seller':'buyer')+'</button></div>'
+    +(B.liveError?'<p class="err" style="margin-bottom:10px">Follow Up Boss didn’t answer, so phone / last contact may be missing. Try Refresh.</p>':'')
+    +(cards.length?strip+'<div class="board" id="board-'+kind+'">'+cols+'</div>':'<p class="empty">No '+label.toLowerCase()+' yet. Sort a lead from Unsorted, or tap + Add.</p>')
+    +(B.archivedCount?'<p style="margin:10px 0 0"><button class="lnkb" type="button" data-archived="'+kind+'">Archived ('+B.archivedCount+')</button></p>':'')+'</section>'
+    +(kind==='s'?sellerRes():buyerRes());
+}
+function moveRow(kind,c){var ST=stagesOf(kind);
+  return '<div class="pfoot"><select data-move="'+kind+'" data-id="'+c.id+'" aria-label="Move to stage">'+ST.map(function(st){return '<option value="'+st.k+'"'+(st.k===c.stage?' selected':'')+'>'+esc(st.n)+'</option>';}).join('')+'</select>'
+   +'<button type="button" class="lk" data-edit="'+kind+'" data-id="'+c.id+'">Edit</button>'
+   +(c.fub?'<a class="lk" href="'+fubUrl(c.fub)+'" target="_blank" rel="noopener">FUB</a>':'')+'</div>';}
+function sellerCard(c,st){
+  var L=liveOf('s',c),all=['homeeval','cma','update','instructions','offers','justsold'],hot=st.p,rest=all.filter(function(k){return hot.indexOf(k)<0;});
+  var done=c.checks||[],left=st.due.filter(function(d){return done.indexOf(d)<0;}).length;
+  var title=c.addr||c.name||L.name||'No name',sub=[c.area,c.addr?(c.name||L.name):''].filter(Boolean).join(' · ');
+  return '<article class="pc"><div class="t"><b>'+esc(title)+'</b>'+(sub?'<span>'+esc(sub)+'</span>':'')+'</div>'
+    +'<div class="meta">'+(c.price?'<span class="chip n">'+esc(c.price)+'</span>':'')+(c.ptype?'<span class="chip">'+esc(c.ptype)+'</span>':'')+(c.fub?lastChip(L.last):'<span class="chip">Not linked to FUB</span>')+'</div>'
+    +(c.note?'<div class="note">'+esc(c.note)+'</div>':'')
+    +'<div class="due"><div class="dh">Due now · '+(left?left+' left':'all done')+'</div>'+st.due.map(function(d){return '<label><input type="checkbox" data-check="'+c.id+'" value="'+esc(d)+'"'+(done.indexOf(d)>=0?' checked':'')+'><span>'+esc(d)+'</span></label>';}).join('')+'</div>'
+    +'<div class="pacts">'+hot.map(function(k){return pbtn(k,'s',c.id,1);}).join('')+'</div>'
+    +'<button type="button" class="morebtn" data-more aria-expanded="false">All prompts</button><div class="pacts" hidden>'+rest.map(function(k){return pbtn(k,'s',c.id);}).join('')+'</div>'
+    +moveRow('s',c)+'</article>';
+}
+function buyerCard(c,st){
+  var L=liveOf('b',c),all=['listings','followup','showings','cma'],hot=st.p,rest=all.filter(function(k){return hot.indexOf(k)<0;});
+  var ph=L.phone||c.phone,em=L.email||c.email;
+  return '<article class="pc"><div class="t"><b>'+esc(c.name||L.name||'No name')+'</b><span>'+[ph,em].filter(Boolean).map(esc).join(' · ')+'</span></div>'
+    +'<dl class="kv">'+(c.want?'<dt>Wants</dt><dd>'+esc(c.want)+'</dd>':'')+(c.area?'<dt>Areas</dt><dd>'+esc(c.area)+'</dd>':'')+(c.budget?'<dt>Budget</dt><dd>'+esc(c.budget)+'</dd>':'')+(c.pre?'<dt>Pre-approved</dt><dd>'+esc(c.pre)+'</dd>':'')
+    +'<dt>Last contact</dt><dd>'+(c.fub?lastChip(L.last):'<span class="chip">Not linked to FUB</span>')+'</dd></dl>'
+    +'<div class="due"><div class="dh">Next step</div><div style="font-size:15px;font-weight:600">'+(c.next?esc(c.next):'<span class="muted" style="font-weight:400">Not set. Tap Edit.</span>')+'</div></div>'
+    +(c.note?'<div class="note">'+esc(c.note)+'</div>':'')
+    +'<div class="pacts">'+hot.map(function(k){return pbtn(k,'b',c.id,1);}).join('')+rest.map(function(k){return pbtn(k,'b',c.id);}).join('')+'</div>'
+    +moveRow('b',c)+'</article>';
+}
+function resTiles(list){return '<div class="res">'+list.map(function(r){return '<a class="rt" href="'+r[3]+'" target="_blank" rel="noopener"><span class="k">'+esc(r[0])+'</span><b>'+esc(r[1])+'</b><p>'+esc(r[2])+'</p></a>';}).join('')+'</div>';}
+function sellerRes(){return '<section class="card"><div class="hd"><h2>Seller resources</h2><span class="sub">Guides and pages to send sellers</span></div>'+resTiles([
+  ['Guide','Seller’s Guide','The full guide page on soldmike.com.','/sell/seller-guide/'],
+  ['PDF','Selling a Home in Vaughan','Free guide PDF to email or print.','/guides/selling-a-home-in-vaughan.pdf'],
+  ['Package','Pre-Listing Package','Send before the listing presentation.','/sell/pre-listing/'],
+  ['Page','How We Market','Photos, video, launch plan.','/sell/how-we-market/'],
+  ['Page','Cost to Sell in Vaughan','Commission, legal, moving costs.','/sell/cost-to-sell-vaughan/'],
+  ['Page','Home Value','The home value request page.','/sell/home-value/'],
+  ['Q&A','Seller questions','Common questions, answered on the site.','/questions/selling/'],
+  ['Results','Case studies','Recent results to show sellers.','/results/']])+'</section>';}
+function buyerRes(){return '<section class="card"><div class="hd"><h2>Buyer resources</h2><span class="sub">Guides and pages to send buyers</span></div>'+resTiles([
+  ['Guide','Buyer’s Guide','The full guide page on soldmike.com.','/buy/buyer-guide/'],
+  ['PDF','Buying a Home in Vaughan','Free guide PDF to email or print.','/guides/buying-a-home-in-vaughan.pdf'],
+  ['Search','Listings search','Search and save homes with the buyer.','/listings/'],
+  ['Page','Pre-construction','For buyers looking at new builds.','/buy/pre-construction/'],
+  ['Areas','Neighbourhoods','Vaughan, Kleinburg, Maple, Woodbridge and more.','/neighbourhoods/'],
+  ['Q&A','Buyer questions','Common questions, answered on the site.','/questions/buying/'],
+  ['Ontario','Land transfer tax','Ontario rules + first-time buyer refund.','https://www.ontario.ca/document/land-transfer-tax'],
+  ['Form','Buyer Representation Agreement','OREA Form 371 (needed in writing before working for a buyer).','https://www.reco.on.ca/']])+'</section>';}
+
+/* ---------- card dialog (add / edit / link FUB) ---------- */
+var SF=[['addr','Property address'],['area','Area / city'],['name','Client name'],['email','Email'],['phone','Phone'],['ptype','Property type'],['size','Beds / baths / size'],['price','Price (list, sold or value)'],['note','Notes','ta']];
+var BF=[['name','Client name'],['email','Email'],['phone','Phone'],['want','What they want','',1],['area','Areas'],['budget','Budget'],['pre','Pre-approval'],['next','Next step','',1],['note','Notes','ta']];
+var edit=null;
+function openCard(kind,id){
+  var c=id?cardById(kind,id):{kind:kind,stage:'talk',fub:null};edit={kind:kind,c:Object.assign({},c),confirmDel:false};
+  var ST=stagesOf(kind),FL=kind==='s'?SF:BF;
+  var d=$('#dlg');
+  d.innerHTML='<form class="dl" id="cardF"><div class="dh"><div style="flex:1;min-width:0"><h2>'+(id?'Edit ':'Add ')+(kind==='s'?'seller':'buyer')+'</h2><p>'+(id?'Changes save to the board.':'Find them in Follow Up Boss first, or fill it in by hand.')+'</p></div><button type="button" class="x" data-close aria-label="Close">×</button></div>'
+   +'<div class="linkbox" id="linkBox"></div>'
+   +'<div class="fgrid"><label for="c_stage">Stage<select id="c_stage">'+ST.map(function(st){return '<option value="'+st.k+'"'+(st.k===c.stage?' selected':'')+'>'+esc(st.n)+'</option>';}).join('')+'</select></label>'
+   +FL.map(function(f){var v=c[f[0]]||'';return '<label class="'+(f[2]||f[3]?'full':'')+'" for="c_'+f[0]+'">'+esc(f[1])+(f[2]?'<textarea id="c_'+f[0]+'">'+esc(v)+'</textarea>':'<input id="c_'+f[0]+'" value="'+esc(v)+'" autocomplete="off">')+'</label>';}).join('')+'</div>'
+   +'<p class="err" id="cErr" hidden></p></form>'
+   +'<div class="dfoot"><button type="button" class="btn" id="cSave">Save</button>'
+   +(id?'<button type="button" class="btn ghost" id="cArch">'+(c.archived?'Restore':'Archive')+'</button><button type="button" class="btn danger" id="cDel">Delete</button>':'<button type="button" class="btn ghost" data-close>Cancel</button>')+'</div>';
+  drawLink();
+  $('#cardF').onsubmit=function(e){e.preventDefault();};
+  $('#cSave').onclick=saveCard;
+  if(id){$('#cArch').onclick=function(){post('desk/card/archive',{id:id,on:!c.archived}).then(function(){d.close();toast(c.archived?'Restored':'Archived. It’s under Archived at the bottom of the board.');S.board[kind]=null;load(true);}).catch(fail);};
+    $('#cDel').onclick=function(){if(!edit.confirmDel){edit.confirmDel=true;this.textContent='Tap again to delete for good';return;}post('desk/card/delete',{id:id}).then(function(){d.close();toast('Deleted');load(true);}).catch(fail);};}
+  if(!d.open)d.showModal();
+}
+function drawLink(){
+  var c=edit.c,box=$('#linkBox'),L=c.fub?(liveOf(edit.kind,c)):{};
+  if(c.fub){box.innerHTML='<div class="row"><span class="chip g">Linked to FUB</span><b>'+esc(L.name||c.name||('#'+c.fub))+'</b><a class="lnkb" href="'+fubUrl(c.fub)+'" target="_blank" rel="noopener">Open</a><button type="button" class="lnkb" id="unlink">Unlink</button></div>';
+    $('#unlink').onclick=function(){c.fub=null;drawLink();};return;}
+  var tags=edit.kind==='s'?['Daily Seller','CMA','Appoinment']:['Daily','Searching','Appoinment'];
+  box.innerHTML='<label class="fl" for="fq">Find in Follow Up Boss (name, email or phone)<input id="fq" type="search" autocomplete="off" placeholder="e.g. Marchetti"></label>'
+   +'<div class="tagrow"><span class="muted" style="font-size:14px;align-self:center">Or pick from tag:</span>'+tags.map(function(t){return '<button type="button" data-tag="'+esc(t)+'">'+esc(t)+'</button>';}).join('')+'</div><div class="results" id="fres"></div>';
+  var tm;$('#fq').addEventListener('input',function(){var v=this.value.trim();clearTimeout(tm);if(v.length<2){$('#fres').innerHTML='';return;}tm=setTimeout(function(){fubSearch('q='+encodeURIComponent(v));},350);});
+  $$('[data-tag]',box).forEach(function(b){b.onclick=function(){fubSearch('tag='+encodeURIComponent(b.dataset.tag));};});
+}
+function fubSearch(qs){var r=$('#fres');r.innerHTML='<p class="empty">Searching…</p>';
+  getJ('desk/fub?'+qs).then(function(j){
+    if(!j.people.length){r.innerHTML='<p class="empty">Nobody found.</p>';return;}
+    r.innerHTML=j.people.map(function(p,i){var on=p.onBoard&&p.onBoard.indexOf(edit.kind)>=0;
+      return '<button type="button" data-pick="'+i+'"'+(on?' disabled':'')+'>'+esc(p.name||'No name')+'<small>'+esc([p.phone,p.email,p.stage].filter(Boolean).join(' · '))+(on?' · already on this board':'')+'</small></button>';}).join('');
+    $$('[data-pick]',r).forEach(function(b){b.onclick=function(){var p=j.people[+b.dataset.pick];edit.c.fub=p.id;
+      [['name',p.name],['email',p.email],['phone',p.phone]].forEach(function(x){var el=$('#c_'+x[0]);if(el&&!el.value)el.value=x[1]||'';});edit.c.name=edit.c.name||p.name;drawLink();};});
+  }).catch(function(e){r.innerHTML='<p class="err">'+esc(e==='pin'?'PIN needed':e)+'</p>';});}
+function saveCard(){
+  var kind=edit.kind,FL=kind==='s'?SF:BF,b={kind:kind,id:edit.c.id||null,fub:edit.c.fub||null,stage:$('#c_stage').value};
+  FL.forEach(function(f){b[f[0]]=$('#c_'+f[0]).value.trim();});
+  if(!b.name&&!b.addr){var e=$('#cErr');e.textContent='Add a name'+(kind==='s'?' or an address':'')+'.';e.hidden=false;return;}
+  post('desk/card',b).then(function(){$('#dlg').close();toast('Saved');S.closed[kind]=S.closed[kind]||b.stage==='closed';load(true);}).catch(fail);
+}
+function openArchived(kind){
+  getJ('desk/board?kind='+kind+'&archived=1').then(function(j){var d=$('#dlg');var ST=stagesOf(kind);
+    d.innerHTML='<div class="dl"><div class="dh"><h2>Archived</h2><button type="button" class="x" data-close aria-label="Close">×</button></div>'
+     +(j.cards.length?'<ul class="li">'+j.cards.map(function(c){return '<li><div><b>'+esc(c.addr||c.name)+'</b><small>'+esc((ST.filter(function(s){return s.k===c.stage;})[0]||{}).n||'')+(c.addr&&c.name?' · '+esc(c.name):'')+'</small></div><button class="btn sm ghost" type="button" data-restore="'+c.id+'">Restore</button></li>';}).join('')+'</ul>':'<p class="empty">Nothing archived.</p>')+'</div>';
+    $$('[data-restore]',d).forEach(function(b){b.onclick=function(){post('desk/card/archive',{id:+b.dataset.restore,on:false}).then(function(){d.close();toast('Restored');load(true);}).catch(fail);};});
+    if(!d.open)d.showModal();}).catch(fail);
+}
+
+/* ---------- Marketing ---------- */
+var AREAS=[['newsletter','Newsletter','#D7141E',['newsletter']],['social','Social posts','#1D2870',['social']],['doorhanger','Door hangers','#1B7A3E',['doorhanger']],['video','Videos','#9A5B00',['ytdesc','thumb']]];
+var STATUS=['Idea','To do','In progress','Scheduled','Done'];
+function areaColor(a){var x=AREAS.filter(function(y){return y[0]===a;})[0];return x?x[2]:'#545B78';}
+// recurring series already scheduled in Metricool (Morning Mindset, Buying & Selling Steps)
+function series(day){var out=[],dow=new Date(day+'T12:00:00').getDay();
+  if(day>='2026-09-28'&&day<='2026-12-27')out.push({t:'Morning Mindset',s:'6 AM · Metricool',c:'#9BA2BD'});
+  if(day>='2026-09-29'&&day<='2027-01-07'&&(dow===2||dow===4))out.push({t:'Buying & Selling Steps',s:'2 PM · Metricool',c:'#4A5592'});
+  return out;}
+function viewMarketing(){
+  if(!S.content)return '<section class="card"><p class="empty">Loading…</p></section>';
+  var now=new Date(),mon=new Date(now);mon.setDate(now.getDate()-((now.getDay()+6)%7));var today=ymd(now);
+  var weeks=[0,1].map(function(w){var days=[];for(var i=0;i<7;i++){var d=new Date(mon);d.setDate(mon.getDate()+w*7+i);days.push(ymd(d));}return days;});
+  var cal=weeks.map(function(days,w){return '<div class="wkhd">'+(w?'Next week':'This week')+' · '+fmtDay(days[0])+'</div><div class="cal">'+days.map(function(day){
+    var its=S.content.filter(function(x){return x.due===day;}),sr=series(day),has=its.length;
+    return '<div class="d'+(day===today?' today':'')+(day<today?' past':'')+(has||day===today?'':' empty-day')+'"><h4>'+new Date(day+'T12:00:00').toLocaleDateString('en-CA',{weekday:'short'})+' <span>'+new Date(day+'T12:00:00').toLocaleDateString('en-CA',{month:'short',day:'numeric'})+'</span></h4>'
+      +its.map(function(x){return '<button type="button" class="ev" data-item="'+x.id+'" style="--c:'+areaColor(x.area)+'">'+esc(x.title)+'<small>'+esc(x.status||'')+(x.done?' · done':'')+'</small></button>';}).join('')
+      +sr.map(function(x){return '<div class="ev" style="--c:'+x.c+'">'+esc(x.t)+'<small>'+esc(x.s)+'</small></div>';}).join('')+'</div>';}).join('')+'</div>';}).join('');
+  var legend='<div class="legend">'+AREAS.map(function(a){return '<span><i style="--c:'+a[2]+'"></i>'+a[1]+'</span>';}).join('')+'<span><i style="--c:#9BA2BD"></i>Morning Mindset</span><span><i style="--c:#4A5592"></i>Buying & Selling Steps</span></div>';
+  var secs=AREAS.map(function(a){var its=S.content.filter(function(x){return x.area===a[0]&&!x.done;});
+    return '<section class="card"><div class="hd"><h2>'+a[1]+'</h2><button class="btn sm ghost" type="button" data-newitem="'+a[0]+'">+ Add</button></div>'
+     +(its.length?'<ul class="li">'+its.map(function(x){var st=x.status||'Idea',cl=st==='Scheduled'?'g':st==='In progress'?'a':'';return '<li><div><button type="button" class="it" data-item="'+x.id+'">'+esc(x.title)+'</button><small>'+(x.due?fmtDay(x.due):'No date')+(x.note?' · '+esc(x.note.slice(0,80)):'')+'</small></div><span class="chip '+cl+'">'+esc(st)+'</span></li>';}).join('')+'</ul>':'<p class="empty">Nothing planned. Tap + Add.</p>')
+     +'<div class="pacts" style="margin-top:12px">'+a[3].map(function(k,i){return pbtn(k,'m','',!i);}).join('')+'</div></section>';}).join('');
+  return '<div class="mk"><section class="card wide"><div class="hd"><h2>Content calendar</h2><span class="sub">Brand-wide only. Client work lives on Sellers / Buyers.</span><button class="btn sm ghost" type="button" data-newitem="social">+ Add</button>'+pbtn('calendar','m','',1)+'</div>'+cal+legend+'</section>'
+    +secs
+    +'<section class="card wide"><div class="hd"><h2>Already running</h2></div><ul class="li">'
+    +'<li><div>Morning Mindset<small>Daily 6 AM quote post, Sep 28 – Dec 27, 2026 (Metricool)</small></div><span class="chip g">Scheduled</span></li>'
+    +'<li><div>Buying & Selling Steps<small>Tue + Thu 2 PM, Sep 29, 2026 – Jan 7, 2027 (Metricool)</small></div><span class="chip g">Scheduled</span></li></ul></section></div>';
+}
+function openItem(id,area){
+  var x=id?S.content.filter(function(y){return y.id===+id;})[0]:{area:area,status:'Idea'},d=$('#dlg'),cf=false;
+  d.innerHTML='<form class="dl" id="itF"><div class="dh"><h2>'+(id?'Edit':'Add')+'</h2><button type="button" class="x" data-close aria-label="Close">×</button></div><div class="fgrid">'
+   +'<label class="full" for="i_title">Title<input id="i_title" value="'+esc(x.title||'')+'" autocomplete="off" placeholder="Fall market update"></label>'
+   +'<label for="i_area">Type<select id="i_area">'+AREAS.concat([['other','Other']]).map(function(a){return '<option value="'+a[0]+'"'+(a[0]===x.area?' selected':'')+'>'+a[1]+'</option>';}).join('')+'</select></label>'
+   +'<label for="i_due">Date<input id="i_due" type="date" value="'+esc(x.due||'')+'"></label>'
+   +'<label for="i_status">Status<select id="i_status">'+STATUS.map(function(s){return '<option'+(s===(x.done?'Done':x.status)?' selected':'')+'>'+s+'</option>';}).join('')+'</select></label>'
+   +'<label class="full" for="i_note">Notes<textarea id="i_note">'+esc(x.note||'')+'</textarea></label></div><p class="err" id="iErr" hidden></p></form>'
+   +'<div class="dfoot"><button type="button" class="btn" id="iSave">Save</button>'+(id?'<button type="button" class="btn danger" id="iDel">Delete</button>':'<button type="button" class="btn ghost" data-close>Cancel</button>')+'</div>';
+  $('#itF').onsubmit=function(e){e.preventDefault();};
+  $('#iSave').onclick=function(){var st=$('#i_status').value,b={id:id||null,title:$('#i_title').value.trim(),area:$('#i_area').value,due:$('#i_due').value,status:st,done:st==='Done',note:$('#i_note').value};
+    if(!b.title){$('#iErr').textContent='Add a title.';$('#iErr').hidden=false;return;}
+    post('desk/content',b).then(function(){d.close();toast('Saved');load(true);}).catch(fail);};
+  if(id)$('#iDel').onclick=function(){if(!cf){cf=true;this.textContent='Tap again to delete';return;}post('desk/content/delete',{id:id}).then(function(){d.close();toast('Deleted');load(true);}).catch(fail);};
+  if(!d.open)d.showModal();
+}
+
+/* ---------- Toolkit ---------- */
+var SCRIPTS=[
+ {k:'buyer',n:'Buyer call',s:'New buyer lead, first call',body:[
+  ['h','Open'],['say','Hi {name}, it’s Michael with the OP Team. You asked about a home in {area}. Is now still a good time?'],
+  ['h','Find out'],['say','What’s got you looking right now?'],['say','Where would you love to live, and what has to be in the next home?'],['say','Have you spoken with a lender yet, or would an introduction help?'],
+  ['h','Close'],['say','Here’s what I suggest: a 20-minute buyer meeting so I can set up your search properly. Does Tuesday or Wednesday evening work better?'],
+  ['cue','If they’re not ready'],['say','No problem. I’ll send you new listings that match, and check in every couple of weeks. Sound good?']]},
+ {k:'listing',n:'Listing appointment',s:'At the kitchen table',body:[
+  ['h','Set the agenda'],['say','Here’s how I’d like to use our time: tour the home, hear your plans, show you the numbers, then talk about how we’d market it. Sound good?'],
+  ['h','Their goals'],['say','Where are you moving to, and when do you need to be there?'],['say','What matters most to you: price, timing, or ease?'],
+  ['h','The price'],['say','These are the homes that sold near you recently. Buyers compare yours to these, so this is where I’d position it.'],
+  ['h','Ask for the listing'],['say','If you’re comfortable with the plan, we can sign today and have photos booked this week.']]},
+ {k:'expired',n:'Expireds',s:'Listing expired, first call',body:[
+  ['say','Hi, it’s Michael with the OP Team. I saw your home on {street} came off the market. Are you still hoping to sell?'],
+  ['cue','If yes'],['say','What do you think stopped it from selling?'],['say','If you put it back on the market, what would you want done differently?'],
+  ['say','I have a few ideas based on what’s selling nearby. Could I come by for 15 minutes tomorrow or Thursday?']]},
+ {k:'fsbo',n:'FSBOs',s:'For sale by owner',body:[
+  ['say','Hi, I’m Michael, a local agent. I saw your home is for sale. I’m not calling to list it. Are you open to buyers who are working with an agent?'],
+  ['say','How have showings been going so far?'],['say','If it doesn’t sell on your own in the next few weeks, what would you do next?'],
+  ['say','I’d be happy to drop off a short report of what’s sold near you, no strings. When is a good time?']]},
+ {k:'obj',n:'Objections',s:'Common pushback',body:[
+  ['cue','“We want to wait for spring.”'],['say','That makes sense. Fewer homes compete in the fall, so serious buyers see yours first. Want me to show you how many sold last month?'],
+  ['cue','“Another agent said a higher price.”'],['say','I’d love that number too. Let’s look at the sales buyers will compare yours to, and decide together.'],
+  ['cue','“Your commission is too high.”'],['say','Fair question. Let me show you what’s included and what we netted our last three sellers.'],
+  ['cue','“We’ll just try it ourselves.”'],['say','Plenty of people try. If it doesn’t go the way you want, can I be the first call?']]}
+];
+var LAW_CHECKED='Oct 7, 2026';
+var LAW=[
+ {q:'Tenant isn’t paying rent. What’s the first step?',a:['The landlord serves an N4 (Notice to End a Tenancy Early for Non-payment of Rent).','Since Sept 21, 2026 the tenant gets 7 days to pay (it used to be 14 for monthly rent). If they pay everything owing in time, the notice is void.','If they don’t, the landlord can apply to the LTB with an L1.'],f:['N4','L1']},
+ {q:'Seller wants the unit back for their own use.',a:['The landlord serves an N12. The landlord, a family member, or a caregiver must intend to live there for at least one year.','Option 1: at least 60 days’ notice, ending on the last day of a rental period, plus one month’s rent as compensation (or another acceptable unit).','Option 2 (since Sept 21, 2026): at least 120 days’ notice and no compensation required.'],f:['N12','L2']},
+ {q:'Buyer of a tenanted home wants to move in.',a:['For a building with 3 or fewer units, once the Agreement of Purchase and Sale is firm, the seller can serve an N12 for the buyer’s own use.','At least 60 days’ notice ending on the last day of a rental period, and the buyer (or family / caregiver) must intend to live there at least one year.','One month’s rent compensation still applies. The 120-day, no-compensation option does not apply to a buyer’s own use.'],f:['N12']},
+ {q:'How much notice to show a tenanted home to buyers?',a:['Written notice at least 24 hours before entry, stating the reason and a time between 8 AM and 8 PM.','Letting a possible buyer view the unit is a permitted reason under the RTA.'],f:['Written notice']},
+ {q:'How much can the rent go up?',a:['At least 90 days’ written notice (N1), and no more than once every 12 months.','Most units are capped at the yearly guideline: 2.1% for 2026.','Units first occupied as residential after Nov 15, 2018 are generally exempt from the guideline.'],f:['N1']},
+ {q:'Tenant wants to leave early.',a:['A monthly tenant gives an N9 with at least 60 days’ notice, ending on the last day of a rental period (not before the end of a fixed-term lease).','If both sides agree to end sooner, they can sign an N11 (Agreement to End the Tenancy).'],f:['N9','N11']},
+ {q:'What deposit can a landlord take?',a:['A rent deposit no larger than one month’s rent, used only for the last month. A refundable key deposit is allowed.','Damage deposits are not allowed. The landlord pays interest on the rent deposit every year at the guideline rate.'],f:['Rent deposit']},
+ {q:'Is there a required lease form?',a:['Most residential leases in Ontario must use the province’s Standard Form of Lease.','If a landlord doesn’t provide it after the tenant asks in writing, the tenant can withhold one month’s rent.'],f:['Standard Lease']}
+];
+function viewToolkit(){
+  var tabs='<div class="subtabs" role="toolbar" aria-label="Toolkit sections">'+[['scripts','Scripts'],['law','Landlord & Tenant'],['todo','To-do']].map(function(t){return '<button type="button" data-tk="'+t[0]+'" aria-pressed="'+(S.tk===t[0])+'">'+t[1]+'</button>';}).join('')+'</div>';
+  var body;
+  if(S.tk==='scripts'){var s=SCRIPTS.filter(function(x){return x.k===S.script;})[0];
+    body='<section class="card"><div class="hd"><h2>Scripts</h2><span class="sub">Big text for the tablet</span></div><div class="reader"><div class="slist">'
+     +SCRIPTS.map(function(x){return '<button type="button" data-script="'+x.k+'" aria-pressed="'+(x.k===S.script)+'">'+esc(x.n)+'<small>'+esc(x.s)+'</small></button>';}).join('')+'</div>'
+     +'<div class="script"><div class="sz"><span>'+esc(s.n)+' · {name} = fill in</span><button type="button" data-fs="-2" aria-label="Smaller text">A−</button><button type="button" data-fs="2" aria-label="Bigger text">A+</button></div><div class="stext" id="stext" style="--fs:'+S.fs+'px">'
+     +s.body.map(function(l){return l[0]==='h'?'<h3>'+esc(l[1])+'</h3>':l[0]==='cue'?'<span class="cue">'+esc(l[1])+'</span>':'<p>'+esc(l[1])+'</p>';}).join('')+'</div></div></div></section>';}
+  else if(S.tk==='law'){
+    body='<section class="card law"><div class="hd"><h2>Landlord & Tenant</h2><span class="sub">Ontario · Residential Tenancies Act</span>'+pbtn('lawq','m','',1)+'</div>'
+     +'<div class="banner"><b>Not legal advice.</b><span>Quick reference for client conversations, updated for the Sept 21, 2026 changes. Confirm on the LTB site or with a paralegal / lawyer before anyone acts.</span></div>'
+     +'<input class="search" id="lawQ" type="search" placeholder="Search: N12, rent increase, showings…" aria-label="Search questions">'
+     +'<div id="lawList">'+LAW.map(function(l){return '<details class="faq" data-txt="'+esc((l.q+' '+l.a.join(' ')+' '+l.f.join(' ')).toLowerCase())+'"><summary>'+esc(l.q)+'</summary><div class="a"><div class="form">'+l.f.map(function(f){return '<span class="chip n">'+esc(f)+'</span>';}).join('')+'</div>'
+       +l.a.map(function(p){return '<p>'+esc(p)+'</p>';}).join('')
+       +'<p style="font-size:15px"><a href="https://tribunalsontario.ca/ltb/forms/" target="_blank" rel="noopener">LTB forms</a> · <a href="https://www.ontario.ca/laws/statute/06r17" target="_blank" rel="noopener">Residential Tenancies Act</a> · <a href="https://www.ontario.ca/page/renting-ontario-your-rights" target="_blank" rel="noopener">Renting in Ontario</a></p>'
+       +'<div class="disc"><b>Not legal advice</b> · Last checked '+LAW_CHECKED+'</div></div></details>';}).join('')+'</div>'
+     +'<p class="empty" id="lawNone" hidden>No matches. Try a form number like N4, or tap Ask a L&T Question.</p></section>';}
+  else{
+    var T=S.todos;
+    body='<section class="card"><div class="hd"><h2>To-do</h2><span class="sub">'+(T?T.filter(function(t){return !t.done;}).length+' open · same list as HQ':'')+'</span></div>'
+     +(!T?'<p class="empty">Loading…</p>':T.length?'<ul class="todo">'+T.map(function(t){return '<li><label><input type="checkbox" data-td="'+t.id+'"'+(t.done?' checked':'')+'><span>'+esc(t.title)+(t.due?'<small>'+fmtDay(t.due)+'</small>':'')+'</span></label><button type="button" class="x" data-tdx="'+t.id+'" aria-label="Remove">×</button></li>';}).join('')+'</ul>':'<p class="empty">Nothing on the list.</p>')
+     +'<form class="add" id="tdForm"><input id="tdIn" type="text" placeholder="Add a to-do" aria-label="New to-do" autocomplete="off"><input id="tdDue" type="date" aria-label="Due date"><button class="btn" type="submit">Add</button></form></section>';}
+  return tabs+body;
+}
+function afterToolkit(){
+  var q=$('#lawQ');if(q)q.addEventListener('input',function(){var v=q.value.trim().toLowerCase(),n=0;$$('#lawList details').forEach(function(d){var ok=!v||d.dataset.txt.indexOf(v)>=0;d.hidden=!ok;if(ok)n++;});$('#lawNone').hidden=n>0;});
+  var f=$('#tdForm');if(f)f.addEventListener('submit',function(e){e.preventDefault();var t=$('#tdIn').value.trim();if(!t)return;
+    post('item',{kind:'todo',title:t,due:$('#tdDue').value||null}).then(function(){return loadTodos();}).then(function(){render();$('#tdIn').focus();}).catch(fail);});
+}
+
+/* ---------- prompt dialog ---------- */
+function ctxData(ctx,id){
+  if(ctx==='s'||ctx==='b'){var c=cardById(ctx,id),L=liveOf(ctx,c),nm=c.name||L.name||'';
+    var d={client:nm,email:L.email||c.email,phone:L.phone||c.phone};
+    if(ctx==='s'){d.addr=[c.addr,c.area].filter(Boolean).join(', ');d.type=c.ptype;d.bb=c.size;d.list=c.price;d.price=c.price;d.notes=c.note;}
+    else{d.area=c.area;d.budget=c.budget;d.must=c.want;d.purpose='Buyer offer price';var dd=daysSince(L.last);d.last=dd==null?'':(dd===0?'today':dd+' days ago');d.ctx=c.next;}
+    return d;}
+  if(ctx==='lead'){var l=(S.inbox.people||[]).filter(function(x){return x.id===+id;})[0]||{};return {client:l.name,email:l.email,phone:l.phone,src:l.source};}
+  return {};
+}
+var cur=null;
+function openPrompt(key,ctx,id){
+  var P=PROMPTS[key],d=ctxData(ctx,id),today=ymd(new Date());
+  var fields=P.fields.map(function(f){return typeof f==='string'?Object.assign({k:f},F[f]):f;});cur={P:P,fields:fields};
+  function inp(f){var v=d[f.k]!=null&&d[f.k]!==''?d[f.k]:(f.type==='date'?today:''),id='f_'+f.k;
+    var ctl=f.opts?'<select id="'+id+'" data-f><option value="">—</option>'+f.opts.map(function(o){return '<option'+(o===v?' selected':'')+'>'+esc(o)+'</option>';}).join('')+'</select>'
+      :f.ta?'<textarea id="'+id+'" data-f placeholder="'+esc(f.ph||'')+'">'+esc(v)+'</textarea>'
+      :'<input id="'+id+'" data-f type="'+(f.type||'text')+'" value="'+esc(v)+'" placeholder="'+esc(f.ph||'')+'" autocomplete="off">';
+    return '<label class="'+(f.full||f.ta?'full':'')+'" for="'+id+'"><span>'+esc(f.l)+(f.req?' <em>*</em>':'')+'</span>'+ctl+'</label>';}
+  var dlg=$('#dlg');
+  dlg.innerHTML='<form class="dl" id="pf"><div class="dh"><div style="flex:1;min-width:0"><h2>'+esc(P.label)+'</h2><p>Fill in what you know, copy, and paste it to Claude. Runs the <span class="chip n">'+esc(P.skill)+'</span> skill.</p></div><button type="button" class="x" data-close aria-label="Close">×</button></div>'
+    +'<div class="fgrid">'+fields.map(inp).join('')+'</div>'
+    +'<div class="pv"><div class="k"><span>Prompt</span><span id="pvMiss"></span></div><textarea id="pvT" readonly aria-label="Prompt text"></textarea></div></form>'
+    +'<div class="dfoot"><button type="button" class="btn" id="copyBtn">Copy prompt</button><button type="button" class="btn ghost" data-close>Close</button></div>';
+  $$('[data-f]',dlg).forEach(function(el){el.addEventListener('input',buildPrompt);});
+  $('#pf').onsubmit=function(e){e.preventDefault();};
+  buildPrompt();if(!dlg.open)dlg.showModal();
+}
+function buildPrompt(){
+  var lines=[],miss=[];
+  cur.fields.forEach(function(f){var el=document.getElementById('f_'+f.k),v=(el&&el.value||'').trim();if(!v){if(f.req)miss.push(f.l);return;}
+    lines.push(f.ta?f.l+':\n'+v.split('\n').map(function(x){return '  '+x;}).join('\n'):'- '+f.l+': '+v);});
+  $('#pvT').value='Use the '+cur.P.skill+' skill.\n'+cur.P.lead+'\n\n'+lines.join('\n')+(miss.length?'\n\n(Missing: '+miss.join(', ')+')':'');
+  var m=$('#pvMiss');m.textContent=miss.length?'Missing: '+miss.join(', '):'Ready';m.style.color=miss.length?'var(--red)':'var(--green)';
+}
+function copyPrompt(){var t=$('#pvT');function sel(){t.focus();t.select();toast('Text selected. Use Copy from the menu.');}
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t.value).then(function(){toast('Copied. Paste it to Claude.');},sel);else sel();}
+
+/* ---------- settings ---------- */
+function openSettings(){var d=$('#dlg');
+  d.innerHTML='<div class="dl"><div class="dh"><h2>Settings</h2><button type="button" class="x" data-close aria-label="Close">×</button></div>'
+   +'<label class="sw"><input type="checkbox" id="tagSw"'+(S.tagSync?' checked':'')+'><i></i>Put the stage on the FUB contact as a tag</label>'
+   +'<p class="muted" style="margin:0;font-size:15px">When on, moving a linked card also tags the person in Follow Up Boss, for example <b>Seller - Prospect</b> or <b>Buyer - Searching</b>, and removes their old stage tag. Off by default. Nothing else in FUB changes.</p>'
+   +'<p class="muted" style="margin:0;font-size:15px">The boards are the desk’s own list. FUB Deals aren’t used.</p></div>';
+  $('#tagSw').onchange=function(){var on=this.checked;post('desk/settings',{tagSync:on}).then(function(j){S.tagSync=j.tagSync;toast(on?'Stage tags on':'Stage tags off');}).catch(fail);};
+  if(!d.open)d.showModal();}
+
+/* ---------- events ---------- */
+document.addEventListener('click',function(e){
+  var t=e.target.closest('button,a');if(!t)return;
+  var ds=t.dataset;
+  if(ds.p){openPrompt(ds.p,ds.ctx,ds.id);return;}
+  if(t.id==='copyBtn'){copyPrompt();return;}
+  if(t.hasAttribute('data-close')){$('#dlg').close();return;}
+  if(t.id==='refresh'){S.inbox=null;load(true);return;}
+  if(t.id==='setBtn'){openSettings();return;}
+  if(ds.jump){var c=document.getElementById('col-'+ds.jump);if(c){var b=c.parentElement;b.scrollTo({left:c.offsetLeft-b.offsetLeft-parseFloat(getComputedStyle(b).paddingLeft),behavior:'smooth'});}return;}
+  if(t.hasAttribute('data-more')){var n=t.nextElementSibling;n.hidden=!n.hidden;t.setAttribute('aria-expanded',String(!n.hidden));t.textContent=n.hidden?'All prompts':'Fewer prompts';return;}
+  if(ds.add){openCard(ds.add,null);return;}
+  if(ds.edit){openCard(ds.edit,+ds.id);return;}
+  if(ds.archived){openArchived(ds.archived);return;}
+  if(ds.sort){var l=(S.inbox.people||[]).filter(function(x){return x.id===+ds.fub;})[0];if(!l)return;t.disabled=true;
+    post('desk/inbox/sort',{fub:l.id,to:ds.sort,name:l.name,email:l.email,phone:l.phone,note:l.source?'From '+l.source:''}).then(function(){
+      S.inbox.people=S.inbox.people.filter(function(x){return x!==l;});badge();
+      if(ds.sort!=='skip'){S.board.s=null;S.board.b=null;}
+      toast(ds.sort==='skip'?l.name+' skipped':l.name+' added to '+(ds.sort==='both'?'Sellers + Buyers':ds.sort==='s'?'Sellers':'Buyers')+' › Talking');
+      render();return load(false);}).catch(function(err){t.disabled=false;fail(err);});return;}
+  if(ds.newitem){openItem(null,ds.newitem);return;}
+  if(ds.item){openItem(+ds.item);return;}
+  if(ds.tk){S.tk=ds.tk;store('desk_tk',S.tk);render();load(false);return;}
+  if(ds.script){S.script=ds.script;render();return;}
+  if(ds.fs){S.fs=Math.max(18,Math.min(48,S.fs+(+ds.fs)));store('desk_fs',S.fs);$('#stext').style.setProperty('--fs',S.fs+'px');return;}
+  if(ds.tdx){post('item/delete',{id:+ds.tdx}).then(loadTodos).then(render).catch(fail);return;}
+});
+document.addEventListener('change',function(e){var t=e.target,ds=t.dataset;
+  if(t.id==='inDays'){S.inboxDays=+t.value;store('desk_inbox_days',S.inboxDays);S.inbox=null;render();loadInbox().then(render).catch(fail);return;}
+  if(ds.closed){S.closed[ds.closed]=t.checked;store('desk_closed_'+ds.closed,t.checked);render();return;}
+  if(ds.move){var kind=ds.move,c=cardById(kind,ds.id),st=t.value;post('desk/card/move',{id:c.id,stage:st}).then(function(j){c.stage=st;c.checks=c.checks||[];
+      if(st==='closed'){S.closed[kind]=true;}render();toast('Moved to '+stagesOf(kind).filter(function(x){return x.k===st;})[0].n+(S.tagSync&&c.fub&&j.tagged===false?' (FUB tag not updated)':''));}).catch(fail);return;}
+  if(ds.check){var c2=cardById('s',ds.check),v=t.value,ch=(c2.checks||[]).filter(function(x){return x!==v;});if(t.checked)ch.push(v);c2.checks=ch;
+    var card=t.closest('.pc'),left=$$('[data-check]',card).filter(function(x){return !x.checked;}).length;$('.dh',card).textContent='Due now · '+(left?left+' left':'all done');
+    post('desk/card/checks',{id:c2.id,checks:ch}).catch(fail);return;}
+  if(ds.td){post('item/done',{id:+ds.td,done:t.checked}).then(function(){var x=S.todos.filter(function(y){return y.id===+ds.td;})[0];if(x)x.done=t.checked?1:0;}).catch(fail);return;}
+});
+$('#dlg').addEventListener('click',function(e){if(e.target===$('#dlg'))$('#dlg').close();});
+
+setTab(S.tab);
+})();
+</script>
+</body>
+</html>
