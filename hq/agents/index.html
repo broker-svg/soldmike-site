@@ -287,6 +287,32 @@ dialog::backdrop{background:rgba(20,24,51,.6)}
 .pk[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:var(--white)}
 .linkbox .row2{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .cardview .pc{border:0;padding:0}
+
+/* side column (activity, unsorted, today) next to the board on wide screens */
+.split{display:grid;gap:20px;grid-template-columns:minmax(0,1fr)}
+.mainc{display:grid;gap:20px;min-width:0;align-content:start}
+.rail{order:-1;display:grid;gap:20px;align-content:start;min-width:0}
+@media (min-width:1180px){.split{grid-template-columns:minmax(0,1fr) 360px}.rail{order:0;position:sticky;top:64px;max-height:calc(100vh - 80px);overflow:auto;overscroll-behavior:contain;padding-bottom:4px}
+  .rail .card{padding:16px}.rail .hd h2{font-size:24px}.rail .hd .sub{flex-basis:100%}.rail .row .rm{flex-basis:100%}.rail .ra{margin-left:0}}
+/* expireds / fsbos */
+.pdot{display:inline-block;width:12px;height:12px;border-radius:50%;flex:none;margin:6px 10px 0 0;background:#B5BBD3}
+.pdot.r{background:var(--red)}.pdot.o{background:#E8590C}.pdot.y{background:#F2C200}.pdot.g{background:var(--green)}.pdot.grey{background:#B5BBD3}
+.pdot.yg{background:linear-gradient(90deg,#F2C200 50%,var(--green) 50%)}
+.pl2{font-weight:600}.pl2.r{color:var(--red)}.pl2.o{color:#B4460A}.pl2.y{color:#8A6D00}.pl2.yg{color:#6B6A00}.pl2.g{color:var(--green)}
+.plegend{display:flex;gap:6px 14px;flex-wrap:wrap;font-size:13px;color:var(--muted);margin:0 0 8px}
+.plegend span{display:inline-flex;align-items:center}.plegend .pdot{margin:0 6px 0 0;width:10px;height:10px}
+.prow .rm{align-items:flex-start}
+/* marketing */
+.mk{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+.mkc{display:grid;gap:20px;align-content:start;min-width:0}
+@media (max-width:900px){.mk{grid-template-columns:minmax(0,1fr)!important}}
+.lead2{margin:0 0 10px;color:var(--muted);font-size:16px;max-width:65ch}
+.runway{display:grid;gap:6px;margin-bottom:10px}
+.rw-top{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline}.rw-top b{font-family:var(--display);font-size:26px;text-transform:uppercase}.rw-top span{color:var(--muted);font-size:15px}
+.rw-bar{height:12px;border-radius:6px;background:var(--mist);border:1px solid var(--line);overflow:hidden}.rw-bar span{display:block;height:100%;border-radius:6px;background:var(--green)}
+.rw-bar.a span{background:#E0A100}.rw-bar.r span{background:var(--red)}
+.rw-sub{display:flex;justify-content:space-between;gap:10px;font-size:13px;color:var(--muted)}
+.sm-note{font-size:15px;margin:8px 0 0}.sm-note ul{margin:4px 0 0;padding-left:20px}
 </style>
 </head>
 <body>
@@ -380,18 +406,19 @@ var PROMPTS={
     fields:['client','email','phone',{k:'chan',l:'Send as',opts:['Text','Email','Call notes']},{k:'last',l:'Last contact'},{k:'ctx',l:'What I want to say',ta:1,full:1}]},
   showings:{label:'Book Showings',skill:'showing-prep',lead:'Plan and book a showing tour.',
     fields:['client','phone',{k:'day',l:'Date',type:'date'},{k:'window',l:'Time window',ph:'Sat 10 AM – 1 PM'},{k:'homes',l:'Addresses / MLS® #s',ta:1,full:1}]},
-  newsletter:{label:'Newsletter',skill:'soldmike-newsletter',lead:'Build this week’s OP Team newsletter.',
-    fields:[{k:'week',l:'Issue date',type:'date'},{k:'theme',l:'Theme',opts:['Charcoal','Blue / white']},{k:'feature',l:'Featured listing'},{k:'stat',l:'Market stat'},{k:'list',l:'Send to Smart List'},'notes']},
-  social:{label:'Social Post',skill:'soldmike-social-post',lead:'Make a brand social post.',
-    fields:[{k:'topic',l:'Topic',full:1},{k:'plat',l:'Where',opts:['Instagram + Facebook','Instagram only','LinkedIn','All']},{k:'date',l:'Post date',type:'date'},'notes']},
-  doorhanger:{label:'Door Hangers',skill:'door-hanger',lead:'Design a door hanger campaign.',
-    fields:[{k:'kind',l:'Kind',opts:['Just Listed','Just Sold','Market update','Open house']},{k:'addr',l:'Feature address'},{k:'area',l:'Streets / area'},{k:'qty',l:'How many'},'notes']},
-  ytdesc:{label:'YouTube Description',skill:'tpm-youtube-description',lead:'Write the YouTube title options and description.',
-    fields:[{k:'title',l:'Working title',full:1},{k:'link',l:'Video link or file',full:1},{k:'points',l:'Key points',ta:1,full:1}]},
-  thumb:{label:'Thumbnail',skill:'tpm-thumbnail-generator',lead:'Make a YouTube thumbnail.',
-    fields:[{k:'title',l:'Video title',full:1},{k:'words',l:'Words on thumbnail (3–4)'},{k:'photo',l:'Photo of me',opts:['Yes','No']}]},
-  calendar:{label:'Plan Next Week',skill:'schedule',lead:'Plan next week’s brand content.',
-    fields:[{k:'week',l:'Week of',type:'date'},{k:'focus',l:'Focus'},'notes']},
+  newsletter:{label:'Newsletter',skill:'soldmike-newsletter',lead:'Build this week’s OP Team newsletter. Do NOT send it to anyone or any list. When I approve it, save it in Follow Up Boss as an email template named "OP Team Newsletter – <date>" so I can send it myself. Look up photos, prices and details from soldmike.ca (or REALTOR.ca) using the addresses; use soldmike.com links only as button links (don’t read soldmike.com listing pages). Write the subject line and preview yourself. Leave out any block I left blank. If something required is missing, ask me in one message.',
+    fields:[{k:'theme',l:'Theme',opts:['Dark (charcoal)','Light (blue / white)'],req:1},{k:'vid',l:'Market Watch video link (Instagram / YouTube)',full:1},{k:'hook',l:'Video hook (optional)',full:1,ph:'Is the market starting to shift?'},
+      {k:'low',l:'Listing of the Week: address',req:1,full:1},{k:'lowlink',l:'Listing of the Week: soldmike.com link (optional)',full:1},{k:'oh',l:'Open house (day + time)',ph:'Sat 2–4 PM'},{k:'clip',l:'5-sec clip or virtual tour link (for the GIF)'},
+      {k:'a1',l:'Also this week #1',full:1},{k:'a2',l:'Also this week #2',full:1},{k:'a3',l:'Also this week #3',full:1},{k:'a4',l:'Also this week #4',full:1},
+      {k:'sold',l:'Sold of the week: address',full:1},{k:'soldp',l:'Sold price'},{k:'soldd',l:'Sold date',type:'date',nodef:1},{k:'thoughts',l:'Market thoughts (optional)',ta:1,full:1},'notes']},
+  socialreview:{label:'Social Review',skill:'metricool-scheduler',lead:'Run my social media review for the SoldMike brand in Metricool:\n1. See what’s scheduled and how many weeks of posts are left in each series.\n2. Check soldmike.ca for our current listings and sold listings, and find anything new since the last review.\n3. New listing: plan the property posts (property-posts skill, about 10 photos, same style as before).\n4. New sold: make a Sold graphic (soldmike-sold-graphic skill) for my approval.\n5. Find scheduled posts for listings that have since sold, expired or changed, and list them for removal (ask before deleting).\n6. Tell me what’s needed to stay ahead by the number of weeks below, plus anything doing well (likes, comments, DMs).\n7. When done, update the Agent Desk social status (POST /api/hq/desk/social, see 2nd Brain Systems/Agent Dashboards).',
+    fields:[{k:'last',l:'Last review'},{k:'weeks',l:'Stay ahead by (weeks)',ph:'4'},'notes']},
+  doorhanger:{label:'Door Hangers',skill:'door-hanger',lead:'Make door hangers the same way as last time, then adjust from my notes.',
+    fields:[{k:'kind',l:'Kind',opts:['Expired listing','FSBO','Just Listed','Just Sold','Market update','Open house']},{k:'homes',l:'Addresses',ta:1,full:1},{k:'area',l:'Streets / area around them'},{k:'qty',l:'How many'},'notes']},
+  flyer:{label:'Flyer',skill:'marketing-copy',lead:'Make a print flyer the same way as last time, then adjust from my notes.',
+    fields:[{k:'kind',l:'Kind',opts:['Listing feature sheet','Just Sold','Neighbourhood mailer','Open house']},{k:'addr',l:'Address (if a listing)',full:1},{k:'area',l:'Area / audience'},{k:'qty',l:'How many'},'notes']},
+  expimport:{label:'Build Expired List',skill:'pdf',lead:'Build / refresh my Expired list. I’m attaching MLS exports (expired, terminated and soon-to-expire listings, plus sold + active for cross-checking). Follow my 2nd Brain note Business/Expired and FSBO Prospecting: drop anything that sold or relisted and keep the live targets. Then load them into the Agent Desk with POST /api/hq/desk/prospects/import {kind:"exp", items:[{addr, city, region, hood, price, ptype, beds, mls, listed, expires (YYYY-MM-DD), status}]} and tell me how many were added and updated.',
+    fields:[{k:'files',l:'What I’m attaching',ph:'Expired + terminated PDF, Sept 7 – Oct 7',full:1},{k:'area',l:'Areas',ph:'Vaughan, King, Richmond Hill'},'notes']},
   lawq:{label:'Ask a L&T Question',skill:'deep-research',lead:'Answer this Ontario landlord & tenant question. Use the current Residential Tenancies Act (including the Sept 21, 2026 changes), name the LTB form, link official sources, and mark it "not legal advice".',
     fields:[{k:'who',l:'I’m helping',opts:['Landlord client','Tenant client','Buyer of tenanted home','Seller of tenanted home']},{k:'q',l:'Question',ta:1,full:1},{k:'facts',l:'Facts (lease dates, rent, units in building)',ta:1,full:1}]},
   firstreply:{label:'First Reply',skill:'draft-outreach',lead:'Draft my first reply to this new lead.',
@@ -405,7 +432,7 @@ var S={tab:TABS.indexOf(location.hash.slice(1))>=0?location.hash.slice(1):(store
   content:null,todos:null,tk:store('desk_tk')||'scripts',
   view:{s:store('desk_view_s')||'board',b:store('desk_view_b')||'board'},showInbox:store('desk_inbox_on')!==false,inboxView:store('desk_inbox_view')||'cards',
   feedOn:store('desk_feed_on')!==false,feedDays:store('desk_feed_days')||2,feedFilter:'all',feedAll:false,viewing:null,
-  sel:{s:{},b:{}},sort:{s:store('desk_sort_s')||'stage',b:store('desk_sort_b')||'stage'},filter:{s:{q:'',stage:'',region:'',act:''},b:{q:'',stage:'',region:'',act:''}},script:'buyer',fs:store('desk_fs')||26,tagSync:false,fubApp:'https://app.followupboss.com'};
+  sel:{s:{},b:{}},prospects:null,social:undefined,pTab:store('desk_ptab')||'exp',pFilter:{q:'',region:'',city:'',all:false},printTab:store('desk_print')||'hangers',sort:{s:store('desk_sort_s')||'stage',b:store('desk_sort_b')||'stage'},filter:{s:{q:'',stage:'',region:'',act:''},b:{q:'',stage:'',region:'',act:''}},script:'buyer',fs:store('desk_fs')||26,tagSync:false,fubApp:'https://app.followupboss.com'};
 
 function setTab(t){S.tab=t;store('desk_tab',t);$$('#tabnav a[data-tab]').forEach(function(a){a.setAttribute('aria-current',a.dataset.tab===t?'page':'false');});render();load(false);}
 $$('#tabnav a[data-tab]').forEach(function(a){a.addEventListener('click',function(e){e.preventDefault();history.replaceState(null,'','#'+a.dataset.tab);setTab(a.dataset.tab);window.scrollTo({top:0});});});
@@ -417,7 +444,8 @@ function load(force){
   if(S.tab==='sellers'||S.tab==='buyers'){
     ['s','b'].forEach(function(k){if(force||!S.board[k])jobs.push(getJ('desk/board?kind='+k+(force?'&pull=1':'')).then(function(j){S.board[k]=j;S.tagSync=j.tagSync;S.fubApp=j.fubApp||S.fubApp;if(j.pulled)toast(j.pulled+' added from your FUB tags');}));});
     if(force||!S.inbox)jobs.push(loadInbox());}
-  if(S.tab==='marketing'&&(force||!S.content))jobs.push(getJ('desk/content').then(function(j){S.content=j.items;}));
+  if(S.tab==='marketing'&&(force||S.social===undefined))jobs.push(getJ('desk/social').then(function(j){S.social=j.social;}));
+  if((S.tab==='marketing'||S.tab==='sellers')&&(force||!S.prospects))jobs.push(loadProspects());
   if(S.tab==='toolkit'&&(force||!S.todos))jobs.push(loadTodos());
   if(!jobs.length)return Promise.resolve();
   var b=$('#refresh');b.classList.add('spin');
@@ -430,7 +458,7 @@ function badge(){var n=S.inbox&&S.inbox.people?S.inbox.people.length:0;['sellers
 function render(){var m=$('#main');
   var html=({sellers:viewBoard,buyers:viewBoard,marketing:viewMarketing,toolkit:viewToolkit})[S.tab]();
   var sx={};$$('.board',m).forEach(function(b){sx[b.id]=b.scrollLeft;});
-  var fa=document.activeElement,fid=fa&&fa.id&&/^lq-/.test(fa.id)?fa.id:null,pos=fid?fa.selectionStart:0;
+  var fa=document.activeElement,fid=fa&&fa.id&&/^(lq-|pq$)/.test(fa.id)?fa.id:null,pos=fid?fa.selectionStart:0;
   m.innerHTML=html;
   if(fid){var el=document.getElementById(fid);if(el){el.focus();try{el.setSelectionRange(pos,pos);}catch(e){}}}
   $$('.board',m).forEach(function(b){if(sx[b.id])b.scrollLeft=sx[b.id];});
@@ -443,6 +471,9 @@ function fubUrl(id){return S.fubApp+'/2/people/view/'+id;}
 function cardById(kind,id){var b=S.board[kind];return b&&b.cards.filter(function(c){return c.id===+id;})[0];}
 function liveOf(kind,c){var b=S.board[kind];return (c.fub&&b&&b.live&&b.live[c.fub])||{};}
 
+var WIDE_MQ=window.matchMedia?matchMedia('(min-width:1180px)'):null;
+function WIDE(){return !!(WIDE_MQ&&WIDE_MQ.matches);}
+if(WIDE_MQ&&WIDE_MQ.addEventListener)WIDE_MQ.addEventListener('change',function(){if(S.tab==='sellers'||S.tab==='buyers')render();});
 /* ---------- places, facts, money ---------- */
 var REGIONS=['York','Toronto','Peel','Durham','Halton','Simcoe','Other'];
 var CITY_REGION={'vaughan':'York','king':'York','richmond hill':'York','markham':'York','aurora':'York','newmarket':'York','whitchurch-stouffville':'York','stouffville':'York','east gwillimbury':'York','georgina':'York',
@@ -541,14 +572,14 @@ function inbox(){
   var I=S.inbox,n=I&&I.people?I.people.length:0;
   if(!S.showInbox)return '<section class="card slim inbox"><div class="hd" style="margin:0"><h2>Unsorted</h2><span class="sub">'+(I?n+' new lead'+(n===1?'':'s'):'')+'</span><label class="sw"><input type="checkbox" data-inboxon><i></i>Show</label></div></section>';
   var head='<div class="hd"><h2>Unsorted</h2><span class="sub">New Follow Up Boss leads not on a board yet</span>'
-   +'<div class="seg" role="group" aria-label="Unsorted view"><button type="button" data-iv="cards" aria-pressed="'+(S.inboxView==='cards')+'">Cards</button><button type="button" data-iv="list" aria-pressed="'+(S.inboxView==='list')+'">List</button></div>'
+   +(WIDE()?'':'<div class="seg" role="group" aria-label="Unsorted view"><button type="button" data-iv="cards" aria-pressed="'+(S.inboxView==='cards')+'">Cards</button><button type="button" data-iv="list" aria-pressed="'+(S.inboxView==='list')+'">List</button></div>')
    +'<select class="selsm" id="inDays" aria-label="How far back">'+[7,14,30].map(function(d){return '<option value="'+d+'"'+(+S.inboxDays===d?' selected':'')+'>Last '+d+' days</option>';}).join('')+'</select>'
    +'<label class="sw"><input type="checkbox" data-inboxon checked><i></i>Show</label></div>';
   if(!I)return '<section class="card inbox">'+head+'<p class="empty">Loading…</p></section>';
   if(I.error)return '<section class="card inbox">'+head+'<p class="err">Follow Up Boss didn’t answer ('+esc(I.error)+'). Try Refresh.</p></section>';
   var acts=function(l,sm){return '<button class="btn sm navy" type="button" data-sort="s" data-fub="'+l.id+'">'+(sm?'Seller':'→ Sellers')+'</button><button class="btn sm navy" type="button" data-sort="b" data-fub="'+l.id+'">'+(sm?'Buyer':'→ Buyers')+'</button><button class="btn sm ghost" type="button" data-sort="both" data-fub="'+l.id+'">Both</button>';};
   var body;
-  if(S.inboxView==='list'){
+  if(S.inboxView==='list'||WIDE()){
     body='<ul class="rows">'+I.people.map(function(l){return '<li class="row"><div class="rm"><b>'+esc(l.name||'No name')+'</b><small>'+esc([l.source,ago(l.created),l.price&&+l.price>3300?money(+l.price):'',l.phone].filter(Boolean).join(' · '))+'</small></div>'
       +'<div class="ra">'+acts(l,1)+'<a class="pb" href="'+fubUrl(l.id)+'" target="_blank" rel="noopener">FUB</a><button class="x" type="button" data-sort="skip" data-fub="'+l.id+'" aria-label="Skip '+esc(l.name)+'" title="Not a lead / skip">×</button></div></li>';}).join('')+'</ul>';}
   else{
@@ -565,8 +596,9 @@ function inbox(){
 /* ---------- boards ---------- */
 function viewBoard(){
   var kind=S.tab==='sellers'?'s':'b',B=S.board[kind],label=kind==='s'?'Sellers':'Buyers';
-  var top=feed(kind)+inbox();
-  if(!B)return top+'<section class="card"><div class="hd"><h2>'+label+'</h2></div><p class="empty">Loading…</p></section>';
+  var rail=feed(kind)+inbox()+(kind==='s'?todayCard():'');
+  function wrap(main){return '<div class="split"><div class="mainc">'+main+'</div><aside class="rail" aria-label="Activity and new leads">'+rail+'</aside></div>';}
+  if(!B)return wrap('<section class="card"><div class="hd"><h2>'+label+'</h2></div><p class="empty">Loading…</p></section>');
   var cards=B.cards,closedN=cards.filter(function(c){return c.stage==='closed';}).length,view=S.view[kind];
   var sub=cards.filter(function(c){return c.stage!=='closed';}).length+' active';
   var head='<div class="hd"><h2>'+label+'</h2><span class="sub">'+sub+'</span>'
@@ -575,9 +607,9 @@ function viewBoard(){
     +'<button class="btn sm" type="button" data-add="'+kind+'">+ Add '+(kind==='s'?'seller':'buyer')+'</button></div>';
   var body=!cards.length?'<p class="empty">No '+label.toLowerCase()+' yet. People tagged '+(kind==='s'?'Daily Seller or CMA':'Searching or Daily')+' in FUB appear here by themselves. You can also sort a lead from Unsorted, or tap + Add.</p>'
     :view==='list'?listView(kind):boardView(kind);
-  return top+'<section class="card">'+head+(B.liveError?'<p class="err" style="margin-bottom:10px">Follow Up Boss didn’t answer, so phone / activity may be missing. Try Refresh.</p>':'')+body
+  return wrap('<section class="card">'+head+(B.liveError?'<p class="err" style="margin-bottom:10px">Follow Up Boss didn’t answer, so phone / activity may be missing. Try Refresh.</p>':'')+body
     +(B.archivedCount?'<p style="margin:10px 0 0"><button class="lnkb" type="button" data-archived="'+kind+'">Archived ('+B.archivedCount+')</button></p>':'')+'</section>'
-    +(kind==='s'?sellerRes():buyerRes());
+    +(kind==='s'?prospectsSection()+sellerRes():buyerRes()));
 }
 function boardView(kind){
   var ST=stagesOf(kind),cards=S.board[kind].cards,vis=ST.filter(function(st){return st.k!=='closed'||S.closed[kind];});
@@ -776,51 +808,97 @@ function openArchived(kind){
     if(!d.open)d.showModal();}).catch(fail);
 }
 
-/* ---------- Marketing ---------- */
-var AREAS=[['newsletter','Newsletter','#D7141E',['newsletter']],['social','Social posts','#1D2870',['social']],['doorhanger','Door hangers','#1B7A3E',['doorhanger']],['video','Videos','#9A5B00',['ytdesc','thumb']]];
-var STATUS=['Idea','To do','In progress','Scheduled','Done'];
-function areaColor(a){var x=AREAS.filter(function(y){return y[0]===a;})[0];return x?x[2]:'#545B78';}
-// recurring series already scheduled in Metricool (Morning Mindset, Buying & Selling Steps)
-function series(day){var out=[],dow=new Date(day+'T12:00:00').getDay();
-  if(day>='2026-09-28'&&day<='2026-12-27')out.push({t:'Morning Mindset',s:'6 AM · Metricool',c:'#9BA2BD'});
-  if(day>='2026-09-29'&&day<='2027-01-07'&&(dow===2||dow===4))out.push({t:'Buying & Selling Steps',s:'2 PM · Metricool',c:'#4A5592'});
-  return out;}
+/* ---------- Expireds + FSBOs (Sellers) ---------- */
+function todayStr(){return ymd(new Date());}
+function dayDiff(a,b){return Math.round((Date.parse(a+'T12:00:00')-Date.parse(b+'T12:00:00'))/DAY);}
+function pColour(x){var t=todayStr();
+  if(x.kind==='fsbo'){if(!x.listed)return {c:'grey',l:'No list date'};var dom=dayDiff(t,x.listed);return dom>=30?{c:'g',l:dom+' days on market · call',go:1}:dom>=21?{c:'y',l:dom+' days on market'}:{c:'grey',l:dom+' days on market'};}
+  if(x.status==='relisted')return {c:'grey',l:'Relisted'};if(x.status==='sold')return {c:'grey',l:'Sold'};
+  if(!x.expires)return {c:'grey',l:'No expiry date'};var d=dayDiff(x.expires,t);
+  if(d>30)return {c:'r',l:'Expires in '+d+' days'};if(d>7)return {c:'o',l:'Expires in '+d+' days'};if(d>0)return {c:'y',l:'Expires in '+d+' day'+(d===1?'':'s')};
+  if(d>-3)return {c:'yg',l:d===0?'Expires today · watch for relist':'Expired '+(-d)+' day'+(d===-1?'':'s')+' ago · watch for relist'};
+  return {c:'g',l:'Expired '+(-d)+' days ago · go',go:1};}
+var ACTION_LABEL={hanger:'Door hanger dropped',called:'Called',knocked:'Knocked',mailed:'Mailed'};
+function pTitle(x){return x.addr+(x.city?', '+x.city:'');}
+function pFacts(x){return [x.hood,x.region,x.ptype,x.beds?x.beds+' bd':'',x.price,x.mls?'MLS® '+x.mls:''].filter(Boolean).join(' · ');}
+function readyList(){return (S.prospects||[]).filter(function(x){var c=pColour(x);return c.go&&!x.action&&['relisted','sold','dropped'].indexOf(x.status)<0;});}
+function pRow(x,compact){var c=pColour(x);
+  return '<li class="row prow"><button type="button" class="rm" data-pedit="'+x.id+'"><i class="pdot '+c.c+'"></i><span class="rt2"><b>'+esc(pTitle(x))+'</b><small>'+esc(compact?c.l:pFacts(x))+'</small>'
+   +(compact?'':'<small class="pl2 '+c.c+'">'+esc(c.l)+(x.action?' · '+esc(ACTION_LABEL[x.action]||x.action)+' '+esc(fmtDay((x.action_at||'').slice(0,10))):'')+'</small>')+'</span></button>'
+   +'<div class="ra">'+(x.kind==='fsbo'?'<button class="btn sm ghost" type="button" data-pact="called" data-id="'+x.id+'">Called</button>':'<button class="btn sm ghost" type="button" data-pact="hanger" data-id="'+x.id+'">Hanger</button>')
+   +(compact?'':(x.card?'<button class="pb" type="button" data-view="s" data-id="'+x.card+'">Card</button>':'<button class="pb" type="button" data-p2s="'+x.id+'">→ Seller</button>'))+'</div></li>';}
+function prospectsSection(){
+  var P=S.prospects;
+  var head='<div class="hd"><h2>Expireds & FSBOs</h2><span class="sub">Prospecting lists from your MLS exports and FSBO finds</span>'
+    +'<div class="seg" role="group" aria-label="List"><button type="button" data-pk2="exp" aria-pressed="'+(S.pTab==='exp')+'">Expiring</button><button type="button" data-pk2="fsbo" aria-pressed="'+(S.pTab==='fsbo')+'">FSBO</button></div>'
+    +'<button class="btn sm ghost" type="button" data-padd>+ Add</button>'+(S.pTab==='exp'?pbtn('expimport','m','',1):'')+'</div>';
+  if(!P)return '<section class="card">'+head+'<p class="empty">Loading…</p></section>';
+  var F=S.pFilter,q=F.q.toLowerCase();
+  var L=P.filter(function(x){if(x.kind!==S.pTab)return false;if(!F.all&&['relisted','sold'].indexOf(x.status)>=0)return false;if(F.region&&x.region!==F.region)return false;if(F.city&&String(x.city).toLowerCase()!==F.city.toLowerCase())return false;
+    if(q&&[x.addr,x.city,x.hood,x.mls,x.owner,x.note].join(' ').toLowerCase().indexOf(q)<0)return false;return true;});
+  L.sort(S.pTab==='exp'?function(a,b){return String(a.expires||'9').localeCompare(String(b.expires||'9'));}:function(a,b){return String(a.listed||'9').localeCompare(String(b.listed||'9'));});
+  var cities=[...new Set(P.filter(function(x){return x.kind===S.pTab&&x.city;}).map(function(x){return x.city;}))].sort();
+  var tools='<div class="ltools"><input type="search" class="search" id="pq" value="'+esc(F.q)+'" placeholder="Search address, MLS®, owner…" aria-label="Search prospects">'
+   +'<select class="selsm" data-pf="region" aria-label="Region"><option value="">All regions</option>'+REGIONS.map(function(r){return '<option'+(F.region===r?' selected':'')+'>'+r+'</option>';}).join('')+'</select>'
+   +'<select class="selsm" data-pf="city" aria-label="City"><option value="">All cities</option>'+cities.map(function(r){return '<option'+(F.city===r?' selected':'')+'>'+esc(r)+'</option>';}).join('')+'</select>'
+   +'<label class="sw"><input type="checkbox" data-pall'+(F.all?' checked':'')+'><i></i>Show relisted / sold</label></div>';
+  var legend=S.pTab==='exp'?'<div class="plegend"><span><i class="pdot r"></i>30+ days</span><span><i class="pdot o"></i>8–30 days</span><span><i class="pdot y"></i>1–7 days</span><span><i class="pdot yg"></i>Expired 0–2 days (may relist)</span><span><i class="pdot g"></i>Expired 3+ days: go</span></div>'
+    :'<div class="plegend"><span><i class="pdot grey"></i>Under 3 weeks</span><span><i class="pdot y"></i>3–4 weeks</span><span><i class="pdot g"></i>30+ days: call</span></div>';
+  return '<section class="card" id="prospects">'+head+tools+legend+(L.length?'<p class="lcount">'+L.length+' propert'+(L.length===1?'y':'ies')+'</p><ul class="rows">'+L.map(function(x){return pRow(x);}).join('')+'</ul>'
+    :'<p class="empty">'+(S.pTab==='exp'?'No expireds yet. Export from your MLS and paste it to Claude with the "Build Expired List" prompt, or tap + Add.':'No FSBOs yet. Tap + Add when you find one (lawn sign, Kijiji, FSBO sites).')+'</p>')+'</section>';
+}
+function todayCard(){var R=readyList();if(!S.prospects)return '';
+  return '<section class="card"><div class="hd"><h2>Today</h2><span class="sub">Door hangers + calls</span></div>'
+   +(R.length?'<ul class="rows">'+R.slice(0,12).map(function(x){return pRow(x,1);}).join('')+'</ul>'+(R.length>12?'<p class="lcount">+'+(R.length-12)+' more in Expireds & FSBOs</p>':''):'<p class="empty">Nothing due. Expireds turn green 3 days after expiry, FSBOs at 30 days on market.</p>')+'</section>';}
+function openProspect(id,kind){var x=id?(S.prospects||[]).filter(function(y){return y.id===+id;})[0]:{kind:kind||S.pTab,status:'active'},d=$('#dlg'),cf=false;S.viewing=null;
+  d.innerHTML='<form class="dl" id="pF"><div class="dh"><h2>'+(id?'Edit':'Add')+' '+(x.kind==='fsbo'?'FSBO':'expired')+'</h2><button type="button" class="x" data-close aria-label="Close">×</button></div><div class="fgrid">'
+   +sel('p_kind','List',x.kind,[['exp','Expiring / expired'],['fsbo','For sale by owner']])+sel('p_status','Status',x.status,[['active','Active (for sale)'],['expired','Expired'],['terminated','Terminated'],['relisted','Relisted'],['sold','Sold']])
+   +inp('p_addr','Address',x.addr,{full:1})+inp('p_city','City',x.city,{list:'dlCity'})+inp('p_hood','Neighbourhood',x.hood,{list:'dlHood'})+sel('p_region','Region',x.region||regionOf(x.city),REGIONS)
+   +inp('p_price','Price',x.price)+sel('p_ptype','Type',x.ptype,TYPES)+inp('p_beds','Beds',x.beds)+inp('p_mls','MLS® #',x.mls)
+   +'<label for="p_listed"><span>Listed on</span><input id="p_listed" type="date" value="'+esc(x.listed||'')+'"></label>'
+   +'<label for="p_expires"><span>Expires on</span><input id="p_expires" type="date" value="'+esc(x.expires||'')+'"></label>'
+   +inp('p_owner','Owner',x.owner)+inp('p_phone','Phone',x.phone)+inp('p_link','Link (FSBO ad, etc.)',x.link,{full:1})+inp('p_note','Notes',x.note,{ta:1,full:1})+'</div>'
+   +(id?'<div class="pacts"><span class="muted" style="font-size:14px;align-self:center">Mark:</span>'+['hanger','called','knocked','mailed'].map(function(a){return '<button type="button" class="pb'+(x.action===a?' hot':'')+'" data-pact="'+a+'" data-id="'+x.id+'">'+ACTION_LABEL[a]+'</button>';}).join('')+(x.action?'<button type="button" class="lnkb" data-pact="" data-id="'+x.id+'">Clear</button>':'')+'</div>':'')
+   +'<datalist id="dlCity">'+CITIES.map(function(c){return '<option value="'+c+'">';}).join('')+'</datalist><datalist id="dlHood">'+HOODS.map(function(c){return '<option value="'+c+'">';}).join('')+'</datalist>'
+   +'<p class="err" id="pErr" hidden></p></form><div class="dfoot"><button type="button" class="btn" id="pSave">Save</button>'+(id?'<button type="button" class="btn ghost" data-p="doorhanger" data-ctx="p" data-id="'+x.id+'">Door hanger</button><button type="button" class="btn danger" id="pDel">Delete</button>':'<button type="button" class="btn ghost" data-close>Cancel</button>')+'</div>';
+  $('#pF').onsubmit=function(e){e.preventDefault();};
+  $('#p_city').addEventListener('change',function(){var r=regionOf(this.value);if(r)$('#p_region').value=r;});
+  $('#pSave').onclick=function(){var b={id:id||null,kind:val('p_kind'),status:val('p_status')};['addr','city','hood','region','price','ptype','beds','mls','listed','expires','owner','phone','link','note'].forEach(function(k){b[k]=val('p_'+k);});
+    if(!b.addr){$('#pErr').textContent='Add the address.';$('#pErr').hidden=false;return;}
+    post('desk/prospect',b).then(function(){d.close();toast('Saved');loadProspects().then(render);}).catch(fail);};
+  if(id)$('#pDel').onclick=function(){if(!cf){cf=true;this.textContent='Tap again to delete';return;}post('desk/prospect/delete',{id:id}).then(function(){d.close();toast('Deleted');loadProspects().then(render);}).catch(fail);};
+  if(!d.open)d.showModal();}
+function loadProspects(){return getJ('desk/prospects').then(function(j){S.prospects=j.items;});}
+function prospectToSeller(id){var x=S.prospects.filter(function(y){return y.id===+id;})[0];if(!x)return;
+  post('desk/card',{kind:'s',stage:'talk',addr:x.addr,name:x.owner,phone:x.phone,ptype:x.ptype,price:x.price,area:x.city,note:(x.kind==='fsbo'?'FSBO':'Expired')+(x.mls?' · MLS® '+x.mls:'')+(x.note?'\n'+x.note:''),
+    facts:{city:x.city,region:x.region||regionOf(x.city),hood:x.hood,beds:x.beds}}).then(function(j){return post('desk/prospect/card',{id:x.id,card:j.id});})
+  .then(function(){toast('Added to Sellers › Talking');S.board.s=null;return Promise.all([loadProspects(),load(true)]);}).then(render).catch(fail);}
+
+/* ---------- Marketing: social (Metricool), newsletter, print media ---------- */
+var METRICOOL='https://app.metricool.com/';
+function socialCard(){var X=S.social,t=todayStr();
+  var bar='';
+  if(X&&X.through){var left=dayDiff(X.through,t),wk=Math.max(0,Math.round(left/7*10)/10),pct=Math.max(0,Math.min(100,left/28*100)),cls=left<7?'r':left<14?'a':'g';
+    bar='<div class="runway"><div class="rw-top"><b>'+(left<0?'Posts ran out '+(-left)+' days ago':wk+' week'+(wk===1?'':'s')+' of posts left')+'</b><span>Scheduled through '+esc(fmtDay(X.through))+'</span></div><div class="rw-bar '+cls+'"><span style="width:'+pct+'%"></span></div><div class="rw-sub"><span>Goal: 4 weeks ahead</span><span>Last review '+esc(ago(X.checked))+'</span></div></div>'
+      +((X.series||[]).length?'<ul class="li">'+X.series.map(function(s2){return '<li><div>'+esc(s2.name)+'<small>'+(s2.n?s2.n+' posts · ':'')+'through '+esc(fmtDay(s2.through))+'</small></div><span class="chip '+(s2.through&&dayDiff(s2.through,t)<14?'a':'g')+'">'+(s2.through?dayDiff(s2.through,t)+' d':'')+'</span></li>';}).join('')+'</ul>':'')
+      +(X.top?'<p class="sm-note"><b>Doing well:</b> '+esc(X.top)+'</p>':'')+((X.todo||[]).length?'<div class="sm-note"><b>To do from last review:</b><ul>'+X.todo.map(function(y){return '<li>'+esc(y)+'</li>';}).join('')+'</ul></div>':'')+(X.notes?'<p class="sm-note">'+esc(X.notes)+'</p>':'');}
+  else bar='<p class="empty">No review yet. Run the Social Review prompt: Claude checks Metricool and fills this in (weeks of posts left, what’s doing well, what to do).</p>';
+  return '<section class="card"><div class="hd"><h2>Social media</h2><a class="btn sm navy" href="'+METRICOOL+'" target="_blank" rel="noopener">Open Metricool</a>'+pbtn('socialreview','m','',1)+'</div>'+bar+'</section>';}
+function newsletterCard(){
+  return '<section class="card"><div class="hd"><h2>Newsletter</h2>'+pbtn('newsletter','m','',1)+'</div>'
+   +'<p class="lead2">Fill in this week’s picks, copy the prompt, paste it to Claude. Claude builds it and saves it in Follow Up Boss as an email template. It never sends; you send it from FUB.</p>'
+   +'<ul class="li"><li><div>Theme<small>Dark (charcoal) or light (blue / white)</small></div></li><li><div>Market Watch video<small>Instagram or YouTube link (optional)</small></div></li>'
+   +'<li><div>Listing of the Week<small>Address, open house, 5-second clip or virtual tour link for the GIF</small></div></li><li><div>Also this week<small>4 more listings (addresses are enough)</small></div></li>'
+   +'<li><div>Sold of the week<small>Address, price, date</small></div></li><li><div>Market thoughts<small>Optional</small></div></li></ul></section>';}
+function printCard(){var R=readyList().filter(function(x){return x.kind==='exp';}),tab=S.printTab;
+  var tabs='<div class="seg" role="group" aria-label="Print media"><button type="button" data-pt="hangers" aria-pressed="'+(tab==='hangers')+'">Door hangers</button><button type="button" data-pt="flyers" aria-pressed="'+(tab==='flyers')+'">Flyers</button></div>';
+  var body=tab==='hangers'
+    ?'<div class="sec" style="margin-top:4px">Ready for a door hanger</div>'+(!S.prospects?'<p class="empty">Loading…</p>':R.length?'<ul class="rows">'+R.map(function(x){return pRow(x,1);}).join('')+'</ul>':'<p class="empty">None right now. Expireds show here 3 days after they expire (if they haven’t relisted). Manage the list on Sellers › Expireds & FSBOs.</p>')
+      +'<div class="pacts" style="margin-top:12px">'+pbtn('doorhanger','m','',1)+'</div><p class="hint" style="margin-top:8px">The prompt asks Claude to make them the same way as last time, then change what you note.</p>'
+    :'<p class="lead2">Listing flyers, feature sheets and neighbourhood mailers.</p><div class="pacts">'+pbtn('flyer','m','',1)+'</div>';
+  return '<section class="card"><div class="hd"><h2>Print media</h2>'+tabs+'</div>'+body+'</section>';}
 function viewMarketing(){
-  if(!S.content)return '<section class="card"><p class="empty">Loading…</p></section>';
-  var now=new Date(),mon=new Date(now);mon.setDate(now.getDate()-((now.getDay()+6)%7));var today=ymd(now);
-  var weeks=[0,1].map(function(w){var days=[];for(var i=0;i<7;i++){var d=new Date(mon);d.setDate(mon.getDate()+w*7+i);days.push(ymd(d));}return days;});
-  var cal=weeks.map(function(days,w){return '<div class="wkhd">'+(w?'Next week':'This week')+' · '+fmtDay(days[0])+'</div><div class="cal">'+days.map(function(day){
-    var its=S.content.filter(function(x){return x.due===day;}),sr=series(day),has=its.length;
-    return '<div class="d'+(day===today?' today':'')+(day<today?' past':'')+(has||day===today?'':' empty-day')+'"><h4>'+new Date(day+'T12:00:00').toLocaleDateString('en-CA',{weekday:'short'})+' <span>'+new Date(day+'T12:00:00').toLocaleDateString('en-CA',{month:'short',day:'numeric'})+'</span></h4>'
-      +its.map(function(x){return '<button type="button" class="ev" data-item="'+x.id+'" style="--c:'+areaColor(x.area)+'">'+esc(x.title)+'<small>'+esc(x.status||'')+(x.done?' · done':'')+'</small></button>';}).join('')
-      +sr.map(function(x){return '<div class="ev" style="--c:'+x.c+'">'+esc(x.t)+'<small>'+esc(x.s)+'</small></div>';}).join('')+'</div>';}).join('')+'</div>';}).join('');
-  var legend='<div class="legend">'+AREAS.map(function(a){return '<span><i style="--c:'+a[2]+'"></i>'+a[1]+'</span>';}).join('')+'<span><i style="--c:#9BA2BD"></i>Morning Mindset</span><span><i style="--c:#4A5592"></i>Buying & Selling Steps</span></div>';
-  var secs=AREAS.map(function(a){var its=S.content.filter(function(x){return x.area===a[0]&&!x.done;});
-    return '<section class="card"><div class="hd"><h2>'+a[1]+'</h2><button class="btn sm ghost" type="button" data-newitem="'+a[0]+'">+ Add</button></div>'
-     +(its.length?'<ul class="li">'+its.map(function(x){var st=x.status||'Idea',cl=st==='Scheduled'?'g':st==='In progress'?'a':'';return '<li><div><button type="button" class="it" data-item="'+x.id+'">'+esc(x.title)+'</button><small>'+(x.due?fmtDay(x.due):'No date')+(x.note?' · '+esc(x.note.slice(0,80)):'')+'</small></div><span class="chip '+cl+'">'+esc(st)+'</span></li>';}).join('')+'</ul>':'<p class="empty">Nothing planned. Tap + Add.</p>')
-     +'<div class="pacts" style="margin-top:12px">'+a[3].map(function(k,i){return pbtn(k,'m','',!i);}).join('')+'</div></section>';}).join('');
-  return '<div class="mk"><section class="card wide"><div class="hd"><h2>Content calendar</h2><span class="sub">Brand-wide only. Client work lives on Sellers / Buyers.</span><button class="btn sm ghost" type="button" data-newitem="social">+ Add</button>'+pbtn('calendar','m','',1)+'</div>'+cal+legend+'</section>'
-    +secs
-    +'<section class="card wide"><div class="hd"><h2>Already running</h2></div><ul class="li">'
-    +'<li><div>Morning Mindset<small>Daily 6 AM quote post, Sep 28 – Dec 27, 2026 (Metricool)</small></div><span class="chip g">Scheduled</span></li>'
-    +'<li><div>Buying & Selling Steps<small>Tue + Thu 2 PM, Sep 29, 2026 – Jan 7, 2027 (Metricool)</small></div><span class="chip g">Scheduled</span></li></ul></section></div>';
-}
-function openItem(id,area){
-  var x=id?S.content.filter(function(y){return y.id===+id;})[0]:{area:area,status:'Idea'},d=$('#dlg'),cf=false;
-  d.innerHTML='<form class="dl" id="itF"><div class="dh"><h2>'+(id?'Edit':'Add')+'</h2><button type="button" class="x" data-close aria-label="Close">×</button></div><div class="fgrid">'
-   +'<label class="full" for="i_title">Title<input id="i_title" value="'+esc(x.title||'')+'" autocomplete="off" placeholder="Fall market update"></label>'
-   +'<label for="i_area">Type<select id="i_area">'+AREAS.concat([['other','Other']]).map(function(a){return '<option value="'+a[0]+'"'+(a[0]===x.area?' selected':'')+'>'+a[1]+'</option>';}).join('')+'</select></label>'
-   +'<label for="i_due">Date<input id="i_due" type="date" value="'+esc(x.due||'')+'"></label>'
-   +'<label for="i_status">Status<select id="i_status">'+STATUS.map(function(s){return '<option'+(s===(x.done?'Done':x.status)?' selected':'')+'>'+s+'</option>';}).join('')+'</select></label>'
-   +'<label class="full" for="i_note">Notes<textarea id="i_note">'+esc(x.note||'')+'</textarea></label></div><p class="err" id="iErr" hidden></p></form>'
-   +'<div class="dfoot"><button type="button" class="btn" id="iSave">Save</button>'+(id?'<button type="button" class="btn danger" id="iDel">Delete</button>':'<button type="button" class="btn ghost" data-close>Cancel</button>')+'</div>';
-  $('#itF').onsubmit=function(e){e.preventDefault();};
-  $('#iSave').onclick=function(){var st=$('#i_status').value,b={id:id||null,title:$('#i_title').value.trim(),area:$('#i_area').value,due:$('#i_due').value,status:st,done:st==='Done',note:$('#i_note').value};
-    if(!b.title){$('#iErr').textContent='Add a title.';$('#iErr').hidden=false;return;}
-    post('desk/content',b).then(function(){d.close();toast('Saved');load(true);}).catch(fail);};
-  if(id)$('#iDel').onclick=function(){if(!cf){cf=true;this.textContent='Tap again to delete';return;}post('desk/content/delete',{id:id}).then(function(){d.close();toast('Deleted');load(true);}).catch(fail);};
-  if(!d.open)d.showModal();
-}
+  return '<div class="mk"><div class="mkc">'+socialCard()+newsletterCard()+'</div><div class="mkc">'+printCard()+'</div></div>';}
 
 /* ---------- Toolkit ---------- */
 var SCRIPTS=[
@@ -900,6 +978,8 @@ function ctxData(ctx,id){
       d.must=[(f.feats||[]).join(', '),f.garage?f.garage+'+ car garage':'',f.sqft?f.sqft+'+ sq ft':''].filter(Boolean).join(', ');d.purpose='Buyer offer price';
       var dd=daysSince(L.last);d.last=dd==null?'':(dd===0?'today':dd+' days ago');d.ctx=c.next;}
     return d;}
+  if(ctx==='p'){var x=(S.prospects||[]).filter(function(y){return y.id===+id;})[0]||{};return {kind:x.kind==='fsbo'?'FSBO':'Expired listing',homes:pTitle(x),area:x.hood||x.city};}
+  if(ctx==='m'){var R=readyList();return {homes:R.map(pTitle).join('\n'),kind:R.length?'Expired listing':'',last:S.social&&S.social.checked?fmtDay(S.social.checked.slice(0,10)):'Never',weeks:'4'};}
   if(ctx==='lead'){var l=(S.inbox.people||[]).filter(function(x){return x.id===+id;})[0]||{};return {client:l.name,email:l.email,phone:l.phone,src:l.source};}
   return {};
 }
@@ -907,7 +987,7 @@ var cur=null;
 function openPrompt(key,ctx,id){
   var P=PROMPTS[key],d=ctxData(ctx,id),today=ymd(new Date());
   var fields=P.fields.map(function(f){return typeof f==='string'?Object.assign({k:f},F[f]):f;});cur={P:P,fields:fields};
-  function inp(f){var v=d[f.k]!=null&&d[f.k]!==''?d[f.k]:(f.type==='date'?today:''),id='f_'+f.k;
+  function inp(f){var v=d[f.k]!=null&&d[f.k]!==''?d[f.k]:(f.type==='date'&&!f.nodef?today:''),id='f_'+f.k;
     var ctl=f.opts?'<select id="'+id+'" data-f><option value="">—</option>'+f.opts.map(function(o){return '<option'+(o===v?' selected':'')+'>'+esc(o)+'</option>';}).join('')+'</select>'
       :f.ta?'<textarea id="'+id+'" data-f placeholder="'+esc(f.ph||'')+'">'+esc(v)+'</textarea>'
       :'<input id="'+id+'" data-f type="'+(f.type||'text')+'" value="'+esc(v)+'" placeholder="'+esc(f.ph||'')+'" autocomplete="off">';
@@ -952,6 +1032,12 @@ document.addEventListener('click',function(e){
   if(ds.jump){var c=document.getElementById('col-'+ds.jump);if(c){var b=c.parentElement;b.scrollTo({left:c.offsetLeft-b.offsetLeft-parseFloat(getComputedStyle(b).paddingLeft),behavior:'smooth'});}return;}
   if(t.hasAttribute('data-more')){var n=t.nextElementSibling;n.hidden=!n.hidden;t.setAttribute('aria-expanded',String(!n.hidden));t.textContent=n.hidden?'All prompts':'Fewer prompts';return;}
   if(ds.add){openCard(ds.add,null);return;}
+  if(ds.pk2){S.pTab=ds.pk2;store('desk_ptab',ds.pk2);render();return;}
+  if(t.hasAttribute('data-padd')){openProspect(null,S.pTab);return;}
+  if(ds.pedit){openProspect(+ds.pedit);return;}
+  if(ds.pact!=null&&ds.id){var pid=+ds.id,pa=ds.pact;post('desk/prospect/action',{id:pid,action:pa}).then(function(){toast(pa?ACTION_LABEL[pa]+' · saved':'Cleared');var dd=$('#dlg');if(dd.open&&$('#pF',dd))dd.close();return loadProspects();}).then(render).catch(fail);return;}
+  if(ds.p2s){prospectToSeller(+ds.p2s);return;}
+  if(ds.pt){S.printTab=ds.pt;store('desk_print',ds.pt);render();return;}
   if(ds.view){viewCard(ds.view,+ds.id);return;}
   if(ds.matches){openMatches(ds.matches,+ds.id);return;}
   if(ds.bv){var kk=S.tab==='sellers'?'s':'b';S.view[kk]=ds.bv;store('desk_view_'+kk,ds.bv);render();return;}
@@ -978,6 +1064,8 @@ document.addEventListener('click',function(e){
 document.addEventListener('change',function(e){var t=e.target,ds=t.dataset;
   if(t.id==='inDays'){S.inboxDays=+t.value;store('desk_inbox_days',S.inboxDays);S.inbox=null;render();loadInbox().then(render).catch(fail);return;}
   if(ds.closed){S.closed[ds.closed]=t.checked;store('desk_closed_'+ds.closed,t.checked);render();return;}
+  if(ds.pf){S.pFilter[ds.pf]=t.value;render();return;}
+  if(t.hasAttribute('data-pall')){S.pFilter.all=t.checked;render();return;}
   if(t.hasAttribute('data-inboxon')){S.showInbox=t.checked;store('desk_inbox_on',t.checked);render();return;}
   if(t.hasAttribute('data-feedon')){S.feedOn=t.checked;store('desk_feed_on',t.checked);render();return;}
   if(t.id==='feedDays'){S.feedDays=+t.value;store('desk_feed_days',S.feedDays);render();return;}
@@ -995,7 +1083,7 @@ document.addEventListener('change',function(e){var t=e.target,ds=t.dataset;
 });
 $('#dlg').addEventListener('click',function(e){if(e.target===$('#dlg'))$('#dlg').close();});
 $('#dlg').addEventListener('close',function(){S.viewing=null;});
-document.addEventListener('input',function(e){var t=e.target;if(t.id&&/^lq-[sb]$/.test(t.id)){var k=t.id.slice(3);S.filter[k].q=t.value;refreshList(k);}});
+document.addEventListener('input',function(e){var t=e.target;if(t.id==='pq'){S.pFilter.q=t.value;render();return;}if(t.id&&/^lq-[sb]$/.test(t.id)){var k=t.id.slice(3);S.filter[k].q=t.value;refreshList(k);}});
 
 setTab(S.tab);
 })();
