@@ -381,6 +381,7 @@ dialog::backdrop{background:rgba(20,24,51,.6)}
 .llegend{display:flex;gap:6px 14px;flex-wrap:wrap;font-size:13px;color:var(--muted);margin:-4px 0 6px}.llegend span{display:inline-flex;align-items:center;gap:6px}
 .lalert{margin:4px 0 0;font-size:14px;font-weight:600;color:#7A5F00}
 @media (max-width:560px){.lrows li{grid-template-columns:auto minmax(0,1fr) auto}.lrows .ls{grid-column:2/-1;justify-self:start}}
+.fchips.when button{border-style:dashed}.fchips.when button[aria-pressed="true"]{border-style:solid}
 </style>
 </head>
 <body>
@@ -502,7 +503,7 @@ var S={tab:TABS.indexOf(location.hash.slice(1))>=0?location.hash.slice(1):(store
   content:null,todos:null,tk:store('desk_tk')||'scripts',
   view:{s:store('desk_view_s')||'board',b:store('desk_view_b')||'board'},showInbox:store('desk_inbox_on')!==false,inboxView:store('desk_inbox_view')||'cards',
   feedOn:store('desk_feed_on')!==false,feedDays:store('desk_feed_days')||2,feedFilter:'all',feedAll:false,viewing:null,
-  sel:{s:{},b:{}},listings:undefined,showSoon:store('desk_soon')!==false,personal:null,things:null,gt:null,rem:null,ptf:store('desk_ptf')||'all',ptAll:false,thingF:'Need',prospects:null,social:undefined,pTab:store('desk_ptab')||'exp',pFilter:{q:'',region:'',city:'',all:false},printTab:store('desk_print')||'hangers',sort:{s:store('desk_sort_s')||'stage',b:store('desk_sort_b')||'stage'},filter:{s:{q:'',stage:'',region:'',act:''},b:{q:'',stage:'',region:'',act:''}},script:'buyer',fs:store('desk_fs')||26,tagSync:false,fubApp:'https://app.followupboss.com'};
+  sel:{s:{},b:{}},listings:undefined,showSoon:store('desk_soon')!==false,personal:null,things:null,gt:null,rem:null,ptf:store('desk_ptf')||'all',ptToday:store('desk_pt_today')!==false,ptLate:store('desk_pt_late')===true,ptAll:false,thingF:'Need',prospects:null,social:undefined,pTab:store('desk_ptab')||'exp',pFilter:{q:'',region:'',city:'',all:false},printTab:store('desk_print')||'hangers',sort:{s:store('desk_sort_s')||'stage',b:store('desk_sort_b')||'stage'},filter:{s:{q:'',stage:'',region:'',act:''},b:{q:'',stage:'',region:'',act:''}},script:'buyer',fs:store('desk_fs')||26,tagSync:false,fubApp:'https://app.followupboss.com'};
 
 function setTab(t){S.tab=t;store('desk_tab',t);$$('#tabnav a[data-tab]').forEach(function(a){a.setAttribute('aria-current',a.dataset.tab===t?'page':'false');});render();load(false);}
 $$('#tabnav a[data-tab]').forEach(function(a){a.addEventListener('click',function(e){e.preventDefault();history.replaceState(null,'','#'+a.dataset.tab);setTab(a.dataset.tab);window.scrollTo({top:0});});});
@@ -1020,12 +1021,16 @@ function allPersonalTasks(){var out=[],t=todayStr();
   return out.sort(function(a,b){var ka=a.day?(a.day<=t?'0'+a.day:'1'+a.day):'2',kb=b.day?(b.day<=t?'0'+b.day:'1'+b.day):'2';return ka.localeCompare(kb)||String(a.title).localeCompare(String(b.title));});}
 function whenTxt(x){if(!x.day)return '';var t=todayStr();if(x.day===t)return 'Today';var dd=dayDiff(x.day,t);if(dd===1)return 'Tomorrow';if(dd<0)return 'Overdue · '+fmtDay(x.day);return fmtDay(x.day);}
 function tasksCard(){
-  var all=allPersonalTasks(),f=S.ptf,L=f==='all'?all:all.filter(function(x){return x.src===f;}),shown=S.ptAll?L:L.slice(0,15);
+  var all=allPersonalTasks(),f=S.ptf,L0=f==='all'?all:all.filter(function(x){return x.src===f;}),tdy=todayStr();
+  var nToday=L0.filter(function(x){return x.day===tdy;}).length,nLate=L0.filter(function(x){return x.late;}).length;
+  var L=(S.ptToday||S.ptLate)?L0.filter(function(x){return (S.ptToday&&x.day===tdy)||(S.ptLate&&x.late);}):L0,shown=S.ptAll?L:L.slice(0,15);
   var cnt=function(s){return all.filter(function(x){return x.src===s;}).length;};
   var chips='<div class="fchips">'+[['all','All',all.length],['mine','To-dos',cnt('mine')],['g','Google',cnt('g')],['rem','Reminders',cnt('rem')]].map(function(c){return '<button type="button" data-ptf="'+c[0]+'" aria-pressed="'+(f===c[0])+'">'+c[1]+' <b>'+c[2]+'</b></button>';}).join('')+'</div>';
   var errs=[S.gt&&S.gt.error?'Google Tasks didn’t answer.':'',S.gt&&S.gt.setup?'Google Tasks isn’t connected (HQ › Settings).':'',S.rem&&S.rem.setup?'Reminders haven’t synced from the iPhone yet.':''].filter(Boolean);
   var rows=shown.map(function(x){return '<li class="trow'+(x.late?' late':'')+'"><input class="ck" type="checkbox" data-tk2="'+x.src+'" data-id="'+esc(x.id)+'" aria-label="Mark done: '+esc(x.title)+'"><div class="nm">'+esc(x.title)+'<small><i class="sdot" style="background:'+TSRC[x.src][1]+'"></i>'+esc(x.who||TSRC[x.src][0])+(whenTxt(x)?' · <span class="'+(x.late?'lt':'')+'">'+esc(whenTxt(x))+'</span>':'')+(x.flag?' · ⚑':'')+'</small></div>'+(x.src==='mine'?'<button type="button" class="x" data-tdx="'+x.id+'" aria-label="Remove">×</button>':'')+'</li>';}).join('');
-  return '<section class="card"><div class="hd"><h2>Tasks & reminders</h2><span class="sub">Your to-dos, Google Tasks and iPhone Reminders. Follow Up Boss tasks stay on HQ.</span></div>'+chips
+  var when='<div class="fchips when"><button type="button" data-ptw="today" aria-pressed="'+!!S.ptToday+'">Today <b>'+nToday+'</b></button><button type="button" data-ptw="late" aria-pressed="'+!!S.ptLate+'" class="r">Overdue <b>'+nLate+'</b></button>'
+    +'<span class="muted" style="font-size:13px;align-self:center">'+(S.ptToday||S.ptLate?L.length+' of '+L0.length+' shown':'Showing all '+L0.length)+'</span></div>';
+  return '<section class="card"><div class="hd"><h2>Tasks & reminders</h2><span class="sub">Your to-dos, Google Tasks and iPhone Reminders. Follow Up Boss tasks stay on HQ.</span></div>'+when+chips
    +(errs.length?'<p class="empty" style="font-size:14px">'+errs.map(esc).join(' ')+'</p>':'')
    +(!S.todos?'<p class="empty">Loading…</p>':L.length?'<ul class="tlist">'+rows+'</ul>'+(L.length>15?'<button type="button" class="more" data-ptall>'+(S.ptAll?'Show less':'Show all '+L.length)+'</button>':''):'<p class="empty">Nothing here.</p>')
    +'<form class="add" id="ptForm"><input id="ptIn" type="text" placeholder="Add a to-do" aria-label="New to-do" autocomplete="off"><input id="ptDue" type="date" aria-label="Due date"><button class="btn" type="submit">Add</button></form>'
@@ -1218,6 +1223,7 @@ document.addEventListener('click',function(e){
   if(ds.jump){var c=document.getElementById('col-'+ds.jump);if(c){var b=c.parentElement;b.scrollTo({left:c.offsetLeft-b.offsetLeft-parseFloat(getComputedStyle(b).paddingLeft),behavior:'smooth'});}return;}
   if(t.hasAttribute('data-more')){var n=t.nextElementSibling;n.hidden=!n.hidden;t.setAttribute('aria-expanded',String(!n.hidden));t.textContent=n.hidden?'All prompts':'Fewer prompts';return;}
   if(ds.add){openCard(ds.add,null);return;}
+  if(ds.ptw){if(ds.ptw==='today'){S.ptToday=!S.ptToday;store('desk_pt_today',S.ptToday);}else{S.ptLate=!S.ptLate;store('desk_pt_late',S.ptLate);}S.ptAll=false;render();return;}
   if(ds.ptf){S.ptf=ds.ptf;store('desk_ptf',ds.ptf);S.ptAll=false;render();return;}
   if(t.hasAttribute('data-ptall')){S.ptAll=!S.ptAll;render();return;}
   if(ds.thf){S.thingF=ds.thf;render();return;}
