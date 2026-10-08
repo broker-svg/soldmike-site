@@ -365,6 +365,22 @@ dialog::backdrop{background:rgba(20,24,51,.6)}
 .mtab th,.mtab td{text-align:left;padding:8px 6px;border-top:1px solid var(--line);vertical-align:top}
 .mtab th{font-family:var(--display);text-transform:uppercase;font-size:16px;white-space:nowrap}
 .mtab tr.today td,.mtab tr.today th{background:#E9ECFA}
+
+/* listings board */
+.lrows{list-style:none;margin:0;padding:0}
+.lrows li{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;gap:4px 12px;align-items:center;padding:7px 0;border-top:1px solid var(--line);font-size:15px}
+.lrows li:first-child{border-top:0}
+.la{min-width:0}.la b{font-weight:600;overflow-wrap:anywhere}.la small{display:block;color:var(--muted);font-size:13px}.la em{font-style:normal;color:var(--red)}
+.lp{font-variant-numeric:tabular-nums;font-weight:600;white-space:nowrap}
+.ls{font-size:12px;font-weight:700;padding:2px 8px;border-radius:12px;white-space:nowrap;border:1px solid transparent}
+.ls.yel{background:#FFF6CC;color:#7A5F00;border-color:#EBD48A}.ls.grn{background:var(--gbg);color:var(--green);border-color:var(--gln)}
+.ls.pink{background:#FDE7F0;color:#A3245C;border-color:#F3B9D0}.ls.red{background:var(--red);color:var(--white)}
+.ls.warn{box-shadow:inset 0 0 0 2px #E0A100}
+.lst{display:inline-block;width:12px;height:12px;border-radius:3px;flex:none}
+.lst.yel{background:#F2C200}.lst.grn{background:var(--green)}.lst.pink{background:#F08DB5}.lst.red{background:var(--red)}
+.llegend{display:flex;gap:6px 14px;flex-wrap:wrap;font-size:13px;color:var(--muted);margin:-4px 0 6px}.llegend span{display:inline-flex;align-items:center;gap:6px}
+.lalert{margin:4px 0 0;font-size:14px;font-weight:600;color:#7A5F00}
+@media (max-width:560px){.lrows li{grid-template-columns:auto minmax(0,1fr) auto}.lrows .ls{grid-column:2/-1;justify-self:start}}
 </style>
 </head>
 <body>
@@ -486,7 +502,7 @@ var S={tab:TABS.indexOf(location.hash.slice(1))>=0?location.hash.slice(1):(store
   content:null,todos:null,tk:store('desk_tk')||'scripts',
   view:{s:store('desk_view_s')||'board',b:store('desk_view_b')||'board'},showInbox:store('desk_inbox_on')!==false,inboxView:store('desk_inbox_view')||'cards',
   feedOn:store('desk_feed_on')!==false,feedDays:store('desk_feed_days')||2,feedFilter:'all',feedAll:false,viewing:null,
-  sel:{s:{},b:{}},personal:null,things:null,gt:null,rem:null,ptf:store('desk_ptf')||'all',ptAll:false,thingF:'Need',prospects:null,social:undefined,pTab:store('desk_ptab')||'exp',pFilter:{q:'',region:'',city:'',all:false},printTab:store('desk_print')||'hangers',sort:{s:store('desk_sort_s')||'stage',b:store('desk_sort_b')||'stage'},filter:{s:{q:'',stage:'',region:'',act:''},b:{q:'',stage:'',region:'',act:''}},script:'buyer',fs:store('desk_fs')||26,tagSync:false,fubApp:'https://app.followupboss.com'};
+  sel:{s:{},b:{}},listings:undefined,showSoon:store('desk_soon')!==false,personal:null,things:null,gt:null,rem:null,ptf:store('desk_ptf')||'all',ptAll:false,thingF:'Need',prospects:null,social:undefined,pTab:store('desk_ptab')||'exp',pFilter:{q:'',region:'',city:'',all:false},printTab:store('desk_print')||'hangers',sort:{s:store('desk_sort_s')||'stage',b:store('desk_sort_b')||'stage'},filter:{s:{q:'',stage:'',region:'',act:''},b:{q:'',stage:'',region:'',act:''}},script:'buyer',fs:store('desk_fs')||26,tagSync:false,fubApp:'https://app.followupboss.com'};
 
 function setTab(t){S.tab=t;store('desk_tab',t);$$('#tabnav a[data-tab]').forEach(function(a){a.setAttribute('aria-current',a.dataset.tab===t?'page':'false');});render();load(false);}
 $$('#tabnav a[data-tab]').forEach(function(a){a.addEventListener('click',function(e){e.preventDefault();history.replaceState(null,'','#'+a.dataset.tab);setTab(a.dataset.tab);window.scrollTo({top:0});});});
@@ -499,6 +515,7 @@ function load(force){
     ['s','b'].forEach(function(k){if(force||!S.board[k])jobs.push(getJ('desk/board?kind='+k+(force?'&pull=1':'')).then(function(j){S.board[k]=j;S.tagSync=j.tagSync;S.fubApp=j.fubApp||S.fubApp;if(j.pulled)toast(j.pulled+' added from your FUB tags');}));});
     if(force||!S.inbox)jobs.push(loadInbox());}
   if(S.tab==='marketing'&&(force||S.social===undefined))jobs.push(getJ('desk/social').then(function(j){S.social=j.social;}));
+  if(S.tab==='marketing'&&(force||S.listings===undefined))jobs.push(getJ('desk/listings').then(function(j){S.listings=j.listings;}));
   if((S.tab==='marketing'||S.tab==='sellers')&&(force||!S.prospects))jobs.push(loadProspects());
   if(S.tab==='toolkit'&&(force||!S.todos))jobs.push(loadTodos());
   if(S.tab==='personal')jobs=jobs.concat(loadPersonal(force));
@@ -953,8 +970,33 @@ function printCard(){var R=readyList().filter(function(x){return x.kind==='exp';
       +'<div class="pacts" style="margin-top:12px">'+pbtn('doorhanger','m','',1)+'</div><p class="hint" style="margin-top:8px">The prompt asks Claude to make them the same way as last time, then change what you note.</p>'
     :'<p class="lead2">Listing flyers, feature sheets and neighbourhood mailers.</p><div class="pacts">'+pbtn('flyer','m','',1)+'</div>';
   return '<section class="card"><div class="hd"><h2>Print media</h2>'+tabs+'</div>'+body+'</section>';}
+/* listings board: Coming Soon / For Sale / Sold with Metricool posting status (Claude updates it after each Social Review) */
+function lStatus(x){var t=todayStr();
+  if(x.kind==='sold')return x.posted?{c:'red',l:'Posted'}:{c:'pink',l:'Not posted'};
+  if(!x.posted)return {c:'yel',l:'Not posted'};
+  var wk=x.start?Math.min(3,Math.floor(dayDiff(t,x.start)/7)+1):0,end=x.ends?dayDiff(x.ends,t):null;
+  if(end!=null&&end<0)return {c:'grn',l:'Posted · run ended '+fmtDay(x.ends),warn:1};
+  return {c:'grn',l:'Posted'+(wk?' · Week '+wk+' of 3':'')+(x.ends?' · ends '+fmtDay(x.ends):''),warn:end!=null&&end<=7};}
+function lRows(L){return '<ul class="lrows">'+L.map(function(x){var s=lStatus(x);
+  return '<li><i class="lst '+s.c+'" aria-hidden="true"></i><span class="la"><b>'+esc(x.addr)+'</b><small>'+esc([x.city,x.kind==='sold'&&x.sold?'Sold '+fmtDay(x.sold):''].filter(Boolean).join(' · '))+(x.note?' · <em>'+esc(x.note)+'</em>':'')+'</small></span>'
+   +'<span class="lp">'+esc(x.price)+'</span><span class="ls '+s.c+(s.warn?' warn':'')+'">'+esc(s.l)+'</span></li>';}).join('')+'</ul>';}
+function listingsCard(){var X=S.listings;
+  if(X===undefined)return '<section class="card"><div class="hd"><h2>Listings</h2></div><p class="empty">Loading…</p></section>';
+  var I=(X&&X.items)||[],t=todayStr();
+  var soon=I.filter(function(x){return x.kind==='soon';}),sale=I.filter(function(x){return x.kind==='sale';}),
+    sold=I.filter(function(x){if(x.kind!=='sold')return false;var d=x.sold?dayDiff(t,x.sold):0;return d<=30||(!x.posted&&d<=60);});
+  var nYel=sale.concat(soon).filter(function(x){return !x.posted;}).length,nPink=sold.filter(function(x){return !x.posted;}).length;
+  var head='<div class="hd"><h2>Listings</h2><span class="sub">All team listings for sale (no leases)'+(X&&X.updated?' · updated '+esc(ago(X.updated)):'')+'</span>'
+    +'<label class="sw"><input type="checkbox" data-soonon'+(S.showSoon?' checked':'')+'><i></i>Coming soon</label></div>';
+  if(!I.length)return '<section class="card">'+head+'<p class="empty">Nothing loaded yet. Claude fills this in during each Social Review.</p></section>';
+  var legend='<div class="llegend"><span><i class="lst yel"></i>Not posted</span><span><i class="lst grn"></i>Posted (3-week run)</span><span><i class="lst pink"></i>Sold, not posted</span><span><i class="lst red"></i>Sold, posted</span></div>';
+  return '<section class="card">'+head+legend
+    +(nYel||nPink?'<p class="lalert">'+[nYel?nYel+' listing'+(nYel===1?'':'s')+' not posted':'',nPink?nPink+' sold not posted':''].filter(Boolean).join(' · ')+'</p>':'')
+    +(S.showSoon?'<div class="sec">Coming soon · '+soon.length+'</div>'+(soon.length?lRows(soon):'<p class="empty">None right now.</p>'):'')
+    +'<div class="sec">For sale · '+sale.length+'</div>'+lRows(sale)
+    +'<div class="sec">Sold · last 30 days · '+sold.length+'</div>'+(sold.length?lRows(sold):'<p class="empty">No recent solds.</p>')+'</section>';}
 function viewMarketing(){
-  return '<div class="mk"><div class="mkc">'+socialCard()+newsletterCard()+'</div><div class="mkc">'+printCard()+'</div></div>';}
+  return '<div class="mk"><div class="mkc">'+socialCard()+newsletterCard()+'</div><div class="mkc">'+listingsCard()+printCard()+'</div></div>';}
 
 /* ---------- Personal: tasks + reminders (not FUB), things to buy, workout, meals ---------- */
 var PL=window.HQPLAN||{EX:{},WEEK:[],MEALS:[],MEAL_LBL:[],PREP:[]};
@@ -1217,6 +1259,7 @@ document.addEventListener('click',function(e){
 document.addEventListener('change',function(e){var t=e.target,ds=t.dataset;
   if(t.id==='inDays'){S.inboxDays=+t.value;store('desk_inbox_days',S.inboxDays);S.inbox=null;render();loadInbox().then(render).catch(fail);return;}
   if(ds.closed){S.closed[ds.closed]=t.checked;store('desk_closed_'+ds.closed,t.checked);render();return;}
+  if(t.hasAttribute('data-soonon')){S.showSoon=t.checked;store('desk_soon',t.checked);render();return;}
   if(ds.pf){S.pFilter[ds.pf]=t.value;render();return;}
   if(ds.tk2){var src=ds.tk2,id=ds.id,all=allPersonalTasks(),it=all.filter(function(x){return x.src===src&&String(x.id)===id;})[0];if(!it)return;
     var call=src==='g'?post('gtask',{list:it.list,id:id,done:t.checked}):src==='mine'?post('item/done',{id:+id,done:t.checked}):post('reminder',{id:id,title:it.title,done:t.checked});
