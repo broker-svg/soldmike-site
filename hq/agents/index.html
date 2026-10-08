@@ -469,8 +469,8 @@ var PROMPTS={
     fields:['addr','client','phone',{k:'mls',l:'MLS® #'},{k:'lockbox',l:'Lockbox / access'},{k:'offerdate',l:'Offer date',type:'date'},{k:'rules',l:'Showing rules',ta:1,full:1,ph:'1 hr notice, remove shoes, dog in crate…'}]},
   offers:{label:'Offer Summary',skill:'offer-review-summary',lead:'Summarize the offers on this listing for my seller.',
     fields:['addr','client','email',{k:'offerdate',l:'Offer date',type:'date'},{k:'count',l:'Number of offers'},{k:'list',l:'List price'},{k:'detail',l:'Offer details (or say "PDFs attached")',ta:1,full:1}]},
-  justsold:{label:'Just Sold',skill:'soldmike-sold-graphic',lead:'Make the Just Sold graphic and caption.',
-    fields:['addr','client',{k:'price',l:'Sale price (or "undisclosed")'},{k:'dom',l:'Days on market'},{k:'pct',l:'% of asking'},{k:'side',l:'We represented',opts:['Seller','Buyer','Both']}]},
+  justsold:{label:'Just Sold',skill:'metricool-scheduler',lead:'Make Just Sold posts with the approved Sold graphic (2nd Brain: Marketing/Sold Posts.md). For each address: find the hero exterior in the Drive sold folder, get sold price, list price and community from soldmike.ca Team Sold Listings, add the OVER ASKING sticker only if sold > list, render with Sold Posts/render_sold.py, write the JUST SOLD caption, show me the graphics first, then schedule in Metricool (SoldMike) on the next Monday slots and update the Agent Desk listings list.',
+    fields:[{k:'addrs',l:'Addresses',ta:1,full:1,req:1},{k:'showprice',l:'Show the sold price',opts:['Yes','No']},'notes']},
   listings:{label:'Send Listings',skill:'draft-outreach',lead:'Draft an email sending these listings to my buyer.',
     fields:['client','email',{k:'area',l:'Areas'},{k:'type',l:'Property type',opts:F.type.opts},{k:'beds',l:'Beds'},{k:'budget',l:'Budget (max)'},{k:'links',l:'Listing links / MLS® #s to send',ta:1,full:1},{k:'must',l:'Must-haves',full:1}]},
   followup:{label:'Follow-up',skill:'draft-outreach',lead:'Draft a follow-up message.',
@@ -995,7 +995,7 @@ function listingsCard(){var X=S.listings;
     +(nYel||nPink?'<p class="lalert">'+[nYel?nYel+' listing'+(nYel===1?'':'s')+' not posted':'',nPink?nPink+' sold not posted':''].filter(Boolean).join(' · ')+'</p>':'')
     +(S.showSoon?'<div class="sec">Coming soon · '+soon.length+'</div>'+(soon.length?lRows(soon):'<p class="empty">None right now.</p>'):'')
     +'<div class="sec">For sale · '+sale.length+'</div>'+lRows(sale)
-    +'<div class="sec">Sold · last 30 days · '+sold.length+'</div>'+(sold.length?lRows(sold):'<p class="empty">No recent solds.</p>')+'</section>';}
+    +'<div class="sec" style="display:flex;align-items:center;gap:10px">Sold · last 30 days · '+sold.length+(nPink?'<span style="margin-left:auto">'+pbtn('justsold','sold','',1)+'</span>':'')+'</div>'+(sold.length?lRows(sold):'<p class="empty">No recent solds.</p>')+'</section>';}
 function viewMarketing(){
   return '<div class="mk"><div class="mkc">'+socialCard()+newsletterCard()+'</div><div class="mkc">'+listingsCard()+printCard()+'</div></div>';}
 
@@ -1163,13 +1163,14 @@ function ctxData(ctx,id){
   if(ctx==='s'||ctx==='b'){var c=cardById(ctx,id),L=liveOf(ctx,c),nm=c.name||L.name||'';
     var d={client:nm,email:L.email||c.email,phone:L.phone||c.phone};
     var f=ff(c);
-    if(ctx==='s'){d.addr=[c.addr,f.hood,cityOf(c)].filter(Boolean).join(', ');d.type=c.ptype;d.bb=[f.beds,f.baths].filter(Boolean).join(' / ')||c.size;d.sqft=f.sqft;d.list=c.price;d.price=c.price;
+    if(ctx==='s'){d.addr=[c.addr,f.hood,cityOf(c)].filter(Boolean).join(', ');d.addrs=d.addr;d.type=c.ptype;d.bb=[f.beds,f.baths].filter(Boolean).join(' / ')||c.size;d.sqft=f.sqft;d.list=c.price;d.price=c.price;
       d.notes=[f.garage?f.garage+'-car garage':'',f.lot?'Lot '+f.lot:'',(f.feats||[]).join(', '),c.note].filter(Boolean).join('. ');}
     else{d.area=[f.hood,f.cities].filter(Boolean).join(', ')||f.region||c.area;d.type=(f.types||[])[0]||'';d.beds=f.beds?f.beds+'+':'';d.budget=f.pmax?money(+f.pmax):c.budget;
       d.must=[(f.feats||[]).join(', '),f.garage?f.garage+'+ car garage':'',f.sqft?f.sqft+'+ sq ft':''].filter(Boolean).join(', ');d.purpose='Buyer offer price';
       var dd=daysSince(L.last);d.last=dd==null?'':(dd===0?'today':dd+' days ago');d.ctx=c.next;}
     return d;}
   if(ctx==='p'){var x=(S.prospects||[]).filter(function(y){return y.id===+id;})[0]||{};return {kind:x.kind==='fsbo'?'FSBO':'Expired listing',homes:pTitle(x),area:x.hood||x.city};}
+  if(ctx==='sold'){var X=(S.listings&&S.listings.items)||[];return {addrs:X.filter(function(x){return x.kind==='sold'&&!x.posted;}).map(function(x){return x.addr+(x.city?', '+x.city:'');}).join('\n'),showprice:'Yes'};}
   if(ctx==='m'){var R=readyList();return {homes:R.map(pTitle).join('\n'),kind:R.length?'Expired listing':'',last:S.social&&S.social.checked?fmtDay(S.social.checked.slice(0,10)):'Never',weeks:'4'};}
   if(ctx==='lead'){var l=(S.inbox.people||[]).filter(function(x){return x.id===+id;})[0]||{};return {client:l.name,email:l.email,phone:l.phone,src:l.source};}
   return {};
