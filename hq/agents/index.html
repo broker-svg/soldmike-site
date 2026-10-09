@@ -875,7 +875,8 @@ function viewBoard(){
   var head='<div class="hd"><h2>'+label+'</h2><span class="sub">'+sub+'</span>'
     +'<div class="seg" role="group" aria-label="View"><button type="button" data-bv="board" aria-pressed="'+(view==='board')+'">Board</button><button type="button" data-bv="list" aria-pressed="'+(view==='list')+'">List</button></div>'
     +(kind==='s'?'<div class="seg" role="group" aria-label="Which phases"><button type="button" data-side="pre" aria-pressed="'+(S.side!=='listed')+'">Before listing</button><button type="button" data-side="listed" aria-pressed="'+(S.side==='listed')+'">Listed</button></div>'
-      +'<label class="sw"><input type="checkbox" data-cold="1"'+(S.coldOn?' checked':'')+'><i></i>Cold ('+cards.filter(function(c){return c.stage==='cold';}).length+')</label>'
+      +(S.side==='listed'?'<label class="sw"><input type="checkbox" data-closed="s"'+(S.closed.s?' checked':'')+'><i></i>Past clients ('+closedN+')</label>'
+        :'<label class="sw"><input type="checkbox" data-cold="1"'+(S.coldOn?' checked':'')+'><i></i>Cold ('+cards.filter(function(c){return c.stage==='cold';}).length+')</label>')
       :'<label class="sw"><input type="checkbox" data-closed="'+kind+'"'+(S.closed[kind]?' checked':'')+'><i></i>Closed ('+closedN+')</label>')
     +'<button class="btn sm" type="button" data-add="'+kind+'">+ Add '+(kind==='s'?'seller':'buyer')+'</button></div>';
   var body=!cards.length?'<p class="empty">No '+label.toLowerCase()+' yet. People tagged '+(kind==='s'?'Daily Seller or CMA':'Searching or Daily')+' in FUB appear here by themselves. You can also sort a lead from Unsorted, or tap + Add.</p>'
@@ -886,14 +887,14 @@ function viewBoard(){
 }
 function boardView(kind){
   var ST=stagesOf(kind),cards=S.board[kind].cards,vis=ST.filter(function(st){return st.k!=='closed'||S.closed[kind];});
-  if(kind==='s'){var keep=S.side==='listed'?['sale','offer','sold','closed']:(S.coldOn?['cold']:[]).concat(['talk','poss','prosp','signed','soon']);vis=ST.filter(function(st){return keep.indexOf(st.k)>=0;});}
+  if(kind==='s'){var keep=S.side==='listed'?['soon','sale','offer','sold'].concat(S.closed.s?['closed']:[]):(S.coldOn?['cold']:[]).concat(['talk','poss','prosp','signed']);vis=ST.filter(function(st){return keep.indexOf(st.k)>=0;});}
   var strip='<div class="stages" role="toolbar" aria-label="Jump to stage">'+vis.map(function(st,i){return (i?'<span class="arrow" aria-hidden="true">›</span>':'')
     +'<button type="button" data-jump="'+kind+'-'+st.k+'">'+esc(st.n)+' <span class="n">'+cards.filter(function(c){return c.stage===st.k;}).length+'</span></button>';}).join('')+'</div>';
   var lastG='';
   var cols=vis.map(function(st){var items=cards.filter(function(c){return c.stage===st.k;});var g=st.g!==lastG?st.g:'';lastG=st.g;
     return '<div class="col" id="col-'+kind+'-'+st.k+'" style="--sc:'+st.c+'"><h3>'+esc(st.n)+' <small>'+items.length+'</small></h3><div class="grp">'+esc(g)+'</div>'
       +(items.length?items.map(function(c){return cardHtml(kind,c);}).join(''):'<div class="none">Nobody here</div>')+'</div>';}).join('');
-  return strip+'<div class="board'+(kind==='s'&&vis.length<=5?' fit':'')+'" id="board-'+kind+'">'+cols+'</div>';
+  return strip+'<div class="board'+(kind==='s'&&vis.length<=4?' fit':'')+'" id="board-'+kind+'">'+cols+'</div>';
 }
 function cardHtml(kind,c){var st=stagesOf(kind).filter(function(x){return x.k===c.stage;})[0]||stagesOf(kind)[0];return kind==='s'?sellerCard(c,st):buyerCard(c,st);}
 
@@ -902,7 +903,7 @@ var SORTS={stage:'Stage',quiet:'Longest since contact',recent:'Most recent activ
 function filtered(kind){
   var F=S.filter[kind],q=F.q.trim().toLowerCase(),ST=stagesOf(kind);
   var L=S.board[kind].cards.filter(function(c){
-    if(kind!=='s'&&c.stage==='closed'&&!S.closed[kind]&&F.stage!=='closed')return false;
+    if(c.stage==='closed'&&!S.closed[kind]&&F.stage!=='closed')return false;
     if(kind==='s'&&c.stage==='cold'&&!S.coldOn&&F.stage!=='cold')return false;
     if(F.stage&&c.stage!==F.stage)return false;
     if(F.region){var r=ff(c).region||regionOf(kind==='s'?cityOf(c):String(ff(c).cities||'').split(',')[0]);if(r!==F.region)return false;}
