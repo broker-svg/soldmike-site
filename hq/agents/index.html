@@ -132,6 +132,10 @@ a{color:var(--navy)}
 .phase{min-width:0;display:grid;gap:12px;align-content:start}
 .phase h3{margin:0;font-family:var(--display);font-size:30px;text-transform:uppercase;color:var(--navy)}
 .phase .muted{margin:-8px 0 0}
+.pc .th{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.pc .cx{flex:none;width:30px;height:30px;border-radius:8px;border:1px solid var(--line);background:var(--white);color:var(--navy);font-weight:800;font-size:18px;line-height:1;cursor:pointer}
+.pc .cx:hover{border-color:var(--navy)}
+.pc.mini{gap:6px}
 .pstrip{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin:2px 0 4px}
 .pstrip i{height:6px;border-radius:3px;background:var(--line)}
 .pstrip i.d{background:var(--green)}
@@ -627,7 +631,7 @@ var PROMPTS={
 var TABS=['sellers','buyers','marketing','toolkit','personal','financial','tpm'];
 var S={tab:TABS.indexOf(location.hash.slice(1))>=0?location.hash.slice(1):(store('desk_tab')||'sellers'),
   board:{s:null,b:null},inbox:null,inboxDays:store('desk_inbox_days')||14,closed:{s:!!store('desk_closed_s'),b:!!store('desk_closed_b')},
-  content:null,todos:null,tk:store('desk_tk')||'scripts',lpp:store('desk_lpp')||'appt',coldOn:store('desk_cold')===true,side:store('desk_side')||'pre',
+  content:null,todos:null,tk:store('desk_tk')||'scripts',lpp:store('desk_lpp')||'appt',exp:store('desk_exp')||{},coldOn:store('desk_cold')===true,side:store('desk_side')||'pre',
   view:{s:store('desk_view_s')||'list',b:store('desk_view_b')||'board'},showInbox:store('desk_inbox_on')!==false,inboxView:store('desk_inbox_view')||'cards',
   feedOn:store('desk_feed_on')!==false,feedDays:store('desk_feed_days')||2,feedFilter:'all',feedAll:false,viewing:null,
   sel:{s:{},b:{}},listings:undefined,expenses:null,people:{s:null,b:null},focus:{s:store('desk_focus_s')||'active',b:store('desk_focus_b')||'active'},fq:{s:'',b:''},fsort:{s:'recent',b:'recent'},fall:{s:false,b:false},pipeOpen:store('desk_pipe')!==false,showSoon:store('desk_soon')!==false,personal:null,things:null,gt:null,rem:null,ptf:store('desk_ptf')||'all',ptToday:store('desk_pt_today')!==false,ptLate:store('desk_pt_late')===true,ptAll:false,thingF:'Need',prospects:null,social:undefined,pTab:store('desk_ptab')||'exp',pFilter:{q:'',region:'',city:'',all:false},printTab:store('desk_print')||'hangers',sort:{s:store('desk_sort_s')||'stage',b:store('desk_sort_b')||'stage'},filter:{s:{q:'',stage:'',region:'',act:''},b:{q:'',stage:'',region:'',act:''}},script:'buyer',fs:store('desk_fs')||26,tagSync:false,fubApp:'https://app.followupboss.com'};
@@ -970,9 +974,12 @@ function sellerCard(c,st){
   var L=liveOf('s',c),all=['sellerintro','homeeval','cma','listpres','followup','intake','listplan','listdocs','listdesc','instructions','update','offers','justsold'],hot=st.p,rest=all.filter(function(k){return hot.indexOf(k)<0;});
   var done=c.checks||[],left=st.due.filter(function(d){return done.indexOf(d)<0;}).length;
   var title=c.addr||c.name||L.name||'No name',sub=c.addr?(c.name||L.name):'';
-  return '<article class="pc"><div class="t"><b>'+dot('s',c)+esc(title)+'</b>'+(sub?'<span>'+esc(sub)+'</span>':'')+'</div>'+phaseStrip(c.stage)
+  var open=!!S.exp[c.id];
+  var head='<div class="t"><div class="th"><b>'+dot('s',c)+esc(title)+'</b><button type="button" class="cx" data-cexp="'+c.id+'" aria-expanded="'+open+'" aria-label="'+(open?'Hide':'Show')+' details">'+(open?'−':'+')+'</button></div>'+(sub?'<span>'+esc(sub)+'</span>':'')+'</div>'+phaseStrip(c.stage)
+    +'<div class="meta">'+(open&&c.price?'<span class="chip n">'+esc(c.price)+'</span>':'')+(c.fub?(actChip('s',c)||lastChip(L.last)):'<span class="chip">Not linked to FUB</span>')+(open?matchChip('s',c):'')+(!open&&left?'<span class="chip">'+left+' to do</span>':'')+'</div>';
+  if(!open)return '<article class="pc mini">'+head+moveRow('s',c)+'</article>';
+  return '<article class="pc">'+head
     +(factsLine('s',c)?'<div class="fl2">'+esc(factsLine('s',c))+'</div>':'')+featChips(c,3)
-    +'<div class="meta">'+(c.price?'<span class="chip n">'+esc(c.price)+'</span>':'')+(c.fub?(actChip('s',c)||lastChip(L.last)):'<span class="chip">Not linked to FUB</span>')+matchChip('s',c)+'</div>'
     +(c.note?'<div class="note">'+esc(c.note)+'</div>':'')
     +'<div class="due"><div class="dh">Due now · '+(left?left+' left':'all done')+'</div>'+st.due.map(function(d){return '<label><input type="checkbox" data-check="'+c.id+'" value="'+esc(d)+'"'+(done.indexOf(d)>=0?' checked':'')+'><span>'+esc(d)+'</span></label>';}).join('')+'</div>'
     +'<div class="pacts">'+hot.map(function(k){return pbtn(k,'s',c.id,1);}).join('')+'</div>'
@@ -1556,6 +1563,7 @@ document.addEventListener('click',function(e){
   if(ds.pview){viewPerson(ds.pview,+ds.id);return;}
   if(ds.fall){S.fall[ds.fall]=true;render();return;}
   if(ds.newexp){openExpense(null,ds.newexp);return;}
+  if(ds.cexp){if(S.exp[ds.cexp])delete S.exp[ds.cexp];else S.exp[ds.cexp]=1;store('desk_exp',S.exp);render();return;}
   if(ds.exp){openExpense(+ds.exp);return;}
   if(ds.ptw){if(ds.ptw==='today'){S.ptToday=!S.ptToday;store('desk_pt_today',S.ptToday);}else{S.ptLate=!S.ptLate;store('desk_pt_late',S.ptLate);}S.ptAll=false;render();return;}
   if(ds.ptf){S.ptf=ds.ptf;store('desk_ptf',ds.ptf);S.ptAll=false;render();return;}
