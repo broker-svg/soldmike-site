@@ -213,6 +213,16 @@ dialog::backdrop{background:rgba(20,24,51,.6)}
 .dl .dh p{margin:4px 0 0;font-size:15px;color:var(--muted)}
 .fgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 12px}
 .fgrid .full{grid-column:1/-1}
+.upl{display:grid;gap:8px;margin-top:12px}
+.upl>span{font-size:14px;font-weight:600;color:var(--muted)}
+.drop{display:flex;align-items:center;justify-content:center;text-align:center;min-height:64px;padding:12px;border:2px dashed var(--line);border-radius:12px;color:var(--navy);font-weight:600;cursor:pointer;background:var(--white)}
+.drop.over{border-color:var(--navy);background:#eef0f8}
+.drop input{position:absolute;width:1px;height:1px;opacity:0}
+.upl ul{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.upl li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;font-size:14px;border:1px solid var(--line);border-radius:8px;padding:6px 10px}
+.upl li b{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.upl li small{color:var(--muted)}
+.upl li button{background:none;border:0;color:var(--red);font-weight:700;cursor:pointer;font-size:14px}
 @media (max-width:560px){.fgrid{grid-template-columns:minmax(0,1fr)}}
 .fgrid label,.fl{display:grid;gap:4px;font-size:14px;font-weight:600;color:var(--muted);min-width:0}
 .fgrid label em{font-style:normal;color:var(--red)}
@@ -486,37 +496,37 @@ var F={addr:{l:'Property address',req:1},client:{l:'Client name',req:1},email:{l
 var PROMPTS={
   sellerintro:{label:'Seller Intro Email',skill:'fub-system',lead:'Get my Seller Intro Email ready for this person (2nd Brain: Real Estate/Client Emails/Seller Intro Email.md, FUB template 243). Check the REALM "for sale" and "sold" links are still current; if they’re more than a month old, refresh them and update template 243. Use the callback timing below. Tell me when it’s ready to send from FUB (I send it myself).',
     fields:['client','email','phone',{k:'addr',l:'Their home address',full:1},{k:'callback',l:'When I’ll get back to them',ph:'Sunday night or Monday morning'},{k:'media',l:'Media examples to show',ph:'155 Dianawood Ridge, 3 Sedgwick Place',full:1},{k:'call',l:'Notes from the call',ta:1,full:1}]},
-  homeeval:{label:'Value Grid Evaluation',skill:'value-grid-evaluation',lead:'Value grid evaluation for this home (2nd Brain: Real Estate/Value Grid Evaluation.md, done like 45 Waddington). I’m attaching the GeoWarehouse PDF + REALM sold PDF + REALM active PDF. Step 1: give me the pricing read in chat. Step 2: re-tier with the owner details below. Step 3: build the page (Artifact to review, then the GitHub link). Step 4: listing strategy (4 prices) using mine below or your proposal. Step 5: the evaluation email saved as a FUB template for me to send.',
+  homeeval:{files:1,label:'Value Grid Evaluation',skill:'value-grid-evaluation',lead:'Value grid evaluation for this home (2nd Brain: Real Estate/Value Grid Evaluation.md, done like 45 Waddington). I’m attaching the GeoWarehouse PDF + REALM sold PDF + REALM active PDF. Step 1: give me the pricing read in chat. Step 2: re-tier with the owner details below. Step 3: build the page (Artifact to review, then the GitHub link). Step 4: listing strategy (4 prices) using mine below or your proposal. Step 5: the evaluation email saved as a FUB template for me to send.',
     fields:['addr','client','email','phone',{k:'community',l:'Community',ph:'Don Valley Village'},{k:'files',l:'What I’m attaching',opts:['GeoWarehouse + REALM sold + REALM active','Missing GeoWarehouse','Missing REALM sold','Missing REALM active']},
       {k:'tier',l:'Condition (owner says)',opts:['Original / as-is','Updated','Renovated','Wow / over the top']},'type','bb','sqft',{k:'suites',l:'Suites / income',ph:'Two 1-bed basement suites'},{k:'mech',l:'Mechanicals',ph:'Owned heat pump, tankless, 100 A service'},
       {k:'up',l:'Pushes it up (upgrades)',ta:1,full:1},{k:'down',l:'Holds it back',ta:1,full:1},{k:'strategy',l:'My listing strategy prices (optional)',ta:1,full:1,ph:'Offer date aggressive / standard / market middle / overpriced'},'notes']},
   listpres:{label:'Listing Presentation',skill:'listing-presentation',lead:'Prepare my listing presentation for this seller (after the evaluation is agreed).',
     fields:['addr','client','email',{k:'date',l:'Appointment date',type:'date'},{k:'price',l:'Agreed price / range'},'notes']},
-  cma:{label:'CMA',skill:'cma-generator',lead:'Prepare a CMA.',
+  cma:{files:1,label:'CMA',skill:'cma-generator',lead:'Prepare a CMA.',
     fields:['addr','client',{k:'purpose',l:'Purpose',opts:['Listing price','Buyer offer price']},'type','bb','sqft',{k:'comps',l:'Comps I picked (MLS® # or addresses)',ta:1,full:1},'notes']},
   update:{label:'Listing Update',skill:'seller-update',lead:'Write this week’s listing update for my seller.',
     fields:['addr','client','email',{k:'week',l:'Week of',type:'date'},{k:'show',l:'Showings this week',ph:'6'},{k:'views',l:'Online views',ph:'1,240'},{k:'fb',l:'Showing feedback',ta:1,full:1},'notes']},
-  instructions:{label:'Showing Instructions',skill:'showing-instructions',lead:'Write the showing instructions for this listing and the admin prep email, the same way as Arbors Lane (2nd Brain: Listings/404-100 Arbors Lane.md › Showings). Give me (1) the showing instructions for MLS / the booking system and (2) the email to admin with everything they need to set up showings. Show me both first. Nothing gets sent until I approve; if I approve the email, save it as a Follow Up Boss template.',
+  instructions:{files:1,label:'Showing Instructions',skill:'showing-instructions',lead:'Write the showing instructions for this listing and the admin prep email, the same way as Arbors Lane (2nd Brain: Listings/404-100 Arbors Lane.md › Showings). Give me (1) the showing instructions for MLS / the booking system and (2) the email to admin with everything they need to set up showings. Show me both first. Nothing gets sent until I approve; if I approve the email, save it as a Follow Up Boss template.',
     fields:['addr','client','phone',{k:'mls',l:'MLS® #'},{k:'golive',l:'Go-live date',type:'date',nodef:1},{k:'offerdate',l:'Offer date',type:'date',nodef:1},
       {k:'len',l:'Showing length',opts:['15 minutes','30 minutes','45 minutes','1 hour']},{k:'book',l:'Booking through',opts:['BrokerBay','ShowingTime','Call the listing agent']},{k:'notice',l:'Notice needed',ph:'1 hour'},{k:'dbl',l:'Double bookings',opts:['Not allowed','Allowed']},
       {k:'lockbox',l:'Lockbox # and where it is',full:1,ph:'#5450, railing left of the building, OP Team sticker'},{k:'notify',l:'Who to tell when a showing is booked',full:1,ph:'Email both sellers'},
       {k:'keys',l:'Keys / fob',ph:'Fob, $100 to replace if lost'},{k:'occ',l:'Occupied / pets',ph:'Owner-occupied, dog in crate'},{k:'docs',l:'Documents available',full:1,ph:'Status certificate, floor plan, survey'},
       {k:'offers',l:'Offer rules',ta:1,full:1,ph:'Register by 5 PM on offer night, irrevocable…'},{k:'rules',l:'Other showing rules',ta:1,full:1,ph:'Remove shoes, lights on, leave cards'}]},
-  listplan:{label:'Listing Plan',skill:'listing-setup-checklist',lead:'Build my listing plan of action for this property: every step from now until it is live and through offer night, in these groups: (1) before the listing appointment, (2) once the listing agreement is signed, (3) the week before going live, (4) launch day, (5) while it is for sale, up to offer night. Put a date on every step, working back from the go-live and offer dates below. Use Arbors Lane as the model timeline (2nd Brain: Listings/404-100 Arbors Lane.md: seller call → stager walkthrough → declutter → staging → media → admin prep email + coming soon post → live → offer date). Flag anything not booked yet. Save the plan as a 2nd Brain note in Listings/<address>.md and link it from Home.',
+  listplan:{files:1,label:'Listing Plan',skill:'listing-setup-checklist',lead:'Build my listing plan of action for this property: every step from now until it is live and through offer night, in these groups: (1) before the listing appointment, (2) once the listing agreement is signed, (3) the week before going live, (4) launch day, (5) while it is for sale, up to offer night. Put a date on every step, working back from the go-live and offer dates below. Use Arbors Lane as the model timeline (2nd Brain: Listings/404-100 Arbors Lane.md: seller call → stager walkthrough → declutter → staging → media → admin prep email + coming soon post → live → offer date). Flag anything not booked yet. Save the plan as a 2nd Brain note in Listings/<address>.md and link it from Home.',
     fields:[{k:'addr',l:'Property address',req:1,full:1},'client','email','phone',{k:'ptype',l:'Type',opts:['Freehold','Condo','Lease']},{k:'price',l:'List price (or range)'},
       {k:'golive',l:'Go-live date',type:'date',nodef:1},{k:'offerdate',l:'Offer date',type:'date',nodef:1},{k:'stage',l:'Where we are now',opts:['Before the listing appointment','Listing agreement signed','Prepping to go live','Live']},
       {k:'staging',l:'Staging',opts:['Stager','Seller declutters only','None']},{k:'media',l:'Media',ph:'TPM photos, video, drone, floor plan'},
       {k:'done',l:'Already booked / done',ta:1,full:1,ph:'Stager walkthrough Thu 4:30, photos Mon'},'notes']},
-  listdocs:{label:'Listing Documents',skill:'form290-filler',lead:'Prepare the listing paperwork for this property. I’m attaching the blank editable PDFs (and the GeoWarehouse report). Fill them from the details below, the same way as Arbors Lane (2nd Brain: Listings/404-100 Arbors Lane.md), and use the fixed brokerage block from Rules/MLS Data Forms.md. Only fill what you know for sure. At the end, list every field you left blank or weren’t sure about so I can check it. Save the filled PDFs and tell me where they are. Don’t send them to anyone.',
+  listdocs:{files:1,label:'Listing Documents',skill:'form290-filler',lead:'Prepare the listing paperwork for this property. I’m attaching the blank editable PDFs (and the GeoWarehouse report). Fill them from the details below, the same way as Arbors Lane (2nd Brain: Listings/404-100 Arbors Lane.md), and use the fixed brokerage block from Rules/MLS Data Forms.md. Only fill what you know for sure. At the end, list every field you left blank or weren’t sure about so I can check it. Save the filled PDFs and tell me where they are. Don’t send them to anyone.',
     fields:[{k:'addr',l:'Property address',req:1,full:1},{k:'sellers',l:'Sellers’ full legal names',req:1,full:1},{k:'ptype',l:'Type (sets the forms)',opts:['Freehold: OREA 271 + PropTx 290','Condo: OREA 271 + PropTx 291','Commercial lease: PropTx 592','Other (say below)']},
       {k:'attach',l:'What I’m attaching',full:1,ph:'Blank 271 + 290 PDFs, GeoWarehouse report'},{k:'price',l:'List price'},{k:'start',l:'Listing start',type:'date',nodef:1},{k:'end',l:'Listing end',type:'date',nodef:1},{k:'holdover',l:'Holdover (days)',ph:'90'},
       {k:'comm',l:'Commission',full:1,ph:'4.25% total: 2.5% co-op, 1.5% listing, 0.25% expenses'},{k:'pin',l:'PIN / ARN',ph:'From GeoWarehouse'},{k:'poss',l:'Possession',ph:'60–90 days / TBA'},
       {k:'incl',l:'Inclusions',ta:1,full:1,ph:'Fridge, stove, dishwasher, washer, dryer, light fixtures, window coverings'},{k:'excl',l:'Exclusions',full:1},{k:'rent',l:'Rental items',full:1,ph:'Hot water tank (Enercare) or none'},'notes']},
-  listdesc:{label:'Listing Description',skill:'marketing-copy',lead:'Write the MLS listing description for this property in my approved style (2nd Brain: Listings/404-100 Arbors Lane.md › Listing description approved): open with the strongest selling point, plain and confident, no clichés, no ALL CAPS. Give me (1) the MLS client remarks, kept inside the MLS character limit, with the character count, (2) a short version for REALTOR.ca and social, and (3) a one-line headline. Only use facts below or what you can see in the photos / feature sheet I attach. Don’t invent features.',
+  listdesc:{files:1,label:'Listing Description',skill:'marketing-copy',lead:'Write the MLS listing description for this property in my approved style (2nd Brain: Listings/404-100 Arbors Lane.md › Listing description approved): open with the strongest selling point, plain and confident, no clichés, no ALL CAPS. Give me (1) the MLS client remarks, kept inside the MLS character limit, with the character count, (2) a short version for REALTOR.ca and social, and (3) a one-line headline. Only use facts below or what you can see in the photos / feature sheet I attach. Don’t invent features.',
     fields:[{k:'addr',l:'Property address',req:1,full:1},'type','bb','sqft',{k:'lot',l:'Lot / unit size',ph:'50 × 126 ft'},{k:'park',l:'Parking / garage',ph:'2 owned parking spots'},
       {k:'best',l:'Best selling point (lead with this)',full:1,req:1},{k:'feat',l:'Features and upgrades',ta:1,full:1},{k:'area',l:'Neighbourhood / nearby',ta:1,full:1},
       {k:'incl',l:'Inclusions',full:1},{k:'buyer',l:'Who will buy it',ph:'First-time buyer, downsizer, investor'},{k:'attach',l:'What I’m attaching',ph:'Photos, feature sheet'},'notes']},
-  offers:{label:'Offer Summary',skill:'offer-review-summary',lead:'Summarize the offers on this listing for my seller.',
+  offers:{files:1,label:'Offer Summary',skill:'offer-review-summary',lead:'Summarize the offers on this listing for my seller.',
     fields:['addr','client','email',{k:'offerdate',l:'Offer date',type:'date'},{k:'count',l:'Number of offers'},{k:'list',l:'List price'},{k:'detail',l:'Offer details (or say "PDFs attached")',ta:1,full:1}]},
   justsold:{label:'Just Sold',skill:'metricool-scheduler',lead:'Make Just Sold posts with the approved Sold graphic (2nd Brain: Marketing/Sold Posts.md). For each address: find the hero exterior in the Drive sold folder, get sold price, list price and community from soldmike.ca Team Sold Listings, add the OVER ASKING sticker only if sold > list, render with Sold Posts/render_sold.py, write the JUST SOLD caption, show me the graphics first, then schedule in Metricool (SoldMike) on the next Monday slots and update the Agent Desk listings list.',
     fields:[{k:'addrs',l:'Addresses',ta:1,full:1,req:1},{k:'showprice',l:'Show the sold price',opts:['Yes','No']},'notes']},
@@ -1406,17 +1416,38 @@ function openPrompt(key,ctx,id){
   var dlg=$('#dlg');
   dlg.innerHTML='<form class="dl" id="pf"><div class="dh"><div style="flex:1;min-width:0"><h2>'+esc(P.label)+'</h2><p>Fill in what you know, copy, and paste it to Claude.'+(P.skill?' Runs the <span class="chip n">'+esc(P.skill)+'</span> skill.':'')+'</p></div><button type="button" class="x" data-close aria-label="Close">×</button></div>'
     +'<div class="fgrid">'+fields.map(inp).join('')+'</div>'
+    +(P.files?'<div class="upl"><span>Files (PDFs, photos), uploaded to HQ so Claude can download them</span><label class="drop" id="upDrop">Tap to add files, or drop them here<input type="file" id="upIn" multiple accept=".pdf,image/*,.doc,.docx,.xls,.xlsx,.csv"></label><ul id="upList"></ul></div>':'')
     +'<div class="pv"><div class="k"><span>Prompt</span><span id="pvMiss"></span></div><textarea id="pvT" readonly aria-label="Prompt text"></textarea></div></form>'
     +'<div class="dfoot"><button type="button" class="btn" id="copyBtn">Copy prompt</button><button type="button" class="btn ghost" data-close>Close</button></div>';
   $$('[data-f]',dlg).forEach(function(el){el.addEventListener('input',buildPrompt);});
+  cur.packet=(function(){var c='abcdefghijklmnopqrstuvwxyz0123456789',a=new Uint8Array(24),o='';crypto.getRandomValues(a);for(var i=0;i<24;i++)o+=c[a[i]%36];return o;})();cur.files=[];cur.busy=0;
+  if(P.files){var inEl=$('#upIn'),dr=$('#upDrop');inEl.onchange=function(){upFiles(inEl.files);inEl.value='';};
+    ['dragenter','dragover'].forEach(function(ev){dr.addEventListener(ev,function(e){e.preventDefault();dr.classList.add('over');});});
+    ['dragleave','drop'].forEach(function(ev){dr.addEventListener(ev,function(e){e.preventDefault();dr.classList.remove('over');});});
+    dr.addEventListener('drop',function(e){if(e.dataTransfer&&e.dataTransfer.files)upFiles(e.dataTransfer.files);});
+    $('#upList').onclick=function(e){var b=e.target.closest('[data-rmf]');if(!b)return;var id=b.getAttribute('data-rmf');
+      post('desk/files/delete',{id:id}).catch(function(){});cur.files=cur.files.filter(function(f){return f.id!==id;});drawFiles();buildPrompt();};}
   $('#pf').onsubmit=function(e){e.preventDefault();};
   buildPrompt();if(!dlg.open)dlg.showModal();
 }
+function fsize(n){return n>=1048576?(n/1048576).toFixed(1)+' MB':Math.max(1,Math.round(n/1024))+' KB';}
+function drawFiles(){var u=$('#upList');if(!u)return;u.innerHTML=cur.files.map(function(f){return '<li><b title="'+esc(f.name)+'">'+esc(f.name)+'</b>'+(f.id?'<span><small>'+fsize(f.size)+'</small> <button type="button" data-rmf="'+esc(f.id)+'" aria-label="Remove '+esc(f.name)+'">Remove</button></span>':'<small>'+(f.err?'<span style="color:var(--red)">'+esc(f.err)+'</span>':'Uploading…')+'</small>')+'</li>';}).join('');}
+function upFiles(list){Array.prototype.forEach.call(list,function(file){
+  var f={name:file.name,size:file.size};cur.files.push(f);
+  if(file.size>20*1048576){f.err='Too big (20 MB max)';drawFiles();return;}
+  cur.busy++;drawFiles();buildPrompt();
+  fetch(API+'/api/hq/desk/files/add?packet='+cur.packet+'&name='+encodeURIComponent(file.name)+'&type='+encodeURIComponent(file.type||''),{method:'POST',headers:{'X-OH-Pin':pin(),'Content-Type':'application/octet-stream'},body:file})
+   .then(function(r){return r.json().then(function(j){if(!r.ok)throw j.error||('Error '+r.status);return j;});})
+   .then(function(j){f.id=j.file.id;},function(e){f.err=typeof e==='string'?e:'Upload failed';})
+   .then(function(){cur.busy--;drawFiles();buildPrompt();});});}
 function buildPrompt(){
   var lines=[],miss=[];
   cur.fields.forEach(function(f){var el=document.getElementById('f_'+f.k),v=(el&&el.value||'').trim();if(!v){if(f.req)miss.push(f.l);return;}
     lines.push(f.ta?f.l+':\n'+v.split('\n').map(function(x){return '  '+x;}).join('\n'):'- '+f.l+': '+v);});
-  $('#pvT').value=(cur.P.skill?'Use the '+cur.P.skill+' skill.\n':'')+cur.P.lead+'\n\n'+lines.join('\n')+(miss.length?'\n\n(Missing: '+miss.join(', ')+')':'');
+  var up=(cur.files||[]).filter(function(f){return f.id;});
+  if(cur.busy)miss.push('files still uploading');
+  var ftxt=up.length?'\n\nFiles: I uploaded '+up.length+' file'+(up.length>1?'s':'')+' to HQ. Download '+(up.length>1?'them':'it')+' first (send the header Origin: https://soldmike.com; links expire in 30 days):\n'+up.map(function(f){return '- '+f.name+' ('+fsize(f.size)+'): '+API+'/api/hqfiles/'+cur.packet+'/'+f.id;}).join('\n')+'\nAll files: '+API+'/api/hqfiles/'+cur.packet:'';
+  $('#pvT').value=(cur.P.skill?'Use the '+cur.P.skill+' skill.\n':'')+cur.P.lead+'\n\n'+lines.join('\n')+ftxt+(miss.length?'\n\n(Missing: '+miss.join(', ')+')':'');
   var m=$('#pvMiss');m.textContent=miss.length?'Missing: '+miss.join(', '):'Ready';m.style.color=miss.length?'var(--red)':'var(--green)';
 }
 function copyPrompt(){var t=$('#pvT');function sel(){t.focus();t.select();toast('Text selected. Use Copy from the menu.');}
