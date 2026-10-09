@@ -127,6 +127,11 @@ a{color:var(--navy)}
 .rt b{font-weight:600}
 .rt p{margin:0;font-size:15px;color:var(--muted)}
 .lprep .rt{gap:8px}
+.lprep.lpbig{grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:16px}
+.lprep.lpbig .rt{padding:20px;gap:10px}
+.lprep.lpbig .rt b{font-size:20px}
+.lprep.lpbig .rt p{font-size:16px}
+.lprep.lpbig .pb{min-height:44px;font-size:16px;padding:0 16px}
 .lprep .lpf{font-size:14px}
 .lprep .lpf span{font-weight:700;color:var(--ink)}
 details.faq{border-top:1px solid var(--line)}
@@ -828,7 +833,7 @@ function viewBoard(){
   function wrap(main){return '<div class="split"><div class="mainc">'+main+'</div><aside class="rail" aria-label="Activity and new leads">'+rail+'</aside></div>';}
   var top=focusSection(kind);
   function pipe(inner,n){return '<details class="pipe"'+(S.pipeOpen?' open':'')+' data-pipe><summary>Pipeline board'+(n!=null?' · '+n+' cards':'')+' <small>Coming Soon → For Sale → Sold → Closed, checklists, facts, matching</small></summary>'+inner+'</details>';}
-  if(!B)return wrap(top+pipe('<section class="card"><p class="empty">Loading…</p></section>')+(kind==='s'?listingPrep()+prospectsSection()+sellerRes():buyerRes()));
+  if(!B)return wrap(top+pipe('<section class="card"><p class="empty">Loading…</p></section>')+(kind==='s'?prospectsSection()+sellerRes():buyerRes()));
   var cards=B.cards,closedN=cards.filter(function(c){return c.stage==='closed';}).length,view=S.view[kind];
   var sub=cards.filter(function(c){return c.stage!=='closed';}).length+' active';
   var head='<div class="hd"><h2>'+label+'</h2><span class="sub">'+sub+'</span>'
@@ -839,7 +844,7 @@ function viewBoard(){
     :view==='list'?listView(kind):boardView(kind);
   return wrap(top+pipe('<section class="card">'+head+(B.liveError?'<p class="err" style="margin-bottom:10px">Follow Up Boss didn’t answer, so phone / activity may be missing. Try Refresh.</p>':'')+body
     +(B.archivedCount?'<p style="margin:10px 0 0"><button class="lnkb" type="button" data-archived="'+kind+'">Archived ('+B.archivedCount+')</button></p>':'')+'</section>',cards.length)
-    +(kind==='s'?listingPrep()+prospectsSection()+sellerRes():buyerRes()));
+    +(kind==='s'?prospectsSection()+sellerRes():buyerRes()));
 }
 function boardView(kind){
   var ST=stagesOf(kind),cards=S.board[kind].cards,vis=ST.filter(function(st){return st.k!=='closed'||S.closed[kind];});
@@ -942,7 +947,7 @@ function listingPrep(){var T=[
   ['listdocs','Listing Documents','Fills the listing agreement and MLS data form from your details, and lists anything to check.','Sellers’ legal names, price, dates, commission, inclusions · attach the blank editable PDFs'],
   ['listdesc','Listing Description','MLS remarks with character count, a short version for REALTOR.ca and social, and a headline.','Best selling point, features, upgrades, neighbourhood · attach photos or the feature sheet'],
   ['instructions','Showing Instructions','Showing instructions for MLS plus the admin prep email, saved in FUB when you approve.','Lockbox, booking, notice, who to notify, offer rules']];
-  return '<section class="card"><div class="hd"><h2>Listing prep</h2><span class="sub">Fill one in, copy the prompt, paste it to Claude with any photos or PDFs attached</span></div><div class="res lprep">'
+  return '<section class="card"><div class="hd"><h2>Listing prep</h2><span class="sub">Fill one in, copy the prompt, paste it to Claude with any photos or PDFs attached</span></div><div class="res lprep lpbig">'
    +T.map(function(t){return '<div class="rt"><span class="k">'+esc(PROMPTS[t[0]].skill||'')+'</span><b>'+esc(t[1])+'</b><p>'+esc(t[2])+'</p><p class="lpf"><span>You fill in:</span> '+esc(t[3])+'</p><div>'+pbtn(t[0],'lp','',1)+'</div></div>';}).join('')+'</div></section>';}
 function resTiles(list){return '<div class="res">'+list.map(function(r){return '<a class="rt" href="'+r[3]+'" target="_blank" rel="noopener"><span class="k">'+esc(r[0])+'</span><b>'+esc(r[1])+'</b><p>'+esc(r[2])+'</p></a>';}).join('')+'</div>';}
 function sellerRes(){return '<section class="card"><div class="hd"><h2>Seller resources</h2><span class="sub">Guides and pages to send sellers</span></div>'+resTiles([
@@ -1357,13 +1362,14 @@ var LAW=[
  {q:'Is there a required lease form?',a:['Most residential leases in Ontario must use the province’s Standard Form of Lease.','If a landlord doesn’t provide it after the tenant asks in writing, the tenant can withhold one month’s rent.'],f:['Standard Lease']}
 ];
 function viewToolkit(){
-  var tabs='<div class="subtabs" role="toolbar" aria-label="Toolkit sections">'+[['scripts','Scripts'],['law','Landlord & Tenant'],['todo','To-do']].map(function(t){return '<button type="button" data-tk="'+t[0]+'" aria-pressed="'+(S.tk===t[0])+'">'+t[1]+'</button>';}).join('')+'</div>';
+  var tabs='<div class="subtabs" role="toolbar" aria-label="Toolkit sections">'+[['scripts','Scripts'],['prep','Listing Prep'],['law','Landlord & Tenant'],['todo','To-do']].map(function(t){return '<button type="button" data-tk="'+t[0]+'" aria-pressed="'+(S.tk===t[0])+'">'+t[1]+'</button>';}).join('')+'</div>';
   var body;
   if(S.tk==='scripts'){var s=SCRIPTS.filter(function(x){return x.k===S.script;})[0];
     body='<section class="card"><div class="hd"><h2>Scripts</h2><span class="sub">Big text for the tablet</span></div><div class="reader"><div class="slist">'
      +SCRIPTS.map(function(x){return '<button type="button" data-script="'+x.k+'" aria-pressed="'+(x.k===S.script)+'">'+esc(x.n)+'<small>'+esc(x.s)+'</small></button>';}).join('')+'</div>'
      +'<div class="script"><div class="sz"><span>'+esc(s.n)+' · {name} = fill in</span><button type="button" data-fs="-2" aria-label="Smaller text">A−</button><button type="button" data-fs="2" aria-label="Bigger text">A+</button></div><div class="stext" id="stext" style="--fs:'+S.fs+'px">'
      +s.body.map(function(l){return l[0]==='h'?'<h3>'+esc(l[1])+'</h3>':l[0]==='cue'?'<span class="cue">'+esc(l[1])+'</span>':'<p>'+esc(l[1])+'</p>';}).join('')+'</div></div></div></section>';}
+  else if(S.tk==='prep'){body=listingPrep();}
   else if(S.tk==='law'){
     body='<section class="card law"><div class="hd"><h2>Landlord & Tenant</h2><span class="sub">Ontario · Residential Tenancies Act</span>'+pbtn('lawq','m','',1)+'</div>'
      +'<div class="banner"><b>Not legal advice.</b><span>Quick reference for client conversations, updated for the Sept 21, 2026 changes. Confirm on the LTB site or with a paralegal / lawyer before anyone acts.</span></div>'
