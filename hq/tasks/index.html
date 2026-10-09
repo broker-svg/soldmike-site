@@ -28,9 +28,10 @@ button,input{font:inherit;color:inherit}
 .row1 nav{margin-left:auto;display:flex;gap:10px}
 .row1 nav a{color:var(--muted);text-decoration:none;font-weight:600}
 .row1 button{background:none;border:0;padding:2px 4px;color:var(--muted);cursor:pointer;font-size:18px}
-.chips{display:flex;flex-wrap:wrap;gap:6px;padding:8px 0}
+.chips{display:flex;flex-wrap:nowrap;gap:5px;padding:8px 0;overflow-x:auto;scrollbar-width:none}
 .chips::-webkit-scrollbar{display:none}
-.chips button{flex:none;min-height:40px;padding:0 10px;border-radius:20px;border:1px solid #C9CEDD;background:var(--bg);font-weight:600;font-size:16px;cursor:pointer;color:var(--ink)}
+.chips::-webkit-scrollbar{display:none}
+.chips button{flex:none;min-height:40px;padding:0 9px;border-radius:20px;border:1px solid #C9CEDD;background:var(--bg);font-weight:600;font-size:16px;cursor:pointer;color:var(--ink)}
 .chips button b{margin-left:4px}
 .chips button[aria-pressed="true"]{border-style:solid;background:var(--ink);border-color:var(--ink);color:#fff}
 .chips button.late b{color:var(--red)}.chips button.late[aria-pressed="true"]{background:var(--red);border-color:var(--red)}.chips button.late[aria-pressed="true"] b{color:#fff}.chips button.late.off{border-style:dashed;color:var(--muted)}
@@ -115,16 +116,17 @@ function load(){
 function render(){
   var t=ymd(new Date()),tm1=new Date();tm1.setDate(tm1.getDate()+1);var tom=ymd(tm1);
   var all=S.items.filter(function(x){return S.src==='all'||x.src===S.src;});
-  all.forEach(function(x){x.late=!!(x.day&&x.day<t);});
-  var nToday=all.filter(function(x){return x.day===t;}).length,nLate=all.filter(function(x){return x.late;}).length;
+  all.forEach(function(x){x.late=!!(x.day&&x.day<t);x.nodate=!x.day;});
+  var nToday=all.filter(function(x){return x.day===t;}).length,nLate=all.filter(function(x){return x.late||x.nodate;}).length;
   // Overdue switch hides overdue tasks in every view; Today = due today; All days = everything by date
-  var L=all.filter(function(x){if(S.hideLate&&x.late)return false;if(S.scope==='today')return x.day===t||(!S.hideLate&&x.late);return true;});
+  // Overdue switch hides overdue AND no-date tasks in every view
+  var L=all.filter(function(x){if(S.hideLate&&(x.late||x.nodate))return false;if(S.scope==='today')return x.day===t||(!S.hideLate&&(x.late||x.nodate));return true;});
   L.sort(function(a,b){var ka=a.day||'9999',kb=b.day||'9999';return ka.localeCompare(kb)||String(a.time||'').localeCompare(String(b.time||''))||String(a.title).localeCompare(String(b.title));});
   var counts={};S.items.forEach(function(x){counts[x.src]=(counts[x.src]||0)+1;});
   // Today (on/off) · sources · Overdue (hide/show) last
   $('chips').innerHTML='<button type="button" data-w="today" aria-pressed="'+(S.scope==='today')+'">Today <b>'+nToday+'</b></button><i class="sep"></i>'
-    +['all','fub','g','rem'].map(function(k){return '<button type="button" class="src" data-s="'+k+'" aria-pressed="'+(S.src===k)+'">'+(k==='all'?'All':k==='rem'?'Reminders':SRC[k][0])+(k!=='all'&&counts[k]?' '+counts[k]:'')+'</button>';}).join('')
-    +'<i class="sep"></i><button type="button" class="late'+(S.hideLate?' off':'')+'" data-w="late" aria-pressed="'+(!S.hideLate)+'">Overdue <b>'+nLate+'</b></button>';
+    +['all','fub','g','rem'].map(function(k){return '<button type="button" class="src" data-s="'+k+'" aria-pressed="'+(S.src===k)+'" title="'+(k==='all'?'All sources':SRC[k][0]+(k==='rem'?'s':''))+'">'+(k==='all'?'All':k==='rem'?'R':k==='g'?'G':SRC[k][0])+(k!=='all'&&counts[k]?' '+counts[k]:'')+'</button>';}).join('')
+    +'<i class="sep"></i><button type="button" class="late'+(S.hideLate?' off':'')+'" data-w="late" aria-pressed="'+(!S.hideLate)+'" title="Overdue + no date">O <b>'+nLate+'</b></button>';
   if(!L.length){$('list').innerHTML='<div class="empty"><b>'+(S.scope==='today'?'Nothing left today':'All clear')+'</b>'+(nLate&&S.hideLate?nLate+' overdue hidden. Tap Overdue to show them.':'Nice work.')+'</div>'+errNote();return;}
   var groups=[],cur=null;
   L.forEach(function(x){var g=x.late?'Overdue':x.day===t?'Today':x.day===tom?'Tomorrow':x.day?new Date(x.day+'T12:00:00').toLocaleDateString('en-CA',{weekday:'long',month:'short',day:'numeric'}):'No date';
