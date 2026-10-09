@@ -127,6 +127,17 @@ a{color:var(--navy)}
 .rt b{font-weight:600}
 .rt p{margin:0;font-size:15px;color:var(--muted)}
 .lprep .rt{gap:8px}
+.phase{min-width:0;display:grid;gap:12px;align-content:start}
+.phase h3{margin:0;font-family:var(--display);font-size:30px;text-transform:uppercase;color:var(--navy)}
+.phase .muted{margin:-8px 0 0}
+.pchk{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.pchk li{position:relative;padding:12px 14px 12px 44px;border:1px solid var(--line);border-radius:10px;font-size:18px;background:var(--white)}
+.pchk li::before{content:"";position:absolute;left:14px;top:50%;width:18px;height:18px;margin-top:-9px;border:2px solid var(--navy);border-radius:5px}
+.ptools{display:grid;gap:8px}
+.ptools>span{font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.ptools>div{display:flex;flex-wrap:wrap;gap:8px}
+.ptools .pb{min-height:44px;font-size:16px;padding:0 16px}
+.pnext{margin:0;font-size:16px}
 .lprep.lpbig{grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:16px}
 .lprep.lpbig .rt{padding:20px;gap:10px}
 .lprep.lpbig .rt b{font-size:20px}
@@ -574,7 +585,7 @@ var PROMPTS={
 var TABS=['sellers','buyers','marketing','toolkit','personal','financial','tpm'];
 var S={tab:TABS.indexOf(location.hash.slice(1))>=0?location.hash.slice(1):(store('desk_tab')||'sellers'),
   board:{s:null,b:null},inbox:null,inboxDays:store('desk_inbox_days')||14,closed:{s:!!store('desk_closed_s'),b:!!store('desk_closed_b')},
-  content:null,todos:null,tk:store('desk_tk')||'scripts',
+  content:null,todos:null,tk:store('desk_tk')||'scripts',lpp:store('desk_lpp')||'appt',
   view:{s:store('desk_view_s')||'board',b:store('desk_view_b')||'board'},showInbox:store('desk_inbox_on')!==false,inboxView:store('desk_inbox_view')||'cards',
   feedOn:store('desk_feed_on')!==false,feedDays:store('desk_feed_days')||2,feedFilter:'all',feedAll:false,viewing:null,
   sel:{s:{},b:{}},listings:undefined,expenses:null,people:{s:null,b:null},focus:{s:store('desk_focus_s')||'active',b:store('desk_focus_b')||'active'},fq:{s:'',b:''},fsort:{s:'recent',b:'recent'},fall:{s:false,b:false},pipeOpen:false,showSoon:store('desk_soon')!==false,personal:null,things:null,gt:null,rem:null,ptf:store('desk_ptf')||'all',ptToday:store('desk_pt_today')!==false,ptLate:store('desk_pt_late')===true,ptAll:false,thingF:'Need',prospects:null,social:undefined,pTab:store('desk_ptab')||'exp',pFilter:{q:'',region:'',city:'',all:false},printTab:store('desk_print')||'hangers',sort:{s:store('desk_sort_s')||'stage',b:store('desk_sort_b')||'stage'},filter:{s:{q:'',stage:'',region:'',act:''},b:{q:'',stage:'',region:'',act:''}},script:'buyer',fs:store('desk_fs')||26,tagSync:false,fubApp:'https://app.followupboss.com'};
@@ -941,13 +952,28 @@ function openMatches(kind,id){var c=cardById(kind,id),m=matchesFor(kind,c),ok=ki
    +'<p class="muted" style="font-size:14px;margin:0">Matched when area and price fit (price within 5% over their top), plus type, beds, garage and size when both sides have them. Features are shown but not required.</p></div>';
   if(!d.open)d.showModal();}
 
+var PHASES=[
+ {k:'appt',n:'Listing appointment',s:'Before you meet the seller',items:['Home Evaluation done (value grid page + range agreed)','Seller Intro Email sent (listings, sold, media)','Pre-listing package sent','CMA printed / on the tablet','Listing presentation ready','Bring: listing agreement, data form, tablet, business cards'],tools:['homeeval','sellerintro','cma','listpres'],next:'Listing signed'},
+ {k:'signed',n:'Listing signed',s:'Paperwork and dates',items:['Listing agreement signed (OREA 271)','MLS data form signed (PropTx 290 / 291)','Sellers’ legal names, IDs and contact details','Listing price, go-live date and offer date agreed','Commission, holdover and listing period confirmed','Inclusions, exclusions and rental items confirmed','Listing note started in the 2nd Brain'],tools:['listdocs','listplan'],next:'Coming soon'},
+ {k:'prep',n:'Coming soon',s:'Getting the home ready',items:['Listing Plan with dates','Stager walkthrough booked','Seller declutter day','Staging day','Photos, video, drone, floor plan (TPM)','Listing description approved','Feature sheet approved','Coming soon post (keyword for DMs)'],tools:['listplan','listdesc'],next:'Going live'},
+ {k:'live',n:'Going live',s:'Launch day',items:['MLS live, details checked','Showing instructions on MLS','Admin prep email sent','Sign and lockbox installed','Property website / links live','Just listed posts scheduled','Added to the newsletter','Seller told it’s live, with the links'],tools:['instructions'],next:'For sale'},
+ {k:'sale',n:'For sale',s:'Weekly updates',items:['Weekly Listing Update sent to the seller','Showing feedback chased','Open house (if planned)','Competition checked (new listings, price changes)','Price review at day 14 if no offer date'],tools:['update'],next:'Offer night'},
+ {k:'offer',n:'Offer night',s:'Offers in, decision made',items:['Offer registration deadline set','Offer Day email sent to the seller','Offers reviewed and summarized','Seller call: walk through every offer','Send offers back for improvement or accept','Signed offer and deposit details to the lawyer'],tools:['offers'],next:'Sold to closed'},
+ {k:'sold',n:'Sold to closed',s:'From firm to keys',items:['Conditions waived / firm','Deposit received','SOLD sign + Just Sold post','Lawyer details exchanged','Closing day: keys handed over','Closing gift sent','Ask for a Google review','Add to past-client follow-up'],tools:['justsold'],next:''}];
+function listingPlaybook(){var ph=PHASES.filter(function(x){return x.k===S.lpp;})[0]||PHASES[0],i=PHASES.indexOf(ph);
+  return '<section class="card"><div class="hd"><h2>Listing Prep</h2><span class="sub">Every phase of a listing, the checklist and the tools for that step</span></div><div class="reader"><div class="slist">'
+   +PHASES.map(function(x,n){return '<button type="button" data-lpp="'+x.k+'" aria-pressed="'+(x.k===ph.k)+'">'+(n+1)+'. '+esc(x.n)+'<small>'+esc(x.s)+'</small></button>';}).join('')+'</div>'
+   +'<div class="phase"><h3>'+(i+1)+'. '+esc(ph.n)+'</h3><p class="muted">'+esc(ph.s)+'</p>'
+   +'<ul class="pchk">'+ph.items.map(function(t){return '<li>'+esc(t)+'</li>';}).join('')+'</ul>'
+   +'<div class="ptools"><span>Tools for this step</span><div>'+ph.tools.map(function(k){return pbtn(k,'lp','',1);}).join('')+'</div></div>'
+   +(ph.next?'<p class="pnext">Next: <button type="button" class="lnkb" data-lpp="'+PHASES[i+1].k+'">'+esc(ph.next)+' →</button></p>':'<p class="pnext">Last phase. Done.</p>')+'</div></div></section>';}
 function listingPrep(){var T=[
   ['homeeval','Home Evaluation','Value grid: assessment multiples, side-by-side comps, listing strategy, then the email in FUB.','Address, condition, suites, upgrades, strategy prices · attach GeoWarehouse + REALM sold + REALM active PDFs'],
   ['listplan','Listing Plan','Every step and date from the appointment to live to offer night, saved as a listing note.','Address, go-live and offer dates, staging, media, what’s already booked'],
   ['listdocs','Listing Documents','Fills the listing agreement and MLS data form from your details, and lists anything to check.','Sellers’ legal names, price, dates, commission, inclusions · attach the blank editable PDFs'],
   ['listdesc','Listing Description','MLS remarks with character count, a short version for REALTOR.ca and social, and a headline.','Best selling point, features, upgrades, neighbourhood · attach photos or the feature sheet'],
   ['instructions','Showing Instructions','Showing instructions for MLS plus the admin prep email, saved in FUB when you approve.','Lockbox, booking, notice, who to notify, offer rules']];
-  return '<section class="card"><div class="hd"><h2>Listing prep</h2><span class="sub">Fill one in, copy the prompt, paste it to Claude with any photos or PDFs attached</span></div><div class="res lprep lpbig">'
+  return '<section class="card"><div class="hd"><h2>All the tools</h2><span class="sub">Fill one in, add files, copy the prompt, paste it to Claude</span></div><div class="res lprep lpbig">'
    +T.map(function(t){return '<div class="rt"><span class="k">'+esc(PROMPTS[t[0]].skill||'')+'</span><b>'+esc(t[1])+'</b><p>'+esc(t[2])+'</p><p class="lpf"><span>You fill in:</span> '+esc(t[3])+'</p><div>'+pbtn(t[0],'lp','',1)+'</div></div>';}).join('')+'</div></section>';}
 function resTiles(list){return '<div class="res">'+list.map(function(r){return '<a class="rt" href="'+r[3]+'" target="_blank" rel="noopener"><span class="k">'+esc(r[0])+'</span><b>'+esc(r[1])+'</b><p>'+esc(r[2])+'</p></a>';}).join('')+'</div>';}
 function sellerRes(){return '<section class="card"><div class="hd"><h2>Seller resources</h2><span class="sub">Guides and pages to send sellers</span></div>'+resTiles([
@@ -1369,7 +1395,7 @@ function viewToolkit(){
      +SCRIPTS.map(function(x){return '<button type="button" data-script="'+x.k+'" aria-pressed="'+(x.k===S.script)+'">'+esc(x.n)+'<small>'+esc(x.s)+'</small></button>';}).join('')+'</div>'
      +'<div class="script"><div class="sz"><span>'+esc(s.n)+' · {name} = fill in</span><button type="button" data-fs="-2" aria-label="Smaller text">A−</button><button type="button" data-fs="2" aria-label="Bigger text">A+</button></div><div class="stext" id="stext" style="--fs:'+S.fs+'px">'
      +s.body.map(function(l){return l[0]==='h'?'<h3>'+esc(l[1])+'</h3>':l[0]==='cue'?'<span class="cue">'+esc(l[1])+'</span>':'<p>'+esc(l[1])+'</p>';}).join('')+'</div></div></div></section>';}
-  else if(S.tk==='prep'){body=listingPrep();}
+  else if(S.tk==='prep'){body=listingPlaybook()+listingPrep();}
   else if(S.tk==='law'){
     body='<section class="card law"><div class="hd"><h2>Landlord & Tenant</h2><span class="sub">Ontario · Residential Tenancies Act</span>'+pbtn('lawq','m','',1)+'</div>'
      +'<div class="banner"><b>Not legal advice.</b><span>Quick reference for client conversations, updated for the Sept 21, 2026 changes. Confirm on the LTB site or with a paralegal / lawyer before anyone acts.</span></div>'
@@ -1521,6 +1547,7 @@ document.addEventListener('click',function(e){
   if(ds.item){openItem(+ds.item);return;}
   if(ds.tk){S.tk=ds.tk;store('desk_tk',S.tk);render();load(false);return;}
   if(ds.script){S.script=ds.script;render();return;}
+  if(ds.lpp){S.lpp=ds.lpp;store('desk_lpp',S.lpp);render();return;}
   if(ds.fs){S.fs=Math.max(18,Math.min(48,S.fs+(+ds.fs)));store('desk_fs',S.fs);$('#stext').style.setProperty('--fs',S.fs+'px');return;}
   if(ds.tdx){post('item/delete',{id:+ds.tdx}).then(loadTodos).then(render).catch(fail);return;}
 });
