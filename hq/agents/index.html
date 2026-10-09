@@ -130,6 +130,12 @@ a{color:var(--navy)}
 .phase{min-width:0;display:grid;gap:12px;align-content:start}
 .phase h3{margin:0;font-family:var(--display);font-size:30px;text-transform:uppercase;color:var(--navy)}
 .phase .muted{margin:-8px 0 0}
+.pstrip{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin:2px 0 4px}
+.pstrip i{height:6px;border-radius:3px;background:var(--line)}
+.pstrip i.d{background:var(--green)}
+.pstrip i.c{background:var(--navy)}
+.pwho{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.pwho>span{font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
 .pchk{list-style:none;margin:0;padding:0;display:grid;gap:8px}
 .pchk li{position:relative;padding:12px 14px 12px 44px;border:1px solid var(--line);border-radius:10px;font-size:18px;background:var(--white)}
 .pchk li::before{content:"";position:absolute;left:14px;top:50%;width:18px;height:18px;margin-top:-9px;border:2px solid var(--navy);border-radius:5px}
@@ -484,13 +490,26 @@ function askPin(){return new Promise(function(res){var d=$('#pinDlg'),i=$('#pinI
 function fail(e){if(e==='pin')return askPin().then(function(){load(true);});toast(typeof e==='string'?e:'Could not reach the server. Check the connection.');}
 
 /* ---------- stages ---------- */
+var PHASES=[
+ {k:'appt',n:'Listing appointment',s:'Before you meet the seller',items:['Home Evaluation done (value grid page + range agreed)','Seller Intro Email sent (listings, sold, media)','Pre-listing package sent','CMA printed / on the tablet','Listing presentation ready','Bring: listing agreement, data form, tablet, business cards'],tools:['homeeval','sellerintro','cma','listpres'],next:'Listing signed'},
+ {k:'signed',n:'Listing signed',s:'Paperwork and dates',items:['Listing agreement signed (OREA 271)','MLS data form signed (PropTx 290 / 291)','Sellers’ legal names, IDs and contact details','Listing price, go-live date and offer date agreed','Commission, holdover and listing period confirmed','Inclusions, exclusions and rental items confirmed','Listing note started in the 2nd Brain'],tools:['listdocs','listplan'],next:'Coming soon'},
+ {k:'prep',n:'Coming soon',s:'Getting the home ready',items:['Listing Plan with dates','Stager walkthrough booked','Seller declutter day','Staging day','Photos, video, drone, floor plan (TPM)','Listing description approved','Feature sheet approved','Coming soon post (keyword for DMs)'],tools:['listplan','listdesc'],next:'Going live'},
+ {k:'live',n:'Going live',s:'Launch day',items:['MLS live, details checked','Showing instructions on MLS','Admin prep email sent','Sign and lockbox installed','Property website / links live','Just listed posts scheduled','Added to the newsletter','Seller told it’s live, with the links'],tools:['instructions'],next:'For sale'},
+ {k:'sale',n:'For sale',s:'Weekly updates',items:['Weekly Listing Update sent to the seller','Showing feedback chased','Open house (if planned)','Competition checked (new listings, price changes)','Price review at day 14 if no offer date'],tools:['update'],next:'Offer night'},
+ {k:'offer',n:'Offer night',s:'Offers in, decision made',items:['Offer registration deadline set','Offer Day email sent to the seller','Offers reviewed and summarized','Seller call: walk through every offer','Send offers back for improvement or accept','Signed offer and deposit details to the lawyer'],tools:['offers'],next:'Sold to closed'},
+ {k:'sold',n:'Sold to closed',s:'From firm to keys',items:['Conditions waived / firm','Deposit received','SOLD sign + Just Sold post','Lawyer details exchanged','Closing day: keys handed over','Closing gift sent','Ask for a Google review','Add to past-client follow-up'],tools:['justsold'],next:''}];
+var PH={};PHASES.forEach(function(x){PH[x.k]=x;});
+// seller stage -> playbook phase (Toolkit › Listing Prep). Going live sits inside For sale.
+var STAGE_PHASE={prosp:'appt',signed:'signed',soon:'prep',sale:'sale',offer:'offer',sold:'sold'};
 var SSTAGES=[
   {k:'talk',n:'Talking',g:'Leads',c:'#9BA2BD',p:['sellerintro','homeeval'],due:['Log the first conversation in FUB','Set a follow-up date','Ask: timing and reason for moving']},
   {k:'poss',n:'Possibility',g:'Leads',c:'#7C86B8',p:['homeeval','sellerintro'],due:['Send the Home Evaluation','Book a walk-through','Add to Daily Seller list']},
-  {k:'prosp',n:'Prospect',g:'Leads',c:'#4A5592',p:['listpres','cma'],due:['Prepare the CMA','Send the pre-listing package','Book the listing presentation']},
-  {k:'soon',n:'Coming Soon',g:'Before listing',c:'#26338A',p:['listplan','listdocs','listdesc','instructions'],due:['Listing agreement signed','Photos + drone booked','Staging / pre-list clean','Listing instructions to admin','Feature sheet approved']},
-  {k:'sale',n:'For Sale',g:'During',c:'#D7141E',p:['update','offers'],due:['Weekly Listing Update sent','Showing feedback chased','Offer date plan agreed','Price review at day 14']},
-  {k:'sold',n:'Sold, before closing',g:'After sold',c:'#1B7A3E',p:['justsold'],due:['Offer summary filed','Conditions waived / firm','Deposit received','Just Sold post + SOLD sign','Lawyer details exchanged']},
+  {k:'prosp',n:'Listing appointment',g:'Leads',c:'#4A5592',p:PH.appt.tools,due:PH.appt.items},
+  {k:'signed',n:'Listing signed',g:'Before listing',c:'#33409A',p:PH.signed.tools,due:PH.signed.items},
+  {k:'soon',n:'Coming soon',g:'Before listing',c:'#26338A',p:PH.prep.tools,due:PH.prep.items},
+  {k:'sale',n:'For sale',g:'During',c:'#D7141E',p:['update','instructions'],due:PH.live.items.map(function(t){return 'Launch: '+t;}).concat(PH.sale.items)},
+  {k:'offer',n:'Offer night',g:'During',c:'#B0101A',p:PH.offer.tools,due:PH.offer.items},
+  {k:'sold',n:'Sold, before closing',g:'After sold',c:'#1B7A3E',p:PH.sold.tools,due:PH.sold.items},
   {k:'closed',n:'Closed',g:'Done',c:'#545B78',p:['justsold'],due:['Keys handed over','Closing gift sent','Ask for a Google review','Add to past-client nurture']}
 ];
 var BSTAGES=[
@@ -597,6 +616,7 @@ window.addEventListener('hashchange',function(){var h=location.hash.slice(1);if(
 /* load what the current tab needs (force = refresh even if loaded) */
 function load(force){
   var jobs=[];
+  if(S.tab==='toolkit'&&S.tk==='prep'&&(force||!S.board.s))jobs.push(getJ('desk/board?kind=s').then(function(j){S.board.s=j;S.fubApp=j.fubApp||S.fubApp;}));
   if(S.tab==='sellers'||S.tab==='buyers'){
     var pk=S.tab==='sellers'?'s':'b';if(force||!S.people[pk])jobs.push(loadPeople(pk));
     ['s','b'].forEach(function(k){if(force||!S.board[k])jobs.push(getJ('desk/board?kind='+k+(force?'&pull=1':'')).then(function(j){S.board[k]=j;S.tagSync=j.tagSync;S.fubApp=j.fubApp||S.fubApp;if(j.pulled)toast(j.pulled+' added from your FUB tags');}));});
@@ -915,11 +935,13 @@ function moveRow(kind,c){var ST=stagesOf(kind);
   return '<div class="pfoot"><select data-move="'+kind+'" data-id="'+c.id+'" aria-label="Move to stage">'+ST.map(function(st){return '<option value="'+st.k+'"'+(st.k===c.stage?' selected':'')+'>'+esc(st.n)+'</option>';}).join('')+'</select>'
    +'<button type="button" class="lk" data-edit="'+kind+'" data-id="'+c.id+'">Edit</button>'
    +(c.fub?'<a class="lk" href="'+fubUrl(c.fub)+'" target="_blank" rel="noopener">FUB</a>':'')+'</div>';}
+function phaseStrip(stage){var map={prosp:0,signed:1,soon:2,sale:4,offer:5,sold:6,closed:7},n=map[stage];if(n==null)return '';
+  return '<div class="pstrip" title="Phase '+Math.min(n+1,7)+' of 7">'+PHASES.map(function(x,i){return '<i class="'+(i<n||n===7?'d':i===n||(n===4&&i===3)?'c':'')+'" title="'+esc(x.n)+'"></i>';}).join('')+'</div>';}
 function sellerCard(c,st){
   var L=liveOf('s',c),all=['sellerintro','homeeval','cma','listpres','listplan','listdocs','listdesc','instructions','update','offers','justsold'],hot=st.p,rest=all.filter(function(k){return hot.indexOf(k)<0;});
   var done=c.checks||[],left=st.due.filter(function(d){return done.indexOf(d)<0;}).length;
   var title=c.addr||c.name||L.name||'No name',sub=c.addr?(c.name||L.name):'';
-  return '<article class="pc"><div class="t"><b>'+dot('s',c)+esc(title)+'</b>'+(sub?'<span>'+esc(sub)+'</span>':'')+'</div>'
+  return '<article class="pc"><div class="t"><b>'+dot('s',c)+esc(title)+'</b>'+(sub?'<span>'+esc(sub)+'</span>':'')+'</div>'+phaseStrip(c.stage)
     +(factsLine('s',c)?'<div class="fl2">'+esc(factsLine('s',c))+'</div>':'')+featChips(c,3)
     +'<div class="meta">'+(c.price?'<span class="chip n">'+esc(c.price)+'</span>':'')+(c.fub?(actChip('s',c)||lastChip(L.last)):'<span class="chip">Not linked to FUB</span>')+matchChip('s',c)+'</div>'
     +(c.note?'<div class="note">'+esc(c.note)+'</div>':'')
@@ -952,18 +974,12 @@ function openMatches(kind,id){var c=cardById(kind,id),m=matchesFor(kind,c),ok=ki
    +'<p class="muted" style="font-size:14px;margin:0">Matched when area and price fit (price within 5% over their top), plus type, beds, garage and size when both sides have them. Features are shown but not required.</p></div>';
   if(!d.open)d.showModal();}
 
-var PHASES=[
- {k:'appt',n:'Listing appointment',s:'Before you meet the seller',items:['Home Evaluation done (value grid page + range agreed)','Seller Intro Email sent (listings, sold, media)','Pre-listing package sent','CMA printed / on the tablet','Listing presentation ready','Bring: listing agreement, data form, tablet, business cards'],tools:['homeeval','sellerintro','cma','listpres'],next:'Listing signed'},
- {k:'signed',n:'Listing signed',s:'Paperwork and dates',items:['Listing agreement signed (OREA 271)','MLS data form signed (PropTx 290 / 291)','Sellers’ legal names, IDs and contact details','Listing price, go-live date and offer date agreed','Commission, holdover and listing period confirmed','Inclusions, exclusions and rental items confirmed','Listing note started in the 2nd Brain'],tools:['listdocs','listplan'],next:'Coming soon'},
- {k:'prep',n:'Coming soon',s:'Getting the home ready',items:['Listing Plan with dates','Stager walkthrough booked','Seller declutter day','Staging day','Photos, video, drone, floor plan (TPM)','Listing description approved','Feature sheet approved','Coming soon post (keyword for DMs)'],tools:['listplan','listdesc'],next:'Going live'},
- {k:'live',n:'Going live',s:'Launch day',items:['MLS live, details checked','Showing instructions on MLS','Admin prep email sent','Sign and lockbox installed','Property website / links live','Just listed posts scheduled','Added to the newsletter','Seller told it’s live, with the links'],tools:['instructions'],next:'For sale'},
- {k:'sale',n:'For sale',s:'Weekly updates',items:['Weekly Listing Update sent to the seller','Showing feedback chased','Open house (if planned)','Competition checked (new listings, price changes)','Price review at day 14 if no offer date'],tools:['update'],next:'Offer night'},
- {k:'offer',n:'Offer night',s:'Offers in, decision made',items:['Offer registration deadline set','Offer Day email sent to the seller','Offers reviewed and summarized','Seller call: walk through every offer','Send offers back for improvement or accept','Signed offer and deposit details to the lawyer'],tools:['offers'],next:'Sold to closed'},
- {k:'sold',n:'Sold to closed',s:'From firm to keys',items:['Conditions waived / firm','Deposit received','SOLD sign + Just Sold post','Lawyer details exchanged','Closing day: keys handed over','Closing gift sent','Ask for a Google review','Add to past-client follow-up'],tools:['justsold'],next:''}];
 function listingPlaybook(){var ph=PHASES.filter(function(x){return x.k===S.lpp;})[0]||PHASES[0],i=PHASES.indexOf(ph);
+  var cards=(S.board.s&&S.board.s.cards)||[],at=function(k){return cards.filter(function(c){return STAGE_PHASE[c.stage]===k;});};
   return '<section class="card"><div class="hd"><h2>Listing Prep</h2><span class="sub">Every phase of a listing, the checklist and the tools for that step</span></div><div class="reader"><div class="slist">'
-   +PHASES.map(function(x,n){return '<button type="button" data-lpp="'+x.k+'" aria-pressed="'+(x.k===ph.k)+'">'+(n+1)+'. '+esc(x.n)+'<small>'+esc(x.s)+'</small></button>';}).join('')+'</div>'
+   +PHASES.map(function(x,n){return '<button type="button" data-lpp="'+x.k+'" aria-pressed="'+(x.k===ph.k)+'">'+(n+1)+'. '+esc(x.n)+(at(x.k).length?' <span class="chip n">'+at(x.k).length+'</span>':'')+'<small>'+esc(x.s)+'</small></button>';}).join('')+'</div>'
    +'<div class="phase"><h3>'+(i+1)+'. '+esc(ph.n)+'</h3><p class="muted">'+esc(ph.s)+'</p>'
+   +(S.board.s?'<div class="pwho"><span>Sellers here</span>'+(at(ph.k).length?at(ph.k).map(function(c){return '<button type="button" class="pb" data-view="s" data-id="'+c.id+'">'+esc(c.addr||c.name||'Seller')+'</button>';}).join(''):'<small class="muted">'+(ph.k==='live'?'Launch steps are on each For sale seller’s checklist':'Nobody right now')+'</small>')+'</div>':'')
    +'<ul class="pchk">'+ph.items.map(function(t){return '<li>'+esc(t)+'</li>';}).join('')+'</ul>'
    +'<div class="ptools"><span>Tools for this step</span><div>'+ph.tools.map(function(k){return pbtn(k,'lp','',1);}).join('')+'</div></div>'
    +(ph.next?'<p class="pnext">Next: <button type="button" class="lnkb" data-lpp="'+PHASES[i+1].k+'">'+esc(ph.next)+' →</button></p>':'<p class="pnext">Last phase. Done.</p>')+'</div></div></section>';}
