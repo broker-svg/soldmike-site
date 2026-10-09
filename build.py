@@ -806,8 +806,61 @@ GF = '/media/gentle-fox/'
 PHOTOS = [(GF + f + '.jpg', a, c) for f, a, c in [('twilight-street', 'Stone home at twilight', 'Twilight'), ('drone-front', 'Drone view of the home and street', 'Drone'), ('kitchen', 'Kitchen island with bar stools', 'Kitchen'), ('backyard-twilight', 'Backyard and pool at twilight', 'Twilight'), ('drone-overhead', 'Overhead drone view of the backyard pool', 'Drone'), ('kitchen-2', 'Kitchen with stainless appliances', 'Kitchen'), ('primary-bedroom', 'Primary bedroom', 'Bedroom'), ('pool', 'Backyard pool and cabana', 'Outdoor living'), ('details', 'Range and stone countertop', 'Details')]]
 def bullets(rows):
     return '<ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:12px">' + ''.join('<li style="display:flex;gap:12px;align-items:flex-start"><span style="flex:none;width:26px;height:26px;border-radius:50%%;background:var(--red);color:#fff;display:grid;place-items:center;font-weight:700;font-size:14px">✓</span><span>%s</span></li>' % r for r in rows) + '</ul>'
+# Road to SOLD: Michael in the centre, the steps curve around him from Your listing (bottom left) to SOLD (bottom right)
+ROAD = [('Start', 'Your listing', ''), ('1', 'Pricing strategy', 'pricing'), ('2', 'Prep &amp; repairs', 'prep'), ('3', 'Staging', 'staging'), ('4', 'Media day', 'media'),
+        ('5', 'Coming soon', 'coming-soon'), ('6', 'MLS® launch', 'mls'), ('7', 'Showings', 'showings'), ('8', 'Offer night', 'offer'), ('', 'SOLD', '')]
+def road_hero(trail, h1, lede, photo):
+    import math
+    cr = '<nav class="crumbs" aria-label="Breadcrumb">' + ' / '.join(
+        ('<a href="%s">%s</a>' % (u, e(n))) if i < len(trail) - 1 else '<span aria-current="page">%s</span>' % e(n)
+        for i, (n, u) in enumerate(trail)) + '</nav>'
+    n, a0, a1, r = len(ROAD), -144, 144, 220  # degrees clockwise from 12 o'clock, radius in a 560 box
+    stops = ''
+    for i, (k, t, img) in enumerate(ROAD):
+        a = math.radians(a0 + (a1 - a0) * i / (n - 1))
+        cls = 'end' if i == n - 1 else 'start' if i == 0 else ''
+        bg = ';background-image:linear-gradient(180deg,rgba(20,24,51,0) 30%%,rgba(20,24,51,.92) 78%%),url(/media/road/%s.jpg)' % img if img else ''
+        stops += '<li class="%s" style="--x:%.2f%%;--y:%.2f%%"><span style="%s"><small>%s</small>%s</span></li>' % (
+            cls or 'pic', 50 + r / 5.6 * math.sin(a), 50 - r / 5.6 * math.cos(a), bg.lstrip(';'), k, t)
+    sx, sy = 280 + r * math.sin(math.radians(a0)), 280 - r * math.cos(math.radians(a0))
+    svg = ('<svg viewBox="0 0 560 560" aria-hidden="true"><path d="M%.1f %.1f A%d %d 0 1 1 %.1f %.1f" /></svg>' % (sx, sy, r, r, 560 - sx, sy))
+    return ('<section class="phero photo road-hero"><div class="bg" style="background-image:url(%s)" aria-hidden="true"></div><div class="wrap">'
+            '<div class="rh-text">%s<h1>%s</h1><p class="lede">%s</p><p class="rh-cta"><a class="btn" href="/sell/home-value/">Get your home value</a></p></div>'
+            '<figure class="road" aria-label="The road from your listing to SOLD">%s<img src="/mike.png" alt="Michael Barillari, Broker" width="720" height="720">'
+            '<ol>%s</ol><figcaption><b>Michael Barillari</b> with you at every step</figcaption></figure></div></section>') % (photo, cr, e(h1), lede, svg, stops)
+ROAD_CSS = '''<style>
+.road-hero .wrap{display:grid;gap:40px;align-items:center}
+@media (min-width:1000px){.road-hero .wrap{grid-template-columns:minmax(0,1fr) minmax(0,560px)}}
+.road-hero .rh-text{display:flex;flex-direction:column;gap:16px}
+.road{margin:0;position:relative;width:100%;max-width:560px;justify-self:center}
+.road svg{display:none}
+.road img{display:block;width:180px;height:180px;margin:0 auto 20px;border-radius:50%;object-fit:cover;object-position:50% 15%;border:5px solid #fff;box-shadow:0 12px 40px rgba(0,0,0,.35)}
+.road ol{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;justify-content:center;gap:10px}
+.road li span{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;width:96px;height:96px;border-radius:50%;background:rgba(29,40,112,.92);border:2px solid rgba(255,255,255,.7);box-shadow:0 6px 18px rgba(0,0,0,.3);color:#fff;font-family:var(--display);font-weight:700;font-size:15px;line-height:1.05;text-transform:uppercase;padding:8px;backdrop-filter:blur(4px)}
+.road li small{font-size:12px;color:var(--pale);letter-spacing:.06em;margin-bottom:3px}
+.road li.pic span{background-size:cover;background-position:center;justify-content:flex-end;padding:0 6px 14px;font-size:13px;text-shadow:0 1px 3px rgba(0,0,0,.6)}
+.road li.pic small{font-size:11px;color:#fff;background:var(--red);border-radius:99px;min-width:18px;padding:0 5px;margin-bottom:3px;text-shadow:none}
+.road li.start span{background:#fff;color:var(--navy);border-color:#fff}
+.road li.start small{color:var(--red)}
+.road li.end span{background:var(--red);border-color:#fff;font-size:30px;font-weight:800;letter-spacing:.02em}
+.road li.end small{display:none}
+.road figcaption{text-align:center;margin-top:14px;color:var(--pale);font-size:15px}
+.road figcaption b{color:#fff}
+@media (min-width:1000px){
+  .road{aspect-ratio:1}
+  .road svg{display:block;position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+  .road path{fill:none;stroke:rgba(255,255,255,.7);stroke-width:3;stroke-dasharray:2 12;stroke-linecap:round;animation:roadmove 1.6s linear infinite}
+  .road img{position:absolute;left:50%;top:50%;width:41%;height:41%;margin:0;transform:translate(-50%,-50%)}
+  .road ol{position:absolute;inset:0;display:block}
+  .road li{position:absolute;left:var(--x);top:var(--y);transform:translate(-50%,-50%)}
+  .road li span{width:104px;height:104px}
+  .road li.start span,.road li.end span{width:118px;height:118px}
+  .road figcaption{position:absolute;left:50%;bottom:4%;transform:translateX(-50%);margin:0;white-space:nowrap}
+}
+@keyframes roadmove{to{stroke-dashoffset:-28}}
+</style>'''
 P('/sell/pre-listing/',
-  lambda: hero([('Home', '/'), ('Sell', '/sell/'), ('Pre-listing package', '/sell/pre-listing/')], 'Your home, presented by SoldMike', 'How we price it, show it and sell it. Take a look before we meet.', GF + 'twilight-street.jpg'),
+  lambda: road_hero([('Home', '/'), ('Sell', '/sell/'), ('Pre-listing package', '/sell/pre-listing/')], 'Your home, presented by SoldMike', 'How we price it, show it and sell it. Take a look before we meet.', GF + 'twilight-street.jpg'),
   lambda: band(statrow([('2,000+', 'transactions, Michael and The OP Team combined'), ('4.9<span style="color:var(--red)">★</span>', 'Google rating, 125 reviews'), ('2011', 'selling in Vaughan since'), ('RENE', 'Negotiation Expert · SRS · ABR®')]) + '<p class="fine" style="margin-top:16px">Transactions: The OP Team and Michael Barillari combined, as of October 2026. Google rating of The OP Team as of October 2026.</p>'),
   lambda: band(head_block('A message from Michael') + '<div style="position:relative;padding-top:56.25%%;border-radius:8px;overflow:hidden"><iframe src="https://www.youtube-nocookie.com/embed/%s" title="Michael Barillari introduces his selling plan" style="position:absolute;inset:0;width:100%%;height:100%%;border:0" allow="encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe></div>' % PRELIST_VIDEO, narrow=True) if PRELIST_VIDEO else '',
   lambda: band(head_block('Your home, on video', 'Real work from a recent listing, 38 Gentle Fox Dr, shot by our own team at Toronto Property Media.') +
@@ -835,7 +888,7 @@ P('/sell/pre-listing/',
   lambda: band('<div class="two"><div class="stack">' + prose('<h2>Take the seller guide with you</h2>', 'All 15 steps, with a checklist for each, in a free 10-page PDF.') + '</div>' + form('guide', '-pl', 'Selling a home in Vaughan') + '</div>'),
   lambda: cta("Let's get your home SOLDMIKE", 'Book your listing consultation. Call or text %s, or send your address below.' % PHONE),
   title='Pre-Listing Package: How We Sell Your Home | SoldMike', desc='Before we meet: our video tours, reels, photography, 8-step launch plan, pricing and offer strategy, and homes Michael Barillari has sold.',
-  trail=[('Sell', '/sell/'), ('Pre-listing package', '/sell/pre-listing/')])
+  trail=[('Sell', '/sell/'), ('Pre-listing package', '/sell/pre-listing/')], head=ROAD_CSS)
 
 
 # ---------- homepage menu (index.html is hand-edited; its menu comes from NAV so it always matches) ----------
