@@ -384,6 +384,22 @@ dialog::backdrop{background:rgba(20,24,51,.6)}
 .fchips.when button{border-style:dashed}.fchips.when button[aria-pressed="true"]{border-style:solid}
 .big2{font:800 44px/1 var(--display);color:var(--navy);margin:-4px 0 10px}.big2 small{display:block;font:500 14px/1.3 var(--body);color:var(--muted);margin-top:4px;text-transform:none}
 .lst.navy{background:var(--navy)}.xrow .la{text-align:left}
+.ftabs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:-2px 0 12px;padding-bottom:2px}
+.ftabs::-webkit-scrollbar{display:none}
+.ftabs button{flex:none;min-height:42px;padding:0 16px;border-radius:21px;border:1px solid var(--line);background:var(--white);font-weight:700;font-size:16px;cursor:pointer;color:var(--ink);white-space:nowrap}
+.ftabs button b{margin-left:4px;font-weight:700;color:var(--muted)}
+.ftabs button[aria-selected="true"]{background:var(--navy);border-color:var(--navy);color:var(--white)}
+.ftabs button[aria-selected="true"] b{color:#C9D0F2}
+.ftabs button.stl{border-style:dashed}
+.prow2 .rs .selsm{min-height:36px;max-width:150px}
+.callb{color:var(--green)!important;font-size:18px}
+details.pipe{background:var(--white);border:1px solid var(--line);border-radius:16px;box-shadow:0 24px 60px -34px rgba(20,24,51,.4)}
+details.pipe>summary{cursor:pointer;list-style:none;padding:16px 20px;font-family:var(--display);font-weight:800;font-size:22px;text-transform:uppercase;color:var(--ink)}
+details.pipe>summary::-webkit-details-marker{display:none}
+details.pipe>summary::before{content:"+ ";color:var(--red)}
+details.pipe[open]>summary::before{content:"– "}
+details.pipe>summary small{display:block;font:500 14px/1.3 var(--body);text-transform:none;color:var(--muted);margin-top:2px}
+details.pipe>.card{border:0;box-shadow:none;border-top:1px solid var(--line);border-radius:0 0 16px 16px}
 </style>
 </head>
 <body>
@@ -525,7 +541,7 @@ var S={tab:TABS.indexOf(location.hash.slice(1))>=0?location.hash.slice(1):(store
   content:null,todos:null,tk:store('desk_tk')||'scripts',
   view:{s:store('desk_view_s')||'board',b:store('desk_view_b')||'board'},showInbox:store('desk_inbox_on')!==false,inboxView:store('desk_inbox_view')||'cards',
   feedOn:store('desk_feed_on')!==false,feedDays:store('desk_feed_days')||2,feedFilter:'all',feedAll:false,viewing:null,
-  sel:{s:{},b:{}},listings:undefined,expenses:null,showSoon:store('desk_soon')!==false,personal:null,things:null,gt:null,rem:null,ptf:store('desk_ptf')||'all',ptToday:store('desk_pt_today')!==false,ptLate:store('desk_pt_late')===true,ptAll:false,thingF:'Need',prospects:null,social:undefined,pTab:store('desk_ptab')||'exp',pFilter:{q:'',region:'',city:'',all:false},printTab:store('desk_print')||'hangers',sort:{s:store('desk_sort_s')||'stage',b:store('desk_sort_b')||'stage'},filter:{s:{q:'',stage:'',region:'',act:''},b:{q:'',stage:'',region:'',act:''}},script:'buyer',fs:store('desk_fs')||26,tagSync:false,fubApp:'https://app.followupboss.com'};
+  sel:{s:{},b:{}},listings:undefined,expenses:null,people:{s:null,b:null},focus:{s:store('desk_focus_s')||'active',b:store('desk_focus_b')||'active'},fq:{s:'',b:''},fsort:{s:'recent',b:'recent'},fall:{s:false,b:false},pipeOpen:false,showSoon:store('desk_soon')!==false,personal:null,things:null,gt:null,rem:null,ptf:store('desk_ptf')||'all',ptToday:store('desk_pt_today')!==false,ptLate:store('desk_pt_late')===true,ptAll:false,thingF:'Need',prospects:null,social:undefined,pTab:store('desk_ptab')||'exp',pFilter:{q:'',region:'',city:'',all:false},printTab:store('desk_print')||'hangers',sort:{s:store('desk_sort_s')||'stage',b:store('desk_sort_b')||'stage'},filter:{s:{q:'',stage:'',region:'',act:''},b:{q:'',stage:'',region:'',act:''}},script:'buyer',fs:store('desk_fs')||26,tagSync:false,fubApp:'https://app.followupboss.com'};
 
 function setTab(t){S.tab=t;store('desk_tab',t);$$('#tabnav a[data-tab]').forEach(function(a){a.setAttribute('aria-current',a.dataset.tab===t?'page':'false');});render();load(false);}
 $$('#tabnav a[data-tab]').forEach(function(a){a.addEventListener('click',function(e){e.preventDefault();history.replaceState(null,'','#'+a.dataset.tab);setTab(a.dataset.tab);window.scrollTo({top:0});});});
@@ -535,6 +551,7 @@ window.addEventListener('hashchange',function(){var h=location.hash.slice(1);if(
 function load(force){
   var jobs=[];
   if(S.tab==='sellers'||S.tab==='buyers'){
+    var pk=S.tab==='sellers'?'s':'b';if(force||!S.people[pk])jobs.push(loadPeople(pk));
     ['s','b'].forEach(function(k){if(force||!S.board[k])jobs.push(getJ('desk/board?kind='+k+(force?'&pull=1':'')).then(function(j){S.board[k]=j;S.tagSync=j.tagSync;S.fubApp=j.fubApp||S.fubApp;if(j.pulled)toast(j.pulled+' added from your FUB tags');}));});
     if(force||!S.inbox)jobs.push(loadInbox());}
   if(S.tab==='marketing'&&(force||S.social===undefined))jobs.push(getJ('desk/social').then(function(j){S.social=j.social;}));
@@ -554,7 +571,7 @@ function badge(){var n=S.inbox&&S.inbox.people?S.inbox.people.length:0;['sellers
 function render(){var m=$('#main');
   var html=({sellers:viewBoard,buyers:viewBoard,marketing:viewMarketing,toolkit:viewToolkit,personal:viewPersonal,financial:viewFinancial,tpm:viewTPM})[S.tab]();
   var sx={};$$('.board',m).forEach(function(b){sx[b.id]=b.scrollLeft;});
-  var fa=document.activeElement,fid=fa&&fa.id&&/^(lq-|pq$)/.test(fa.id)?fa.id:null,pos=fid?fa.selectionStart:0;
+  var fa=document.activeElement,fid=fa&&fa.id&&/^(lq-|pq$|fq-)/.test(fa.id)?fa.id:null,pos=fid?fa.selectionStart:0;
   m.innerHTML=html;
   if(fid){var el=document.getElementById(fid);if(el){el.focus();try{el.setSelectionRange(pos,pos);}catch(e){}}}
   $$('.board',m).forEach(function(b){if(sx[b.id])b.scrollLeft=sx[b.id];});
@@ -664,10 +681,93 @@ function feed(kind){
 }
 function stageName(kind,k){var s=stagesOf(kind).filter(function(x){return x.k===k;})[0];return s?'<span class="muted" style="font-size:14px">· '+esc(s.n)+'</span>':'';}
 
+/* ---------- Seller / Buyer focus tabs (from FUB tags + stage; moving here updates FUB) ---------- */
+var FOCUS={s:[['leads','Leads'],['active','Active'],['appointment','Appointment'],['undercontract','Under Contract'],['stale','Stale']],
+  b:[['leads','Leads'],['active','Active'],['appointment','Appointment'],['searching','Searching'],['showings','Showings'],['undercontract','Under Contract'],['stale','Stale']]};
+var MOVE_TO={s:[['active','Active'],['appointment','Appointment'],['undercontract','Under Contract'],['stale','Stale'],['closed','Closed (FUB stage)']],
+  b:[['active','Active'],['appointment','Appointment'],['searching','Searching'],['showings','Showings'],['undercontract','Under Contract'],['stale','Stale'],['closed','Closed (FUB stage)']]};
+function hasTag(p,t){return (p.tags||[]).indexOf(t)>=0;}
+function actP(p){var a=p.act||{},inn=mx(a.rt,a.re,a.ic),out=mx(a.st,a.se,a.oc),eng=mx(a.em,a.web,a.lead),two=Math.max(inn,out),now=Date.now();
+  var st=inn&&inn>=out&&now-inn<7*DAY?'reply':eng&&now-eng<3*DAY&&eng>inn?'engaged':(!two||now-two>30*DAY)?'stale':out>inn&&now-out>2*DAY?'waiting':'ok';
+  return {st:st,inn:inn,out:out,eng:eng,two:two,days:two?Math.floor((now-two)/DAY):null};}
+// one tab per person: Under Contract > Appointment > Showings > Searching > Stale > Active
+function focusOf(kind,p){
+  if(p.stage==='Under Contract')return 'undercontract';
+  if(p.stage==='Closed'||p.stage==='Past Client')return 'closed';
+  if(hasTag(p,'Appoinment'))return 'appointment';
+  if(kind==='b'&&hasTag(p,'Showing'))return 'showings';
+  if(kind==='b'&&hasTag(p,'Searching'))return 'searching';
+  if(hasTag(p,'Stale'))return 'stale';
+  // Active = real two-way contact in 30 days, or opened an email / on the site in 14 days. Everything else is Stale.
+  var a=actP(p),now=Date.now();
+  if((a.two&&now-a.two<=30*DAY)||(a.eng&&now-a.eng<=14*DAY))return 'active';
+  return 'stale';}
+function loadPeople(kind){return getJ('desk/people?kind='+kind).then(function(j){S.people[kind]=j;S.fubApp=j.fubApp||S.fubApp;});}
+function pChip(p){var a=actP(p);
+  if(a.st==='reply')return '<span class="chip g">Replied '+esc(agoMs(a.inn))+'</span>';
+  if(a.st==='engaged')return '<span class="chip n">Active '+esc(agoMs(a.eng))+'</span>';
+  if(a.st==='waiting')return '<span class="chip a">Waiting '+Math.floor((Date.now()-a.out)/DAY)+' d</span>';
+  if(a.st==='stale')return '<span class="chip r">'+(a.days!=null?a.days+' d quiet':'Never contacted')+'</span>';
+  return a.two?'<span class="chip">'+esc(agoMs(a.two))+'</span>':'';}
+function focusSection(kind){
+  var P=S.people[kind],f=S.focus[kind],label=kind==='s'?'Sellers':'Buyers';
+  var nLeads=S.inbox&&S.inbox.people?S.inbox.people.length:0;
+  var cnt={};if(P)P.people.forEach(function(p){var k=focusOf(kind,p);cnt[k]=(cnt[k]||0)+1;});
+  var chips='<div class="ftabs" role="tablist" aria-label="'+label+' lists">'+FOCUS[kind].map(function(x){var n=x[0]==='leads'?nLeads:(cnt[x[0]]||0);
+    return '<button type="button" role="tab" data-focus="'+x[0]+'" aria-selected="'+(f===x[0])+'" class="'+(x[0]==='stale'?'stl':'')+'">'+x[1]+' <b>'+n+'</b></button>';}).join('')+'</div>';
+  var head='<div class="hd"><h2>'+label+'</h2><span class="sub">'+(kind==='s'?'Tagged Seller':'Tagged Buyer')+' in Follow Up Boss · moving someone here updates FUB</span></div>';
+  if(f==='leads')return '<section class="card">'+head+chips+'</section>'+inbox(true);
+  if(!P)return '<section class="card">'+head+chips+'<p class="empty">Loading…</p></section>';
+  var q=(S.fq[kind]||'').toLowerCase();
+  var L=P.people.filter(function(p){return focusOf(kind,p)===f&&(!q||[p.name,p.phone,p.email,(p.tags||[]).join(' ')].join(' ').toLowerCase().indexOf(q)>=0);});
+  var srt=S.fsort[kind]||'recent';
+  L.sort(srt==='quiet'?function(a,b){return actP(a).two-actP(b).two;}:srt==='name'?function(a,b){return String(a.name).localeCompare(String(b.name));}
+    :function(a,b){var x=actP(a),y=actP(b);return Math.max(y.inn,y.eng,y.two)-Math.max(x.inn,x.eng,x.two);});
+  var tools='<div class="ltools"><input type="search" class="search" id="fq-'+kind+'" value="'+esc(S.fq[kind]||'')+'" placeholder="Search name, phone, tag…" aria-label="Search">'
+    +'<select class="selsm" data-fsort="'+kind+'" aria-label="Sort">'+[['recent','Most recent activity'],['quiet','Longest since contact'],['name','Name']].map(function(o){return '<option value="'+o[0]+'"'+(srt===o[0]?' selected':'')+'>Sort: '+o[1]+'</option>';}).join('')+'</select></div>';
+  var rows=L.length?'<ul class="rows">'+L.slice(0,S.fall[kind]?999:60).map(function(p){var tel=p.phone?String(p.phone).replace(/[^\d+]/g,''):'';
+    var tg=(p.tags||[]).filter(function(t){return ['Hot','Daily','Daily Seller','CMA','Appoinment','Searching','Showing'].indexOf(t)>=0;});
+    return '<li class="row prow2"><button type="button" class="rm" data-pview="'+kind+'" data-id="'+p.id+'"><i class="dot '+actP(p).st+'"></i><span class="rt2"><b>'+esc(p.name||'No name')+'</b><small>'+esc([p.phone,p.email].filter(Boolean).join(' · '))+'</small>'
+      +(tg.length?'<span class="feats">'+tg.map(function(t){return '<span class="ft">'+esc(t==='Appoinment'?'Appointment':t)+'</span>';}).join('')+'</span>':'')+'</span></button>'
+      +'<div class="rs">'+pChip(p)+(tel?'<a class="lk callb" href="tel:'+esc(tel)+'" aria-label="Call '+esc(p.name)+'">✆</a>':'')+'<a class="lk" href="'+fubUrl(p.id)+'" target="_blank" rel="noopener">FUB</a>'
+      +'<select class="selsm" data-pmove="'+kind+'" data-id="'+p.id+'" aria-label="Move '+esc(p.name)+'"><option value="">Move to…</option>'+MOVE_TO[kind].filter(function(o){return o[0]!==f;}).map(function(o){return '<option value="'+o[0]+'">'+o[1]+'</option>';}).join('')+'</select></div></li>';}).join('')+'</ul>'
+      +(L.length>60&&!S.fall[kind]?'<button type="button" class="more" data-fall="'+kind+'">Show all '+L.length+'</button>':'')
+    :'<p class="empty">'+({active:'Nobody active right now.',appointment:'No appointments. Tag someone Appoinment in FUB or move them here.',undercontract:'Nobody under contract.',stale:'Nobody stale.',searching:'Nobody searching.',showings:'Nobody in showings. Move a buyer here when you book showings.'})[f]+'</p>';
+  return '<section class="card">'+head+chips+tools+'<p class="lcount">'+L.length+' '+(L.length===1?'person':'people')+(P.hidden?' · '+P.hidden+' hidden (pond, other agent, lease)':'')+'</p>'+rows+'</section>';
+}
+/* activity feed from the focus people (replaces the board-based feed on Sellers / Buyers) */
+function feedP(kind){
+  var P=S.people[kind];
+  var head='<div class="hd"><h2>Activity</h2><span class="sub">From Follow Up Boss</span>'
+    +'<select class="selsm" id="feedDays" aria-label="How far back">'+[1,2,7].map(function(d){return '<option value="'+d+'"'+(S.feedDays===d?' selected':'')+'>Last '+(d===1?'24 hours':d+' days')+'</option>';}).join('')+'</select>'
+    +'<label class="sw"><input type="checkbox" data-feedon'+(S.feedOn?' checked':'')+'><i></i>Show</label></div>';
+  if(!S.feedOn)return '<section class="card slim"><div class="hd" style="margin:0"><h2>Activity</h2><span class="sub">Hidden</span><label class="sw"><input type="checkbox" data-feedon><i></i>Show</label></div></section>';
+  if(!P)return '<section class="card">'+head+'<p class="empty">Loading…</p></section>';
+  var since=Date.now()-S.feedDays*DAY,ev=[];
+  P.people.forEach(function(p){var a=p.act||{};Object.keys(EV).forEach(function(k){var t=ts(a[k]);if(!t||t<since)return;if(k==='lead'&&Math.abs(t-ts(a.web))<36e5)return;ev.push({p:p,k:k,t:t});});});
+  ev.sort(function(x,y){return y.t-x.t;});var show=S.feedAll?ev:ev.slice(0,12);
+  return '<section class="card">'+head+(ev.length?'<ul class="feed">'+show.map(function(e){var lab=EV[e.k];
+    return '<li class="'+lab[1]+'"><button type="button" data-pview="'+kind+'" data-id="'+e.p.id+'"><i class="dot '+(lab[1]==='g'?'reply':lab[1]==='n'?'engaged':'ok')+'"></i><span>'+(lab[1]==='o'?esc(lab[0])+' <b>'+esc(e.p.name)+'</b>':'<b>'+esc(e.p.name)+'</b> '+esc(lab[0]))+'</span><small>'+esc(agoMs(e.t))+'</small></button></li>';}).join('')+'</ul>'
+    +(ev.length>12?'<button type="button" class="more" data-feedall>'+(S.feedAll?'Show less':'Show all '+ev.length)+'</button>':''):'<p class="empty">No activity in this window.</p>')+'</section>';
+}
+/* tap a person: quick sheet with contact, status, move, prompts */
+function viewPerson(kind,id){var P=S.people[kind],p=P&&P.people.filter(function(x){return x.id===+id;})[0];if(!p){window.open(fubUrl(id),'_blank');return;}var d=$('#dlg'),f=focusOf(kind,p),tel=p.phone?String(p.phone).replace(/[^\d+]/g,''):'';S.viewing=null;
+  var prompts=kind==='s'?['sellerintro','homeeval','cma','listpres','update']:['followup','listings','showings','cma'];
+  d.innerHTML='<div class="dl"><div class="dh"><div style="flex:1;min-width:0"><h2>'+esc(p.name)+'</h2><p>'+esc([p.phone,p.email].filter(Boolean).join(' · '))+'</p></div><button type="button" class="x" data-close aria-label="Close">×</button></div>'
+   +'<div class="meta">'+pChip(p)+'<span class="chip n">'+esc((FOCUS[kind].filter(function(x){return x[0]===f;})[0]||[,f])[1])+'</span>'+(p.stage?'<span class="chip">FUB: '+esc(p.stage)+'</span>':'')+(p.tags||[]).slice(0,6).map(function(t){return '<span class="chip">'+esc(t)+'</span>';}).join('')+'</div>'
+   +'<div class="pacts">'+(tel?'<a class="btn sm navy" href="tel:'+esc(tel)+'">Call</a><a class="btn sm ghost" href="sms:'+esc(tel)+'">Text</a>':'')+'<a class="btn sm ghost" href="'+fubUrl(p.id)+'" target="_blank" rel="noopener">Open in FUB</a></div>'
+   +'<label class="fl" for="pvMove">Move to<select id="pvMove" class="selsm" data-pmove="'+kind+'" data-id="'+p.id+'"><option value="">Choose…</option>'+MOVE_TO[kind].filter(function(o){return o[0]!==f;}).map(function(o){return '<option value="'+o[0]+'">'+o[1]+'</option>';}).join('')+'</select></label>'
+   +'<div class="pacts">'+prompts.map(function(k){return pbtn(k,'p'+kind,p.id);}).join('')+'</div></div>';
+  if(!d.open)d.showModal();}
+function movePerson(kind,id,to,sel){var P=S.people[kind],p=P.people.filter(function(x){return x.id===+id;})[0];if(sel)sel.disabled=true;
+  post('desk/person/move',{fub:+id,to:to,kind:kind}).then(function(j){p.tags=j.tags;p.stage=j.stage;
+    var lab=(MOVE_TO[kind].filter(function(o){return o[0]===to;})[0]||[,to])[1];toast(p.name+' → '+lab+' (saved in FUB)');var d=$('#dlg');if(d.open&&$('#pvMove',d))d.close();render();})
+  .catch(function(e){if(sel)sel.disabled=false;fail(e);});}
+
 /* ---------- Unsorted inbox ---------- */
-function inbox(){
+function inbox(force){
   var I=S.inbox,n=I&&I.people?I.people.length:0;
-  if(!S.showInbox)return '<section class="card slim inbox"><div class="hd" style="margin:0"><h2>Unsorted</h2><span class="sub">'+(I?n+' new lead'+(n===1?'':'s'):'')+'</span><label class="sw"><input type="checkbox" data-inboxon><i></i>Show</label></div></section>';
+  if(!S.showInbox&&!force)return '<section class="card slim inbox"><div class="hd" style="margin:0"><h2>Unsorted</h2><span class="sub">'+(I?n+' new lead'+(n===1?'':'s'):'')+'</span><label class="sw"><input type="checkbox" data-inboxon><i></i>Show</label></div></section>';
   var head='<div class="hd"><h2>Unsorted</h2><span class="sub">New Follow Up Boss leads not on a board yet</span>'
    +(WIDE()?'':'<div class="seg" role="group" aria-label="Unsorted view"><button type="button" data-iv="cards" aria-pressed="'+(S.inboxView==='cards')+'">Cards</button><button type="button" data-iv="list" aria-pressed="'+(S.inboxView==='list')+'">List</button></div>')
    +'<select class="selsm" id="inDays" aria-label="How far back">'+[7,14,30].map(function(d){return '<option value="'+d+'"'+(+S.inboxDays===d?' selected':'')+'>Last '+d+' days</option>';}).join('')+'</select>'
@@ -693,9 +793,11 @@ function inbox(){
 /* ---------- boards ---------- */
 function viewBoard(){
   var kind=S.tab==='sellers'?'s':'b',B=S.board[kind],label=kind==='s'?'Sellers':'Buyers';
-  var rail=feed(kind)+inbox()+(kind==='s'?todayCard():'');
+  var rail=feedP(kind)+(kind==='s'?todayCard():'');
   function wrap(main){return '<div class="split"><div class="mainc">'+main+'</div><aside class="rail" aria-label="Activity and new leads">'+rail+'</aside></div>';}
-  if(!B)return wrap('<section class="card"><div class="hd"><h2>'+label+'</h2></div><p class="empty">Loading…</p></section>');
+  var top=focusSection(kind);
+  function pipe(inner,n){return '<details class="pipe"'+(S.pipeOpen?' open':'')+' data-pipe><summary>Pipeline board'+(n!=null?' · '+n+' cards':'')+' <small>Coming Soon → For Sale → Sold → Closed, checklists, facts, matching</small></summary>'+inner+'</details>';}
+  if(!B)return wrap(top+pipe('<section class="card"><p class="empty">Loading…</p></section>')+(kind==='s'?prospectsSection()+sellerRes():buyerRes()));
   var cards=B.cards,closedN=cards.filter(function(c){return c.stage==='closed';}).length,view=S.view[kind];
   var sub=cards.filter(function(c){return c.stage!=='closed';}).length+' active';
   var head='<div class="hd"><h2>'+label+'</h2><span class="sub">'+sub+'</span>'
@@ -704,8 +806,8 @@ function viewBoard(){
     +'<button class="btn sm" type="button" data-add="'+kind+'">+ Add '+(kind==='s'?'seller':'buyer')+'</button></div>';
   var body=!cards.length?'<p class="empty">No '+label.toLowerCase()+' yet. People tagged '+(kind==='s'?'Daily Seller or CMA':'Searching or Daily')+' in FUB appear here by themselves. You can also sort a lead from Unsorted, or tap + Add.</p>'
     :view==='list'?listView(kind):boardView(kind);
-  return wrap('<section class="card">'+head+(B.liveError?'<p class="err" style="margin-bottom:10px">Follow Up Boss didn’t answer, so phone / activity may be missing. Try Refresh.</p>':'')+body
-    +(B.archivedCount?'<p style="margin:10px 0 0"><button class="lnkb" type="button" data-archived="'+kind+'">Archived ('+B.archivedCount+')</button></p>':'')+'</section>'
+  return wrap(top+pipe('<section class="card">'+head+(B.liveError?'<p class="err" style="margin-bottom:10px">Follow Up Boss didn’t answer, so phone / activity may be missing. Try Refresh.</p>':'')+body
+    +(B.archivedCount?'<p style="margin:10px 0 0"><button class="lnkb" type="button" data-archived="'+kind+'">Archived ('+B.archivedCount+')</button></p>':'')+'</section>',cards.length)
     +(kind==='s'?prospectsSection()+sellerRes():buyerRes()));
 }
 function boardView(kind){
@@ -1256,6 +1358,7 @@ function ctxData(ctx,id){
       d.must=[(f.feats||[]).join(', '),f.garage?f.garage+'+ car garage':'',f.sqft?f.sqft+'+ sq ft':''].filter(Boolean).join(', ');d.purpose='Buyer offer price';
       var dd=daysSince(L.last);d.last=dd==null?'':(dd===0?'today':dd+' days ago');d.ctx=c.next;}
     return d;}
+  if(ctx==='ps'||ctx==='pb'){var kk=ctx.slice(1),pp=(S.people[kk]&&S.people[kk].people||[]).filter(function(y){return y.id===+id;})[0]||{};var dd=daysSince(pp.last);return {client:pp.name,email:pp.email,phone:pp.phone,last:dd==null?'':(dd===0?'today':dd+' days ago'),purpose:kk==='b'?'Buyer offer price':'Listing price'};}
   if(ctx==='p'){var x=(S.prospects||[]).filter(function(y){return y.id===+id;})[0]||{};return {kind:x.kind==='fsbo'?'FSBO':'Expired listing',homes:pTitle(x),area:x.hood||x.city};}
   if(ctx==='sold'){var X=(S.listings&&S.listings.items)||[];return {addrs:X.filter(function(x){return x.kind==='sold'&&!x.posted;}).map(function(x){return x.addr+(x.city?', '+x.city:'');}).join('\n'),showprice:'Yes'};}
   if(ctx==='m'){var R=readyList();return {homes:R.map(pTitle).join('\n'),kind:R.length?'Expired listing':'',last:S.social&&S.social.checked?fmtDay(S.social.checked.slice(0,10)):'Never',weeks:'4'};}
@@ -1311,6 +1414,9 @@ document.addEventListener('click',function(e){
   if(ds.jump){var c=document.getElementById('col-'+ds.jump);if(c){var b=c.parentElement;b.scrollTo({left:c.offsetLeft-b.offsetLeft-parseFloat(getComputedStyle(b).paddingLeft),behavior:'smooth'});}return;}
   if(t.hasAttribute('data-more')){var n=t.nextElementSibling;n.hidden=!n.hidden;t.setAttribute('aria-expanded',String(!n.hidden));t.textContent=n.hidden?'All prompts':'Fewer prompts';return;}
   if(ds.add){openCard(ds.add,null);return;}
+  if(ds.focus){var kf=S.tab==='sellers'?'s':'b';S.focus[kf]=ds.focus;store('desk_focus_'+kf,ds.focus);S.fall[kf]=false;render();if(ds.focus==='leads'&&!S.inbox)loadInbox().then(render);return;}
+  if(ds.pview){viewPerson(ds.pview,+ds.id);return;}
+  if(ds.fall){S.fall[ds.fall]=true;render();return;}
   if(ds.newexp){openExpense(null,ds.newexp);return;}
   if(ds.exp){openExpense(+ds.exp);return;}
   if(ds.ptw){if(ds.ptw==='today'){S.ptToday=!S.ptToday;store('desk_pt_today',S.ptToday);}else{S.ptLate=!S.ptLate;store('desk_pt_late',S.ptLate);}S.ptAll=false;render();return;}
@@ -1340,10 +1446,10 @@ document.addEventListener('click',function(e){
   if(ds.edit){openCard(ds.edit,+ds.id);return;}
   if(ds.archived){openArchived(ds.archived);return;}
   if(ds.sort){var l=(S.inbox.people||[]).filter(function(x){return x.id===+ds.fub;})[0];if(!l)return;t.disabled=true;
-    post('desk/inbox/sort',{fub:l.id,to:ds.sort,name:l.name,email:l.email,phone:l.phone,tags:l.tags,price:l.price,note:l.source?'From '+l.source:''}).then(function(){
+    (ds.sort==='skip'?post('desk/inbox/sort',{fub:l.id,to:'skip'}):post('desk/person/tag',{fub:l.id,tags:ds.sort==='both'?['Seller','Buyer']:[ds.sort==='s'?'Seller':'Buyer']})).then(function(){
       S.inbox.people=S.inbox.people.filter(function(x){return x!==l;});badge();
-      if(ds.sort!=='skip'){S.board.s=null;S.board.b=null;}
-      toast(ds.sort==='skip'?l.name+' skipped':l.name+' added to '+(ds.sort==='both'?'Sellers + Buyers':ds.sort==='s'?'Sellers':'Buyers')+' › Talking');
+      if(ds.sort!=='skip'){S.people.s=null;S.people.b=null;}
+      toast(ds.sort==='skip'?l.name+' skipped':l.name+' tagged '+(ds.sort==='both'?'Seller + Buyer':ds.sort==='s'?'Seller':'Buyer')+' in FUB');
       render();return load(false);}).catch(function(err){t.disabled=false;fail(err);});return;}
   if(ds.newitem){openItem(null,ds.newitem);return;}
   if(ds.item){openItem(+ds.item);return;}
@@ -1356,6 +1462,8 @@ document.addEventListener('change',function(e){var t=e.target,ds=t.dataset;
   if(t.id==='inDays'){S.inboxDays=+t.value;store('desk_inbox_days',S.inboxDays);S.inbox=null;render();loadInbox().then(render).catch(fail);return;}
   if(ds.closed){S.closed[ds.closed]=t.checked;store('desk_closed_'+ds.closed,t.checked);render();return;}
   if(t.hasAttribute('data-soonon')){S.showSoon=t.checked;store('desk_soon',t.checked);render();return;}
+  if(ds.pmove&&t.value){movePerson(ds.pmove,+ds.id,t.value,t);return;}
+  if(ds.fsort){S.fsort[ds.fsort]=t.value;render();return;}
   if(ds.pf){S.pFilter[ds.pf]=t.value;render();return;}
   if(ds.tk2){var src=ds.tk2,id=ds.id,all=allPersonalTasks(),it=all.filter(function(x){return x.src===src&&String(x.id)===id;})[0];if(!it)return;
     var call=src==='g'?post('gtask',{list:it.list,id:id,done:t.checked}):src==='mine'?post('item/done',{id:+id,done:t.checked}):post('reminder',{id:id,title:it.title,done:t.checked});
@@ -1385,8 +1493,9 @@ document.addEventListener('change',function(e){var t=e.target,ds=t.dataset;
   if(ds.td){post('item/done',{id:+ds.td,done:t.checked}).then(function(){var x=S.todos.filter(function(y){return y.id===+ds.td;})[0];if(x)x.done=t.checked?1:0;}).catch(fail);return;}
 });
 $('#dlg').addEventListener('click',function(e){if(e.target===$('#dlg'))$('#dlg').close();});
+document.addEventListener('toggle',function(e){if(e.target.hasAttribute&&e.target.hasAttribute('data-pipe'))S.pipeOpen=e.target.open;},true);
 $('#dlg').addEventListener('close',function(){S.viewing=null;if(S.tab==='personal')render();});
-document.addEventListener('input',function(e){var t=e.target;if(t.id==='pq'){S.pFilter.q=t.value;render();return;}if(t.id&&/^lq-[sb]$/.test(t.id)){var k=t.id.slice(3);S.filter[k].q=t.value;refreshList(k);}});
+document.addEventListener('input',function(e){var t=e.target;if(t.id&&/^fq-[sb]$/.test(t.id)){S.fq[t.id.slice(3)]=t.value;render();return;}if(t.id==='pq'){S.pFilter.q=t.value;render();return;}if(t.id&&/^lq-[sb]$/.test(t.id)){var k=t.id.slice(3);S.filter[k].q=t.value;refreshList(k);}});
 
 setTab(S.tab);
 })();
