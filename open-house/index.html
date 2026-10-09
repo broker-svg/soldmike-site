@@ -161,7 +161,7 @@ dialog form{display:flex;flex-direction:column;gap:12px}
   // =========================================================
   function hostHome(){
     history.replaceState(null,'','/open-house/');
-    app.innerHTML='<div class="bar"><a href="/" aria-label="SoldMike home"><img src="'+LOGO+'" alt="SoldMike"></a><b>Open houses</b><a href="/leads/" style="color:#fff;font-size:15px;border:1px solid #4A5592;border-radius:8px;padding:8px 14px;text-decoration:none">Leads</a></div>'
+    app.innerHTML='<div class="bar"><a href="/" aria-label="SoldMike home"><img src="'+LOGO+'" alt="SoldMike"></a><b>Open houses</b><span><a href="/hq/" style="color:#fff;font-size:15px;border:1px solid #4A5592;border-radius:8px;padding:8px 14px;text-decoration:none;margin-right:8px">HQ</a><a href="/leads/" style="color:#fff;font-size:15px;border:1px solid #4A5592;border-radius:8px;padding:8px 14px;text-decoration:none">Leads</a></span></div>'
       +'<div class="wrap host">'
       +'<div class="card"><h2>New open house</h2><div><label for="q">Address or MLS® number</label><input id="q" placeholder="Start typing the address" autocomplete="off"></div><div class="res" id="res"></div>'
       +'<div id="when" hidden><div class="three"><div><label for="day">Date</label><input id="day" type="date" value="'+today()+'"></div><div><label for="st">Start</label><input id="st" type="time" value="14:00"></div><div><label for="en">End</label><input id="en" type="time" value="16:00"></div></div></div>'
@@ -218,7 +218,7 @@ dialog form{display:flex;flex-direction:column;gap:12px}
   }
 
   function hostDetail(id){
-    app.innerHTML='<div class="bar"><a href="/" aria-label="SoldMike home"><img src="'+LOGO+'" alt="SoldMike"></a><b>Sign-ins</b><button type="button" id="back">Back</button></div><div class="wrap host"><div class="card"><a class="btn" href="/open-house/?id='+esc(id)+'">Open the sign-in screen</a><div class="tblwrap" id="sl"><p class="muted">Loading…</p></div><p class="fine">✓ = saved in Follow Up Boss.</p><button class="btn ghost" type="button" id="del" style="color:var(--red)!important;border-color:var(--red)">Remove this open house</button></div></div>';
+    app.innerHTML='<div class="bar"><a href="/" aria-label="SoldMike home"><img src="'+LOGO+'" alt="SoldMike"></a><b>Sign-ins</b><span><a href="/hq/" style="color:#fff;font-size:15px;border:1px solid #4A5592;border-radius:8px;padding:8px 14px;text-decoration:none;margin-right:8px">HQ</a><button type="button" id="back">Back</button></span></div><div class="wrap host"><div class="card"><a class="btn" href="/open-house/?id='+esc(id)+'">Open the sign-in screen</a><div class="tblwrap" id="sl"><p class="muted">Loading…</p></div><p class="fine">✓ = saved in Follow Up Boss.</p><button class="btn ghost" type="button" id="del" style="color:var(--red)!important;border-color:var(--red)">Remove this open house</button></div></div>';
     document.getElementById('back').onclick=hostHome;
     document.getElementById('del').onclick=function(){
       if(!confirm('Remove this open house? It disappears from the website. People who already signed in stay in Follow Up Boss.'))return;

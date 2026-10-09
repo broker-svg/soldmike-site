@@ -382,6 +382,8 @@ dialog::backdrop{background:rgba(20,24,51,.6)}
 .lalert{margin:4px 0 0;font-size:14px;font-weight:600;color:#7A5F00}
 @media (max-width:560px){.lrows li{grid-template-columns:auto minmax(0,1fr) auto}.lrows .ls{grid-column:2/-1;justify-self:start}}
 .fchips.when button{border-style:dashed}.fchips.when button[aria-pressed="true"]{border-style:solid}
+.big2{font:800 44px/1 var(--display);color:var(--navy);margin:-4px 0 10px}.big2 small{display:block;font:500 14px/1.3 var(--body);color:var(--muted);margin-top:4px;text-transform:none}
+.lst.navy{background:var(--navy)}.xrow .la{text-align:left}
 </style>
 </head>
 <body>
@@ -400,6 +402,9 @@ dialog::backdrop{background:rgba(20,24,51,.6)}
   <a href="#marketing" data-tab="marketing">Marketing</a>
   <a href="#toolkit" data-tab="toolkit">Toolkit</a>
   <a href="#personal" data-tab="personal">Personal</a>
+  <a href="#financial" data-tab="financial">Financial</a>
+  <a href="#tpm" data-tab="tpm">TPM</a>
+  <a href="/open-house/">Open House</a>
 </nav></div>
 <main class="wrap" id="main"><p class="empty">Loading…</p></main>
 
@@ -434,9 +439,9 @@ function fail(e){if(e==='pin')return askPin().then(function(){load(true);});toas
 
 /* ---------- stages ---------- */
 var SSTAGES=[
-  {k:'talk',n:'Talking',g:'Leads',c:'#9BA2BD',p:['homeeval'],due:['Log the first conversation in FUB','Set a follow-up date','Ask: timing and reason for moving']},
-  {k:'poss',n:'Possibility',g:'Leads',c:'#7C86B8',p:['homeeval','cma'],due:['Send the Home Evaluation','Book a walk-through','Add to Daily Seller list']},
-  {k:'prosp',n:'Prospect',g:'Leads',c:'#4A5592',p:['cma'],due:['Prepare the CMA','Send the pre-listing package','Book the listing presentation']},
+  {k:'talk',n:'Talking',g:'Leads',c:'#9BA2BD',p:['sellerintro','homeeval'],due:['Log the first conversation in FUB','Set a follow-up date','Ask: timing and reason for moving']},
+  {k:'poss',n:'Possibility',g:'Leads',c:'#7C86B8',p:['homeeval','sellerintro'],due:['Send the Home Evaluation','Book a walk-through','Add to Daily Seller list']},
+  {k:'prosp',n:'Prospect',g:'Leads',c:'#4A5592',p:['listpres','cma'],due:['Prepare the CMA','Send the pre-listing package','Book the listing presentation']},
   {k:'soon',n:'Coming Soon',g:'Before listing',c:'#26338A',p:['instructions','cma'],due:['Listing agreement signed','Photos + drone booked','Staging / pre-list clean','Listing instructions to admin','Feature sheet approved']},
   {k:'sale',n:'For Sale',g:'During',c:'#D7141E',p:['update','offers'],due:['Weekly Listing Update sent','Showing feedback chased','Offer date plan agreed','Price review at day 14']},
   {k:'sold',n:'Sold, before closing',g:'After sold',c:'#1B7A3E',p:['justsold'],due:['Offer summary filed','Conditions waived / firm','Deposit received','Just Sold post + SOLD sign','Lawyer details exchanged']},
@@ -459,8 +464,14 @@ var LEADSTAGES=['talk','poss','prosp'];
 var F={addr:{l:'Property address',req:1},client:{l:'Client name',req:1},email:{l:'Email'},phone:{l:'Phone'},
   type:{l:'Property type',opts:['Detached','Semi','Townhouse','Condo','Bungalow']},bb:{l:'Beds / baths',ph:'4 + 1 / 3'},sqft:{l:'Size (sq ft)',ph:'2,400'},notes:{l:'Notes',ta:1,full:1}};
 var PROMPTS={
-  homeeval:{label:'Home Evaluation',skill:'home-evaluation-dashboard',lead:'Build a home evaluation for this seller.',
-    fields:['addr','client','email','phone','type','bb','sqft',{k:'why',l:'Why they asked',opts:['Curious about value','Planning to sell in 6–12 months','Selling soon','Refinancing / estate']},'notes']},
+  sellerintro:{label:'Seller Intro Email',skill:'fub-system',lead:'Get my Seller Intro Email ready for this person (2nd Brain: Real Estate/Client Emails/Seller Intro Email.md, FUB template 243). Check the REALM "for sale" and "sold" links are still current; if they’re more than a month old, refresh them and update template 243. Use the callback timing below. Tell me when it’s ready to send from FUB (I send it myself).',
+    fields:['client','email','phone',{k:'addr',l:'Their home address',full:1},{k:'callback',l:'When I’ll get back to them',ph:'Sunday night or Monday morning'},{k:'media',l:'Media examples to show',ph:'155 Dianawood Ridge, 3 Sedgwick Place',full:1},{k:'call',l:'Notes from the call',ta:1,full:1}]},
+  homeeval:{label:'Value Grid Evaluation',skill:'value-grid-evaluation',lead:'Value grid evaluation for this home (2nd Brain: Real Estate/Value Grid Evaluation.md, done like 45 Waddington). I’m attaching the GeoWarehouse PDF + REALM sold PDF + REALM active PDF. Step 1: give me the pricing read in chat. Step 2: re-tier with the owner details below. Step 3: build the page (Artifact to review, then the GitHub link). Step 4: listing strategy (4 prices) using mine below or your proposal. Step 5: the evaluation email saved as a FUB template for me to send.',
+    fields:['addr','client','email','phone',{k:'community',l:'Community',ph:'Don Valley Village'},{k:'files',l:'What I’m attaching',opts:['GeoWarehouse + REALM sold + REALM active','Missing GeoWarehouse','Missing REALM sold','Missing REALM active']},
+      {k:'tier',l:'Condition (owner says)',opts:['Original / as-is','Updated','Renovated','Wow / over the top']},'type','bb','sqft',{k:'suites',l:'Suites / income',ph:'Two 1-bed basement suites'},{k:'mech',l:'Mechanicals',ph:'Owned heat pump, tankless, 100 A service'},
+      {k:'up',l:'Pushes it up (upgrades)',ta:1,full:1},{k:'down',l:'Holds it back',ta:1,full:1},{k:'strategy',l:'My listing strategy prices (optional)',ta:1,full:1,ph:'Offer date aggressive / standard / market middle / overpriced'},'notes']},
+  listpres:{label:'Listing Presentation',skill:'listing-presentation',lead:'Prepare my listing presentation for this seller (after the evaluation is agreed).',
+    fields:['addr','client','email',{k:'date',l:'Appointment date',type:'date'},{k:'price',l:'Agreed price / range'},'notes']},
   cma:{label:'CMA',skill:'cma-generator',lead:'Prepare a CMA.',
     fields:['addr','client',{k:'purpose',l:'Purpose',opts:['Listing price','Buyer offer price']},'type','bb','sqft',{k:'comps',l:'Comps I picked (MLS® # or addresses)',ta:1,full:1},'notes']},
   update:{label:'Listing Update',skill:'seller-update',lead:'Write this week’s listing update for my seller.',
@@ -490,6 +501,16 @@ var PROMPTS={
     fields:[{k:'kind',l:'Kind',opts:['Listing feature sheet','Just Sold','Neighbourhood mailer','Open house']},{k:'addr',l:'Address (if a listing)',full:1},{k:'area',l:'Area / audience'},{k:'qty',l:'How many'},'notes']},
   expimport:{label:'Build Expired List',skill:'pdf',lead:'Build / refresh my Expired list. I’m attaching MLS exports (expired, terminated and soon-to-expire listings, plus sold + active for cross-checking). Follow my 2nd Brain note Business/Expired and FSBO Prospecting: drop anything that sold or relisted and keep the live targets. Then load them into the Agent Desk with POST /api/hq/desk/prospects/import {kind:"exp", items:[{addr, city, region, hood, price, ptype, beds, mls, listed, expires (YYYY-MM-DD), status}]} and tell me how many were added and updated.',
     fields:[{k:'files',l:'What I’m attaching',ph:'Expired + terminated PDF, Sept 7 – Oct 7',full:1},{k:'area',l:'Areas',ph:'Vaughan, King, Richmond Hill'},'notes']},
+  ytdesc:{label:'YouTube Description',skill:'tpm-youtube-description',lead:'Write the YouTube title options, description, tags and hashtags.',
+    fields:[{k:'title',l:'Working title',full:1},{k:'link',l:'Video link or file',full:1},{k:'points',l:'Key points',ta:1,full:1}]},
+  tpmshotlist:{label:'Shot List',skill:'',lead:'Make the TPM shot list and story arc for this shoot (2nd Brain: TPM/TPM Shoot & Edit Workflow.md + Reel Template & Shot List).',
+    fields:[{k:'addr',l:'Property address',full:1,req:1},{k:'agent',l:'Agent'},{k:'pkg',l:'Package',opts:['Everything','Photography, Cinematic Tour & Social Media','Photo & Cinematic Tour','Photo & Reel','Photography','Cinematic Videography']},{k:'day',l:'Shoot date',type:'date'},'notes']},
+  tpmscript:{label:'Agent Script',skill:'',lead:'Write the agent-on-camera script for this property and add it to the agent’s script portal (2nd Brain: TPM/TPM Client Delivery.md).',
+    fields:[{k:'addr',l:'Property address',full:1,req:1},{k:'agent',l:'Agent'},{k:'len',l:'Length',opts:['30 seconds','60 seconds','90 seconds']},'notes']},
+  tpmtwilight:{label:'Virtual Twilight',skill:'',lead:'Create a virtual twilight (2nd Brain: TPM/TPM Virtual Twilight.md, Vivant reference, real dusk look).',
+    fields:[{k:'addr',l:'Property address',full:1},{k:'photo',l:'Which photo (file name or link)',full:1},'notes']},
+  tpmtalkinghead:{label:'Talking Head Edit',skill:'',lead:'Talking head edit: captions, animated graphics, B-roll and whooshes in the locked style (2nd Brain: TPM/TPM Talking Head Video Editing.md).',
+    fields:[{k:'file',l:'Video file / link',full:1,req:1},{k:'topic',l:'Topic',full:1},'notes']},
   lawq:{label:'Ask a L&T Question',skill:'deep-research',lead:'Answer this Ontario landlord & tenant question. Use the current Residential Tenancies Act (including the Sept 21, 2026 changes), name the LTB form, link official sources, and mark it "not legal advice".',
     fields:[{k:'who',l:'I’m helping',opts:['Landlord client','Tenant client','Buyer of tenanted home','Seller of tenanted home']},{k:'q',l:'Question',ta:1,full:1},{k:'facts',l:'Facts (lease dates, rent, units in building)',ta:1,full:1}]},
   firstreply:{label:'First Reply',skill:'draft-outreach',lead:'Draft my first reply to this new lead.',
@@ -497,13 +518,13 @@ var PROMPTS={
 };
 
 /* ---------- state ---------- */
-var TABS=['sellers','buyers','marketing','toolkit','personal'];
+var TABS=['sellers','buyers','marketing','toolkit','personal','financial','tpm'];
 var S={tab:TABS.indexOf(location.hash.slice(1))>=0?location.hash.slice(1):(store('desk_tab')||'sellers'),
   board:{s:null,b:null},inbox:null,inboxDays:store('desk_inbox_days')||14,closed:{s:!!store('desk_closed_s'),b:!!store('desk_closed_b')},
   content:null,todos:null,tk:store('desk_tk')||'scripts',
   view:{s:store('desk_view_s')||'board',b:store('desk_view_b')||'board'},showInbox:store('desk_inbox_on')!==false,inboxView:store('desk_inbox_view')||'cards',
   feedOn:store('desk_feed_on')!==false,feedDays:store('desk_feed_days')||2,feedFilter:'all',feedAll:false,viewing:null,
-  sel:{s:{},b:{}},listings:undefined,showSoon:store('desk_soon')!==false,personal:null,things:null,gt:null,rem:null,ptf:store('desk_ptf')||'all',ptToday:store('desk_pt_today')!==false,ptLate:store('desk_pt_late')===true,ptAll:false,thingF:'Need',prospects:null,social:undefined,pTab:store('desk_ptab')||'exp',pFilter:{q:'',region:'',city:'',all:false},printTab:store('desk_print')||'hangers',sort:{s:store('desk_sort_s')||'stage',b:store('desk_sort_b')||'stage'},filter:{s:{q:'',stage:'',region:'',act:''},b:{q:'',stage:'',region:'',act:''}},script:'buyer',fs:store('desk_fs')||26,tagSync:false,fubApp:'https://app.followupboss.com'};
+  sel:{s:{},b:{}},listings:undefined,expenses:null,showSoon:store('desk_soon')!==false,personal:null,things:null,gt:null,rem:null,ptf:store('desk_ptf')||'all',ptToday:store('desk_pt_today')!==false,ptLate:store('desk_pt_late')===true,ptAll:false,thingF:'Need',prospects:null,social:undefined,pTab:store('desk_ptab')||'exp',pFilter:{q:'',region:'',city:'',all:false},printTab:store('desk_print')||'hangers',sort:{s:store('desk_sort_s')||'stage',b:store('desk_sort_b')||'stage'},filter:{s:{q:'',stage:'',region:'',act:''},b:{q:'',stage:'',region:'',act:''}},script:'buyer',fs:store('desk_fs')||26,tagSync:false,fubApp:'https://app.followupboss.com'};
 
 function setTab(t){S.tab=t;store('desk_tab',t);$$('#tabnav a[data-tab]').forEach(function(a){a.setAttribute('aria-current',a.dataset.tab===t?'page':'false');});render();load(false);}
 $$('#tabnav a[data-tab]').forEach(function(a){a.addEventListener('click',function(e){e.preventDefault();history.replaceState(null,'','#'+a.dataset.tab);setTab(a.dataset.tab);window.scrollTo({top:0});});});
@@ -520,6 +541,7 @@ function load(force){
   if((S.tab==='marketing'||S.tab==='sellers')&&(force||!S.prospects))jobs.push(loadProspects());
   if(S.tab==='toolkit'&&(force||!S.todos))jobs.push(loadTodos());
   if(S.tab==='personal')jobs=jobs.concat(loadPersonal(force));
+  if(S.tab==='financial'&&(force||!S.expenses))jobs.push(loadExpenses());
   if(!jobs.length)return Promise.resolve();
   var b=$('#refresh');b.classList.add('spin');
   return Promise.all(jobs).then(function(){render();refreshViewing();}).catch(fail).then(function(){b.classList.remove('spin');});
@@ -529,7 +551,7 @@ function loadTodos(){return getJ('desk/todos?today='+ymd(new Date())).then(funct
 function badge(){var n=S.inbox&&S.inbox.people?S.inbox.people.length:0;['sellers','buyers'].forEach(function(t){var a=$('#tabnav a[data-tab="'+t+'"]');a.innerHTML=t[0].toUpperCase()+t.slice(1)+(n?' <span class="n" title="Unsorted leads">'+n+'</span>':'');});}
 
 function render(){var m=$('#main');
-  var html=({sellers:viewBoard,buyers:viewBoard,marketing:viewMarketing,toolkit:viewToolkit,personal:viewPersonal})[S.tab]();
+  var html=({sellers:viewBoard,buyers:viewBoard,marketing:viewMarketing,toolkit:viewToolkit,personal:viewPersonal,financial:viewFinancial,tpm:viewTPM})[S.tab]();
   var sx={};$$('.board',m).forEach(function(b){sx[b.id]=b.scrollLeft;});
   var fa=document.activeElement,fid=fa&&fa.id&&/^(lq-|pq$)/.test(fa.id)?fa.id:null,pos=fid?fa.selectionStart:0;
   m.innerHTML=html;
@@ -744,7 +766,7 @@ function moveRow(kind,c){var ST=stagesOf(kind);
    +'<button type="button" class="lk" data-edit="'+kind+'" data-id="'+c.id+'">Edit</button>'
    +(c.fub?'<a class="lk" href="'+fubUrl(c.fub)+'" target="_blank" rel="noopener">FUB</a>':'')+'</div>';}
 function sellerCard(c,st){
-  var L=liveOf('s',c),all=['homeeval','cma','update','instructions','offers','justsold'],hot=st.p,rest=all.filter(function(k){return hot.indexOf(k)<0;});
+  var L=liveOf('s',c),all=['sellerintro','homeeval','cma','listpres','update','instructions','offers','justsold'],hot=st.p,rest=all.filter(function(k){return hot.indexOf(k)<0;});
   var done=c.checks||[],left=st.due.filter(function(d){return done.indexOf(d)<0;}).length;
   var title=c.addr||c.name||L.name||'No name',sub=c.addr?(c.name||L.name):'';
   return '<article class="pc"><div class="t"><b>'+dot('s',c)+esc(title)+'</b>'+(sub?'<span>'+esc(sub)+'</span>':'')+'</div>'
@@ -1091,6 +1113,70 @@ function afterPersonal(){
   var g=$('#thForm');if(g)g.onsubmit=function(e){e.preventDefault();var t=$('#thIn').value.trim();if(!t)return;var st=$('#thSt').value;post('desk/thing',{title:t,status:st}).then(function(){return getJ('desk/things');}).then(function(j){S.things=j.items;S.thingF=st;render();var i=$('#thIn');if(i)i.focus();}).catch(fail);};
 }
 
+/* ---------- Financial: recurring monthly expenses + new expenses (first draft) ---------- */
+var EXP_CATS=['Home','Car','Business','Marketing','Software','Insurance','Phone & internet','Health & gym','Loans','Kids','Other'];
+function money2(n){return '$'+(+n||0).toLocaleString('en-CA',{minimumFractionDigits:2,maximumFractionDigits:2});}
+function monthly(x){var a=+x.amount||0;return x.cadence==='weekly'?a*52/12:x.cadence==='yearly'?a/12:x.cadence==='quarterly'?a/3:a;}
+function loadExpenses(){return getJ('desk/expenses').then(function(j){S.expenses=j.items;});}
+function expRows(L,kind){if(!L.length)return '<p class="empty">'+(kind==='recurring'?'Nothing yet. Add rent, car, phone, software, insurance…':'Nothing yet. Add one-off or new costs as they come up.')+'</p>';
+  return '<ul class="lrows">'+L.map(function(x){var when=kind==='recurring'?(x.cadence==='monthly'?(x.day?'Day '+x.day:'Monthly'):x.cadence):(x.due?fmtDay(x.due):'No date');
+    return '<li class="xrow"><i class="lst '+(kind==='new'&&x.paid?'grn':kind==='new'?'yel':'navy')+'"></i><button type="button" class="la nmb" data-exp="'+x.id+'"><b>'+esc(x.title)+'</b><small>'+esc([x.category,when,x.note].filter(Boolean).join(' · '))+'</small></button>'
+     +'<span class="lp">'+money2(x.amount)+(kind==='recurring'&&x.cadence!=='monthly'?'<small class="muted"> /'+esc(x.cadence.replace('ly',''))+'</small>':'')+'</span>'
+     +(kind==='new'?'<span class="ls '+(x.paid?'grn':'yel')+'">'+(x.paid?'Paid':'To pay')+'</span>':'<span></span>')+'</li>';}).join('')+'</ul>';}
+function viewFinancial(){var E=S.expenses;
+  if(!E)return '<section class="card"><p class="empty">Loading…</p></section>';
+  var rec=E.filter(function(x){return x.kind==='recurring';}),nw=E.filter(function(x){return x.kind==='new';});
+  var tot=rec.reduce(function(a,x){return a+monthly(x);},0),due=nw.filter(function(x){return !x.paid;}).reduce(function(a,x){return a+(+x.amount||0);},0);
+  return '<div class="pgrid"><section class="card"><div class="hd"><h2>Recurring expenses</h2><span class="sub">Every month · '+rec.length+' item'+(rec.length===1?'':'s')+'</span><button class="btn sm" type="button" data-newexp="recurring">+ Add</button></div>'
+    +'<div class="big2">'+money2(tot)+'<small>per month (weekly / yearly bills converted)</small></div>'+expRows(rec,'recurring')+'</section>'
+    +'<section class="card"><div class="hd"><h2>New expenses</h2><span class="sub">One-off and new costs</span><button class="btn sm" type="button" data-newexp="new">+ Add</button></div>'
+    +'<div class="big2">'+money2(due)+'<small>still to pay</small></div>'+expRows(nw,'new')+'</section></div>'
+    +'<p class="hint" style="margin-top:4px">First draft. Tell Claude what else Financial should track (income, commissions, taxes, savings goals…).</p>';}
+function openExpense(id,kind){var x=id?(S.expenses||[]).filter(function(y){return y.id===+id;})[0]:{kind:kind,cadence:kind==='new'?'once':'monthly'},d=$('#dlg'),cf=false;S.viewing=null;
+  d.innerHTML='<form class="dl" id="eF"><div class="dh"><h2>'+(id?'Edit':'Add')+' '+(x.kind==='new'?'new expense':'recurring expense')+'</h2><button type="button" class="x" data-close aria-label="Close">×</button></div><div class="fgrid">'
+   +inp('e_title','What',x.title,{full:1,ph:x.kind==='new'?'New laptop':'Car lease'})+inp('e_amount','Amount ($)',x.amount!=null?x.amount:'',{num:1,ph:'650'})+sel('e_cat','Category',x.category,EXP_CATS)
+   +(x.kind==='recurring'?sel('e_cad','How often',x.cadence,[['monthly','Monthly'],['weekly','Weekly'],['quarterly','Quarterly'],['yearly','Yearly']])+inp('e_day','Day of month it comes out',x.day||'',{num:1,ph:'15'})
+     :'<label for="e_due"><span>Date</span><input id="e_due" type="date" value="'+esc(x.due||'')+'"></label>'+sel('e_paid','Status',x.paid?'1':'0',[['0','To pay'],['1','Paid']]))
+   +inp('e_note','Notes',x.note,{ta:1,full:1})+'</div><p class="err" id="eErr" hidden></p></form>'
+   +'<div class="dfoot"><button type="button" class="btn" id="eSave">Save</button>'+(id?'<button type="button" class="btn danger" id="eDel">Delete</button>':'<button type="button" class="btn ghost" data-close>Cancel</button>')+'</div>';
+  $('#eF').onsubmit=function(e){e.preventDefault();};
+  $('#eSave').onclick=function(){var b={id:id||null,kind:x.kind,title:val('e_title'),amount:parseFloat(val('e_amount').replace(/[$,]/g,''))||0,category:val('e_cat'),note:val('e_note')};
+    if(x.kind==='recurring'){b.cadence=val('e_cad')||'monthly';b.day=+val('e_day')||null;}else{b.cadence='once';b.due=val('e_due');b.paid=val('e_paid')==='1';}
+    if(!b.title){$('#eErr').textContent='Add what it is.';$('#eErr').hidden=false;return;}
+    post('desk/expense',b).then(function(){d.close();toast('Saved');return loadExpenses();}).then(render).catch(fail);};
+  if(id)$('#eDel').onclick=function(){if(!cf){cf=true;this.textContent='Tap again to delete';return;}post('desk/expense/delete',{id:id}).then(function(){d.close();return loadExpenses();}).then(render).catch(fail);};
+  if(!d.open)d.showModal();}
+
+/* ---------- Toronto Property Media (first draft, ideas from the 2nd Brain TPM folder) ---------- */
+function viewTPM(){
+  var link=function(h,t,s){return '<a class="rt" href="'+h+'" target="_blank" rel="noopener"><b>'+esc(t)+'</b><p>'+esc(s)+'</p></a>';};
+  var step=function(t,s){return '<li><div>'+esc(t)+'<small>'+esc(s)+'</small></div></li>';};
+  return '<div class="mk"><div class="mkc">'
+   +'<section class="card"><div class="hd"><h2>Shoots</h2><span class="chip">Draft</span></div>'
+   +'<p class="lead2">Idea: upcoming shoots from the TPM calendar (Workspace account), each with address, agent, package, access window and lockbox. Tap a shoot for its shot list and prep checklist.</p>'
+   +'<div class="pacts">'+pbtn('tpmshotlist','m','',1)+pbtn('tpmscript','m','')+'</div>'
+   +'<div class="sec">Shoot-day checklist</div><ul class="li">'+step('Property vacant, everyone out','Especially for video')+step('Lockbox code + 3-hour access window','Client picks the start time')+step('Home clean, all lights on','Michael doesn’t turn lights on')+step('Gear check','Sony A1 / A7S III, Mavic 3, RS 4, Ninja V+')+'</ul></section>'
+   +'<section class="card"><div class="hd"><h2>Editing queue</h2><span class="chip">Draft</span></div>'
+   +'<p class="lead2">Idea: one row per job moving Shot → Editing → Review → Delivered, with what’s due (photos, reel, cinematic tour, twilight, floor plan, website) and the delivery date.</p>'
+   +'<div class="pacts">'+pbtn('tpmtwilight','m','',1)+pbtn('tpmtalkinghead','m','')+pbtn('ytdesc','m','')+'</div></section>'
+   +'<section class="card"><div class="hd"><h2>Client delivery</h2><span class="chip">Draft</span></div><ul class="li">'
+   +step('1. Booking confirmation','')+step('2. 24-hour reminder + prep checklist','Vacant, lockbox, lights on, clean')+step('3. Shoot complete, editing in progress','')+step('4. Delivery: download link + invoice','Stripe, Net 7, HST added on top')+step('5. One-week follow-up','Ask for a review / testimonial')+'</ul></section>'
+   +'</div><div class="mkc">'
+   +'<section class="card"><div class="hd"><h2>Packages</h2><span class="sub">From torontopropertymedia.ca (site is the source of truth)</span></div><ul class="li">'
+   +'<li><div>Everything<small>Photos, cinematic, reel, drone, agent on camera, floor plan, staging, twilight, website</small></div><span class="lp">from $900</span></li>'
+   +'<li><div>Photography, Cinematic Tour & Social Media</div><span class="lp">from $550</span></li>'
+   +'<li><div>Photo & Cinematic Tour</div><span class="lp">from $350</span></li>'
+   +'<li><div>Photo & Reel<small>Most-booked combo</small></div><span class="lp">from $350</span></li>'
+   +'<li><div>Photography</div><span class="lp">from $200</span></li>'
+   +'<li><div>Cinematic Videography</div><span class="lp">from $200</span></li></ul>'
+   +'<p class="hint" style="margin-top:8px">Travel by drive time: 0–25 min free · 26–45 +$25 · 46–70 +$50 · 71–90 +$125 · 91+ +$300.</p></section>'
+   +'<section class="card"><div class="hd"><h2>Tools</h2></div><div class="res">'
+   +link('https://torontopropertymedia.ca','Website','Fotello site + booking')+link('https://dashboard.stripe.com','Stripe','Invoices, payouts Fridays')+link('https://calendly.com','Calendly','Booking types')+link('https://broker-svg.github.io/','Shot Commander','On-set shot list apps')
+   +'</div></section>'
+   +'<section class="card"><div class="hd"><h2>Ideas to decide</h2></div><ul class="li">'
+   +step('TPM calendar on this tab','Pull shoots from the TPM Google calendar')+step('Property website tracker','Agent, address, live URL, Active / Sold / Expired')+step('Agent script portals','Move from Notion into the desk?')+step('Income vs. expenses','Link to the Financial tab')+'</ul></section>'
+   +'</div></div>';}
+
 /* ---------- Toolkit ---------- */
 var SCRIPTS=[
  {k:'buyer',n:'Buyer call',s:'New buyer lead, first call',body:[
@@ -1163,7 +1249,7 @@ function ctxData(ctx,id){
   if(ctx==='s'||ctx==='b'){var c=cardById(ctx,id),L=liveOf(ctx,c),nm=c.name||L.name||'';
     var d={client:nm,email:L.email||c.email,phone:L.phone||c.phone};
     var f=ff(c);
-    if(ctx==='s'){d.addr=[c.addr,f.hood,cityOf(c)].filter(Boolean).join(', ');d.addrs=d.addr;d.type=c.ptype;d.bb=[f.beds,f.baths].filter(Boolean).join(' / ')||c.size;d.sqft=f.sqft;d.list=c.price;d.price=c.price;
+    if(ctx==='s'){d.addr=[c.addr,f.hood,cityOf(c)].filter(Boolean).join(', ');d.addrs=d.addr;d.community=f.hood;d.up=(f.feats||[]).join(', ');d.type=c.ptype;d.bb=[f.beds,f.baths].filter(Boolean).join(' / ')||c.size;d.sqft=f.sqft;d.list=c.price;d.price=c.price;
       d.notes=[f.garage?f.garage+'-car garage':'',f.lot?'Lot '+f.lot:'',(f.feats||[]).join(', '),c.note].filter(Boolean).join('. ');}
     else{d.area=[f.hood,f.cities].filter(Boolean).join(', ')||f.region||c.area;d.type=(f.types||[])[0]||'';d.beds=f.beds?f.beds+'+':'';d.budget=f.pmax?money(+f.pmax):c.budget;
       d.must=[(f.feats||[]).join(', '),f.garage?f.garage+'+ car garage':'',f.sqft?f.sqft+'+ sq ft':''].filter(Boolean).join(', ');d.purpose='Buyer offer price';
@@ -1185,7 +1271,7 @@ function openPrompt(key,ctx,id){
       :'<input id="'+id+'" data-f type="'+(f.type||'text')+'" value="'+esc(v)+'" placeholder="'+esc(f.ph||'')+'" autocomplete="off">';
     return '<label class="'+(f.full||f.ta?'full':'')+'" for="'+id+'"><span>'+esc(f.l)+(f.req?' <em>*</em>':'')+'</span>'+ctl+'</label>';}
   var dlg=$('#dlg');
-  dlg.innerHTML='<form class="dl" id="pf"><div class="dh"><div style="flex:1;min-width:0"><h2>'+esc(P.label)+'</h2><p>Fill in what you know, copy, and paste it to Claude. Runs the <span class="chip n">'+esc(P.skill)+'</span> skill.</p></div><button type="button" class="x" data-close aria-label="Close">×</button></div>'
+  dlg.innerHTML='<form class="dl" id="pf"><div class="dh"><div style="flex:1;min-width:0"><h2>'+esc(P.label)+'</h2><p>Fill in what you know, copy, and paste it to Claude.'+(P.skill?' Runs the <span class="chip n">'+esc(P.skill)+'</span> skill.':'')+'</p></div><button type="button" class="x" data-close aria-label="Close">×</button></div>'
     +'<div class="fgrid">'+fields.map(inp).join('')+'</div>'
     +'<div class="pv"><div class="k"><span>Prompt</span><span id="pvMiss"></span></div><textarea id="pvT" readonly aria-label="Prompt text"></textarea></div></form>'
     +'<div class="dfoot"><button type="button" class="btn" id="copyBtn">Copy prompt</button><button type="button" class="btn ghost" data-close>Close</button></div>';
@@ -1197,7 +1283,7 @@ function buildPrompt(){
   var lines=[],miss=[];
   cur.fields.forEach(function(f){var el=document.getElementById('f_'+f.k),v=(el&&el.value||'').trim();if(!v){if(f.req)miss.push(f.l);return;}
     lines.push(f.ta?f.l+':\n'+v.split('\n').map(function(x){return '  '+x;}).join('\n'):'- '+f.l+': '+v);});
-  $('#pvT').value='Use the '+cur.P.skill+' skill.\n'+cur.P.lead+'\n\n'+lines.join('\n')+(miss.length?'\n\n(Missing: '+miss.join(', ')+')':'');
+  $('#pvT').value=(cur.P.skill?'Use the '+cur.P.skill+' skill.\n':'')+cur.P.lead+'\n\n'+lines.join('\n')+(miss.length?'\n\n(Missing: '+miss.join(', ')+')':'');
   var m=$('#pvMiss');m.textContent=miss.length?'Missing: '+miss.join(', '):'Ready';m.style.color=miss.length?'var(--red)':'var(--green)';
 }
 function copyPrompt(){var t=$('#pvT');function sel(){t.focus();t.select();toast('Text selected. Use Copy from the menu.');}
@@ -1224,6 +1310,8 @@ document.addEventListener('click',function(e){
   if(ds.jump){var c=document.getElementById('col-'+ds.jump);if(c){var b=c.parentElement;b.scrollTo({left:c.offsetLeft-b.offsetLeft-parseFloat(getComputedStyle(b).paddingLeft),behavior:'smooth'});}return;}
   if(t.hasAttribute('data-more')){var n=t.nextElementSibling;n.hidden=!n.hidden;t.setAttribute('aria-expanded',String(!n.hidden));t.textContent=n.hidden?'All prompts':'Fewer prompts';return;}
   if(ds.add){openCard(ds.add,null);return;}
+  if(ds.newexp){openExpense(null,ds.newexp);return;}
+  if(ds.exp){openExpense(+ds.exp);return;}
   if(ds.ptw){if(ds.ptw==='today'){S.ptToday=!S.ptToday;store('desk_pt_today',S.ptToday);}else{S.ptLate=!S.ptLate;store('desk_pt_late',S.ptLate);}S.ptAll=false;render();return;}
   if(ds.ptf){S.ptf=ds.ptf;store('desk_ptf',ds.ptf);S.ptAll=false;render();return;}
   if(t.hasAttribute('data-ptall')){S.ptAll=!S.ptAll;render();return;}
