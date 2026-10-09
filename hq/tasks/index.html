@@ -28,13 +28,14 @@ button,input{font:inherit;color:inherit}
 .row1 nav{margin-left:auto;display:flex;gap:10px}
 .row1 nav a{color:var(--muted);text-decoration:none;font-weight:600}
 .row1 button{background:none;border:0;padding:2px 4px;color:var(--muted);cursor:pointer;font-size:18px}
-.chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:8px 0}
+.chips{display:flex;flex-wrap:wrap;gap:6px;padding:8px 0}
 .chips::-webkit-scrollbar{display:none}
-.chips button{flex:none;min-height:40px;padding:0 14px;border-radius:20px;border:1px solid #C9CEDD;background:var(--bg);font-weight:600;font-size:17px;cursor:pointer;color:var(--ink)}
+.chips button{flex:none;min-height:40px;padding:0 10px;border-radius:20px;border:1px solid #C9CEDD;background:var(--bg);font-weight:600;font-size:16px;cursor:pointer;color:var(--ink)}
 .chips button b{margin-left:4px}
 .chips button[aria-pressed="true"]{border-style:solid;background:var(--ink);border-color:var(--ink);color:#fff}
 .chips button.late b{color:var(--red)}.chips button.late[aria-pressed="true"]{background:var(--red);border-color:var(--red)}.chips button.late[aria-pressed="true"] b{color:#fff}.chips button.late.off{border-style:dashed;color:var(--muted)}
-.chips .sep{flex:none;width:1px;background:var(--line);margin:4px 2px}
+.chips .sep{display:none}
+.chips button.late.off{text-decoration:line-through;text-decoration-color:var(--red)}
 .chips .src{border-style:solid;border-color:var(--line);color:var(--muted)}
 main{padding:0 14px calc(90px + env(safe-area-inset-bottom,0px))}
 .grp{font-family:var(--display);font-weight:800;font-size:18px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:14px 0 2px}
@@ -92,7 +93,7 @@ function post(p,b){return api(p,{method:'POST',body:JSON.stringify(b)});}
 function askPin(){return new Promise(function(res){var d=$('pinDlg');$('pinForm').onsubmit=function(e){e.preventDefault();store('sm_oh_pin',$('pinIn').value.trim());api('desk/todos').then(function(){d.close();res();}).catch(function(){$('pinErr').hidden=false;});};if(!d.open)d.showModal();$('pinIn').focus();});}
 
 var SRC={fub:['FUB','#1D2870'],mine:['To-do','#D7141E'],g:['Google','#1B7A3E'],rem:['Reminder','#9A5B00']};
-var S={items:[],errs:[],fubApp:'https://app.followupboss.com',scope:store('tk_scope')||'today',hideLate:store('tk_hidelate')!==false,src:store('tk_src')||'all',loading:false};
+var S={items:[],errs:[],fubApp:'https://app.followupboss.com',scope:store('tk_scope')||'today',hideLate:store('tk_hidelate')!==false,src:(store('tk_src')==='mine'?'all':store('tk_src'))||'all',loading:false};
 
 function dayOf(x){if(!x)return '';var s=String(x);if(/^\d{4}-\d{2}-\d{2}$/.test(s))return s;var t=Date.parse(s);return isNaN(t)?s.slice(0,10):ymd(new Date(t));}
 function hasTime(x){return /T\d\d:\d\d/.test(String(x||''))&&!/T00:00(:00)?(\.000)?(Z|[+-]00:?00)?$/.test(String(x));}
@@ -120,9 +121,10 @@ function render(){
   var L=all.filter(function(x){if(S.hideLate&&x.late)return false;if(S.scope==='today')return x.day===t||(!S.hideLate&&x.late);return true;});
   L.sort(function(a,b){var ka=a.day||'9999',kb=b.day||'9999';return ka.localeCompare(kb)||String(a.time||'').localeCompare(String(b.time||''))||String(a.title).localeCompare(String(b.title));});
   var counts={};S.items.forEach(function(x){counts[x.src]=(counts[x.src]||0)+1;});
-  $('chips').innerHTML='<button type="button" data-w="today" aria-pressed="'+(S.scope==='today')+'">Today <b>'+nToday+'</b></button><button type="button" data-w="all" aria-pressed="'+(S.scope==='all')+'">All days <b>'+all.length+'</b></button>'
-    +'<button type="button" class="late'+(S.hideLate?' off':'')+'" data-w="late" aria-pressed="'+(!S.hideLate)+'">'+(S.hideLate?'Overdue hidden':'Overdue')+' <b>'+nLate+'</b></button><i class="sep"></i>'
-    +['all','fub','mine','g','rem'].map(function(k){return '<button type="button" class="src" data-s="'+k+'" aria-pressed="'+(S.src===k)+'">'+(k==='all'?'All sources':SRC[k][0])+(k!=='all'&&counts[k]?' '+counts[k]:'')+'</button>';}).join('');
+  // Today (on/off) · sources · Overdue (hide/show) last
+  $('chips').innerHTML='<button type="button" data-w="today" aria-pressed="'+(S.scope==='today')+'">Today <b>'+nToday+'</b></button><i class="sep"></i>'
+    +['all','fub','g','rem'].map(function(k){return '<button type="button" class="src" data-s="'+k+'" aria-pressed="'+(S.src===k)+'">'+(k==='all'?'All':k==='rem'?'Reminders':SRC[k][0])+(k!=='all'&&counts[k]?' '+counts[k]:'')+'</button>';}).join('')
+    +'<i class="sep"></i><button type="button" class="late'+(S.hideLate?' off':'')+'" data-w="late" aria-pressed="'+(!S.hideLate)+'">Overdue <b>'+nLate+'</b></button>';
   if(!L.length){$('list').innerHTML='<div class="empty"><b>'+(S.scope==='today'?'Nothing left today':'All clear')+'</b>'+(nLate&&S.hideLate?nLate+' overdue hidden. Tap Overdue to show them.':'Nice work.')+'</div>'+errNote();return;}
   var groups=[],cur=null;
   L.forEach(function(x){var g=x.late?'Overdue':x.day===t?'Today':x.day===tom?'Tomorrow':x.day?new Date(x.day+'T12:00:00').toLocaleDateString('en-CA',{weekday:'long',month:'short',day:'numeric'}):'No date';
@@ -145,7 +147,7 @@ document.addEventListener('change',function(e){var c=e.target;if(!c.classList.co
   call.then(function(){toast(src==='rem'?'Done. Clears on your iPhone at its next sync.':'Done');if(!c.checked)return;setTimeout(function(){S.items=S.items.filter(function(y){return y!==x;});render();},700);})
     .catch(function(err){c.checked=!c.checked;li.classList.toggle('done',c.checked);toast(err==='pin'?'PIN needed':'Couldn\u2019t save. Try again.');});});
 document.addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;
-  if(b.dataset.w){if(b.dataset.w==='late'){S.hideLate=!S.hideLate;store('tk_hidelate',S.hideLate);}else{S.scope=b.dataset.w;store('tk_scope',S.scope);}render();}
+  if(b.dataset.w){if(b.dataset.w==='late'){S.hideLate=!S.hideLate;store('tk_hidelate',S.hideLate);}else{S.scope=S.scope==='today'?'all':'today';store('tk_scope',S.scope);}render();}
   if(b.dataset.s){S.src=b.dataset.s;store('tk_src',S.src);render();}
   if(b.id==='ref')load();});
 $('add').onsubmit=function(e){e.preventDefault();var v=$('addIn').value.trim();if(!v)return;
