@@ -92,6 +92,8 @@ a{color:var(--navy)}
 .board{display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:10px;margin:0 -20px;padding-inline:20px;scroll-padding-inline:20px}
 @media (max-width:640px){.board{margin:0 -16px;padding-inline:16px;scroll-padding-inline:16px}}
 .col{flex:none;width:min(330px,calc(100vw - 64px));scroll-snap-align:start;background:var(--mist);border-radius:14px;padding:10px;display:flex;flex-direction:column;gap:10px;align-self:flex-start;border-top:5px solid var(--sc,var(--navy))}
+.board.fit{margin:0;padding-inline:0;overflow-x:visible}
+@media (min-width:900px){.board.fit .col{flex:1 1 0;width:auto;min-width:0}}
 .col h3{font-size:22px;display:flex;align-items:baseline;gap:8px;padding:4px 4px 0}
 .col h3 small{font-family:var(--body);font-weight:600;font-size:14px;color:var(--muted);text-transform:none}
 .col .grp{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding:0 4px;margin-top:-6px;min-height:16px}
@@ -504,6 +506,7 @@ var PH={};PHASES.forEach(function(x){PH[x.k]=x;});
 // seller stage -> playbook phase (Toolkit › Listing Prep). Going live sits inside For sale.
 var STAGE_PHASE={prosp:'appt',signed:'signed',soon:'prep',sale:'sale',offer:'offer',sold:'sold'};
 var SSTAGES=[
+  {k:'cold',n:'Cold',g:'Parked',c:'#B8BCCB',p:['sellerintro','homeeval'],due:['Check in every 90 days','Still a seller? Move back to Talking']},
   {k:'talk',n:'Talking',g:'Leads',c:'#9BA2BD',p:['sellerintro','homeeval'],due:['Log the first conversation in FUB','Set a follow-up date','Ask: timing and reason for moving']},
   {k:'poss',n:'Possibility',g:'Leads',c:'#7C86B8',p:['homeeval','sellerintro'],due:['Send the Home Evaluation','Book a walk-through','Add to Daily Seller list']},
   {k:'prosp',n:'Listing appointment',g:'Leads',c:'#4A5592',p:PH.appt.tools,due:PH.appt.items},
@@ -512,7 +515,7 @@ var SSTAGES=[
   {k:'sale',n:'For sale',g:'During',c:'#D7141E',p:['update','instructions'],due:PH.live.items.map(function(t){return 'Launch: '+t;}).concat(PH.sale.items)},
   {k:'offer',n:'Offer night',g:'During',c:'#B0101A',p:PH.offer.tools,due:PH.offer.items},
   {k:'sold',n:'Sold, before closing',g:'After sold',c:'#1B7A3E',p:PH.sold.tools,due:PH.sold.items},
-  {k:'closed',n:'Closed',g:'Done',c:'#545B78',p:['justsold'],due:['Keys handed over','Closing gift sent','Ask for a Google review','Add to past-client nurture']}
+  {k:'closed',n:'Past client',g:'Done',c:'#545B78',p:['justsold'],due:['Keys handed over','Closing gift sent','Ask for a Google review','Add to past-client nurture']}
 ];
 var BSTAGES=[
   {k:'talk',n:'Talking',g:'Leads',c:'#9BA2BD',p:['followup']},
@@ -606,7 +609,7 @@ var PROMPTS={
 var TABS=['sellers','buyers','marketing','toolkit','personal','financial','tpm'];
 var S={tab:TABS.indexOf(location.hash.slice(1))>=0?location.hash.slice(1):(store('desk_tab')||'sellers'),
   board:{s:null,b:null},inbox:null,inboxDays:store('desk_inbox_days')||14,closed:{s:!!store('desk_closed_s'),b:!!store('desk_closed_b')},
-  content:null,todos:null,tk:store('desk_tk')||'scripts',lpp:store('desk_lpp')||'appt',
+  content:null,todos:null,tk:store('desk_tk')||'scripts',lpp:store('desk_lpp')||'appt',coldOn:store('desk_cold')===true,side:store('desk_side')||'pre',
   view:{s:store('desk_view_s')||'list',b:store('desk_view_b')||'board'},showInbox:store('desk_inbox_on')!==false,inboxView:store('desk_inbox_view')||'cards',
   feedOn:store('desk_feed_on')!==false,feedDays:store('desk_feed_days')||2,feedFilter:'all',feedAll:false,viewing:null,
   sel:{s:{},b:{}},listings:undefined,expenses:null,people:{s:null,b:null},focus:{s:store('desk_focus_s')||'active',b:store('desk_focus_b')||'active'},fq:{s:'',b:''},fsort:{s:'recent',b:'recent'},fall:{s:false,b:false},pipeOpen:store('desk_pipe')!==false,showSoon:store('desk_soon')!==false,personal:null,things:null,gt:null,rem:null,ptf:store('desk_ptf')||'all',ptToday:store('desk_pt_today')!==false,ptLate:store('desk_pt_late')===true,ptAll:false,thingF:'Need',prospects:null,social:undefined,pTab:store('desk_ptab')||'exp',pFilter:{q:'',region:'',city:'',all:false},printTab:store('desk_print')||'hangers',sort:{s:store('desk_sort_s')||'stage',b:store('desk_sort_b')||'stage'},filter:{s:{q:'',stage:'',region:'',act:''},b:{q:'',stage:'',region:'',act:''}},script:'buyer',fs:store('desk_fs')||26,tagSync:false,fubApp:'https://app.followupboss.com'};
@@ -871,7 +874,9 @@ function viewBoard(){
   var sub=cards.filter(function(c){return c.stage!=='closed';}).length+' active';
   var head='<div class="hd"><h2>'+label+'</h2><span class="sub">'+sub+'</span>'
     +'<div class="seg" role="group" aria-label="View"><button type="button" data-bv="board" aria-pressed="'+(view==='board')+'">Board</button><button type="button" data-bv="list" aria-pressed="'+(view==='list')+'">List</button></div>'
-    +'<label class="sw"><input type="checkbox" data-closed="'+kind+'"'+(S.closed[kind]?' checked':'')+'><i></i>Closed ('+closedN+')</label>'
+    +(kind==='s'?'<div class="seg" role="group" aria-label="Which phases"><button type="button" data-side="pre" aria-pressed="'+(S.side!=='listed')+'">Before listing</button><button type="button" data-side="listed" aria-pressed="'+(S.side==='listed')+'">Listed</button></div>'
+      +'<label class="sw"><input type="checkbox" data-cold="1"'+(S.coldOn?' checked':'')+'><i></i>Cold ('+cards.filter(function(c){return c.stage==='cold';}).length+')</label>'
+      :'<label class="sw"><input type="checkbox" data-closed="'+kind+'"'+(S.closed[kind]?' checked':'')+'><i></i>Closed ('+closedN+')</label>')
     +'<button class="btn sm" type="button" data-add="'+kind+'">+ Add '+(kind==='s'?'seller':'buyer')+'</button></div>';
   var body=!cards.length?'<p class="empty">No '+label.toLowerCase()+' yet. People tagged '+(kind==='s'?'Daily Seller or CMA':'Searching or Daily')+' in FUB appear here by themselves. You can also sort a lead from Unsorted, or tap + Add.</p>'
     :view==='list'?listView(kind):boardView(kind);
@@ -881,13 +886,14 @@ function viewBoard(){
 }
 function boardView(kind){
   var ST=stagesOf(kind),cards=S.board[kind].cards,vis=ST.filter(function(st){return st.k!=='closed'||S.closed[kind];});
+  if(kind==='s'){var keep=S.side==='listed'?['sale','offer','sold','closed']:(S.coldOn?['cold']:[]).concat(['talk','poss','prosp','signed','soon']);vis=ST.filter(function(st){return keep.indexOf(st.k)>=0;});}
   var strip='<div class="stages" role="toolbar" aria-label="Jump to stage">'+vis.map(function(st,i){return (i?'<span class="arrow" aria-hidden="true">›</span>':'')
     +'<button type="button" data-jump="'+kind+'-'+st.k+'">'+esc(st.n)+' <span class="n">'+cards.filter(function(c){return c.stage===st.k;}).length+'</span></button>';}).join('')+'</div>';
   var lastG='';
   var cols=vis.map(function(st){var items=cards.filter(function(c){return c.stage===st.k;});var g=st.g!==lastG?st.g:'';lastG=st.g;
     return '<div class="col" id="col-'+kind+'-'+st.k+'" style="--sc:'+st.c+'"><h3>'+esc(st.n)+' <small>'+items.length+'</small></h3><div class="grp">'+esc(g)+'</div>'
       +(items.length?items.map(function(c){return cardHtml(kind,c);}).join(''):'<div class="none">Nobody here</div>')+'</div>';}).join('');
-  return strip+'<div class="board" id="board-'+kind+'">'+cols+'</div>';
+  return strip+'<div class="board'+(kind==='s'&&vis.length<=5?' fit':'')+'" id="board-'+kind+'">'+cols+'</div>';
 }
 function cardHtml(kind,c){var st=stagesOf(kind).filter(function(x){return x.k===c.stage;})[0]||stagesOf(kind)[0];return kind==='s'?sellerCard(c,st):buyerCard(c,st);}
 
@@ -896,7 +902,8 @@ var SORTS={stage:'Stage',quiet:'Longest since contact',recent:'Most recent activ
 function filtered(kind){
   var F=S.filter[kind],q=F.q.trim().toLowerCase(),ST=stagesOf(kind);
   var L=S.board[kind].cards.filter(function(c){
-    if(c.stage==='closed'&&!S.closed[kind]&&F.stage!=='closed')return false;
+    if(kind!=='s'&&c.stage==='closed'&&!S.closed[kind]&&F.stage!=='closed')return false;
+    if(kind==='s'&&c.stage==='cold'&&!S.coldOn&&F.stage!=='cold')return false;
     if(F.stage&&c.stage!==F.stage)return false;
     if(F.region){var r=ff(c).region||regionOf(kind==='s'?cityOf(c):String(ff(c).cities||'').split(',')[0]);if(r!==F.region)return false;}
     if(F.act&&actOf(kind,c).st!==F.act)return false;
@@ -1565,12 +1572,14 @@ document.addEventListener('click',function(e){
   if(ds.item){openItem(+ds.item);return;}
   if(ds.tk){S.tk=ds.tk;store('desk_tk',S.tk);render();load(false);return;}
   if(ds.script){S.script=ds.script;render();return;}
+  if(ds.side){S.side=ds.side;store('desk_side',S.side);render();return;}
   if(ds.lpp){S.lpp=ds.lpp;store('desk_lpp',S.lpp);render();return;}
   if(ds.fs){S.fs=Math.max(18,Math.min(48,S.fs+(+ds.fs)));store('desk_fs',S.fs);$('#stext').style.setProperty('--fs',S.fs+'px');return;}
   if(ds.tdx){post('item/delete',{id:+ds.tdx}).then(loadTodos).then(render).catch(fail);return;}
 });
 document.addEventListener('change',function(e){var t=e.target,ds=t.dataset;
   if(t.id==='inDays'){S.inboxDays=+t.value;store('desk_inbox_days',S.inboxDays);S.inbox=null;render();loadInbox().then(render).catch(fail);return;}
+  if(ds.cold){S.coldOn=t.checked;store('desk_cold',t.checked);if(t.checked)S.side='pre';render();return;}
   if(ds.closed){S.closed[ds.closed]=t.checked;store('desk_closed_'+ds.closed,t.checked);render();return;}
   if(t.hasAttribute('data-soonon')){S.showSoon=t.checked;store('desk_soon',t.checked);render();return;}
   if(ds.pmove&&t.value){movePerson(ds.pmove,+ds.id,t.value,t);return;}
