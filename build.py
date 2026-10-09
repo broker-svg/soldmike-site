@@ -826,7 +826,7 @@ def road_hero(trail, h1, lede, photo):
     svg = ('<svg viewBox="0 0 560 560" aria-hidden="true"><path d="M%.1f %.1f A%d %d 0 1 1 %.1f %.1f" /></svg>' % (sx, sy, r, r, 560 - sx, sy))
     return ('<section class="phero photo road-hero"><div class="bg" style="background-image:url(%s)" aria-hidden="true"></div><div class="wrap">'
             '<div class="rh-text">%s<h1>%s</h1><p class="lede">%s</p><p class="rh-cta"><a class="btn" href="/sell/home-value/">Get your home value</a></p></div>'
-            '<figure class="road" aria-label="The road from your listing to SOLD">%s<img src="/mike.png" alt="Michael Barillari, Broker" width="720" height="720">'
+            '<figure class="road" aria-label="The road from your listing to SOLD">%s<img class="rh-mike" src="/media/road/mike-cutout.webp" alt="Michael Barillari, Broker" width="620" height="830">'
             '<ol>%s</ol><figcaption><b>Michael Barillari</b> with you at every step</figcaption></figure></div></section>') % (photo, cr, e(h1), lede, svg, stops)
 ROAD_CSS = '''<style>
 .road-hero .wrap{display:grid;gap:40px;align-items:center}
@@ -834,7 +834,8 @@ ROAD_CSS = '''<style>
 .road-hero .rh-text{display:flex;flex-direction:column;gap:16px}
 .road{margin:0;position:relative;width:100%;max-width:560px;justify-self:center}
 .road svg{display:none}
-.road img{display:block;width:180px;height:180px;margin:0 auto 20px;border-radius:50%;object-fit:cover;object-position:50% 15%;border:5px solid #fff;box-shadow:0 12px 40px rgba(0,0,0,.35)}
+.road::before{content:"";position:absolute;left:50%;top:0;width:280px;height:280px;transform:translateX(-50%);border-radius:50%;background:radial-gradient(circle,rgba(201,208,242,.35),rgba(201,208,242,0) 70%);pointer-events:none}
+.road img{position:relative;display:block;width:220px;height:auto;margin:0 auto 4px;filter:drop-shadow(0 14px 30px rgba(0,0,0,.45));-webkit-mask-image:linear-gradient(180deg,#000 72%,transparent 100%);mask-image:linear-gradient(180deg,#000 72%,transparent 100%)}
 .road ol{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;justify-content:center;gap:10px}
 .road li span{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;width:96px;height:96px;border-radius:50%;background:rgba(29,40,112,.92);border:2px solid rgba(255,255,255,.7);box-shadow:0 6px 18px rgba(0,0,0,.3);color:#fff;font-family:var(--display);font-weight:700;font-size:15px;line-height:1.05;text-transform:uppercase;padding:8px;backdrop-filter:blur(4px)}
 .road li small{font-size:12px;color:var(--pale);letter-spacing:.06em;margin-bottom:3px}
@@ -850,12 +851,14 @@ ROAD_CSS = '''<style>
   .road{aspect-ratio:1}
   .road svg{display:block;position:absolute;inset:0;width:100%;height:100%;overflow:visible}
   .road path{fill:none;stroke:rgba(255,255,255,.7);stroke-width:3;stroke-dasharray:2 12;stroke-linecap:round;animation:roadmove 1.6s linear infinite}
-  .road img{position:absolute;left:50%;top:50%;width:41%;height:41%;margin:0;transform:translate(-50%,-50%)}
+  .road::before{top:50%;width:62%;height:62%;transform:translate(-50%,-45%)}
+  .road img{position:absolute;left:50%;top:24%;width:44%;margin:0;transform:translateX(-50%);-webkit-mask-image:linear-gradient(180deg,#000 68%,transparent 96%);mask-image:linear-gradient(180deg,#000 68%,transparent 96%)}
+  .road li{z-index:1}
   .road ol{position:absolute;inset:0;display:block}
   .road li{position:absolute;left:var(--x);top:var(--y);transform:translate(-50%,-50%)}
   .road li span{width:104px;height:104px}
   .road li.start span,.road li.end span{width:118px;height:118px}
-  .road figcaption{position:absolute;left:50%;bottom:4%;transform:translateX(-50%);margin:0;white-space:nowrap}
+  .road figcaption{position:absolute;left:50%;bottom:-6px;transform:translateX(-50%);margin:0;white-space:nowrap;z-index:1}
 }
 @keyframes roadmove{to{stroke-dashoffset:-28}}
 </style>'''
