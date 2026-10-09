@@ -863,7 +863,7 @@ function viewBoard(){
   var rail=feedP(kind)+(kind==='s'?todayCard():'');
   function wrap(main){return '<div class="split"><div class="mainc">'+main+'</div><aside class="rail" aria-label="Activity and new leads">'+rail+'</aside></div>';}
   var top=focusSection(kind);
-  function pipe(inner,n){return '<details class="pipe"'+(S.pipeOpen?' open':'')+' data-pipe><summary>Pipeline board'+(n!=null?' · '+n+' cards':'')+' <small>Coming Soon → For Sale → Sold → Closed, checklists, facts, matching</small></summary>'+inner+'</details>';}
+  function pipe(inner,n){return '<details class="pipe"'+(S.pipeOpen?' open':'')+' data-pipe><summary>Pipeline board'+(n!=null?' · '+n+' cards':'')+' <small>'+(kind==='s'?'Listing appointment → Signed → Coming soon → For sale → Offer night → Sold, with each phase’s checklist':'Searching → Showings → Offer → Firm → Closed, checklists, facts, matching')+'</small></summary>'+inner+'</details>';}
   if(!B)return wrap(top+pipe('<section class="card"><p class="empty">Loading…</p></section>')+(kind==='s'?prospectsSection()+sellerRes():buyerRes()));
   var cards=B.cards,closedN=cards.filter(function(c){return c.stage==='closed';}).length,view=S.view[kind];
   var sub=cards.filter(function(c){return c.stage!=='closed';}).length+' active';
