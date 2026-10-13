@@ -428,6 +428,7 @@ dialog::backdrop{background:rgba(20,24,51,.6)}
 .gitem small{color:var(--muted);font-size:14px;white-space:nowrap}.gitem.ok span{text-decoration:line-through;opacity:.5}
 .gtabs{margin-left:auto}.gtabs button{font-size:13px;padding:0 10px}
 .gitem{grid-template-columns:auto 1fr auto auto}.gitem .x{background:none;border:0;font-size:22px;line-height:1;color:var(--muted);cursor:pointer;padding:0 2px 0 6px;min-height:36px}
+.gaisle{margin:0 0 4px;flex-wrap:wrap;overflow:visible}.gaisle button b{color:var(--green)}
 .gtot.two{grid-template-columns:repeat(2,minmax(0,1fr))}
 .gpick{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;width:100%;padding:7px 0;border:0;border-top:1px solid var(--line);background:none;text-align:left;font:inherit;color:inherit;cursor:pointer}
 .gpick i{width:28px;height:28px;border-radius:50%;border:2px solid var(--pale);display:grid;place-items:center;font-style:normal;font-weight:800;color:var(--navy)}
@@ -677,7 +678,7 @@ var S={tab:TABS.indexOf(location.hash.slice(1))>=0?location.hash.slice(1):(store
   content:null,todos:null,tk:store('desk_tk')||'scripts',lpp:store('desk_lpp')||'appt',exp:store('desk_exp')||{},coldOn:store('desk_cold')===true,side:store('desk_side')||'pre',
   view:{s:store('desk_view_s')||'list',b:store('desk_view_b')||'board'},showInbox:store('desk_inbox_on')!==false,inboxView:store('desk_inbox_view')||'cards',
   feedOn:store('desk_feed_on')!==false,feedDays:store('desk_feed_days')||2,feedFilter:'all',feedAll:false,viewing:null,
-  sel:{s:{},b:{}},listings:undefined,expenses:null,people:{s:null,b:null},focus:{s:store('desk_focus_s')||'active',b:store('desk_focus_b')||'active'},fq:{s:'',b:''},fsort:{s:'recent',b:'recent'},fall:{s:false,b:false},pipeOpen:store('desk_pipe')!==false,showSoon:store('desk_soon')!==false,personal:null,things:null,gt:null,rem:null,ptf:store('desk_ptf')||'all',ptToday:store('desk_pt_today')!==false,ptLate:store('desk_pt_late')===true,ptAll:false,thingF:'Need',grocV:store('desk_groc_v')||'mine',prospects:null,social:undefined,pTab:store('desk_ptab')||'exp',pFilter:{q:'',region:'',city:'',all:false},printTab:store('desk_print')||'hangers',sort:{s:store('desk_sort_s')||'stage',b:store('desk_sort_b')||'stage'},filter:{s:{q:'',stage:'',region:'',act:''},b:{q:'',stage:'',region:'',act:''}},script:'buyer',fs:store('desk_fs')||26,tagSync:false,fubApp:'https://app.followupboss.com'};
+  sel:{s:{},b:{}},listings:undefined,expenses:null,people:{s:null,b:null},focus:{s:store('desk_focus_s')||'active',b:store('desk_focus_b')||'active'},fq:{s:'',b:''},fsort:{s:'recent',b:'recent'},fall:{s:false,b:false},pipeOpen:store('desk_pipe')!==false,showSoon:store('desk_soon')!==false,personal:null,things:null,gt:null,rem:null,ptf:store('desk_ptf')||'all',ptToday:store('desk_pt_today')!==false,ptLate:store('desk_pt_late')===true,ptAll:false,thingF:'Need',grocV:store('desk_groc_v')||'mine',grocAisle:store('desk_groc_aisle')||'',prospects:null,social:undefined,pTab:store('desk_ptab')||'exp',pFilter:{q:'',region:'',city:'',all:false},printTab:store('desk_print')||'hangers',sort:{s:store('desk_sort_s')||'stage',b:store('desk_sort_b')||'stage'},filter:{s:{q:'',stage:'',region:'',act:''},b:{q:'',stage:'',region:'',act:''}},script:'buyer',fs:store('desk_fs')||26,tagSync:false,fubApp:'https://app.followupboss.com'};
 
 function setTab(t){S.tab=t;store('desk_tab',t);$$('#tabnav a[data-tab]').forEach(function(a){a.setAttribute('aria-current',a.dataset.tab===t?'page':'false');});render();load(false);}
 $$('#tabnav a[data-tab]').forEach(function(a){a.addEventListener('click',function(e){e.preventDefault();history.replaceState(null,'','#'+a.dataset.tab);setTab(a.dataset.tab);window.scrollTo({top:0});});});
@@ -1426,8 +1427,11 @@ function groceryCard(){var P=S.personal;if(!P)return '<section class="card"><div
   }else{
     h='<div class="gtot two"><div><small>On my list · '+mine.length+'</small><b>'+gmoney(lt)+'</b></div><div><small>Whole week’s menu</small><b>'+gmoney(wk)+'</b></div></div>'
       +'<p class="hint" style="margin:0 0 8px">Tap an item to add it to your list. Tap again to take it off.</p>'
-      +'<div class="pacts" style="margin-bottom:4px"><button class="btn sm ghost" type="button" data-gaddall>Add everything</button></div>';
-    h+=groups(all,function(x){var on=g.l.indexOf(x.id)>=0;return '<button type="button" class="gpick'+(on?' on':'')+'" data-gpick="'+x.id+'" aria-pressed="'+on+'"><i>'+(on?'✓':'+')+'</i><span>'+esc(x.name)+'<small>'+esc(x.amt)+'</small></span><b>'+gmoney(x.pr)+'</b></button>';});
+      +'<div class="pacts" style="margin-bottom:8px"><button class="btn sm ghost" type="button" data-gaddall>Add everything</button></div>';
+    var secs=(PL.GROCERY||[]).map(function(g){return g[0];}),ai=S.grocAisle;if(ai!=='All'&&secs.indexOf(ai)<0)ai=secs[0];
+    h+='<div class="fchips gaisle">'+['All'].concat(secs).map(function(sc){var n=sc==='All'?mine.length:mine.filter(function(x){return x.sec===sc;}).length;
+      return '<button type="button" data-gaisle="'+esc(sc)+'" aria-pressed="'+(ai===sc)+'">'+esc(sc)+(n?' <b>'+n+'</b>':'')+'</button>';}).join('')+'</div>';
+    h+=groups(ai==='All'?all:all.filter(function(x){return x.sec===ai;}),function(x){var on=g.l.indexOf(x.id)>=0;return '<button type="button" class="gpick'+(on?' on':'')+'" data-gpick="'+x.id+'" aria-pressed="'+on+'"><i>'+(on?'✓':'+')+'</i><span>'+esc(x.name)+'<small>'+esc(x.amt)+'</small></span><b>'+gmoney(x.pr)+'</b></button>';});
   }
   return '<section class="card"><div class="hd"><h2>Grocery list</h2>'+tabs+'</div>'+h
    +'<p class="hint" style="margin-top:10px">Prices are rough estimates (average GTA grocery prices, before tax), so totals are a ballpark. Ask Claude to add items or change prices.</p></section>';}
@@ -1678,6 +1682,7 @@ document.addEventListener('click',function(e){
   if(ds.wopick){var sched=(PL.WEEK[new Date().getDay()]||{}).id;plog('wo_pick',ds.wopick===sched?null:ds.wopick);toast(PL.ROUTINES[ds.wopick].name.replace(/^Gym · /,'')+' is today’s workout');render();openWorkout();return;}
   if(t.hasAttribute('data-wounpick')){plog('wo_pick',null);render();return;}
   if(ds.grocv){S.grocV=ds.grocv;store('desk_groc_v',ds.grocv);render();return;}
+  if(ds.gaisle){S.grocAisle=ds.gaisle;store('desk_groc_aisle',ds.gaisle);render();return;}
   if(ds.gpick){var g1=G(),id1=ds.gpick;if(g1.l.indexOf(id1)>=0){g1.l=g1.l.filter(function(x){return x!==id1;});g1.b=g1.b.filter(function(x){return x!==id1;});}else g1.l.push(id1);saveGroc();render();return;}
   if(ds.goff){var g2=G(),id2=ds.goff;g2.l=g2.l.filter(function(x){return x!==id2;});g2.b=g2.b.filter(function(x){return x!==id2;});saveGroc();render();return;}
   if(t.hasAttribute('data-gaddall')){var g3=G();gItems().forEach(function(x){if(g3.l.indexOf(x.id)<0)g3.l.push(x.id);});saveGroc();toast('Everything’s on your list');render();return;}
