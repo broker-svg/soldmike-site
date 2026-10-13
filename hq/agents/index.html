@@ -1400,20 +1400,20 @@ function openWeekMenu(){var dw=new Date().getDay(),order=[1,2,3,4,5,6,0],d=$('#d
 /* Grocery list: one week of the menu, ticks saved on this week's Sunday so they reset each week */
 function gid(sec,item){return (sec+'-'+item).toLowerCase().replace(/[^a-z0-9]+/g,'-').slice(0,48);}
 function saveGroc(){return post('log',{day:S.personal.grocDay,k:'groc',v:S.personal.groc}).catch(fail);}
-function money(n){return '$'+(Math.round(n*100)/100).toFixed(n%1?2:0);}
+function gmoney(n){return '$'+(Math.round(n*100)/100).toFixed(n%1?2:0);}
 function groceryCard(){var P=S.personal;if(!P)return '<section class="card"><div class="hd"><h2>Grocery list</h2></div><p class="empty">Loading…</p></section>';
   var got=P.groc||[],total=0,have=0,sum=0,cart=0,h='';
   (PL.GROCERY||[]).forEach(function(g){var st=0,vis=0;g[1].forEach(function(it){st+=it[2]||0;var on=got.indexOf(gid(g[0],it[0]))>=0;if(S.grocV==='all'||(S.grocV==='cart')===on)vis++;});
-    if(vis)h+='<div class="gsec"><span>'+esc(g[0])+'</span><span>'+money(st)+'</span></div>';
+    if(vis)h+='<div class="gsec"><span>'+esc(g[0])+'</span><span>'+gmoney(st)+'</span></div>';
     g[1].forEach(function(it){var id=gid(g[0],it[0]),on=got.indexOf(id)>=0,pr=it[2]||0;total++;sum+=pr;if(on){have++;cart+=pr;}
-    h+='<label class="gitem'+(on?' ok':'')+'"><input class="ck" type="checkbox" data-groc="'+id+'"'+(on?' checked':'')+'><span>'+esc(it[0])+'<small>'+esc(it[1])+'</small></span><b>'+(pr?money(pr):'')+'</b></label>';});});
+    h+='<label class="gitem'+(on?' ok':'')+'"><input class="ck" type="checkbox" data-groc="'+id+'"'+(on?' checked':'')+'><span>'+esc(it[0])+'<small>'+esc(it[1])+'</small></span><b>'+(pr?gmoney(pr):'')+'</b></label>';});});
   return '<section class="card"><div class="hd"><h2>Grocery list</h2><span class="sub">This week’s menu</span></div>'
-   +'<div class="gtot"><div><small>In the cart · '+have+' of '+total+'</small><b>'+money(cart)+'</b></div><div><small>Still to buy</small><b>'+money(sum-cart)+'</b></div><div><small>Whole list</small><b>'+money(sum)+'</b></div></div>'
+   +'<div class="gtot"><div><small>In the cart · '+have+' of '+total+'</small><b>'+gmoney(cart)+'</b></div><div><small>Still to buy</small><b>'+gmoney(sum-cart)+'</b></div><div><small>Whole list</small><b>'+gmoney(sum)+'</b></div></div>'
    +'<div class="pacts"><div class="seg" role="group" aria-label="Show">'+[['all','All'],['need','To buy'],['cart','In cart']].map(function(v){return '<button type="button" data-grocv="'+v[0]+'" aria-pressed="'+(S.grocV===v[0])+'">'+v[1]+'</button>';}).join('')+'</div><button class="btn sm ghost" type="button" data-groccopy>Copy list</button>'+(have?'<button class="btn sm ghost" type="button" data-grocreset>Untick all</button>':'')+'</div>'
    +'<div class="glist '+S.grocV+'">'+(h.indexOf('gsec')<0?'<p class="empty">'+(S.grocV==='cart'?'Nothing in the cart yet.':'Everything’s in the cart.')+'</p>':h)+'</div><p class="hint" style="margin-top:8px">Prices are rough estimates (average GTA grocery prices, before tax), so the totals are a ballpark. Ticks start fresh every Sunday. Ask Claude to change items or prices.</p></section>';}
 function grocText(){var got=S.personal.groc||[],out=[],est=0;
-  (PL.GROCERY||[]).forEach(function(g){var L=g[1].filter(function(it){return got.indexOf(gid(g[0],it[0]))<0;});if(L.length)out.push(g[0].toUpperCase()+'\n'+L.map(function(it){est+=it[2]||0;return '- '+it[0]+' ('+it[1]+')'+(it[2]?' ~'+money(it[2]):'');}).join('\n'));});
-  return 'Groceries\n\n'+out.join('\n\n')+'\n\nEstimated total: ~'+money(est);}
+  (PL.GROCERY||[]).forEach(function(g){var L=g[1].filter(function(it){return got.indexOf(gid(g[0],it[0]))<0;});if(L.length)out.push(g[0].toUpperCase()+'\n'+L.map(function(it){est+=it[2]||0;return '- '+it[0]+' ('+it[1]+')'+(it[2]?' ~'+gmoney(it[2]):'');}).join('\n'));});
+  return 'Groceries\n\n'+out.join('\n\n')+'\n\nEstimated total: ~'+gmoney(est);}
 function viewPersonal(){return '<div class="pgrid"><div class="mkc">'+workoutCard()+libraryCard()+'</div><div class="mkc">'+mealsCard()+groceryCard()+'</div></div>'
   +'<div class="pgrid" style="margin-top:20px"><div class="mkc">'+tasksCard()+'</div><div class="mkc">'+thingsCard()+'</div></div>';}
 function afterPersonal(){
