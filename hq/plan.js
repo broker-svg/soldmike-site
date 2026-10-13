@@ -23,21 +23,44 @@
     deadbug:['Dead bug','3 × 10 / side','Low back pressed into the floor.',3],
     sideplank:['Side plank','3 × 30 s / side','Hips high, straight line.',3],
     birddog:['Bird dog','3 × 10 / side','Reach long, no hip rotation.',3],
-    hipflex:['Hip flexor stretch','2 × 45 s / side','Tuck the pelvis, lean gently.',2]
+    hipflex:['Hip flexor stretch','2 × 45 s / side','Tuck the pelvis, lean gently.',2],
+    dbinc:['Incline DB press','3 × 10','30° bench, press up and slightly in, control down.',3],
+    fly:['DB chest fly','3 × 12','Soft elbows, open wide until the chest stretches, hug back up.',3],
+    dips:['Dips (or bench dips)','3 × 8–10','Lean slightly forward, lower until elbows hit 90°.',3],
+    lateral:['Lateral raise','3 × 12','Light weight, lead with the elbows, stop at shoulder height.',3],
+    reardelt:['Rear-delt fly','3 × 12','Hinge forward, flat back, open the arms out wide.',3],
+    facepull:['Face pull','3 × 15','Rope at face height, pull to the eyes, elbows high.',3],
+    shrug:['DB shrug','3 × 12','Straight up to the ears, pause, slow down.',3],
+    curl:['DB biceps curl','3 × 10','Elbows pinned to your sides, no swinging.',3],
+    hammer:['Hammer curl','3 × 10','Thumbs up, curl straight up, slow down.',3],
+    pushdown:['Triceps pushdown','3 × 12','Elbows locked at your sides, push down until arms are straight.',3],
+    ohext:['Overhead triceps extension','3 × 12','Elbows point up, lower the DB behind the head, press up.',3]
   };
   // Every day, no matter what: these are the minimum
   var DAILY=[
     {k:'pushups',t:'25 push-ups',sub:'8:55 AM · in one go or 2 sets',fig:'pushup'},
     {k:'walk',t:'Walk 30 min',sub:'Any time · a round of golf counts',fig:'walk'}
   ];
+  // Every workout in the system. Any of them can be done on any day (Agent Desk › Personal › All workouts).
+  var ROUTINES={
+    legs:{name:'Gym · Legs',sub:'Legs + core · ~45 min',ex:['squat','split','bridge','plank'],gym:1},
+    back:{name:'Gym · Back',sub:'Back + shoulders · ~45 min',ex:['dead','pull','row','dbpress'],gym:1},
+    full:{name:'Gym · Legs & back',sub:'Full body + golf turn · ~45 min',ex:['rdl','goblet','crow','bench','cable'],gym:1},
+    chest:{name:'Gym · Chest',sub:'Chest + triceps · ~40 min',ex:['bench','dbinc','fly','dips'],gym:1},
+    shoulders:{name:'Gym · Shoulders',sub:'Shoulders + traps · ~40 min',ex:['dbpress','lateral','reardelt','facepull','shrug'],gym:1},
+    arms:{name:'Gym · Arms',sub:'Biceps + triceps · ~35 min',ex:['curl','hammer','pushdown','ohext','dips'],gym:1},
+    core:{name:'Core & mobility',sub:'20 min at home',ex:['deadbug','sideplank','birddog','hipflex']}
+  };
+  var RORDER=['legs','back','full','chest','shoulders','arms','core'];
+  function R(id,o){var r={id:id},k;for(k in ROUTINES[id])r[k]=ROUTINES[id][k];for(k in (o||{}))r[k]=o[k];return r;}
   // index = getDay() (0 Sunday). gym:1 = gym day, opt:1 = optional extra
   var WEEK=[
     {name:'Walk or golf',sub:'No gym · Sunday meal prep and groceries',ex:[],free:'Longer walk (45–60 min) or a round of golf, then the Sunday meal prep and grocery run.'},
-    {name:'Gym · Legs',sub:'Legs + core · ~45 min',ex:['squat','split','bridge','plank'],gym:1},
-    {name:'Core & mobility',sub:'Optional · 20 min at home',ex:['deadbug','sideplank','birddog','hipflex'],opt:1},
-    {name:'Gym · Back',sub:'Back + shoulders · ~45 min',ex:['dead','pull','row','dbpress'],gym:1},
+    R('legs'),
+    R('core',{sub:'Optional · 20 min at home',opt:1}),
+    R('back'),
     {name:'Walk or range',sub:'No gym',ex:[],free:'Your walk, or a bucket at the range plus 10 min of stretching.'},
-    {name:'Gym · Legs & back',sub:'Optional 3rd gym day · full body + golf turn · ~45 min',ex:['rdl','goblet','crow','bench','cable'],gym:1,opt:1},
+    R('full',{sub:'Optional 3rd gym day · full body + golf turn · ~45 min',opt:1}),
     {name:'Walk or golf',sub:'No gym',ex:[],free:'Walk 30–60 min or play a round.'}
   ];
   var MEALS=[ // per weekday 0..6: breakfast, lunch, pre-gym snack, dinner
@@ -51,14 +74,14 @@
   ];
   var MEAL_LBL=['Breakfast · 7–8 AM','Lunch · 12–1 PM','Pre-gym snack','Dinner'];
   var PREP=['Grocery run (list below the menu)','Batch cook 2 proteins','Portion meals for the week','Hard-boil eggs','Wash and prep greens'];
-  // One week of the menu above. [aisle, [[item, amount], …]]
+  // One week of the menu above. [aisle, [[item, amount, est. price CAD], …]]. Prices are rough GTA grocery averages (Oct 2026), not quotes.
   var GROCERY=[
-    ['Meat & fish',[['Chicken breast','1.5 kg'],['Chicken thighs','1 kg'],['Sliced roast turkey','500 g'],['Steak / lean beef','1.5 kg'],['Salmon fillets','2'],['Shrimp','450 g'],['Lobster tails','2'],['King crab legs','1 lb'],['Scallops','450 g'],['Mixed shellfish (omelette + pasta)','500 g'],['Tuna, canned','4 cans']]],
-    ['Dairy & eggs',[['Eggs','3 dozen'],['Fage 2% Greek yogurt','2 × 1 kg'],['Cottage cheese','2 tubs'],['String cheese','1 pack']]],
-    ['Fruit & veg',[['Berries (blue, rasp, black)','4 packs'],['Bananas','1 bunch'],['Fruit (apples, oranges)','6'],['Spinach / salad greens','2 boxes'],['Broccoli','2 heads'],['Carrots','1 bag'],['Mushrooms','1 box'],['Onions','3'],['Celery','1 bunch'],['Peppers + zucchini (roasting)','4'],['Sweet potatoes','3'],['Gold potatoes, small','1 bag']]],
-    ['Bread, rice & pantry',[['Whole-grain bread','1 loaf'],['Whole-wheat wraps','1 pack'],['Brown rice','1 bag'],['Pasta','1 box'],['Croutons','1 bag'],['Protein pancake mix','1 box'],['Olive oil + spices','top up'],['Black coffee','top up']]],
-    ['Nuts, seeds & snacks',[['Almonds','1 bag'],['Mixed nuts (walnuts, cashews, pistachios)','1 bag'],['Chia / flax / hemp seeds','top up'],['Love Crunch granola','1 bag'],['Protein bars (Quest or Built)','1 box']]],
-    ['Supplements',[['Protein powder','check level']]]
+    ['Meat & fish',[['Chicken breast','1.5 kg',33],['Chicken thighs','1 kg',15],['Sliced roast turkey','500 g',14],['Steak / lean beef','1.5 kg',45],['Salmon fillets','2',14],['Shrimp','450 g',14],['Lobster tails','2',30],['King crab legs','1 lb',45],['Scallops','450 g',25],['Mixed shellfish (omelette + pasta)','500 g',14],['Tuna, canned','4 cans',10]]],
+    ['Dairy & eggs',[['Eggs','3 dozen',14],['Fage 2% Greek yogurt','2 × 1 kg',19],['Cottage cheese','2 tubs',12],['String cheese','1 pack',8]]],
+    ['Fruit & veg',[['Berries (blue, rasp, black)','4 packs',20],['Bananas','1 bunch',2],['Fruit (apples, oranges)','6',6],['Spinach / salad greens','2 boxes',10],['Broccoli','2 heads',6],['Carrots','1 bag',3],['Mushrooms','1 box',3.5],['Onions','3',3],['Celery','1 bunch',3.5],['Peppers + zucchini (roasting)','4',8],['Sweet potatoes','3',4.5],['Gold potatoes, small','1 bag',6]]],
+    ['Bread, rice & pantry',[['Whole-grain bread','1 loaf',5],['Whole-wheat wraps','1 pack',5],['Brown rice','1 bag',6],['Pasta','1 box',3],['Croutons','1 bag',4],['Protein pancake mix','1 box',12],['Olive oil + spices','top up',10],['Black coffee','top up',14]]],
+    ['Nuts, seeds & snacks',[['Almonds','1 bag',12],['Mixed nuts (walnuts, cashews, pistachios)','1 bag',14],['Chia / flax / hemp seeds','top up',9],['Love Crunch granola','1 bag',8],['Protein bars (Quest or Built)','1 box',30]]],
+    ['Supplements',[['Protein powder','check level',55]]]
   ];
 
   /* ---------- Exercise figures ----------
@@ -103,9 +126,25 @@
              b:{h:[61,34],s:[61,44],e:[71,56],w:[63,68],p:[61,75],k:[80,71],f:[80,92],k2:[44,90],f2:[26,92]}},
     pushup:{a:{h:[88,56],s:[80,60],e:[80,75],w:[80,90],p:[52,72],k:[36,79],f:[16,88]},
             b:{h:[89,79],s:[80,82],e:[70,80],w:[80,90],p:[52,85],k:[36,86],f:[16,88]}},
+    dbinc:{x:'db',bench:[18,70,62],a:{h:[30,40],s:[36,48],e:[48,46],w:[56,40],p:[56,70],k:[76,66],f:[80,92]},
+                                    b:{h:[30,40],s:[36,48],e:[50,32],w:[62,22],p:[56,70],k:[76,66],f:[80,92]}},
+    fly:{x:'db',bench:[18,70,62],a:{h:[22,62],s:[32,64],e:[33,50],w:[33,36],p:[62,66],k:[80,64],f:[82,92]},
+                                 b:{h:[22,62],s:[32,64],e:[42,54],w:[54,58],p:[62,66],k:[80,64],f:[82,92]}},
+    dips:{dip:[50,74,52],a:{h:[61,12],s:[60,24],e:[60,38],w:[60,52],p:[58,54],k:[50,68],f:[60,78]},
+                         b:{h:[61,26],s:[60,38],e:[48,44],w:[60,52],p:[58,68],k:[50,82],f:[60,90]}},
+    lateral:{x:'db',solid:1,a:{h:[60,12],s:[60,22],e:[54,36],w:[52,50],p:[60,52],k:[56,72],f:[55,92],e2:[66,36],w2:[68,50],k2:[64,72],f2:[65,92]},
+                             b:{h:[60,12],s:[60,22],e:[46,24],w:[32,24],p:[60,52],k:[56,72],f:[55,92],e2:[74,24],w2:[88,24],k2:[64,72],f2:[65,92]}},
+    reardelt:{x:'db',a:{h:[83,40],s:[74,44],e:[74,57],w:[74,70],p:[46,54],k:[58,73],f:[60,92]},
+                     b:{h:[83,40],s:[74,44],e:[73,33],w:[72,21],p:[46,54],k:[58,73],f:[60,92]}},
+    facepull:{cab:[112,20],a:P(STAND,{h:[61,12],e:[73,22],w:[86,20]}),b:P(STAND,{h:[61,12],e:[50,18],w:[64,14]})},
+    shrug:{x:'db',a:P(STAND,{s:[60,25],e:[65,38],w:[67,52]}),b:P(STAND,{s:[60,20],e:[65,33],w:[67,47]})},
+    curl:{x:'db',a:P(STAND,{e:[65,36],w:[68,50]}),b:P(STAND,{e:[65,36],w:[76,27]})},
+    pushdown:{cab:[82,4],a:P(STAND,{e:[65,36],w:[77,29]}),b:P(STAND,{e:[65,36],w:[69,50]})},
+    ohext:{x:'db',a:P(STAND,{h:[62,12],e:[68,7],w:[56,14]}),b:P(STAND,{h:[62,12],e:[68,7],w:[73,-6]})},
     walk:{a:{h:[61,12],s:[60,22],e:[54,37],w:[50,50],p:[60,52],k:[68,72],f:[74,92],e2:[66,36],w2:[72,48],k2:[54,72],f2:[46,92]},
           b:{h:[61,12],s:[60,22],e:[66,36],w:[72,48],p:[60,52],k:[54,72],f:[46,92],e2:[54,37],w2:[50,50],k2:[68,72],f2:[74,92]}}
   };
+  FIG.hammer=FIG.curl;
   var still=false;try{still=window.matchMedia('(prefers-reduced-motion: reduce)').matches;}catch(e){}
   // Returns an SVG string for an exercise key ('' when there is no figure). cls is added to the <svg>.
   function fig(key,cls){var F=FIG[key];if(!F)return '';var A=F.a,B=F.b,T='2.6s',o='';
@@ -115,12 +154,14 @@
     function dot(j,r,c){var a=A[j],b=B[j]||a;return '<circle cx="'+a[0]+'" cy="'+a[1]+'" r="'+r+'" class="'+c+'">'+an('cx',a[0],b[0])+an('cy',a[1],b[1])+'</circle>';}
     if(!F.pb)o+='<line x1="4" y1="93" x2="116" y2="93" class="fl"/>';
     if(F.bench)o+='<rect x="'+F.bench[0]+'" y="'+F.bench[1]+'" width="'+F.bench[2]+'" height="5" rx="2" class="eq"/><line x1="'+(F.bench[0]+5)+'" y1="'+(F.bench[1]+5)+'" x2="'+(F.bench[0]+5)+'" y2="92" class="eqs"/><line x1="'+(F.bench[0]+F.bench[2]-5)+'" y1="'+(F.bench[1]+5)+'" x2="'+(F.bench[0]+F.bench[2]-5)+'" y2="92" class="eqs"/>';
+    if(F.dip)o+='<line x1="'+F.dip[0]+'" y1="'+F.dip[2]+'" x2="'+F.dip[1]+'" y2="'+F.dip[2]+'" class="eqs" style="stroke-width:3"/><line x1="'+F.dip[1]+'" y1="'+F.dip[2]+'" x2="'+F.dip[1]+'" y2="92" class="eqs"/>';
     if(F.pb)o+='<line x1="34" y1="'+F.pb+'" x2="86" y2="'+F.pb+'" class="eqs" style="stroke-width:3"/>';
     if(F.cab){var w=A.w,wb=B.w;o+='<rect x="'+(F.cab[0]-3)+'" y="'+(F.cab[1]-5)+'" width="6" height="10" rx="1.5" class="eq"/><line x1="'+F.cab[0]+'" y1="'+F.cab[1]+'" x2="'+w[0]+'" y2="'+w[1]+'" class="cb">'+an('x2',w[0],wb[0])+an('y2',w[1],wb[1])+'</line>';}
-    o+=ln('s','e2','far')+ln('e2','w2','far')+ln('p','k2','far')+ln('k2','f2','far');
+    var fc=F.solid?'':'far';o+=ln('s','e2',fc)+ln('e2','w2',fc)+ln('p','k2',fc)+ln('k2','f2',fc);
+    if(F.solid&&F.x==='db')o+=dot('w2',4,'pl');
     o+=ln('s','p')+ln('p','k')+ln('k','f')+ln('s','e')+ln('e','w')+dot('h',6.5,'hd');
     if(F.x==='bar')o+=dot('w',8,'pl');else if(F.x==='db')o+=dot('w',4,'pl');else if(F.x==='kb')o+=dot('w',5.5,'pl');
     return '<svg class="fig'+(cls?' '+cls:'')+'" viewBox="0 0 120 100" aria-hidden="true" focusable="false">'+o+'</svg>';}
 
-  window.HQPLAN={EX:EX,DAILY:DAILY,WEEK:WEEK,MEALS:MEALS,MEAL_LBL:MEAL_LBL,PREP:PREP,GROCERY:GROCERY,FIG:FIG,fig:fig};
+  window.HQPLAN={EX:EX,DAILY:DAILY,ROUTINES:ROUTINES,RORDER:RORDER,WEEK:WEEK,MEALS:MEALS,MEAL_LBL:MEAL_LBL,PREP:PREP,GROCERY:GROCERY,FIG:FIG,fig:fig};
 })();
