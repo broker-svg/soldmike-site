@@ -285,11 +285,11 @@ dialog::backdrop{background:rgba(20,24,51,.6)}
 
 <main class="wrap"><div class="grid">
   <section class="card" id="today"><div class="hd"><h2>Today</h2><span class="sub" id="todaySub"></span><button type="button" class="rt" id="rtBtn" aria-pressed="false">Routine <b>Off</b></button></div>
-    <div class="tcols"><div><div class="sec">Schedule</div><div id="sched"><p class="empty">Loading…</p></div></div>
-    <div><div class="sec sech">Tasks &amp; reminders<span class="tabs tk" id="tkTg"></span></div><div class="tabs tk" id="tkTabs"></div><div id="tasks"><p class="empty">Loading…</p></div></div></div>
+    <div class="sec">Schedule</div><div id="sched"><p class="empty">Loading…</p></div>
   </section>
   <section class="card" id="outlook"><div class="hd"><h2>Next 3 days</h2></div><div class="days" id="days"></div></section>
-  <section class="card" id="brief"><div class="hd"><h2>Check this</h2><span class="sub" id="briefSub"></span></div><div id="briefBody"></div></section>
+  <section class="card" id="brief"><div class="hd sech"><h2>Tasks &amp; reminders</h2><span class="tabs tk" id="tkTg"></span></div><div class="tabs tk" id="tkTabs"></div><div id="tasks"><p class="empty">Loading…</p></div>
+    <div class="sec" style="margin-top:22px">From email <span class="sub" id="briefSub"></span></div><div id="briefBody"></div></section>
   <section class="card" id="follow"><div class="hd"><h2>Follow-ups</h2></div><div class="tabs tk" id="listTabs"></div><div id="people"><p class="empty">Loading…</p></div></section>
   <section class="card" id="todo"><div class="hd"><h2>Follow Up Boss tasks</h2><span class="sub" id="todoSub"></span></div><div class="tabs tk" id="fbTabs"></div><div id="todoList"></div></section>
   <section class="card" id="drive"><div class="hd"><h2>Daily Drive</h2></div><div id="driveBody"></div></section>
