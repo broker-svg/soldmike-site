@@ -474,6 +474,31 @@ dialog::backdrop{background:rgba(20,24,51,.6)}
 .fmiss h3{font:700 16px var(--display);text-transform:uppercase;letter-spacing:.04em;color:var(--amber);margin:0 0 6px}
 .fmiss ul{margin:0;padding-left:20px;display:grid;gap:4px}
 .fmiss p{margin:8px 0 0;font-size:13px;color:var(--muted)}
+.fboard{margin:0 0 20px}
+.fbg{display:grid;gap:16px;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr)}
+.fbg>div{display:grid;gap:16px;align-content:start;min-width:0}
+@media (max-width:900px){.fbg{grid-template-columns:minmax(0,1fr)}}
+.fb{border:1px solid var(--line);border-radius:12px;padding:12px 14px;min-width:0}
+.fb h3{font:700 16px var(--display);text-transform:uppercase;letter-spacing:.04em;color:var(--navy);margin:0 0 6px}
+.fb.fmiss{margin:0}.fb.fmiss h3{color:var(--amber)}
+.fb textarea{width:100%;min-height:96px;font:inherit;font-size:15px;padding:10px;border:1px solid var(--line);border-radius:10px;resize:vertical;box-sizing:border-box}
+.fleg{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);white-space:nowrap}.fleg .lst{margin-left:6px}
+.frow{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;margin:0 0 10px}
+.lst.bank{background:#E07A00}.lst.gry{background:var(--line)}
+.due{display:block;font-size:13px;font-weight:700;color:var(--navy)}.duei{font-weight:700;color:var(--navy)}
+.lrows li.grp{display:block;font:700 14px var(--display);text-transform:uppercase;letter-spacing:.04em;color:var(--muted);padding:14px 0 2px;border-top:0}
+.lrows li.sub{padding-left:16px}
+.lrows li.gx{opacity:.55}
+.ls.nav{background:var(--nbg);color:var(--navy);border-color:var(--pale);cursor:pointer}
+.ls.gry{background:var(--mist);color:var(--muted);border-color:var(--line)}
+.ls.tagb{background:var(--white);color:var(--red);border-color:var(--rln);cursor:pointer}
+button.ls.pink{cursor:pointer}
+.mnav{display:inline-flex;align-items:center;gap:8px}.mnav b{font:800 22px var(--display);color:var(--navy);min-width:170px;text-align:center}
+.mnav .btn{min-height:36px;padding:0 12px;font-size:20px}
+.ftiles.ft3{grid-template-columns:repeat(3,minmax(0,1fr));margin:12px 0 14px}
+@media (max-width:640px){.ftiles.ft3{grid-template-columns:minmax(0,1fr)}.mnav b{min-width:0;font-size:19px}}
+.txsum{display:flex;gap:10px;align-items:flex-start}.txsum .lst{margin-top:5px}
+.fcan{margin-top:14px;padding:12px 14px;border:1px solid var(--rln);background:var(--rbg);border-radius:12px}.fcan h3{margin:0 0 4px;font:700 16px var(--display);text-transform:uppercase;color:var(--red)}
 @media (max-width:900px){.ftiles{grid-template-columns:repeat(2,minmax(0,1fr))}.ftiles b{font-size:24px}.ftiles span{white-space:normal}}
 .lrows li{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;gap:4px 12px;align-items:center;padding:7px 0;border-top:1px solid var(--line);font-size:15px}
 .lrows li:first-child{border-top:0}
@@ -718,7 +743,9 @@ function load(force){
   if(S.tab==='toolkit'&&(force||!S.todos))jobs.push(loadTodos());
   if(S.tab==='personal')jobs=jobs.concat(loadPersonal(force));
   if(S.tab==='financial'&&(force||!S.expenses))jobs.push(loadExpenses());
-  if(S.tab==='financial'&&(force||S.finsum===undefined))jobs.push(getJ('desk/finsum').then(function(j){S.finsum=j.finsum;}));
+  if(S.tab==='financial'&&(force||S.finsum===undefined))jobs.push(getJ('desk/finsum').then(function(j){S.finsum=j.finsum;S.finNotes=j.notes||'';}));
+  if(S.tab==='financial'&&(force||!S.tx))jobs.push(loadTx());
+  if(S.tab==='financial'&&(force||!S.todos))jobs.push(loadTodos());
   if(!jobs.length)return Promise.resolve();
   var b=$('#refresh');b.classList.add('spin');
   // Personal: draw each card as soon as its own data lands (Google Tasks / Reminders can be slow)
@@ -1472,23 +1499,52 @@ function afterPersonal(){
 var EXP_CATS=['Advertising & marketing','Brokerage & board fees','Software & subscriptions','Phone & internet','Vehicle','Insurance','Office & supplies','Professional fees','Meals & entertainment','Travel','Education & licences','Video & photo','Bank & card fees','Personal','Taxes (HST / corporate)','Other'];
 var EXP_ACCT=[['visa','Business Visa'],['bank','Business bank account'],['other','Other']];
 function money2(n){return '$'+(+n||0).toLocaleString('en-CA',{minimumFractionDigits:2,maximumFractionDigits:2});}
+function money0(n){return '$'+Math.round(+n||0).toLocaleString('en-CA');}
 function monthly(x){var a=+x.amount||0;return x.cadence==='weekly'?a*52/12:x.cadence==='yearly'?a/12:x.cadence==='quarterly'?a/3:a;}
 function loadExpenses(){return getJ('desk/expenses').then(function(j){S.expenses=j.items;});}
+function loadTx(){return getJ('desk/tx').then(function(j){S.tx=j.items;});}
 function renewal(x){if(!x.due)return '';var t=todayStr(),d=x.due;for(var i=0;i<50&&d<t;i++)d=String(+d.slice(0,4)+1)+d.slice(4);return d;}
 function acctLbl(a){var m=EXP_ACCT.filter(function(o){return o[0]===a;})[0];return m?m[1]:'';}
-function expRow(x,mode){var when,price,tag='<span></span>',dot='navy';
-  if(mode==='ended'){when='Stopped '+(x.ended?fmtDay(x.ended):'');price=money2(monthly(x)*12)+'<small class="muted"> /yr saved</small>';dot='grn';}
-  else if(mode==='once'){when=x.due?fmtDay(x.due):'No date';price=money2(x.amount);tag='<span class="ls '+(x.paid?'grn':'yel')+'">'+(x.paid?'Paid':'To pay')+'</span>';dot=x.paid?'grn':'yel';}
-  else{when=x.cadence==='yearly'?(renewal(x)?'Renews '+fmtDay(renewal(x)):'Yearly · add the renewal date'):x.cadence==='monthly'?(x.day?'Day '+x.day+' of the month':'Monthly'):x.cadence==='weekly'?'Weekly':'Every 3 months';
-    price=money2(x.amount)+'<small class="muted"> /'+(x.cadence==='yearly'?'yr':x.cadence==='weekly'?'wk':x.cadence==='quarterly'?'qtr':'mo')+'</small>';}
-  return '<li class="xrow"><i class="lst '+dot+'"></i><button type="button" class="la nmb" data-exp="'+x.id+'"><b>'+esc(x.title)+'</b><small>'+esc([x.category,acctLbl(x.account),when,x.note].filter(Boolean).join(' · '))+'</small></button><span class="lp">'+price+'</span>'+tag+'</li>';}
+var MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+function monthName(m){return MONTHS[+m.slice(5)-1]+' '+m.slice(0,4);}
+function addDays(s,n){var d=new Date(s+'T12:00:00');d.setDate(d.getDate()+n);return ymd(d);}
+function daysTo(s){return Math.round((new Date(s+'T12:00:00')-new Date(todayStr()+'T12:00:00'))/864e5);}
+function soonTxt(s){var n=daysTo(s);return n<0?fmtDay(s):n===0?'Today':n===1?'Tomorrow':n<7?'In '+n+' days':fmtDay(s);}
+/* the next date a bill comes out: monthly = its day this month or next, yearly = renewal date, one-off = date if not paid yet */
+function nextDue(x){if(x.ended)return '';if(x.kind==='new')return x.paid?'':(x.due||'');if(x.cadence==='yearly')return renewal(x);
+  if(x.cadence==='monthly'&&x.day){var t=new Date(),at=function(y,m){return ymd(new Date(y,m,Math.min(x.day,new Date(y,m+1,0).getDate())));},d=at(t.getFullYear(),t.getMonth());return d>=todayStr()?d:at(t.getFullYear(),t.getMonth()+1);}
+  return '';}
+/* coloured square = where it's paid from */
+function acctDot(a){return '<i class="lst '+(a==='bank'?'bank':a==='visa'?'navy':'gry')+'" title="'+esc(acctLbl(a)||'Account not set')+'"></i>';}
+var FLEG='<span class="fleg"><i class="lst navy"></i>Visa <i class="lst bank"></i>Corp bank</span>';
+function perLbl(x){return x.cadence==='yearly'?'yr':x.cadence==='weekly'?'wk':x.cadence==='quarterly'?'qtr':'mo';}
+function cancelTask(x){return x.task?(S.todos||[]).filter(function(t){return t.id===x.task;})[0]:null;}
+function revTag(x){if(x.ended)return '';if(x.review==='cancel'){var t=cancelTask(x);return '<span class="ls red">'+(t?(t.done?'Cancelled? Tap “Stopped”':'Cancel by '+fmtDay(t.due).replace(/^\w+, /,'')):'To cancel')+'</span>';}
+  return x.review==='think'?'<span class="ls yel">Thinking</span>':'';}
+function expRow(x,mode){var when,price,tag='<span></span>',bits=[],last='';
+  if(x.last_date)last='Last charged '+fmtDay(x.last_date).replace(/^\w+, /,'')+' '+money2(x.last_amt);
+  if(mode==='ended'){when='Stopped '+(x.ended?fmtDay(x.ended):'');price=money2(monthly(x)*12)+'<small class="muted"> /yr saved</small>';bits=[x.category,when];}
+  else if(mode==='once'){when=x.due?fmtDay(x.due):'No date';price=money2(x.amount);tag='<span class="ls '+(x.paid?'grn':'yel')+'">'+(x.paid?'Paid':'To pay')+'</span>';bits=[when,x.category];}
+  else{var nd=nextDue(x);
+    when=x.cadence==='yearly'?(nd?'Renews '+fmtDay(nd):'Add the renewal date'):nd?'Next '+fmtDay(nd):x.cadence==='weekly'?'Weekly':x.cadence==='quarterly'?'Every 3 months':'Add the day it comes out';
+    price=money2(x.amount)+'<small class="muted"> /'+perLbl(x)+'</small>';tag=revTag(x)||tag;bits=[x.category,last];
+    var stale=x.cadence==='monthly'&&x.last_date&&daysTo(x.last_date)<-45;
+    if(stale)bits[1]='<em>No charge since '+fmtDay(x.last_date).replace(/^\w+, /,'')+'</em>';}
+  var small=bits.filter(Boolean).map(function(b){return /^<em>/.test(b)?b:esc(b);}).join(' · ')+(x.note?' · '+esc(x.note):'');
+  return '<li class="xrow">'+acctDot(x.account)+'<button type="button" class="la nmb" data-exp="'+x.id+'">'+(mode==='rec'?'<span class="due">'+esc(when)+'</span>':'')+'<b>'+esc(x.title)+'</b><small>'+small+'</small></button><span class="lp">'+price+'</span>'+tag+'</li>';}
 function expList(L,mode,empty){return L.length?'<ul class="lrows">'+L.map(function(x){return expRow(x,mode);}).join('')+'</ul>':'<p class="empty">'+empty+'</p>';}
+/* yearly bills under month headings, soonest first */
+function yrList(L){if(!L.length)return '<p class="empty">Nothing yet. Add board dues, insurance, licences, domain renewals…</p>';var h='',cur=null;
+  L.forEach(function(x){var r=renewal(x),m=r?r.slice(0,7):'';if(m!==cur){cur=m;var tot=L.filter(function(y){return (renewal(y)||'').slice(0,7)===m;}).reduce(function(a,y){return a+(+y.amount||0);},0);
+    h+='<li class="grp">'+(m?esc(monthName(m))+' · '+money0(tot):'No renewal date')+'</li>';}h+=expRow(x,'rec');});
+  return '<ul class="lrows">'+h+'</ul>';}
 function viewFinancial(){var E=S.expenses;
   if(!E)return '<section class="card"><p class="empty">Loading…</p></section>';
   var rec=E.filter(function(x){return x.kind==='recurring'&&!x.ended;}),ended=E.filter(function(x){return x.kind==='recurring'&&x.ended;}),once=E.filter(function(x){return x.kind==='new';});
-  var mon=rec.filter(function(x){return x.cadence!=='yearly';}).sort(function(a,b){return (a.day||99)-(b.day||99);}),yr=rec.filter(function(x){return x.cadence==='yearly';}).sort(function(a,b){return (renewal(a)||'9').localeCompare(renewal(b)||'9');});
+  var byNext=function(a,b){return (nextDue(a)||'9').localeCompare(nextDue(b)||'9');};
+  var mon=rec.filter(function(x){return x.cadence!=='yearly';}).sort(byNext),yr=rec.filter(function(x){return x.cadence==='yearly';}).sort(byNext);
   var monTot=mon.reduce(function(a,x){return a+monthly(x);},0),yrTot=yr.reduce(function(a,x){return a+(+x.amount||0);},0),allMo=monTot+yrTot/12;
-  var saved=ended.reduce(function(a,x){return a+monthly(x)*12;},0),y=todayStr().slice(0,4);
+  var saved=ended.reduce(function(a,x){return a+monthly(x)*12;},0),y=todayStr().slice(0,4),canc=rec.filter(function(x){return x.review==='cancel';}),cancYr=canc.reduce(function(a,x){return a+monthly(x)*12;},0);
   var onceYr=once.filter(function(x){return (x.due||x.created||'').slice(0,4)===y;}).reduce(function(a,x){return a+(+x.amount||0);},0),toPay=once.filter(function(x){return !x.paid;}).reduce(function(a,x){return a+(+x.amount||0);},0);
   var next=yr.filter(function(x){return renewal(x);})[0];
   once.sort(function(a,b){return (b.due||'').localeCompare(a.due||'');});ended.sort(function(a,b){return (b.ended||'').localeCompare(a.ended||'');});
@@ -1496,21 +1552,129 @@ function viewFinancial(){var E=S.expenses;
     +'<div><small>Monthly bills · '+mon.length+'</small><b>'+money2(monTot)+'</b><span>per month</span></div>'
     +'<div><small>Yearly bills · '+yr.length+'</small><b>'+money2(yrTot)+'</b><span>'+(next?'Next: '+esc(next.title)+', '+fmtDay(renewal(next)):'per year')+'</span></div>'
     +'<div><small>All recurring</small><b>'+money2(allMo)+'</b><span>a month · '+money2(allMo*12)+' a year</span></div>'
-    +'<div class="sv"><small>Stopped paying · '+ended.length+'</small><b>'+money2(saved)+'</b><span>saved per year</span></div></div>';
+    +'<div class="sv"><small>Stopped paying · '+ended.length+'</small><b>'+money2(saved)+'</b><span>'+(canc.length?'+'+money0(cancYr)+' more once you cancel '+canc.length:'saved per year')+'</span></div></div>';
   var v=S.recV==='yearly'?'yearly':'monthly';
-  var recCard='<section class="card"><div class="hd"><h2>Recurring expenses</h2><span class="sub">Always there, month after month</span><button class="btn sm" type="button" data-newexp="recurring">+ Add</button></div>'
-    +'<div class="seg" role="group" aria-label="Monthly or yearly" style="margin-bottom:10px"><button type="button" data-recv="monthly" aria-pressed="'+(v==='monthly')+'">Monthly · '+mon.length+'</button><button type="button" data-recv="yearly" aria-pressed="'+(v==='yearly')+'">Yearly · '+yr.length+'</button></div>'
+  var recCard='<section class="card"><div class="hd"><h2>Recurring expenses</h2><span class="sub">In order of when they come out</span><button class="btn sm" type="button" data-newexp="recurring">+ Add</button></div>'
+    +'<div class="frow"><div class="seg" role="group" aria-label="Monthly or yearly"><button type="button" data-recv="monthly" aria-pressed="'+(v==='monthly')+'">Monthly · '+mon.length+'</button><button type="button" data-recv="yearly" aria-pressed="'+(v==='yearly')+'">Yearly · '+yr.length+'</button></div>'+FLEG+'</div>'
     +(v==='monthly'?'<div class="big2">'+money2(monTot)+'<small>a month (weekly and every-3-month bills converted)</small></div>'+expList(mon,'rec','Nothing yet. Add software, phone, car, desk fees, subscriptions…')
-      :'<div class="big2">'+money2(yrTot)+'<small>a year · about '+money2(yrTot/12)+' a month</small></div>'+expList(yr,'rec','Nothing yet. Add board dues, insurance, licences, domain renewals…'))+'</section>';
+      :'<div class="big2">'+money2(yrTot)+'<small>a year · about '+money2(yrTot/12)+' a month</small></div>'+yrList(yr))+'</section>';
   var onceCard='<section class="card"><div class="hd"><h2>One-off expenses</h2><span class="sub">'+y+' · '+money2(onceYr)+' so far</span><button class="btn sm" type="button" data-newexp="new">+ Add</button></div>'
     +'<div class="big2">'+money2(toPay)+'<small>still to pay</small></div>'+expList(once,'once','Nothing yet. Add one-off costs as they come up (a laptop, a sign order…).')+'</section>';
   var endCard='<section class="card"><div class="hd"><h2>No longer paying</h2><span class="sub">Recurring costs you cut</span></div>'
     +expList(ended,'ended','Nothing yet. Open a recurring expense and tap “Stopped paying” to move it here.')+'</section>';
-  return tiles+finMissing(S.finsum)+'<div class="pgrid"><div class="mkc">'+recCard+'</div><div class="mkc">'+onceCard+endCard+'</div></div>'+finMonths(S.finsum);}
-/* Statements Claude still needs + notes (from fin_summary, rebuilt by the "update financials" routine) */
-function finMissing(F){if(!F||!(F.missing||[]).length)return '';
-  return '<div class="fmiss" role="note"><h3>Missing statements · '+F.missing.length+'</h3><ul>'+F.missing.map(function(m){return '<li><b>'+esc(m.what)+'</b>. '+esc(m.why)+'</li>';}).join('')+'</ul>'
-    +((F.notes||[]).length?'<p>'+F.notes.map(esc).join(' · ')+'</p>':'')+'</div>';}
+  return finBoard(E,S.finsum)+tiles+'<div class="pgrid"><div class="mkc">'+recCard+'</div><div class="mkc">'+onceCard+endCard+finPersonal()+'</div></div>'+finMonth()+finMonths(S.finsum);}
+/* Bulletin board: always on top. Coming up (next 30 days), to cancel, missing statements, Michael's notes. */
+function finBoard(E,F){
+  var soon=E.map(function(x){return {x:x,d:nextDue(x)};}).filter(function(o){return o.d&&daysTo(o.d)<=30;}).sort(function(a,b){return a.d.localeCompare(b.d)||(+b.x.amount)-(+a.x.amount);});
+  var soonTot=soon.reduce(function(a,o){return a+(+o.x.amount||0);},0);
+  var canc=E.filter(function(x){return x.review==='cancel'&&!x.ended;}),miss=(F&&F.missing)||[],notes=(F&&F.notes)||[];
+  var row=function(x,left,right){return '<li class="xrow">'+acctDot(x.account)+'<button type="button" class="la nmb" data-exp="'+x.id+'"><b>'+esc(x.title)+'</b><small>'+left+'</small></button><span class="lp">'+right+'</span>'+(revTag(x)||'<span></span>')+'</li>';};
+  var up='<div class="fb"><h3>Coming up · next 30 days <span class="muted">'+money0(soonTot)+'</span></h3>'
+    +(soon.length?'<ul class="lrows">'+soon.map(function(o){return row(o.x,'<b class="duei">'+esc(soonTxt(o.d))+'</b> · '+esc(o.x.kind==='new'?'One-off, to pay':o.x.cadence==='yearly'?'Yearly renewal':'Monthly'),money2(o.x.amount));}).join('')+'</ul>':'<p class="empty">Nothing due in the next 30 days.</p>')+'</div>';
+  var cn='<div class="fb"><h3>To cancel'+(canc.length?' · saves '+money0(canc.reduce(function(a,x){return a+monthly(x)*12;},0))+'/yr':'')+'</h3>'
+    +(canc.length?'<ul class="lrows">'+canc.map(function(x){var t=cancelTask(x);return row(x,t?(t.done?'Task done. Open it and tap “Stopped paying”':'Task on your to-do list for '+esc(fmtDay(t.due))):x.task?'Task on your to-do list':'No task yet. Open it to add one',money2(x.amount)+'<small class="muted"> /'+perLbl(x)+'</small>');}).join('')+'</ul>'
+      :'<p class="empty">Open any bill and tap “Cancel it…” to add a task to your to-do list.</p>')+'</div>';
+  var ms=miss.length||notes.length?'<div class="fb fmiss"><h3>Missing statements'+(miss.length?' · '+miss.length:'')+'</h3>'+(miss.length?'<ul>'+miss.map(function(m){return '<li><b>'+esc(m.what)+'</b>. '+esc(m.why)+'</li>';}).join('')+'</ul>':'<p class="empty">None. All statements are in.</p>')
+    +(notes.length?'<p>'+notes.map(esc).join(' · ')+'</p>':'')+'</div>':'';
+  var nt='<div class="fb"><h3>Notes</h3><textarea id="finNotes" rows="4" aria-label="Notes" placeholder="Anything to remember: call Intuit about the double charge, ask Rob about HST…">'+esc(S.finNotes||'')+'</textarea>'
+    +'<button type="button" class="btn sm ghost" data-fnsave style="margin-top:8px">Save notes</button></div>';
+  return '<section class="card fboard"><div class="hd"><h2>Bulletin board</h2><span class="sub">What’s coming, what to cut, what’s missing</span>'+FLEG+'</div><div class="fbg"><div>'+up+cn+'</div><div>'+ms+nt+'</div></div></section>';}
+/* Month by month: every Visa + corp bank transaction for one month. Tag a charge = link it to a bill on the list. */
+var TX_SKIP={skip:'Card payment',transfer:'Transfer',income:'Deposit'};
+function txSpend(t){return !TX_SKIP[t.kind];}
+/* category after Michael's correction; personal = his fix says Personal, or the sorting rules flagged it */
+function effCat(t){return t.fixcat||(t.cat==='Personal (check)'||t.kind==='personal'?'Personal':t.cat)||'';}
+function txPersonal(t){return effCat(t)==='Personal';}
+function txTax(t){return t.fixcat?t.fixcat==='Taxes (HST / corporate)':t.kind==='tax';}
+function txMonths(){var o={};(S.tx||[]).forEach(function(t){o[t.date.slice(0,7)]=1;});return Object.keys(o).sort();}
+function finMonth(){var T=S.tx;
+  if(!T)return '<section class="card" style="margin-top:20px"><p class="empty">Loading transactions…</p></section>';
+  var ms=txMonths(),cur=todayStr().slice(0,7);if(!S.txM)S.txM=ms.filter(function(x){return x<=cur;}).pop()||cur;
+  var src=S.txSrc||(S.txSrc=store('desk_txsrc')||'all'),m=S.txM,prev=ms.filter(function(x){return x<m;}).pop(),next=ms.filter(function(x){return x>m;})[0];
+  var L=T.filter(function(t){return t.date.slice(0,7)===m&&(src==='all'||t.src===src);}),sp=L.filter(txSpend);
+  var biz=sp.filter(function(t){return !txPersonal(t)&&!txTax(t);}).reduce(function(a,t){return a+t.amount;},0),pers=sp.filter(txPersonal).reduce(function(a,t){return a+t.amount;},0),tax=sp.filter(txTax).reduce(function(a,t){return a+t.amount;},0);
+  var dep=L.filter(function(t){return t.kind==='income';}).reduce(function(a,t){return a-t.amount;},0),untag=sp.filter(function(t){return !t.expense&&!txPersonal(t);}).length;
+  var byId={};(S.expenses||[]).forEach(function(x){byId[x.id]=x;});
+  var rows=L.map(function(t){var x=t.expense&&byId[t.expense],chip;
+    if(TX_SKIP[t.kind])chip='<span class="ls gry">'+TX_SKIP[t.kind]+'</span>';
+    else if(x)chip='<button type="button" class="ls nav" data-tx="'+t.id+'">'+(x.kind==='new'?'One-off':x.cadence==='yearly'?'Yearly':'Monthly')+(x.review==='cancel'?' · cancel':'')+'</button>';
+    else if(txPersonal(t))chip='<button type="button" class="ls pink" data-tx="'+t.id+'">Personal</button>';
+    else chip='<button type="button" class="ls tagb" data-tx="'+t.id+'">Tag</button>';
+    return '<li class="xrow'+(TX_SKIP[t.kind]?' gx':'')+'">'+acctDot(t.src)+'<button type="button" class="la nmb" data-tx="'+t.id+'"><b>'+esc(t.label)+'</b><small>'+esc(fmtDay(t.date).replace(/^\w+, /,'')+' · '+effCat(t)+(t.fixcat?' (fixed)':'')+(x&&x.title!==t.label?' · '+x.title:'')+' · '+t.descr)+'</small></button><span class="lp">'+(t.amount<0?'−'+money2(-t.amount):money2(t.amount))+'</span>'+chip+'</li>';}).join('');
+  var nav='<div class="frow"><div class="mnav"><button type="button" class="btn sm ghost" data-txm="'+(prev||'')+'"'+(prev?'':' disabled')+' aria-label="Previous month">‹</button><b>'+esc(monthName(m))+'</b><button type="button" class="btn sm ghost" data-txm="'+(next||'')+'"'+(next?'':' disabled')+' aria-label="Next month">›</button></div>'
+    +'<div class="seg" role="group" aria-label="Account"><button type="button" data-txsrc="all" aria-pressed="'+(src==='all')+'">All</button><button type="button" data-txsrc="visa" aria-pressed="'+(src==='visa')+'">Visa</button><button type="button" data-txsrc="bank" aria-pressed="'+(src==='bank')+'">Corp bank</button></div>'+FLEG+'</div>';
+  var part=S.finsum&&S.finsum.partial&&S.finsum.partial[m];
+  return '<section class="card" style="margin-top:20px"><div class="hd"><h2>Month by month</h2><span class="sub">Every charge on the Visa and the corp bank account. Tap “Tag” to mark a bill monthly, yearly or one-off.</span></div>'+nav
+    +(part?'<p class="hint" style="margin:8px 0 0;color:var(--amber)">Partial month: '+esc(part)+'</p>':'')
+    +'<div class="ftiles ft3"><div><small>Business spending</small><b>'+money2(biz)+'</b><span>'+sp.filter(function(t){return !txPersonal(t)&&!txTax(t);}).length+' charges'+(untag?' · '+untag+' not tagged':'')+'</span></div>'
+    +'<div><small>Personal</small><b>'+money2(pers)+'</b><span>'+(tax?'Taxes: '+money2(tax):'not business')+'</span></div><div><small>Deposits</small><b>'+money2(dep)+'</b><span>into the corp bank</span></div></div>'
+    +(L.length?'<ul class="lrows">'+rows+'</ul>':'<p class="empty">No statements loaded for this month yet.</p>')+'</section>';}
+/* Personal: everything the sorting rules (or Michael) called personal this year, grouped by what it is. Tap a charge to fix its category. */
+function finPersonal(){var T=S.tx;if(!T)return '';var y=todayStr().slice(0,4),P=T.filter(function(t){return t.date.slice(0,4)===y&&txSpend(t)&&txPersonal(t);});
+  var g={};P.forEach(function(t){(g[t.label]=g[t.label]||[]).push(t);});
+  var keys=Object.keys(g).sort(function(a,b){return sumA(g[b])-sumA(g[a]);}),open=S.persOpen||{};
+  function sumA(L){return L.reduce(function(a,t){return a+t.amount;},0);}
+  function often(L){var ms={};L.forEach(function(t){ms[t.date.slice(0,7)]=1;});var n=Object.keys(ms).length;return L.length===1?'Once':L.length+' times in '+n+' month'+(n>1?'s':'');}
+  var h=keys.map(function(k){var L=g[k],o=open[k];
+    return '<li class="xrow">'+acctDot(L[0].src)+'<button type="button" class="la nmb" data-persg="'+esc(k)+'" aria-expanded="'+!!o+'"><b>'+esc(k)+' '+(o?'▾':'▸')+'</b><small>'+esc(often(L)+' · last '+fmtDay(L[0].date).replace(/^\w+, /,''))+'</small></button><span class="lp">'+money2(sumA(L))+'</span><span></span></li>'
+      +(o?L.map(function(t){return '<li class="xrow sub">'+acctDot(t.src)+'<button type="button" class="la nmb" data-tx="'+t.id+'"><b>'+esc(fmtDay(t.date))+'</b><small>'+esc(t.descr)+'</small></button><span class="lp">'+money2(t.amount)+'</span><button type="button" class="ls tagb" data-tx="'+t.id+'">Fix</button></li>';}).join(''):'');}).join('');
+  return '<section class="card"><div class="hd"><h2>Personal expenses</h2><span class="sub">'+y+' · '+money2(sumA(P))+' · not counted as business</span></div>'
+    +(P.length?'<ul class="lrows">'+h+'</ul><p class="hint" style="margin-top:10px">Tap a group to see each charge. Wrong one? Tap it and change the category. The by-month table picks up fixes on the next “update financials”.</p>':'<p class="empty">Nothing marked personal this year.</p>')+'</section>';}
+function openTx(id){var t=(S.tx||[]).filter(function(y){return y.id===id;})[0];if(!t)return;var d=$('#dlg'),E=S.expenses||[],x=t.expense&&E.filter(function(y){return y.id===t.expense;})[0];S.viewing=null;
+  var opts=E.filter(function(y){return !y.ended||y.id===t.expense;}).sort(function(a,b){var sa=a.title===t.label?0:1,sb=b.title===t.label?0:1;return sa-sb||(a.kind+a.title).localeCompare(b.kind+b.title);})
+    .map(function(y){return [y.id,(y.kind==='new'?'One-off: ':y.cadence==='yearly'?'Yearly: ':'Monthly: ')+y.title+' ('+money2(y.amount)+')'];});
+  d.innerHTML='<div class="dl"><div class="dh"><h2>Tag this charge</h2><button type="button" class="x" data-close aria-label="Close">×</button></div>'
+    +'<div class="txsum">'+acctDot(t.src)+'<div><b>'+esc(t.label)+'</b> · '+money2(t.amount)+'<br><small class="muted">'+esc(fmtDay(t.date)+' · '+acctLbl(t.src)+' · '+t.descr)+'</small></div></div>'+'<div class="fgrid" style="margin-top:12px">'+sel('tx_cat','Category'+(t.fixcat?' (you fixed this)':''),effCat(t),EXP_CATS,{full:1})+'</div>'
+    +(x?'<p style="margin:12px 0 0">Tagged as <b>'+esc(x.title)+'</b> ('+(x.kind==='new'?'one-off':x.cadence)+').</p>':'')
+    +'<h3 class="sec">New bill from this charge</h3><div class="frow"><button type="button" class="btn sm" data-txnew="monthly">Monthly</button><button type="button" class="btn sm" data-txnew="yearly">Yearly</button><button type="button" class="btn sm ghost" data-txnew="new">One-off</button></div>'
+    +'<h3 class="sec">Or link it to one on your list</h3><div class="fgrid">'+sel('tx_link','Bill',t.expense||'',opts,{full:1})+'</div>'
+    +'<div class="dfoot"><button type="button" class="btn" id="txSave">Save</button>'+(x?'<button type="button" class="btn ghost" data-exp="'+x.id+'">Open the bill</button><button type="button" class="btn danger" id="txUn">Untag</button>':'<button type="button" class="btn ghost" data-close>Cancel</button>')+'</div></div>';
+  var link=function(eid,msg){return post('desk/tx/link',{id:t.id,expense:eid}).then(function(){d.close();toast(msg);return Promise.all([loadTx(),loadExpenses()]);}).then(render).catch(fail);};
+  /* category fix: saved only when it differs from what the sorting rules said */
+  var fixCat=function(){var c=val('tx_cat'),orig=(t.cat==='Personal (check)'||t.kind==='personal'?'Personal':t.cat)||'',f=c&&c!==orig?c:null;return f===(t.fixcat||null)?Promise.resolve(false):post('desk/tx/cat',{id:t.id,cat:f}).then(function(){return true;});};
+  $('#txSave').onclick=function(){var v=+val('tx_link');fixCat().then(function(ch){if(v&&v!==t.expense)return link(v,'Saved');d.close();if(ch)toast('Category fixed');return (ch?loadTx():Promise.resolve()).then(render);}).catch(fail);};
+  if($('#txUn'))$('#txUn').onclick=function(){link(null,'Tag removed');};
+  d.querySelectorAll('[data-txnew]').forEach(function(b){b.onclick=function(){var k=b.getAttribute('data-txnew'),pre={title:t.label.replace(/ \(check\)$/,''),amount:t.amount,account:t.src,category:EXP_CATS.indexOf(effCat(t))>=0?effCat(t):''};
+    if(k==='new'){pre.due=t.date;pre.paid=1;}else if(k==='yearly'){pre.cadence='yearly';pre.due=String(+t.date.slice(0,4)+1)+t.date.slice(4);}else{pre.cadence='monthly';pre.day=+t.date.slice(8);}
+    openExpense(null,k==='new'?'new':'recurring',pre,function(eid){return post('desk/tx/link',{id:t.id,expense:eid}).then(function(){return loadTx();});});};});
+  if(!d.open)d.showModal();}
+function openExpense(id,kind,pre,after){var x=id?(S.expenses||[]).filter(function(y){return y.id===+id;})[0]:Object.assign({kind:kind,cadence:kind==='new'?'once':'monthly',account:'visa'},pre||{}),d=$('#dlg'),cf=false;S.viewing=null;
+  var rec=x.kind==='recurring',ct=cancelTask(x);
+  d.innerHTML='<form class="dl" id="eF"><div class="dh"><h2>'+(id?'Edit':'Add')+' '+(rec?(x.ended?'stopped expense':'recurring expense'):'one-off expense')+'</h2><button type="button" class="x" data-close aria-label="Close">×</button></div>'
+   +(id&&(x.n_tx||x.last_date)?'<p class="hint" style="margin:0 0 10px">'+x.n_tx+' charge'+(x.n_tx===1?'':'s')+' on your statements · last '+esc(fmtDay(x.last_date))+' '+money2(x.last_amt)+'</p>':'')
+   +'<div class="fgrid">'
+   +inp('e_title','What',x.title,{full:1,ph:rec?'Adobe Creative Cloud':'New laptop'})+inp('e_amount','Amount ($, as charged)',x.amount!=null?x.amount:'',{num:1,ph:'650'})+sel('e_cat','Category',x.category,EXP_CATS)
+   +sel('e_acct','Paid from',x.account||'visa',EXP_ACCT)
+   +(rec?sel('e_cad','How often',x.cadence,[['monthly','Monthly'],['yearly','Yearly'],['quarterly','Every 3 months'],['weekly','Weekly']])+inp('e_day','Day of month it comes out',x.day||'',{num:1,ph:'15'})
+        +'<label for="e_due"><span>Renewal date (yearly bills)</span><input id="e_due" type="date" value="'+esc(x.due||'')+'"></label>'
+        +(x.ended?'<label for="e_end"><span>Stopped paying on</span><input id="e_end" type="date" value="'+esc(x.ended)+'"></label>'
+          :'<label for="e_rev"><span>Keep it?</span><select id="e_rev"><option value="">Keep</option><option value="think"'+(x.review==='think'?' selected':'')+'>Thinking about cancelling</option><option value="cancel"'+(x.review==='cancel'?' selected':'')+'>To cancel</option></select></label>')
+     :'<label for="e_due"><span>Date</span><input id="e_due" type="date" value="'+esc(x.due||'')+'"></label>'+sel('e_paid','Status',x.paid?'1':'0',[['0','To pay'],['1','Paid']]))
+   +inp('e_note','Notes',x.note,{ta:1,full:1})+'</div>'
+   +(id&&rec&&!x.ended?'<div class="fcan" id="eCan" hidden><h3>Cancel '+esc(x.title)+'</h3><p class="hint">'+(x.cadence==='yearly'?'Most yearly plans let you cancel early and they just run out at renewal'+(renewal(x)?' ('+esc(fmtDay(renewal(x)))+')':'')+'. The task date defaults to a month before.':'Cancel before the next charge'+(nextDue(x)?' ('+esc(fmtDay(nextDue(x)))+')':'')+'.')+'</p>'
+      +'<div class="fgrid"><label for="e_tdue"><span>Task date</span><input id="e_tdue" type="date" value="'+esc(cancelDate(x))+'"></label></div><button type="button" class="btn sm" id="eTask" style="margin-top:8px">Add task to my to-do list</button></div>':'')
+   +(ct?'<p class="hint" style="margin-top:10px">Cancel task: '+(ct.done?'done ✓':'on your to-do list for '+esc(fmtDay(ct.due)))+'</p>':'')
+   +'<p class="err" id="eErr" hidden></p></form>'
+   +'<div class="dfoot"><button type="button" class="btn" id="eSave">Save</button>'
+   +(id&&rec&&!x.ended?'<button type="button" class="btn ghost" id="eCanB">Cancel it…</button>':'')
+   +(id&&rec?'<button type="button" class="btn ghost" id="eEnd">'+(x.ended?'Paying again':'Stopped paying')+'</button>':'')
+   +(id?'<button type="button" class="btn danger" id="eDel">Delete</button>':'<button type="button" class="btn ghost" data-close>Cancel</button>')+'</div>';
+  $('#eF').onsubmit=function(e){e.preventDefault();};
+  function body(){var b={id:id||null,kind:x.kind,title:val('e_title'),amount:parseFloat(val('e_amount').replace(/[$,]/g,''))||0,category:val('e_cat'),account:val('e_acct'),note:val('e_note'),due:val('e_due')||null,review:val('e_rev')||null,task:x.task||null};
+    if(rec){b.cadence=val('e_cad')||'monthly';b.day=+val('e_day')||null;b.ended=x.ended?(val('e_end')||x.ended):null;}else{b.cadence='once';b.paid=val('e_paid')==='1';}
+    return b;}
+  function save(b,msg){if(!b.title){$('#eErr').textContent='Add what it is.';$('#eErr').hidden=false;return Promise.resolve();}
+    return post('desk/expense',b).then(function(r){d.close();toast(msg||'Saved');return after?after(r.id):null;}).then(loadExpenses).then(render).catch(fail);}
+  $('#eSave').onclick=function(){save(body());};
+  if($('#eEnd'))$('#eEnd').onclick=function(){var b=body();b.ended=x.ended?null:todayStr();if(b.ended)b.review=null;save(b,x.ended?'Back on your recurring list':'Moved to No longer paying');};
+  if($('#eCanB'))$('#eCanB').onclick=function(){$('#eCan').hidden=false;this.hidden=true;$('#eCan').scrollIntoView({block:'nearest'});$('#e_tdue').focus();};
+  if($('#eTask'))$('#eTask').onclick=function(){var b=body(),due=val('e_tdue')||todayStr(),btn=this;btn.disabled=true;
+    var note='From Agent Desk › Financial. '+money2(b.amount)+' /'+perLbl(b)+', paid from '+acctLbl(b.account)+'. '+(b.cadence==='yearly'&&renewal(b)?'Renews '+fmtDay(renewal(b))+'. ':nextDue(b)?'Next charge '+fmtDay(nextDue(b))+'. ':'')+'Once it’s cancelled, open it on the Financial tab and tap “Stopped paying”.';
+    post('item',{kind:'todo',title:'Cancel '+b.title,due:due,note:note}).then(function(r){b.review='cancel';b.task=r.id;return Promise.all([loadTodos(),save(b,'Task added to your to-do list for '+fmtDay(due))]);}).catch(function(e){btn.disabled=false;fail(e);});};
+  if(id)$('#eDel').onclick=function(){if(!cf){cf=true;this.textContent='Tap again to delete';return;}post('desk/expense/delete',{id:id}).then(function(){d.close();return Promise.all([loadExpenses(),S.tx?loadTx():null]);}).then(render).catch(fail);};
+  if(!d.open)d.showModal();}
+/* default cancel-task date: monthly = today; yearly = a month before renewal (today if that's already passed) */
+function cancelDate(x){var t=todayStr();if(x.cadence==='yearly'&&renewal(x)){var d=addDays(renewal(x),-30);return d>t?d:t;}return t;}
 /* Year by month: business categories × months, then business total, personal, taxes, deposits. Partial months flagged. */
 function finMonths(F){if(!F)return '';
   var M=F.months||[],P=F.partial||{},C=F.cats||{},MN=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -1525,30 +1689,6 @@ function finMonths(F){if(!F)return '';
     +'<div class="fwrap"><table class="ftab"><thead>'+head+'</thead><tbody>'+names.map(function(k){return row(k,C[k]);}).join('')
     +row('Business total',biz,'tot')+row('Personal',F.personal,'oth')+row('Taxes (HST / corporate)',F.taxes,'oth')+row('Deposits',F.deposits,'oth')+'</tbody></table></div>'
     +'<p class="hint" style="margin-top:10px">'+(flags?flags+'. ':'')+'Covers: Visa '+esc((F.coverage||{}).visa||'')+'; bank '+esc((F.coverage||{}).bank||'')+'. Rounded to the dollar.</p></section>';}
-function openExpense(id,kind){var x=id?(S.expenses||[]).filter(function(y){return y.id===+id;})[0]:{kind:kind,cadence:kind==='new'?'once':'monthly',account:'visa'},d=$('#dlg'),cf=false;S.viewing=null;
-  var rec=x.kind==='recurring';
-  d.innerHTML='<form class="dl" id="eF"><div class="dh"><h2>'+(id?'Edit':'Add')+' '+(rec?(x.ended?'stopped expense':'recurring expense'):'one-off expense')+'</h2><button type="button" class="x" data-close aria-label="Close">×</button></div><div class="fgrid">'
-   +inp('e_title','What',x.title,{full:1,ph:rec?'Adobe Creative Cloud':'New laptop'})+inp('e_amount','Amount ($, as charged)',x.amount!=null?x.amount:'',{num:1,ph:'650'})+sel('e_cat','Category',x.category,EXP_CATS)
-   +sel('e_acct','Paid from',x.account||'visa',EXP_ACCT)
-   +(rec?sel('e_cad','How often',x.cadence,[['monthly','Monthly'],['yearly','Yearly'],['quarterly','Every 3 months'],['weekly','Weekly']])+inp('e_day','Day of month it comes out',x.day||'',{num:1,ph:'15'})
-        +'<label for="e_due"><span>Renewal date (yearly bills)</span><input id="e_due" type="date" value="'+esc(x.due||'')+'"></label>'
-        +(x.ended?'<label for="e_end"><span>Stopped paying on</span><input id="e_end" type="date" value="'+esc(x.ended)+'"></label>':'')
-     :'<label for="e_due"><span>Date</span><input id="e_due" type="date" value="'+esc(x.due||'')+'"></label>'+sel('e_paid','Status',x.paid?'1':'0',[['0','To pay'],['1','Paid']]))
-   +inp('e_note','Notes',x.note,{ta:1,full:1})+'</div><p class="err" id="eErr" hidden></p></form>'
-   +'<div class="dfoot"><button type="button" class="btn" id="eSave">Save</button>'
-   +(id&&rec?'<button type="button" class="btn ghost" id="eEnd">'+(x.ended?'Paying again':'Stopped paying')+'</button>':'')
-   +(id?'<button type="button" class="btn danger" id="eDel">Delete</button>':'<button type="button" class="btn ghost" data-close>Cancel</button>')+'</div>';
-  $('#eF').onsubmit=function(e){e.preventDefault();};
-  function body(){var b={id:id||null,kind:x.kind,title:val('e_title'),amount:parseFloat(val('e_amount').replace(/[$,]/g,''))||0,category:val('e_cat'),account:val('e_acct'),note:val('e_note'),due:val('e_due')||null};
-    if(rec){b.cadence=val('e_cad')||'monthly';b.day=+val('e_day')||null;b.ended=x.ended?(val('e_end')||x.ended):null;}else{b.cadence='once';b.paid=val('e_paid')==='1';}
-    return b;}
-  function save(b,msg){if(!b.title){$('#eErr').textContent='Add what it is.';$('#eErr').hidden=false;return;}
-    post('desk/expense',b).then(function(){d.close();toast(msg||'Saved');return loadExpenses();}).then(render).catch(fail);}
-  $('#eSave').onclick=function(){save(body());};
-  if($('#eEnd'))$('#eEnd').onclick=function(){var b=body();b.ended=x.ended?null:todayStr();save(b,x.ended?'Back on your recurring list':'Moved to No longer paying');};
-  if(id)$('#eDel').onclick=function(){if(!cf){cf=true;this.textContent='Tap again to delete';return;}post('desk/expense/delete',{id:id}).then(function(){d.close();return loadExpenses();}).then(render).catch(fail);};
-  if(!d.open)d.showModal();}
-
 /* ---------- Toronto Property Media (first draft, ideas from the 2nd Brain TPM folder) ---------- */
 function viewTPM(){
   var link=function(h,t,s){return '<a class="rt" href="'+h+'" target="_blank" rel="noopener"><b>'+esc(t)+'</b><p>'+esc(s)+'</p></a>';};
@@ -1742,6 +1882,11 @@ document.addEventListener('click',function(e){
   if(ds.recv){S.recV=ds.recv;store('desk_recv',ds.recv);render();return;}
   if(ds.cexp){if(S.exp[ds.cexp])delete S.exp[ds.cexp];else S.exp[ds.cexp]=1;store('desk_exp',S.exp);render();return;}
   if(ds.exp){openExpense(+ds.exp);return;}
+  if(ds.tx){openTx(+ds.tx);return;}
+  if('txm' in ds){if(ds.txm){S.txM=ds.txm;render();}return;}
+  if(ds.txsrc){S.txSrc=ds.txsrc;store('desk_txsrc',ds.txsrc);render();return;}
+  if(ds.persg){S.persOpen=S.persOpen||{};S.persOpen[ds.persg]=!S.persOpen[ds.persg];render();return;}
+  if(t.hasAttribute('data-fnsave')){var fn=$('#finNotes').value;post('desk/finnotes',{text:fn}).then(function(){S.finNotes=fn;toast('Notes saved');}).catch(fail);return;}
   if(ds.ptw){if(ds.ptw==='today'){S.ptToday=!S.ptToday;store('desk_pt_today',S.ptToday);}else{S.ptLate=!S.ptLate;store('desk_pt_late',S.ptLate);}S.ptAll=false;render();return;}
   if(ds.ptf){S.ptf=ds.ptf;store('desk_ptf',ds.ptf);S.ptAll=false;render();return;}
   if(t.hasAttribute('data-ptall')){S.ptAll=!S.ptAll;render();return;}
