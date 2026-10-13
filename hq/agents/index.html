@@ -426,7 +426,13 @@ dialog::backdrop{background:rgba(20,24,51,.6)}
 .gsec{font:700 15px var(--display);text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin:14px 0 2px}
 .gitem{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:7px 0;border-top:1px solid var(--line);cursor:pointer}
 .gitem small{color:var(--muted);font-size:14px;white-space:nowrap}.gitem.ok span{text-decoration:line-through;opacity:.5}
-.glist.need .gitem.ok,.glist.cart .gitem:not(.ok){display:none}
+.gtabs{margin-left:auto}.gtabs button{font-size:13px;padding:0 10px}
+.gitem{grid-template-columns:auto 1fr auto auto}.gitem .x{background:none;border:0;font-size:22px;line-height:1;color:var(--muted);cursor:pointer;padding:0 2px 0 6px;min-height:36px}
+.gtot.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+.gpick{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;width:100%;padding:7px 0;border:0;border-top:1px solid var(--line);background:none;text-align:left;font:inherit;color:inherit;cursor:pointer}
+.gpick i{width:28px;height:28px;border-radius:50%;border:2px solid var(--pale);display:grid;place-items:center;font-style:normal;font-weight:800;color:var(--navy)}
+.gpick.on i{background:var(--green);border-color:var(--green);color:var(--white)}.gpick.on span{font-weight:700}
+.gpick span small{display:block;color:var(--muted);font-size:13px;font-weight:400}.gpick b{font-size:15px;font-variant-numeric:tabular-nums}
 .wplan button{border-radius:8px;padding:6px 2px;text-align:center;background:var(--mist);border:2px solid transparent;cursor:pointer;font:inherit;color:inherit;min-width:0}
 .wplan button:hover{border-color:var(--pale)}
 .swap{margin:8px 0 0;font-size:15px;color:var(--muted)}.lnk{background:none;border:0;padding:0;color:var(--navy);font:inherit;font-weight:700;text-decoration:underline;cursor:pointer}
@@ -671,7 +677,7 @@ var S={tab:TABS.indexOf(location.hash.slice(1))>=0?location.hash.slice(1):(store
   content:null,todos:null,tk:store('desk_tk')||'scripts',lpp:store('desk_lpp')||'appt',exp:store('desk_exp')||{},coldOn:store('desk_cold')===true,side:store('desk_side')||'pre',
   view:{s:store('desk_view_s')||'list',b:store('desk_view_b')||'board'},showInbox:store('desk_inbox_on')!==false,inboxView:store('desk_inbox_view')||'cards',
   feedOn:store('desk_feed_on')!==false,feedDays:store('desk_feed_days')||2,feedFilter:'all',feedAll:false,viewing:null,
-  sel:{s:{},b:{}},listings:undefined,expenses:null,people:{s:null,b:null},focus:{s:store('desk_focus_s')||'active',b:store('desk_focus_b')||'active'},fq:{s:'',b:''},fsort:{s:'recent',b:'recent'},fall:{s:false,b:false},pipeOpen:store('desk_pipe')!==false,showSoon:store('desk_soon')!==false,personal:null,things:null,gt:null,rem:null,ptf:store('desk_ptf')||'all',ptToday:store('desk_pt_today')!==false,ptLate:store('desk_pt_late')===true,ptAll:false,thingF:'Need',grocV:store('desk_groc_v')||'all',prospects:null,social:undefined,pTab:store('desk_ptab')||'exp',pFilter:{q:'',region:'',city:'',all:false},printTab:store('desk_print')||'hangers',sort:{s:store('desk_sort_s')||'stage',b:store('desk_sort_b')||'stage'},filter:{s:{q:'',stage:'',region:'',act:''},b:{q:'',stage:'',region:'',act:''}},script:'buyer',fs:store('desk_fs')||26,tagSync:false,fubApp:'https://app.followupboss.com'};
+  sel:{s:{},b:{}},listings:undefined,expenses:null,people:{s:null,b:null},focus:{s:store('desk_focus_s')||'active',b:store('desk_focus_b')||'active'},fq:{s:'',b:''},fsort:{s:'recent',b:'recent'},fall:{s:false,b:false},pipeOpen:store('desk_pipe')!==false,showSoon:store('desk_soon')!==false,personal:null,things:null,gt:null,rem:null,ptf:store('desk_ptf')||'all',ptToday:store('desk_pt_today')!==false,ptLate:store('desk_pt_late')===true,ptAll:false,thingF:'Need',grocV:store('desk_groc_v')||'mine',prospects:null,social:undefined,pTab:store('desk_ptab')||'exp',pFilter:{q:'',region:'',city:'',all:false},printTab:store('desk_print')||'hangers',sort:{s:store('desk_sort_s')||'stage',b:store('desk_sort_b')||'stage'},filter:{s:{q:'',stage:'',region:'',act:''},b:{q:'',stage:'',region:'',act:''}},script:'buyer',fs:store('desk_fs')||26,tagSync:false,fubApp:'https://app.followupboss.com'};
 
 function setTab(t){S.tab=t;store('desk_tab',t);$$('#tabnav a[data-tab]').forEach(function(a){a.setAttribute('aria-current',a.dataset.tab===t?'page':'false');});render();load(false);}
 $$('#tabnav a[data-tab]').forEach(function(a){a.addEventListener('click',function(e){e.preventDefault();history.replaceState(null,'','#'+a.dataset.tab);setTab(a.dataset.tab);window.scrollTo({top:0});});});
@@ -693,6 +699,8 @@ function load(force){
   if(S.tab==='financial'&&(force||!S.expenses))jobs.push(loadExpenses());
   if(!jobs.length)return Promise.resolve();
   var b=$('#refresh');b.classList.add('spin');
+  // Personal: draw each card as soon as its own data lands (Google Tasks / Reminders can be slow)
+  if(S.tab==='personal')jobs.forEach(function(p){p.then(function(){if(S.tab==='personal'&&!$('#dlg').open&&!(document.activeElement&&/^(ptIn|ptDue|thIn)$/.test(document.activeElement.id)))render();},function(){});});
   return Promise.all(jobs).then(function(){render();refreshViewing();}).catch(fail).then(function(){b.classList.remove('spin');});
 }
 function loadInbox(){return getJ('desk/inbox?days='+S.inboxDays).then(function(j){S.inbox=j;badge();}).catch(function(e){if(e==='pin')throw e;S.inbox={error:String(e),people:[]};});}
@@ -1398,22 +1406,34 @@ function openWeekMenu(){var dw=new Date().getDay(),order=[1,2,3,4,5,6,0],d=$('#d
    +'</table></div><p class="hint">From your Health & Fitness plan. Ask Claude to change any meal (it lives in one place for HQ and here).</p></div>';
   if(!d.open)d.showModal();}
 /* Grocery list: one week of the menu, ticks saved on this week's Sunday so they reset each week */
-function gid(sec,item){return (sec+'-'+item).toLowerCase().replace(/[^a-z0-9]+/g,'-').slice(0,48);}
-function saveGroc(){return post('log',{day:S.personal.grocDay,k:'groc',v:S.personal.groc}).catch(fail);}
+/* Grocery: pick items from the full week's list onto My list, then tick them off at the store. One standing list (doesn't reset). */
+function gid(sec,item){return (sec+'-'+item).toLowerCase().replace(/[^a-z0-9]+/g,'-').slice(0,40);}
+function G(){var g=S.personal.groc;if(Array.isArray(g))g={l:g.slice(),b:g.slice()};if(!g||typeof g!=='object')g={};g.l=g.l||[];g.b=g.b||[];S.personal.groc=g;return g;}
+function saveGroc(){return post('log',{day:S.personal.grocDay,k:'groc',v:G()}).catch(fail);}
 function gmoney(n){return '$'+(Math.round(n*100)/100).toFixed(n%1?2:0);}
+function gItems(){var out=[];(PL.GROCERY||[]).forEach(function(g){g[1].forEach(function(it){out.push({sec:g[0],id:gid(g[0],it[0]),name:it[0],amt:it[1],pr:it[2]||0});});});return out;}
 function groceryCard(){var P=S.personal;if(!P)return '<section class="card"><div class="hd"><h2>Grocery list</h2></div><p class="empty">Loading…</p></section>';
-  var got=P.groc||[],total=0,have=0,sum=0,cart=0,h='';
-  (PL.GROCERY||[]).forEach(function(g){var st=0,vis=0;g[1].forEach(function(it){st+=it[2]||0;var on=got.indexOf(gid(g[0],it[0]))>=0;if(S.grocV==='all'||(S.grocV==='cart')===on)vis++;});
-    if(vis)h+='<div class="gsec"><span>'+esc(g[0])+'</span><span>'+gmoney(st)+'</span></div>';
-    g[1].forEach(function(it){var id=gid(g[0],it[0]),on=got.indexOf(id)>=0,pr=it[2]||0;total++;sum+=pr;if(on){have++;cart+=pr;}
-    h+='<label class="gitem'+(on?' ok':'')+'"><input class="ck" type="checkbox" data-groc="'+id+'"'+(on?' checked':'')+'><span>'+esc(it[0])+'<small>'+esc(it[1])+'</small></span><b>'+(pr?gmoney(pr):'')+'</b></label>';});});
-  return '<section class="card"><div class="hd"><h2>Grocery list</h2><span class="sub">This week’s menu</span></div>'
-   +'<div class="gtot"><div><small>In the cart · '+have+' of '+total+'</small><b>'+gmoney(cart)+'</b></div><div><small>Still to buy</small><b>'+gmoney(sum-cart)+'</b></div><div><small>Whole list</small><b>'+gmoney(sum)+'</b></div></div>'
-   +'<div class="pacts"><div class="seg" role="group" aria-label="Show">'+[['all','All'],['need','To buy'],['cart','In cart']].map(function(v){return '<button type="button" data-grocv="'+v[0]+'" aria-pressed="'+(S.grocV===v[0])+'">'+v[1]+'</button>';}).join('')+'</div><button class="btn sm ghost" type="button" data-groccopy>Copy list</button>'+(have?'<button class="btn sm ghost" type="button" data-grocreset>Untick all</button>':'')+'</div>'
-   +'<div class="glist '+S.grocV+'">'+(h.indexOf('gsec')<0?'<p class="empty">'+(S.grocV==='cart'?'Nothing in the cart yet.':'Everything’s in the cart.')+'</p>':h)+'</div><p class="hint" style="margin-top:8px">Prices are rough estimates (average GTA grocery prices, before tax), so the totals are a ballpark. Ticks start fresh every Sunday. Ask Claude to change items or prices.</p></section>';}
-function grocText(){var got=S.personal.groc||[],out=[],est=0;
-  (PL.GROCERY||[]).forEach(function(g){var L=g[1].filter(function(it){return got.indexOf(gid(g[0],it[0]))<0;});if(L.length)out.push(g[0].toUpperCase()+'\n'+L.map(function(it){est+=it[2]||0;return '- '+it[0]+' ('+it[1]+')'+(it[2]?' ~'+gmoney(it[2]):'');}).join('\n'));});
-  return 'Groceries\n\n'+out.join('\n\n')+'\n\nEstimated total: ~'+gmoney(est);}
+  var g=G(),all=gItems(),mine=all.filter(function(x){return g.l.indexOf(x.id)>=0;}),v=S.grocV==='all'?'all':'mine';
+  var lt=0,bt=0,nb=0,wk=0;all.forEach(function(x){wk+=x.pr;});mine.forEach(function(x){lt+=x.pr;if(g.b.indexOf(x.id)>=0){bt+=x.pr;nb++;}});
+  function groups(L,row){var h='',last='';L.forEach(function(x){if(x.sec!==last){last=x.sec;var st=0;L.forEach(function(y){if(y.sec===x.sec)st+=y.pr;});h+='<div class="gsec"><span>'+esc(x.sec)+'</span><span>'+gmoney(st)+'</span></div>';}h+=row(x);});return h;}
+  var tabs='<div class="seg gtabs" role="group" aria-label="Grocery view"><button type="button" data-grocv="mine" aria-pressed="'+(v==='mine')+'">My list · '+mine.length+'</button><button type="button" data-grocv="all" aria-pressed="'+(v==='all')+'">All items · '+all.length+'</button></div>';
+  var h;
+  if(v==='mine'){
+    h='<div class="gtot"><div><small>My list · '+mine.length+' item'+(mine.length===1?'':'s')+'</small><b>'+gmoney(lt)+'</b></div><div><small>Bought · '+nb+'</small><b>'+gmoney(bt)+'</b></div><div><small>Left to buy</small><b>'+gmoney(lt-bt)+'</b></div></div>';
+    h+=mine.length?groups(mine,function(x){var on=g.b.indexOf(x.id)>=0;return '<label class="gitem'+(on?' ok':'')+'"><input class="ck" type="checkbox" data-gbuy="'+x.id+'"'+(on?' checked':'')+' aria-label="Bought: '+esc(x.name)+'"><span>'+esc(x.name)+'<small>'+esc(x.amt)+'</small></span><b>'+gmoney(x.pr)+'</b><button type="button" class="x" data-goff="'+x.id+'" aria-label="Take '+esc(x.name)+' off the list">×</button></label>';})
+      +'<div class="pacts" style="margin-top:12px"><button class="btn sm ghost" type="button" data-groccopy>Copy list</button>'+(nb?'<button class="btn sm ghost" type="button" data-grocdone>Clear what I bought</button>':'')+'<button class="btn sm ghost" type="button" data-grocclear>Empty the list</button></div>'
+      :'<p class="empty">Your list is empty. Open <button type="button" class="lnk" data-grocv="all">All items</button> and tap what you want to buy.</p>';
+  }else{
+    h='<div class="gtot two"><div><small>On my list · '+mine.length+'</small><b>'+gmoney(lt)+'</b></div><div><small>Whole week’s menu</small><b>'+gmoney(wk)+'</b></div></div>'
+      +'<p class="hint" style="margin:0 0 8px">Tap an item to add it to your list. Tap again to take it off.</p>'
+      +'<div class="pacts" style="margin-bottom:4px"><button class="btn sm ghost" type="button" data-gaddall>Add everything</button></div>';
+    h+=groups(all,function(x){var on=g.l.indexOf(x.id)>=0;return '<button type="button" class="gpick'+(on?' on':'')+'" data-gpick="'+x.id+'" aria-pressed="'+on+'"><i>'+(on?'✓':'+')+'</i><span>'+esc(x.name)+'<small>'+esc(x.amt)+'</small></span><b>'+gmoney(x.pr)+'</b></button>';});
+  }
+  return '<section class="card"><div class="hd"><h2>Grocery list</h2>'+tabs+'</div>'+h
+   +'<p class="hint" style="margin-top:10px">Prices are rough estimates (average GTA grocery prices, before tax), so totals are a ballpark. Ask Claude to add items or change prices.</p></section>';}
+function grocText(){var g=G(),out=[],last='',est=0;
+  gItems().filter(function(x){return g.l.indexOf(x.id)>=0&&g.b.indexOf(x.id)<0;}).forEach(function(x){if(x.sec!==last){last=x.sec;out.push('\n'+x.sec.toUpperCase());}est+=x.pr;out.push('- '+x.name+' ('+x.amt+') ~'+gmoney(x.pr));});
+  return 'Groceries\n'+out.join('\n')+'\n\nEstimated total: ~'+gmoney(est);}
 function viewPersonal(){return '<div class="pgrid"><div class="mkc">'+workoutCard()+libraryCard()+'</div><div class="mkc">'+mealsCard()+groceryCard()+'</div></div>'
   +'<div class="pgrid" style="margin-top:20px"><div class="mkc">'+tasksCard()+'</div><div class="mkc">'+thingsCard()+'</div></div>';}
 function afterPersonal(){
@@ -1658,8 +1678,12 @@ document.addEventListener('click',function(e){
   if(ds.wopick){var sched=(PL.WEEK[new Date().getDay()]||{}).id;plog('wo_pick',ds.wopick===sched?null:ds.wopick);toast(PL.ROUTINES[ds.wopick].name.replace(/^Gym · /,'')+' is today’s workout');render();openWorkout();return;}
   if(t.hasAttribute('data-wounpick')){plog('wo_pick',null);render();return;}
   if(ds.grocv){S.grocV=ds.grocv;store('desk_groc_v',ds.grocv);render();return;}
+  if(ds.gpick){var g1=G(),id1=ds.gpick;if(g1.l.indexOf(id1)>=0){g1.l=g1.l.filter(function(x){return x!==id1;});g1.b=g1.b.filter(function(x){return x!==id1;});}else g1.l.push(id1);saveGroc();render();return;}
+  if(ds.goff){var g2=G(),id2=ds.goff;g2.l=g2.l.filter(function(x){return x!==id2;});g2.b=g2.b.filter(function(x){return x!==id2;});saveGroc();render();return;}
+  if(t.hasAttribute('data-gaddall')){var g3=G();gItems().forEach(function(x){if(g3.l.indexOf(x.id)<0)g3.l.push(x.id);});saveGroc();toast('Everything’s on your list');render();return;}
   if(t.hasAttribute('data-groccopy')){var gt=grocText();(navigator.clipboard?navigator.clipboard.writeText(gt):Promise.reject()).then(function(){toast('List copied. Paste it in Notes or a text.');},function(){toast('Couldn’t copy on this device');});return;}
-  if(t.hasAttribute('data-grocreset')){if(!t.dataset.cf){t.dataset.cf='1';t.textContent='Tap again to untick all';return;}S.personal.groc=[];saveGroc();render();return;}
+  if(t.hasAttribute('data-grocdone')){var g4=G();g4.l=g4.l.filter(function(x){return g4.b.indexOf(x)<0;});g4.b=[];saveGroc();toast('Bought items cleared');render();return;}
+  if(t.hasAttribute('data-grocclear')){if(!t.dataset.cf){t.dataset.cf='1';t.textContent='Tap again to empty';return;}S.personal.groc={l:[],b:[]};saveGroc();render();return;}
   if(t.hasAttribute('data-weekmenu')){openWeekMenu();return;}
   if(ds.ws){var lk='lift:'+ds.ws,l=Object.assign({sets:[],w:''},S.personal.logs[lk]);l.sets=(l.sets||[]).slice();l.sets[+ds.s]=l.sets[+ds.s]?0:1;plog(lk,l);t.classList.toggle('on');return;}
   if(t.hasAttribute('data-wodone')){var v=!S.personal.logs.workout;plog('workout',v||null);if(v)toast('Workout logged. Nice work.');$('#dlg').close();render();return;}
@@ -1711,7 +1735,7 @@ document.addEventListener('change',function(e){var t=e.target,ds=t.dataset;
     .catch(function(e){t.checked=!t.checked;fail(e);});return;}
   if(ds.thb){var th=S.things.filter(function(x){return x.id===+ds.thb;})[0];th.done=t.checked?1:0;post('desk/thing',Object.assign({},th,{done:t.checked})).then(function(){toast(t.checked?'Bought ✓':'Back on the list');setTimeout(render,500);}).catch(fail);return;}
   if(ds.wlog){plog(ds.wlog,t.checked||null);render();return;}
-  if(ds.groc){var gl=(S.personal.groc||[]).filter(function(x){return x!==ds.groc;});if(t.checked)gl.push(ds.groc);S.personal.groc=gl;saveGroc();render();return;}
+  if(ds.gbuy){var g5=G(),id5=ds.gbuy;g5.b=g5.b.filter(function(x){return x!==id5;});if(t.checked)g5.b.push(id5);saveGroc();render();return;}
   if(ds.ww){var lk2='lift:'+ds.ww,l2=Object.assign({sets:[],w:''},S.personal.logs[lk2]);l2.w=t.value.trim().slice(0,10);plog(lk2,l2);return;}
   if(ds.meal!=null){var mi=+ds.meal,a=(S.personal.logs.meals||[]).filter(function(x){return x!==mi;});if(t.checked)a.push(mi);plog('meals',a);render();return;}
   if(ds.prep!=null){var pi=+ds.prep,a2=(S.personal.logs.prep||[]).filter(function(x){return x!==pi;});if(t.checked)a2.push(pi);plog('prep',a2);return;}
