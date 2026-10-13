@@ -1299,7 +1299,8 @@ var DOWS=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'
 var TSRC={mine:['To-do','#1D2870'],g:['Google Tasks','#1B7A3E'],rem:['Reminders','#9A5B00']};
 var THING_CATS=['Tech','Clothes & shoes','Home','Health & gym','Car','Golf','Gifts','Office','Other'];
 function loadPersonal(force){var j=[];
-  if(force||!S.personal)j.push(getJ('desk/personal?today='+todayStr()).then(function(x){S.personal=x;}));
+  if(force||!S.personal){S.personalErr=null;j.push(Promise.race([getJ('desk/personal?today='+todayStr()),new Promise(function(_,no){setTimeout(function(){no('timeout');},15000);})])
+    .then(function(x){S.personal=x;},function(e){if(e==='pin')throw e;S.personalErr=e==='timeout'?'The workout and menu are taking too long to load.':'The workout and menu didn’t load ('+e+').';}));}
   if(force||!S.todos)j.push(loadTodos());
   if(force||!S.things)j.push(getJ('desk/things').then(function(x){S.things=x.items;}));
   if(force||!S.gt)j.push(getJ('gtasks').then(function(x){S.gt=x;}).catch(function(e){if(e==='pin')throw e;S.gt={error:String(e)};}));
@@ -1357,7 +1358,8 @@ function habitGrid(){var P=S.personal,t=todayStr(),h='<div class="hgrid"><span><
   return h+'</div>';}
 function todayPlan(){var dw=new Date().getDay(),pick=S.personal&&S.personal.logs.wo_pick,w=PL.WEEK[dw]||{name:'',sub:'',ex:[]};
   if(pick&&PL.ROUTINES[pick]&&pick!==w.id){var r=Object.assign({id:pick},PL.ROUTINES[pick]);r.swapped=w.name;return r;}return w;}
-function workoutCard(){var P=S.personal;if(!P)return '<section class="card"><div class="hd"><h2>Workout</h2></div><p class="empty">Loading…</p></section>';
+function pLoading(t){return '<section class="card"><div class="hd"><h2>'+t+'</h2></div>'+(S.personalErr?'<p class="empty">'+esc(S.personalErr)+'</p><div class="pacts"><button class="btn navy" type="button" data-pretry>Try again</button></div>':'<p class="empty">Loading…</p>')+'</section>';}
+function workoutCard(){var P=S.personal;if(!P)return pLoading('Workout');
   var dw=new Date().getDay(),w=todayPlan(),lg=P.logs,water=+lg.water||0,h='';
   h+='<div class="sec" style="margin-top:2px">Every day · the minimum</div>';
   h+=(PL.DAILY||[]).map(function(x){var on=!!lg[x.k];return '<label class="dmin'+(on?' ok':'')+'"><input class="ck" type="checkbox" data-wlog="'+x.k+'"'+(on?' checked':'')+'>'+fig(x.fig,'sm')+'<div><b>'+esc(x.t)+'</b><small>'+esc(x.sub)+'</small></div></label>';}).join('');
@@ -1395,7 +1397,7 @@ function openWorkout(){var P=S.personal,w=todayPlan(),d=$('#dlg');S.viewing=null
         +(noW?'':'<input type="text" inputmode="decimal" data-ww="'+k+'" placeholder="lb" value="'+esc(l.w||'')+'" aria-label="Weight in pounds"><span class="hint">'+hint+'</span>')+'</div></div>';}).join('')
     +'<div class="pacts" style="justify-content:space-between;align-items:center"><span class="muted" style="font-size:15px">Saved as you go.</span><button class="btn '+(P.logs.workout?'ghost':'navy')+'" type="button" data-wodone>'+(P.logs.workout?'Done ✓ (undo)':'Mark workout done')+'</button></div></div>';}
   d.innerHTML=body();if(!d.open)d.showModal();}
-function mealsCard(){var P=S.personal;if(!P)return '<section class="card"><div class="hd"><h2>Today’s menu</h2></div><p class="empty">Loading…</p></section>';
+function mealsCard(){var P=S.personal;if(!P)return pLoading('Today’s menu');
   var dw=new Date().getDay(),M=PL.MEALS[dw]||[],eaten=P.logs.meals||[],h='';
   h+=M.map(function(m,i){return '<label class="meal'+(eaten.indexOf(i)>=0?' ok':'')+'"><input class="ck" type="checkbox" data-meal="'+i+'"'+(eaten.indexOf(i)>=0?' checked':'')+'><div><small>'+esc(PL.MEAL_LBL[i])+'</small>'+esc(m)+'</div></label>';}).join('');
   h+='<div class="targets"><span class="chip n">Protein 160 g</span><span class="chip">Carbs around training</span><span class="chip">Water 3 L</span></div>';
@@ -1413,7 +1415,7 @@ function G(){var g=S.personal.groc;if(Array.isArray(g))g={l:g.slice(),b:g.slice(
 function saveGroc(){return post('log',{day:S.personal.grocDay,k:'groc',v:G()}).catch(fail);}
 function gmoney(n){return '$'+(Math.round(n*100)/100).toFixed(n%1?2:0);}
 function gItems(){var out=[];(PL.GROCERY||[]).forEach(function(g){g[1].forEach(function(it){out.push({sec:g[0],id:gid(g[0],it[0]),name:it[0],amt:it[1],pr:it[2]||0});});});return out;}
-function groceryCard(){var P=S.personal;if(!P)return '<section class="card"><div class="hd"><h2>Grocery list</h2></div><p class="empty">Loading…</p></section>';
+function groceryCard(){var P=S.personal;if(!P)return pLoading('Grocery list');
   var g=G(),all=gItems(),mine=all.filter(function(x){return g.l.indexOf(x.id)>=0;}),v=S.grocV==='all'?'all':'mine';
   var lt=0,bt=0,nb=0,wk=0;all.forEach(function(x){wk+=x.pr;});mine.forEach(function(x){lt+=x.pr;if(g.b.indexOf(x.id)>=0){bt+=x.pr;nb++;}});
   function groups(L,row){var h='',last='';L.forEach(function(x){if(x.sec!==last){last=x.sec;var st=0;L.forEach(function(y){if(y.sec===x.sec)st+=y.pr;});h+='<div class="gsec"><span>'+esc(x.sec)+'</span><span>'+gmoney(st)+'</span></div>';}h+=row(x);});return h;}
@@ -1681,6 +1683,7 @@ document.addEventListener('click',function(e){
   if(ds.wlib){openRoutine(ds.wlib);return;}
   if(ds.wopick){var sched=(PL.WEEK[new Date().getDay()]||{}).id;plog('wo_pick',ds.wopick===sched?null:ds.wopick);toast(PL.ROUTINES[ds.wopick].name.replace(/^Gym · /,'')+' is today’s workout');render();openWorkout();return;}
   if(t.hasAttribute('data-wounpick')){plog('wo_pick',null);render();return;}
+  if(t.hasAttribute('data-pretry')){S.personalErr=null;render();load(true);return;}
   if(ds.grocv){S.grocV=ds.grocv;store('desk_groc_v',ds.grocv);render();return;}
   if(ds.gaisle){S.grocAisle=ds.gaisle;store('desk_groc_aisle',ds.gaisle);render();return;}
   if(ds.gpick){var g1=G(),id1=ds.gpick;if(g1.l.indexOf(id1)>=0){g1.l=g1.l.filter(function(x){return x!==id1;});g1.b=g1.b.filter(function(x){return x!==id1;});}else g1.l.push(id1);saveGroc();render();return;}
