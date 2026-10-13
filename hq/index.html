@@ -304,7 +304,7 @@ dialog::backdrop{background:rgba(20,24,51,.6)}
 <dialog id="pinDlg"><form method="dialog" id="pinForm" class="dl"><h2>Host only</h2><label for="pinIn">Enter your PIN</label><input id="pinIn" inputmode="numeric" autocomplete="off" type="password"><p class="err" id="pinErr" hidden>Wrong PIN</p><button class="btn" type="submit">Continue</button></form></dialog>
 
 <script src="/assets/listings.js?v=5"></script>
-<script src="/hq/plan.js?v=1"></script>
+<script src="/hq/plan.js?v=2"></script>
 <script>
 (function(){
   var SM=window.SM, esc=SM.esc;
@@ -816,7 +816,7 @@ dialog::backdrop{background:rgba(20,24,51,.6)}
     var wk='',start=addDays(fromYmd(S.today),-6);
     for(var i=0;i<7;i++){var d=addDays(start,i),day=ymd(d),v=day===S.today?done:!!(S.data.week[day]||{}).workout;wk+='<i class="'+(v?'on':'')+(day===S.today?' today':'')+'">'+DOWS[d.getDay()].charAt(0)+'</i>';}
     var cnt=0;for(var j=0;j<7;j++){var dj=ymd(addDays(start,j));if(dj===S.today?done:(S.data.week[dj]||{}).workout)cnt++;}
-    h+='<div class="sec" style="margin-top:14px">Last 7 days · '+cnt+' session'+(cnt===1?'':'s')+' (goal 3–5)</div><div class="wk">'+wk+'</div>';
+    h+='<div class="sec" style="margin-top:14px">Last 7 days · '+cnt+' session'+(cnt===1?'':'s')+' (goal 2–3 gym)</div><div class="wk">'+wk+'</div>';
     $('workBody').innerHTML=h;
     if($('openWo'))$('openWo').onclick=openWorkout;
     if($('restDone'))$('restDone').onchange=function(){log('workout',this.checked||null);workout();};
