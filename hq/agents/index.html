@@ -461,6 +461,19 @@ dialog::backdrop{background:rgba(20,24,51,.6)}
 .ftiles b{display:block;font:800 30px/1.1 var(--display);color:var(--navy);font-variant-numeric:tabular-nums;margin-top:4px}
 .ftiles span{display:block;font-size:13px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .ftiles .sv b{color:var(--green)}
+.fwrap{overflow-x:auto;margin:0 -4px;padding:0 4px}
+.ftab{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums}
+.ftab th,.ftab td{padding:7px 8px;border-top:1px solid var(--line);text-align:right;white-space:nowrap}
+.ftab th:first-child,.ftab td:first-child{text-align:left;position:sticky;left:0;background:var(--white);white-space:normal;min-width:150px}
+.ftab thead th{font:700 14px var(--display);text-transform:uppercase;letter-spacing:.04em;color:var(--muted);border-top:0}
+.ftab thead th.pt{color:var(--amber)}
+.ftab td.z{color:var(--line)}
+.ftab tr.tot td{font-weight:700;color:var(--navy);border-top:2px solid var(--navy)}
+.ftab tr.oth td{color:var(--muted)}
+.fmiss{background:var(--abg);border:1px solid var(--aln);border-radius:14px;padding:14px 16px;margin:0 0 20px}
+.fmiss h3{font:700 16px var(--display);text-transform:uppercase;letter-spacing:.04em;color:var(--amber);margin:0 0 6px}
+.fmiss ul{margin:0;padding-left:20px;display:grid;gap:4px}
+.fmiss p{margin:8px 0 0;font-size:13px;color:var(--muted)}
 @media (max-width:900px){.ftiles{grid-template-columns:repeat(2,minmax(0,1fr))}.ftiles b{font-size:24px}.ftiles span{white-space:normal}}
 .lrows li{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;gap:4px 12px;align-items:center;padding:7px 0;border-top:1px solid var(--line);font-size:15px}
 .lrows li:first-child{border-top:0}
@@ -705,6 +718,7 @@ function load(force){
   if(S.tab==='toolkit'&&(force||!S.todos))jobs.push(loadTodos());
   if(S.tab==='personal')jobs=jobs.concat(loadPersonal(force));
   if(S.tab==='financial'&&(force||!S.expenses))jobs.push(loadExpenses());
+  if(S.tab==='financial'&&(force||S.finsum===undefined))jobs.push(getJ('desk/finsum').then(function(j){S.finsum=j.finsum;}));
   if(!jobs.length)return Promise.resolve();
   var b=$('#refresh');b.classList.add('spin');
   // Personal: draw each card as soon as its own data lands (Google Tasks / Reminders can be slow)
@@ -1454,9 +1468,8 @@ function afterPersonal(){
   var g=$('#thForm');if(g)g.onsubmit=function(e){e.preventDefault();var t=$('#thIn').value.trim();if(!t)return;var st=$('#thSt').value;post('desk/thing',{title:t,status:st}).then(function(){return getJ('desk/things');}).then(function(j){S.things=j.items;S.thingF=st;render();var i=$('#thIn');if(i)i.focus();}).catch(fail);};
 }
 
-/* ---------- Financial: recurring monthly expenses + new expenses (first draft) ---------- */
 /* ---------- Financial: recurring (monthly / yearly), one-off, and stopped paying. Business Visa + business bank account. ---------- */
-var EXP_CATS=['Advertising & marketing','Brokerage & board fees','Software & subscriptions','Phone & internet','Vehicle','Insurance','Office & supplies','Professional fees','Meals & entertainment','Travel','Education & licences','Video & photo','Bank & card fees','Other'];
+var EXP_CATS=['Advertising & marketing','Brokerage & board fees','Software & subscriptions','Phone & internet','Vehicle','Insurance','Office & supplies','Professional fees','Meals & entertainment','Travel','Education & licences','Video & photo','Bank & card fees','Personal','Taxes (HST / corporate)','Other'];
 var EXP_ACCT=[['visa','Business Visa'],['bank','Business bank account'],['other','Other']];
 function money2(n){return '$'+(+n||0).toLocaleString('en-CA',{minimumFractionDigits:2,maximumFractionDigits:2});}
 function monthly(x){var a=+x.amount||0;return x.cadence==='weekly'?a*52/12:x.cadence==='yearly'?a/12:x.cadence==='quarterly'?a/3:a;}
@@ -1493,12 +1506,29 @@ function viewFinancial(){var E=S.expenses;
     +'<div class="big2">'+money2(toPay)+'<small>still to pay</small></div>'+expList(once,'once','Nothing yet. Add one-off costs as they come up (a laptop, a sign order…).')+'</section>';
   var endCard='<section class="card"><div class="hd"><h2>No longer paying</h2><span class="sub">Recurring costs you cut</span></div>'
     +expList(ended,'ended','Nothing yet. Open a recurring expense and tap “Stopped paying” to move it here.')+'</section>';
-  return tiles+'<div class="pgrid"><div class="mkc">'+recCard+'</div><div class="mkc">'+onceCard+endCard+'</div></div>'
-    +'<p class="hint" style="margin-top:4px">Next: Claude reads your 2026 business Visa and bank statements to fill this in and build the monthly report, income, possible income and HST set-aside.</p>';}
+  return tiles+finMissing(S.finsum)+'<div class="pgrid"><div class="mkc">'+recCard+'</div><div class="mkc">'+onceCard+endCard+'</div></div>'+finMonths(S.finsum);}
+/* Statements Claude still needs + notes (from fin_summary, rebuilt by the "update financials" routine) */
+function finMissing(F){if(!F||!(F.missing||[]).length)return '';
+  return '<div class="fmiss" role="note"><h3>Missing statements · '+F.missing.length+'</h3><ul>'+F.missing.map(function(m){return '<li><b>'+esc(m.what)+'</b>. '+esc(m.why)+'</li>';}).join('')+'</ul>'
+    +((F.notes||[]).length?'<p>'+F.notes.map(esc).join(' · ')+'</p>':'')+'</div>';}
+/* Year by month: business categories × months, then business total, personal, taxes, deposits. Partial months flagged. */
+function finMonths(F){if(!F)return '';
+  var M=F.months||[],P=F.partial||{},C=F.cats||{},MN=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var sum=function(o){return M.reduce(function(a,m){return a+(+(o||{})[m]||0);},0);};
+  var cell=function(v){return v?'<td>$'+Math.round(v).toLocaleString('en-CA')+'</td>':'<td class="z">–</td>';};
+  var row=function(lbl,o,cls){return '<tr'+(cls?' class="'+cls+'"':'')+'><td>'+esc(lbl)+'</td>'+M.map(function(m){return cell(+(o||{})[m]||0);}).join('')+cell(sum(o))+'</tr>';};
+  var names=Object.keys(C).sort(function(a,b){return sum(C[b])-sum(C[a]);}),biz={};
+  M.forEach(function(m){biz[m]=names.reduce(function(a,k){return a+(+C[k][m]||0);},0);});
+  var head='<tr><th>Category</th>'+M.map(function(m){var p=P[m];return '<th'+(p?' class="pt" title="'+esc(p)+'"':'')+'>'+MN[+m.slice(5)-1]+(p?'*':'')+'</th>';}).join('')+'<th>Total</th></tr>';
+  var flags=Object.keys(P).sort().map(function(m){return MN[+m.slice(5)-1]+'*: '+esc(P[m]);}).join(' · ');
+  return '<section class="card" style="margin-top:20px"><div class="hd"><h2>'+(F.year||'')+' by month</h2><span class="sub">Business Visa + business bank account · updated '+(F.updated?fmtDay(F.updated):'')+'</span></div>'
+    +'<div class="fwrap"><table class="ftab"><thead>'+head+'</thead><tbody>'+names.map(function(k){return row(k,C[k]);}).join('')
+    +row('Business total',biz,'tot')+row('Personal',F.personal,'oth')+row('Taxes (HST / corporate)',F.taxes,'oth')+row('Deposits',F.deposits,'oth')+'</tbody></table></div>'
+    +'<p class="hint" style="margin-top:10px">'+(flags?flags+'. ':'')+'Covers: Visa '+esc((F.coverage||{}).visa||'')+'; bank '+esc((F.coverage||{}).bank||'')+'. Rounded to the dollar.</p></section>';}
 function openExpense(id,kind){var x=id?(S.expenses||[]).filter(function(y){return y.id===+id;})[0]:{kind:kind,cadence:kind==='new'?'once':'monthly',account:'visa'},d=$('#dlg'),cf=false;S.viewing=null;
   var rec=x.kind==='recurring';
   d.innerHTML='<form class="dl" id="eF"><div class="dh"><h2>'+(id?'Edit':'Add')+' '+(rec?(x.ended?'stopped expense':'recurring expense'):'one-off expense')+'</h2><button type="button" class="x" data-close aria-label="Close">×</button></div><div class="fgrid">'
-   +inp('e_title','What',x.title,{full:1,ph:rec?'Adobe Creative Cloud':'New laptop'})+inp('e_amount','Amount ($, before HST)',x.amount!=null?x.amount:'',{num:1,ph:'650'})+sel('e_cat','Category',x.category,EXP_CATS)
+   +inp('e_title','What',x.title,{full:1,ph:rec?'Adobe Creative Cloud':'New laptop'})+inp('e_amount','Amount ($, as charged)',x.amount!=null?x.amount:'',{num:1,ph:'650'})+sel('e_cat','Category',x.category,EXP_CATS)
    +sel('e_acct','Paid from',x.account||'visa',EXP_ACCT)
    +(rec?sel('e_cad','How often',x.cadence,[['monthly','Monthly'],['yearly','Yearly'],['quarterly','Every 3 months'],['weekly','Weekly']])+inp('e_day','Day of month it comes out',x.day||'',{num:1,ph:'15'})
         +'<label for="e_due"><span>Renewal date (yearly bills)</span><input id="e_due" type="date" value="'+esc(x.due||'')+'"></label>'
