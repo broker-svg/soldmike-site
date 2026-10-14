@@ -339,6 +339,7 @@ dialog::backdrop{background:rgba(20,24,51,.6)}
 /* side column (activity, unsorted, today) next to the board on wide screens */
 .split{display:grid;gap:20px;grid-template-columns:minmax(0,1fr)}
 .mainc{display:grid;gap:20px;min-width:0;align-content:start}
+.mainc+.mainc{margin-top:20px}
 .rail{order:-1;display:grid;gap:20px;align-content:start;min-width:0}
 .railtop{display:grid;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));gap:20px;margin-bottom:20px;align-items:start}
 .railtop>*{margin:0}
@@ -1008,10 +1009,11 @@ function viewBoard(){
   var kind=S.tab==='sellers'?'s':'b',B=S.board[kind],label=kind==='s'?'Sellers':'Buyers';
   var rail=feedP(kind)+(kind==='s'?todayCard():'');
   // Activity (and, for sellers, Today) runs full width across the top so the boards below get the whole width
-  function wrap(main){return '<aside class="railtop" aria-label="Activity">'+rail+'</aside><div class="mainc">'+main+'</div>';}
+  // sellers: Expireds & FSBOs sits right under the top row, full width
+  function wrap(main){return '<aside class="railtop" aria-label="Activity">'+rail+'</aside>'+(kind==='s'?'<div class="mainc">'+prospectsSection()+'</div>':'')+'<div class="mainc">'+main+'</div>';}
   var top=focusSection(kind);
   function pipe(inner,n){return '<details class="pipe"'+(S.pipeOpen?' open':'')+' data-pipe><summary>Pipeline board'+(n!=null?' · '+n+' cards':'')+' <small>'+(kind==='s'?'Listing appointment → Follow-up & intake → Coming soon → For sale → Offer night → Sold, with each phase’s checklist':'Searching → Showings → Offer → Firm → Closed, checklists, facts, matching')+'</small></summary>'+inner+'</details>';}
-  if(!B)return wrap(top+pipe('<section class="card"><p class="empty">Loading…</p></section>')+(kind==='s'?prospectsSection()+sellerRes():buyerRes()));
+  if(!B)return wrap(top+pipe('<section class="card"><p class="empty">Loading…</p></section>')+(kind==='s'?sellerRes():buyerRes()));
   var cards=B.cards,closedN=cards.filter(function(c){return c.stage==='closed';}).length,view=S.view[kind];
   var sub=cards.filter(function(c){return c.stage!=='closed';}).length+' active';
   var head='<div class="hd"><h2>'+label+'</h2><span class="sub">'+sub+'</span>'
@@ -1025,7 +1027,7 @@ function viewBoard(){
     :view==='list'?listView(kind):boardView(kind);
   return wrap(top+pipe('<section class="card">'+head+(B.liveError?'<p class="err" style="margin-bottom:10px">Follow Up Boss didn’t answer, so phone / activity may be missing. Try Refresh.</p>':'')+body
     +(B.archivedCount?'<p style="margin:10px 0 0"><button class="lnkb" type="button" data-archived="'+kind+'">Archived ('+B.archivedCount+')</button></p>':'')+'</section>',cards.length)
-    +(kind==='s'?prospectsSection()+sellerRes():buyerRes()));
+    +(kind==='s'?sellerRes():buyerRes()));
 }
 function boardView(kind){
   var ST=stagesOf(kind),cards=S.board[kind].cards,vis=ST.filter(function(st){return st.k!=='closed'||S.closed[kind];});
