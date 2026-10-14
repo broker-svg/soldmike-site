@@ -498,6 +498,11 @@ button.ls.pink{cursor:pointer}
 .ftiles.ft3{grid-template-columns:repeat(3,minmax(0,1fr));margin:12px 0 14px}
 @media (max-width:640px){.ftiles.ft3{grid-template-columns:minmax(0,1fr)}.mnav b{min-width:0;font-size:19px}}
 .txsum{display:flex;gap:10px;align-items:flex-start}.txsum .lst{margin-top:5px}
+.atab td.ac{text-align:center;font-weight:700}.atab td.ok{color:var(--green)}.atab td.pt{color:var(--amber);background:var(--abg)}.atab td.ms{color:var(--red);background:var(--rbg)}.atab td.ny{color:var(--line)}
+.atab th,.atab td{text-align:center}
+.alist{margin:0;padding-left:18px;display:grid;gap:6px;font-size:15px}
+.lnk{color:var(--navy);text-decoration:underline;text-underline-offset:2px}
+.tnote{color:var(--navy)!important}
 .fcan{margin-top:14px;padding:12px 14px;border:1px solid var(--rln);background:var(--rbg);border-radius:12px}.fcan h3{margin:0 0 4px;font:700 16px var(--display);text-transform:uppercase;color:var(--red)}
 @media (max-width:900px){.ftiles{grid-template-columns:repeat(2,minmax(0,1fr))}.ftiles b{font-size:24px}.ftiles span{white-space:normal}}
 .lrows li{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;gap:4px 12px;align-items:center;padding:7px 0;border-top:1px solid var(--line);font-size:15px}
@@ -743,7 +748,7 @@ function load(force){
   if(S.tab==='toolkit'&&(force||!S.todos))jobs.push(loadTodos());
   if(S.tab==='personal')jobs=jobs.concat(loadPersonal(force));
   if(S.tab==='financial'&&(force||!S.expenses))jobs.push(loadExpenses());
-  if(S.tab==='financial'&&(force||S.finsum===undefined))jobs.push(getJ('desk/finsum').then(function(j){S.finsum=j.finsum;S.finNotes=j.notes||'';}));
+  if(S.tab==='financial'&&(force||S.finsum===undefined))jobs.push(getJ('desk/finsum').then(function(j){S.finsum=j.finsum;S.finNotes=j.notes||'';S.finAcct=j.acct;}));
   if(S.tab==='financial'&&(force||!S.tx))jobs.push(loadTx());
   if(S.tab==='financial'&&(force||!S.todos))jobs.push(loadTodos());
   if(!jobs.length)return Promise.resolve();
@@ -1562,7 +1567,7 @@ function viewFinancial(){var E=S.expenses;
     +'<div class="big2">'+money2(toPay)+'<small>still to pay</small></div>'+expList(once,'once','Nothing yet. Add one-off costs as they come up (a laptop, a sign order…).')+'</section>';
   var endCard='<section class="card"><div class="hd"><h2>No longer paying</h2><span class="sub">Recurring costs you cut</span></div>'
     +expList(ended,'ended','Nothing yet. Open a recurring expense and tap “Stopped paying” to move it here.')+'</section>';
-  return finBoard(E,S.finsum)+tiles+'<div class="pgrid"><div class="mkc">'+recCard+'</div><div class="mkc">'+onceCard+endCard+finPersonal()+'</div></div>'+finMonth()+finMonths(S.finsum);}
+  return finBoard(E,S.finsum)+tiles+'<div class="pgrid"><div class="mkc">'+recCard+'</div><div class="mkc">'+onceCard+endCard+finPersonal()+'</div></div>'+finMonth()+finMonths(S.finsum)+finAcct(S.finAcct);}
 /* Bulletin board: always on top. Coming up (next 30 days), to cancel, missing statements, Michael's notes. */
 function finBoard(E,F){
   var soon=E.map(function(x){return {x:x,d:nextDue(x)};}).filter(function(o){return o.d&&daysTo(o.d)<=30;}).sort(function(a,b){return a.d.localeCompare(b.d)||(+b.x.amount)-(+a.x.amount);});
@@ -1576,6 +1581,8 @@ function finBoard(E,F){
       :'<p class="empty">Open any bill and tap “Cancel it…” to add a task to your to-do list.</p>')+'</div>';
   var ms=miss.length||notes.length?'<div class="fb fmiss"><h3>Missing statements'+(miss.length?' · '+miss.length:'')+'</h3>'+(miss.length?'<ul>'+miss.map(function(m){return '<li><b>'+esc(m.what)+'</b>. '+esc(m.why)+'</li>';}).join('')+'</ul>':'<p class="empty">None. All statements are in.</p>')
     +(notes.length?'<p>'+notes.map(esc).join(' · ')+'</p>':'')+'</div>':'';
+  var A=S.finAcct,need=A?acctTodo(A).length:0;
+  if(A)ms+='<div class="fb"><h3>Accountant</h3><p style="margin:0">'+(need?'<b>'+need+' thing'+(need>1?'s':'')+' needed</b> for the books. ':'Books are up to date. ')+'<a href="#fin-acct" data-goacct>See the Accountant section ↓</a></p></div>';
   var nt='<div class="fb"><h3>Notes</h3><textarea id="finNotes" rows="4" aria-label="Notes" placeholder="Anything to remember: call Intuit about the double charge, ask Rob about HST…">'+esc(S.finNotes||'')+'</textarea>'
     +'<button type="button" class="btn sm ghost" data-fnsave style="margin-top:8px">Save notes</button></div>';
   return '<section class="card fboard"><div class="hd"><h2>Bulletin board</h2><span class="sub">What’s coming, what to cut, what’s missing</span>'+FLEG+'</div><div class="fbg"><div>'+up+cn+'</div><div>'+ms+nt+'</div></div></section>';}
@@ -1596,11 +1603,11 @@ function finMonth(){var T=S.tx;
   var dep=L.filter(function(t){return t.kind==='income';}).reduce(function(a,t){return a-t.amount;},0),untag=sp.filter(function(t){return !t.expense&&!txPersonal(t);}).length;
   var byId={};(S.expenses||[]).forEach(function(x){byId[x.id]=x;});
   var rows=L.map(function(t){var x=t.expense&&byId[t.expense],chip;
-    if(TX_SKIP[t.kind])chip='<span class="ls gry">'+TX_SKIP[t.kind]+'</span>';
+    if(TX_SKIP[t.kind])chip='<button type="button" class="ls gry" data-tx="'+t.id+'">'+TX_SKIP[t.kind]+(t.kind==='income'&&!t.note?' · what?':'')+'</button>';
     else if(x)chip='<button type="button" class="ls nav" data-tx="'+t.id+'">'+(x.kind==='new'?'One-off':x.cadence==='yearly'?'Yearly':'Monthly')+(x.review==='cancel'?' · cancel':'')+'</button>';
     else if(txPersonal(t))chip='<button type="button" class="ls pink" data-tx="'+t.id+'">Personal</button>';
     else chip='<button type="button" class="ls tagb" data-tx="'+t.id+'">Tag</button>';
-    return '<li class="xrow'+(TX_SKIP[t.kind]?' gx':'')+'">'+acctDot(t.src)+'<button type="button" class="la nmb" data-tx="'+t.id+'"><b>'+esc(t.label)+'</b><small>'+esc(fmtDay(t.date).replace(/^\w+, /,'')+' · '+effCat(t)+(t.fixcat?' (fixed)':'')+(x&&x.title!==t.label?' · '+x.title:'')+' · '+t.descr)+'</small></button><span class="lp">'+(t.amount<0?'−'+money2(-t.amount):money2(t.amount))+'</span>'+chip+'</li>';}).join('');
+    return '<li class="xrow'+(TX_SKIP[t.kind]?' gx':'')+'">'+acctDot(t.src)+'<button type="button" class="la nmb" data-tx="'+t.id+'"><b>'+esc(t.label)+'</b><small>'+esc(fmtDay(t.date).replace(/^\w+, /,'')+' · '+effCat(t)+(t.fixcat?' (fixed)':'')+(x&&x.title!==t.label?' · '+x.title:'')+' · '+t.descr)+(t.note?'</small><small class="tnote">📝 '+esc(t.note):'')+'</small></button><span class="lp">'+(t.amount<0?'−'+money2(-t.amount):money2(t.amount))+'</span>'+chip+'</li>';}).join('');
   var nav='<div class="frow"><div class="mnav"><button type="button" class="btn sm ghost" data-txm="'+(prev||'')+'"'+(prev?'':' disabled')+' aria-label="Previous month">‹</button><b>'+esc(monthName(m))+'</b><button type="button" class="btn sm ghost" data-txm="'+(next||'')+'"'+(next?'':' disabled')+' aria-label="Next month">›</button></div>'
     +'<div class="seg" role="group" aria-label="Account"><button type="button" data-txsrc="all" aria-pressed="'+(src==='all')+'">All</button><button type="button" data-txsrc="visa" aria-pressed="'+(src==='visa')+'">Visa</button><button type="button" data-txsrc="bank" aria-pressed="'+(src==='bank')+'">Corp bank</button></div>'+FLEG+'</div>';
   var part=S.finsum&&S.finsum.partial&&S.finsum.partial[m];
@@ -1609,6 +1616,19 @@ function finMonth(){var T=S.tx;
     +'<div class="ftiles ft3"><div><small>Business spending</small><b>'+money2(biz)+'</b><span>'+sp.filter(function(t){return !txPersonal(t)&&!txTax(t);}).length+' charges'+(untag?' · '+untag+' not tagged':'')+'</span></div>'
     +'<div><small>Personal</small><b>'+money2(pers)+'</b><span>'+(tax?'Taxes: '+money2(tax):'not business')+'</span></div><div><small>Deposits</small><b>'+money2(dep)+'</b><span>into the corp bank</span></div></div>'
     +(L.length?'<ul class="lrows">'+rows+'</ul>':'<p class="empty">No statements loaded for this month yet.</p>')+'</section>';}
+/* Accountant: is the year's bookkeeping up to date? Statements in per month, what's still needed, notes for Rob. Built by Claude's bookkeeper. */
+function acctTodo(A){var byH={};(S.tx||[]).forEach(function(t){byH[t.hash]=t;});return (A.todo||[]).filter(function(x){var t=x.tx&&byH[x.tx];return !(t&&t.note);});}
+function finAcct(A){if(!A)return '';
+  var ic={ok:['✓','ok','In'],partial:['½','pt','Partly in'],missing:['✗','ms','Missing'],notyet:['·','ny','Not due yet']},byH={};(S.tx||[]).forEach(function(t){byH[t.hash]=t;});
+  var M=A.months||[],row=function(k,lbl){return '<tr><td>'+lbl+'</td>'+M.map(function(m){var x=ic[m[k]]||ic.notyet;return '<td class="ac '+x[1]+'" title="'+esc(lbl+', '+monthName(m.m)+': '+x[2])+'">'+x[0]+'</td>';}).join('')+'</tr>';};
+  var grid='<div class="fwrap"><table class="ftab atab"><thead><tr><th>Statements</th>'+M.map(function(m){return '<th>'+MONTHS[+m.m.slice(5)-1].slice(0,3)+'</th>';}).join('')+'</tr></thead><tbody>'+row('visa','Business Visa')+row('bank','Business bank')+row('remax','RE/MAX dues')+'</tbody></table></div>'
+    +'<p class="hint" style="margin:6px 0 0">✓ in · ½ partly in · ✗ missing · · not due yet</p>';
+  var todo=acctTodo(A),li=function(x){var t=x.tx&&byH[x.tx];return '<li>'+(t?'<button type="button" class="nmb lnk" data-tx="'+t.id+'"><b>'+esc(x.what)+'</b></button>':'<b>'+esc(x.what)+'</b>')+'<br><small class="muted">'+esc(x.why)+'</small></li>';};
+  return '<section class="card" id="fin-acct" style="margin-top:20px"><div class="hd"><h2>Accountant</h2><span class="sub">'+A.year+' books for Rob · year-end Dec 31 · checked '+esc(fmtDay(A.updated))+'</span></div>'+grid
+    +'<div class="fbg" style="margin-top:16px"><div><div class="fb fmiss"><h3>Needed · '+todo.length+'</h3>'+(todo.length?'<ul class="alist">'+todo.map(li).join('')+'</ul>':'<p class="empty">Nothing. The books are up to date.</p>')+'</div>'
+    +'<div class="fb"><h3>Up to date ✓</h3><ul class="alist">'+(A.ok||[]).map(function(x){return '<li>'+esc(x)+'</li>';}).join('')+'</ul></div></div>'
+    +'<div><div class="fb"><h3>For Rob</h3><ul class="alist">'+(A.info||[]).map(function(x){return '<li>'+esc(x)+'</li>';}).join('')+'</ul></div>'
+    +'<div class="fb"><h3>Package</h3><p style="margin:0">Excel workbook: <b>'+esc((A.package||{}).file||'')+'</b> (plus a CSV ledger) in Google Drive › 2026 Financials, updated '+esc(fmtDay((A.package||{}).date))+'. Claude refreshes it on every “update financials” and drafts the email to Rob when you say so.</p></div></div></div></section>';}
 /* Personal: everything the sorting rules (or Michael) called personal this year, grouped by what it is. Tap a charge to fix its category. */
 function finPersonal(){var T=S.tx;if(!T)return '';var y=todayStr().slice(0,4),P=T.filter(function(t){return t.date.slice(0,4)===y&&txSpend(t)&&txPersonal(t);});
   var g={};P.forEach(function(t){(g[t.label]=g[t.label]||[]).push(t);});
@@ -1624,15 +1644,16 @@ function openTx(id){var t=(S.tx||[]).filter(function(y){return y.id===id;})[0];i
   var opts=E.filter(function(y){return !y.ended||y.id===t.expense;}).sort(function(a,b){var sa=a.title===t.label?0:1,sb=b.title===t.label?0:1;return sa-sb||(a.kind+a.title).localeCompare(b.kind+b.title);})
     .map(function(y){return [y.id,(y.kind==='new'?'One-off: ':y.cadence==='yearly'?'Yearly: ':'Monthly: ')+y.title+' ('+money2(y.amount)+')'];});
   d.innerHTML='<div class="dl"><div class="dh"><h2>Tag this charge</h2><button type="button" class="x" data-close aria-label="Close">×</button></div>'
-    +'<div class="txsum">'+acctDot(t.src)+'<div><b>'+esc(t.label)+'</b> · '+money2(t.amount)+'<br><small class="muted">'+esc(fmtDay(t.date)+' · '+acctLbl(t.src)+' · '+t.descr)+'</small></div></div>'+'<div class="fgrid" style="margin-top:12px">'+sel('tx_cat','Category'+(t.fixcat?' (you fixed this)':''),effCat(t),EXP_CATS,{full:1})+'</div>'
+    +'<div class="txsum">'+acctDot(t.src)+'<div><b>'+esc(t.label)+'</b> · '+money2(t.amount)+'<br><small class="muted">'+esc(fmtDay(t.date)+' · '+acctLbl(t.src)+' · '+t.descr)+'</small></div></div>'+'<div class="fgrid" style="margin-top:12px">'+sel('tx_cat','Category'+(t.fixcat?' (you fixed this)':''),effCat(t),EXP_CATS,{full:1})+inp('tx_note',t.kind==='income'?'What was this deposit? (for the accountant)':'Note',t.note||'',{full:1,ph:t.kind==='income'?'Commission – 404-100 Arbors Lane':'What this was, who it was for…'})+'</div>'
     +(x?'<p style="margin:12px 0 0">Tagged as <b>'+esc(x.title)+'</b> ('+(x.kind==='new'?'one-off':x.cadence)+').</p>':'')
-    +'<h3 class="sec">New bill from this charge</h3><div class="frow"><button type="button" class="btn sm" data-txnew="monthly">Monthly</button><button type="button" class="btn sm" data-txnew="yearly">Yearly</button><button type="button" class="btn sm ghost" data-txnew="new">One-off</button></div>'
-    +'<h3 class="sec">Or link it to one on your list</h3><div class="fgrid">'+sel('tx_link','Bill',t.expense||'',opts,{full:1})+'</div>'
+    +(TX_SKIP[t.kind]?'':'<h3 class="sec">New bill from this charge</h3><div class="frow"><button type="button" class="btn sm" data-txnew="monthly">Monthly</button><button type="button" class="btn sm" data-txnew="yearly">Yearly</button><button type="button" class="btn sm ghost" data-txnew="new">One-off</button></div>'
+    +'<h3 class="sec">Or link it to one on your list</h3><div class="fgrid">'+sel('tx_link','Bill',t.expense||'',opts,{full:1})+'</div>')
     +'<div class="dfoot"><button type="button" class="btn" id="txSave">Save</button>'+(x?'<button type="button" class="btn ghost" data-exp="'+x.id+'">Open the bill</button><button type="button" class="btn danger" id="txUn">Untag</button>':'<button type="button" class="btn ghost" data-close>Cancel</button>')+'</div></div>';
   var link=function(eid,msg){return post('desk/tx/link',{id:t.id,expense:eid}).then(function(){d.close();toast(msg);return Promise.all([loadTx(),loadExpenses()]);}).then(render).catch(fail);};
   /* category fix: saved only when it differs from what the sorting rules said */
   var fixCat=function(){var c=val('tx_cat'),orig=(t.cat==='Personal (check)'||t.kind==='personal'?'Personal':t.cat)||'',f=c&&c!==orig?c:null;return f===(t.fixcat||null)?Promise.resolve(false):post('desk/tx/cat',{id:t.id,cat:f}).then(function(){return true;});};
-  $('#txSave').onclick=function(){var v=+val('tx_link');fixCat().then(function(ch){if(v&&v!==t.expense)return link(v,'Saved');d.close();if(ch)toast('Category fixed');return (ch?loadTx():Promise.resolve()).then(render);}).catch(fail);};
+  var saveNote=function(){var n=val('tx_note');return n===(t.note||'')?Promise.resolve(false):post('desk/tx/note',{id:t.id,note:n}).then(function(){return true;});};
+  $('#txSave').onclick=function(){var v=+val('tx_link');Promise.all([fixCat(),saveNote()]).then(function(r){var ch=r[0]||r[1];if(v&&v!==t.expense)return link(v,'Saved');d.close();if(ch)toast('Saved');return (ch?loadTx():Promise.resolve()).then(render);}).catch(fail);};
   if($('#txUn'))$('#txUn').onclick=function(){link(null,'Tag removed');};
   d.querySelectorAll('[data-txnew]').forEach(function(b){b.onclick=function(){var k=b.getAttribute('data-txnew'),pre={title:t.label.replace(/ \(check\)$/,''),amount:t.amount,account:t.src,category:EXP_CATS.indexOf(effCat(t))>=0?effCat(t):''};
     if(k==='new'){pre.due=t.date;pre.paid=1;}else if(k==='yearly'){pre.cadence='yearly';pre.due=String(+t.date.slice(0,4)+1)+t.date.slice(4);}else{pre.cadence='monthly';pre.day=+t.date.slice(8);}
@@ -1882,6 +1903,7 @@ document.addEventListener('click',function(e){
   if(ds.recv){S.recV=ds.recv;store('desk_recv',ds.recv);render();return;}
   if(ds.cexp){if(S.exp[ds.cexp])delete S.exp[ds.cexp];else S.exp[ds.cexp]=1;store('desk_exp',S.exp);render();return;}
   if(ds.exp){openExpense(+ds.exp);return;}
+  if(t.hasAttribute('data-goacct')){e.preventDefault();var ac=$('#fin-acct');if(ac)ac.scrollIntoView({behavior:'smooth'});return;}
   if(ds.tx){openTx(+ds.tx);return;}
   if('txm' in ds){if(ds.txm){S.txM=ds.txm;render();}return;}
   if(ds.txsrc){S.txSrc=ds.txsrc;store('desk_txsrc',ds.txsrc);render();return;}
