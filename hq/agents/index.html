@@ -1576,9 +1576,20 @@ function finBoard(E,F){
   var row=function(x,left,right){return '<li class="xrow">'+acctDot(x.account)+'<button type="button" class="la nmb" data-exp="'+x.id+'"><b>'+esc(x.title)+'</b><small>'+left+'</small></button><span class="lp">'+right+'</span>'+(revTag(x)||'<span></span>')+'</li>';};
   var up='<div class="fb"><h3>Coming up · next 30 days <span class="muted">'+money0(soonTot)+'</span></h3>'
     +(soon.length?'<ul class="lrows">'+soon.map(function(o){return row(o.x,'<b class="duei">'+esc(soonTxt(o.d))+'</b> · '+esc(o.x.kind==='new'?'One-off, to pay':o.x.cadence==='yearly'?'Yearly renewal':'Monthly'),money2(o.x.amount));}).join('')+'</ul>':'<p class="empty">Nothing due in the next 30 days.</p>')+'</div>';
-  var cn='<div class="fb"><h3>To cancel'+(canc.length?' · saves '+money0(canc.reduce(function(a,x){return a+monthly(x)*12;},0))+'/yr':'')+'</h3>'
-    +(canc.length?'<ul class="lrows">'+canc.map(function(x){var t=cancelTask(x);return row(x,t?(t.done?'Task done. Open it and tap “Stopped paying”':'Task on your to-do list for '+esc(fmtDay(t.due))):x.task?'Task on your to-do list':'No task yet. Open it to add one',money2(x.amount)+'<small class="muted"> /'+perLbl(x)+'</small>');}).join('')+'</ul>'
-      :'<p class="empty">Open any bill and tap “Cancel it…” to add a task to your to-do list.</p>')+'</div>';
+  /* everything under review lives here: To cancel (with Monthly / Yearly + task date) and Still deciding */
+  var cadL=function(x){return x.cadence==='yearly'?'Yearly':x.cadence==='weekly'?'Weekly':x.cadence==='quarterly'?'Every 3 months':'Monthly';};
+  var tdue=function(x){var t=cancelTask(x);return t&&t.due||'9';};
+  canc.sort(function(a,b){return (a.cadence==='yearly')-(b.cadence==='yearly')||tdue(a).localeCompare(tdue(b));});
+  var dec=E.filter(function(x){return x.review==='think'&&!x.ended;}).sort(function(a,b){return monthly(b)-monthly(a);});
+  var yrSave=function(L){return money0(L.reduce(function(a,x){return a+monthly(x)*12;},0));};
+  var cn='<div class="fb"><h3>To cancel'+(canc.length?' · '+canc.length+' · saves '+yrSave(canc)+'/yr':'')+'</h3>'
+    +(canc.length?'<ul class="lrows">'+canc.map(function(x){var t=cancelTask(x),bits=['<b class="duei">'+cadL(x)+'</b>'];
+        if(x.cadence==='yearly'&&renewal(x))bits.push('renews '+esc(fmtDay(renewal(x)).replace(/^\w+, /,''))+' '+renewal(x).slice(0,4));
+        bits.push(t?(t.done?'task done: tap it, then “Stopped paying”':'task '+esc(fmtDay(t.due).replace(/^\w+, /,''))):x.task?'task on your to-do list':'no task yet: tap to add one');
+        return row(x,bits.join(' · '),money2(x.amount)+'<small class="muted"> /'+perLbl(x)+'</small>');}).join('')+'</ul>'
+      :'<p class="empty">Open any bill and tap “Cancel it…” to add a task to your to-do list.</p>')
+    +(dec.length?'<h3 style="margin-top:14px">Still deciding · '+dec.length+' · '+yrSave(dec)+'/yr under review</h3><ul class="lrows">'+dec.map(function(x){var n=(x.note||'').split(/(?<=\.)\s/)[0];
+        return row(x,'<b class="duei">'+cadL(x)+'</b>'+(x.cadence==='yearly'&&renewal(x)?' · renews '+esc(fmtDay(renewal(x)).replace(/^\w+, /,'')):'')+(n?' · '+esc(n):''),money2(x.amount)+'<small class="muted"> /'+perLbl(x)+'</small>');}).join('')+'</ul>':'')+'</div>';
   var ms=miss.length||notes.length?'<div class="fb fmiss"><h3>Missing statements'+(miss.length?' · '+miss.length:'')+'</h3>'+(miss.length?'<ul>'+miss.map(function(m){return '<li><b>'+esc(m.what)+'</b>. '+esc(m.why)+'</li>';}).join('')+'</ul>':'<p class="empty">None. All statements are in.</p>')
     +(notes.length?'<p>'+notes.map(esc).join(' · ')+'</p>':'')+'</div>':'';
   var A=S.finAcct,need=A?acctTodo(A).length:0;
