@@ -73,17 +73,23 @@ a{color:var(--navy)}
 #outlook .days{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
 /* ?only=re: just Follow-ups + FUB tasks (embedded in the Agent Desk › Real Estate tab) */
 html.re-only .bar,html.re-only .dtabs,html.re-only .hero,html.re-only .jump,html.re-only .grid>.card{display:none}
-html.re-only #follow,html.re-only #todo{display:block}
+html.re-only #follow,html.re-only #todo,html.re-only #drive{display:block}
+/* Daily Drive across the top of the Real Estate tab: streak ring, then the 7 boxes in a row, then counters */
+html.re-only #driveBody{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px;align-items:stretch}
+html.re-only #driveBody .ring{grid-column:1/-1;margin:0}
+html.re-only #driveBody .drv{border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:var(--mist)}
+html.re-only #driveBody .drv:has(input:checked){background:#E7F4EC;border-color:#B9DEC6}
+html.re-only #driveBody>:not(.drv):not(.ring){grid-column:1/-1}
 html.re-only .wrap{padding:0 0 10px;max-width:none}
-html.re-only .grid{grid-template-areas:"fol fol fol fol fol fol todo todo todo todo todo todo"}
+html.re-only .grid{grid-template-areas:"drive drive drive drive drive drive drive drive drive drive drive drive" "fol fol fol fol fol fol todo todo todo todo todo todo"}
 @media (max-width:1180px){
   .grid{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-areas:"today today" "brief brief" "out out" "wkr wkr" "drive proj"}
-  html.re-only .grid{grid-template-areas:"fol todo"}
+  html.re-only .grid{grid-template-areas:"drive drive" "fol todo"}
   .hero .in{grid-template-columns:1fr 1fr}.hero .mon{grid-column:1/-1}
 }
 @media (max-width:780px){
   .grid{grid-template-columns:minmax(0,1fr);grid-template-areas:"today" "brief" "out" "wkr" "drive" "proj"}
-  html.re-only .grid{grid-template-areas:"fol" "todo"}
+  html.re-only .grid{grid-template-areas:"drive" "fol" "todo"}
   #outlook .days{display:flex;flex-direction:column}
   .jump{display:flex}
   .hero .in{grid-template-columns:1fr;gap:10px}.hero .dow{font-size:38px}.clock{font-size:34px}
@@ -329,7 +335,10 @@ dialog::backdrop{background:rgba(20,24,51,.6)}
 <script>
 (function(){
   var SM=window.SM, esc=SM.esc;
-  if(/[?&]only=re\b/.test(location.search))document.documentElement.classList.add('re-only');
+  if(/[?&]only=re\b/.test(location.search)){document.documentElement.classList.add('re-only');
+    // embedded in the Agent Desk: make the parent's iframe exactly as tall as this content
+    var fitParent=function(){var fe=window.frameElement,w=document.querySelector('.wrap');if(fe&&w)fe.style.height=Math.ceil(w.getBoundingClientRect().height)+'px';};
+    window.addEventListener('load',function(){fitParent();try{new ResizeObserver(fitParent).observe(document.querySelector('.wrap'));}catch(e){}});setInterval(fitParent,1000);}
   var $=function(id){return document.getElementById(id);};
 
   // ---------- plan data (from the 2nd Brain: Daily Drive, Daily Routine, Health & Fitness) ----------

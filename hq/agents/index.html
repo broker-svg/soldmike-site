@@ -744,9 +744,7 @@ document.addEventListener('click',function(e){var b=e.target.closest&&e.target.c
 function reBar(){return '<div class="resub" role="tablist">'+RE_SUBS.map(function(x){return '<button type="button" role="tab" data-resub="'+x[0]+'" aria-selected="'+(S.tab===x[0])+'">'+x[1]+(x[0]!=='realestate'&&S.inbox&&S.inbox.people&&S.inbox.people.length?' <span class="n">'+S.inbox.people.length+'</span>':'')+'</button>';}).join('')+'</div>';}
 /* Real Estate › Real Estate: HQ's Follow-ups + Follow Up Boss tasks, embedded (same page, same PIN) */
 function viewRE(){return '<iframe id="reFrame" class="reframe" src="/hq/?only=re" title="Follow-ups and Follow Up Boss tasks"></iframe>';}
-function fitRE(){var f=document.getElementById('reFrame');if(!f)return;
-  function size(){try{var d=f.contentDocument;if(d&&d.body)f.style.height=Math.max(400,d.documentElement.scrollHeight)+'px';}catch(e){}}
-  f.addEventListener('load',function(){size();try{new ResizeObserver(size).observe(f.contentDocument.body);}catch(e){setInterval(size,1500);}});}
+function fitRE(){} /* the embedded page (/hq/?only=re) sizes this iframe itself */
 window.addEventListener('hashchange',function(){var h=location.hash.slice(1);if(TABS.indexOf(h)>=0&&h!==S.tab)setTab(h);});
 
 /* load what the current tab needs (force = refresh even if loaded) */
