@@ -52,6 +52,11 @@ a{color:var(--navy)}
 .tabsbar nav::-webkit-scrollbar{display:none}
 .tabsbar a{flex:none;display:inline-flex;align-items:center;gap:6px;min-height:52px;padding:0 16px;color:var(--pale);text-decoration:none;font-family:var(--display);font-weight:700;font-size:21px;text-transform:uppercase;letter-spacing:.04em;border-bottom:4px solid transparent}
 .tabsbar a[aria-current="page"]{color:var(--white);border-bottom-color:var(--red)}
+.resub{display:flex;gap:8px;margin:0 0 16px;flex-wrap:wrap}
+.resub button{min-height:44px;padding:0 20px;border-radius:22px;border:1px solid var(--line);background:var(--white);font-family:var(--display);font-weight:700;font-size:19px;text-transform:uppercase;letter-spacing:.04em;cursor:pointer;color:var(--ink);display:inline-flex;align-items:center;gap:6px}
+.resub button[aria-selected="true"]{background:var(--navy);border-color:var(--navy);color:var(--white)}
+.resub .n{font-family:var(--body);font-size:12px;font-weight:700;background:var(--red);color:var(--white);border-radius:10px;padding:0 7px;line-height:19px}
+.reframe{display:block;width:100%;border:0;min-height:400px;background:transparent}
 .tabsbar a .n{font-family:var(--body);font-size:12px;font-weight:700;background:var(--red);color:var(--white);border-radius:10px;padding:0 7px;line-height:19px;letter-spacing:0}
 
 .wrap{max-width:1440px;margin:0 auto;padding:20px 16px 80px;display:grid;gap:20px}
@@ -556,8 +561,7 @@ details.pipe>.card{border:0;box-shadow:none;border-top:1px solid var(--line);bor
 <div class="tabsbar"><nav aria-label="Dashboards" id="tabnav">
   <a href="/hq/tasks/">Tasks</a>
   <a href="/hq/">HQ</a>
-  <a href="#sellers" data-tab="sellers">Sellers</a>
-  <a href="#buyers" data-tab="buyers">Buyers</a>
+  <a href="#realestate" data-tab="realestate">Real Estate</a>
   <a href="#marketing" data-tab="marketing">Marketing</a>
   <a href="#toolkit" data-tab="toolkit">Toolkit</a>
   <a href="#personal" data-tab="personal">Personal</a>
@@ -723,7 +727,10 @@ var PROMPTS={
 };
 
 /* ---------- state ---------- */
-var TABS=['sellers','buyers','marketing','toolkit','personal','financial','tpm'];
+var TABS=['realestate','sellers','buyers','marketing','toolkit','personal','financial','tpm'];
+/* Real Estate tab = three toggles: Real Estate (HQ follow-ups + FUB tasks, embedded) · Buyers · Sellers */
+var RE_SUBS=[['realestate','Real Estate'],['buyers','Buyers'],['sellers','Sellers']];
+function isRE(t){return t==='realestate'||t==='buyers'||t==='sellers';}
 var S={tab:TABS.indexOf(location.hash.slice(1))>=0?location.hash.slice(1):(store('desk_tab')||'sellers'),
   board:{s:null,b:null},inbox:null,inboxDays:store('desk_inbox_days')||14,closed:{s:!!store('desk_closed_s'),b:!!store('desk_closed_b')},
   content:null,todos:null,tk:store('desk_tk')||'scripts',lpp:store('desk_lpp')||'appt',exp:store('desk_exp')||{},coldOn:store('desk_cold')===true,side:store('desk_side')||'pre',
@@ -731,8 +738,15 @@ var S={tab:TABS.indexOf(location.hash.slice(1))>=0?location.hash.slice(1):(store
   feedOn:store('desk_feed_on')!==false,feedDays:store('desk_feed_days')||2,feedFilter:'all',feedAll:false,viewing:null,
   sel:{s:{},b:{}},listings:undefined,expenses:null,people:{s:null,b:null},focus:{s:store('desk_focus_s')||'active',b:store('desk_focus_b')||'active'},fq:{s:'',b:''},fsort:{s:'recent',b:'recent'},fall:{s:false,b:false},pipeOpen:store('desk_pipe')!==false,showSoon:store('desk_soon')!==false,personal:null,things:null,gt:null,rem:null,ptf:store('desk_ptf')||'all',ptToday:store('desk_pt_today')!==false,ptLate:store('desk_pt_late')===true,ptAll:false,thingF:'Need',grocV:store('desk_groc_v')||'mine',recV:store('desk_recv')||'monthly',grocAisle:store('desk_groc_aisle')||'',prospects:null,social:undefined,pTab:store('desk_ptab')||'exp',pFilter:{q:'',region:'',city:'',all:false},printTab:store('desk_print')||'hangers',sort:{s:store('desk_sort_s')||'stage',b:store('desk_sort_b')||'stage'},filter:{s:{q:'',stage:'',region:'',act:''},b:{q:'',stage:'',region:'',act:''}},script:'buyer',fs:store('desk_fs')||26,tagSync:false,fubApp:'https://app.followupboss.com'};
 
-function setTab(t){S.tab=t;store('desk_tab',t);$$('#tabnav a[data-tab]').forEach(function(a){a.setAttribute('aria-current',a.dataset.tab===t?'page':'false');});render();load(false);}
-$$('#tabnav a[data-tab]').forEach(function(a){a.addEventListener('click',function(e){e.preventDefault();history.replaceState(null,'','#'+a.dataset.tab);setTab(a.dataset.tab);window.scrollTo({top:0});});});
+function setTab(t){S.tab=t;store('desk_tab',t);if(isRE(t))store('desk_re',t);$$('#tabnav a[data-tab]').forEach(function(a){a.setAttribute('aria-current',(a.dataset.tab===t||(a.dataset.tab==='realestate'&&isRE(t)))?'page':'false');});render();load(false);}
+$$('#tabnav a[data-tab]').forEach(function(a){a.addEventListener('click',function(e){e.preventDefault();var t=a.dataset.tab;if(t==='realestate')t=isRE(S.tab)?'realestate':(store('desk_re')||'realestate');history.replaceState(null,'','#'+t);setTab(t);window.scrollTo({top:0});});});
+document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-resub]');if(!b)return;var t=b.dataset.resub;history.replaceState(null,'','#'+t);setTab(t);});
+function reBar(){return '<div class="resub" role="tablist">'+RE_SUBS.map(function(x){return '<button type="button" role="tab" data-resub="'+x[0]+'" aria-selected="'+(S.tab===x[0])+'">'+x[1]+(x[0]!=='realestate'&&S.inbox&&S.inbox.people&&S.inbox.people.length?' <span class="n">'+S.inbox.people.length+'</span>':'')+'</button>';}).join('')+'</div>';}
+/* Real Estate › Real Estate: HQ's Follow-ups + Follow Up Boss tasks, embedded (same page, same PIN) */
+function viewRE(){return '<iframe id="reFrame" class="reframe" src="/hq/?only=re" title="Follow-ups and Follow Up Boss tasks"></iframe>';}
+function fitRE(){var f=document.getElementById('reFrame');if(!f)return;
+  function size(){try{var d=f.contentDocument;if(d&&d.body)f.style.height=Math.max(400,d.documentElement.scrollHeight)+'px';}catch(e){}}
+  f.addEventListener('load',function(){size();try{new ResizeObserver(size).observe(f.contentDocument.body);}catch(e){setInterval(size,1500);}});}
 window.addEventListener('hashchange',function(){var h=location.hash.slice(1);if(TABS.indexOf(h)>=0&&h!==S.tab)setTab(h);});
 
 /* load what the current tab needs (force = refresh even if loaded) */
@@ -760,17 +774,21 @@ function load(force){
 }
 function loadInbox(){return getJ('desk/inbox?days='+S.inboxDays).then(function(j){S.inbox=j;badge();}).catch(function(e){if(e==='pin')throw e;S.inbox={error:String(e),people:[]};});}
 function loadTodos(){return getJ('desk/todos?today='+ymd(new Date())).then(function(j){S.todos=j.items;});}
-function badge(){var n=S.inbox&&S.inbox.people?S.inbox.people.length:0;['sellers','buyers'].forEach(function(t){var a=$('#tabnav a[data-tab="'+t+'"]');a.innerHTML=t[0].toUpperCase()+t.slice(1)+(n?' <span class="n" title="Unsorted leads">'+n+'</span>':'');});}
+function badge(){var n=S.inbox&&S.inbox.people?S.inbox.people.length:0,a=$('#tabnav a[data-tab="realestate"]');if(a)a.innerHTML='Real Estate'+(n?' <span class="n" title="Unsorted leads">'+n+'</span>':'');}
 
 function render(){var m=$('#main');
-  var html=({sellers:viewBoard,buyers:viewBoard,marketing:viewMarketing,toolkit:viewToolkit,personal:viewPersonal,financial:viewFinancial,tpm:viewTPM})[S.tab]();
+  var keepFrame=S.tab==='realestate'&&$('#reFrame');
+  if(keepFrame){$$('.resub [data-resub]',m).forEach(function(b){b.setAttribute('aria-selected',b.dataset.resub===S.tab);});return;}
+  var html=({realestate:viewRE,sellers:viewBoard,buyers:viewBoard,marketing:viewMarketing,toolkit:viewToolkit,personal:viewPersonal,financial:viewFinancial,tpm:viewTPM})[S.tab]();
+  if(isRE(S.tab))html=reBar()+html;
   var sx={};$$('.board',m).forEach(function(b){sx[b.id]=b.scrollLeft;});
   var fa=document.activeElement,fid=fa&&fa.id&&/^(lq-|pq$|fq-)/.test(fa.id)?fa.id:null,pos=fid?fa.selectionStart:0;
   m.innerHTML=html;
   if(fid){var el=document.getElementById(fid);if(el){el.focus();try{el.setSelectionRange(pos,pos);}catch(e){}}}
   $$('.board',m).forEach(function(b){if(sx[b.id])b.scrollLeft=sx[b.id];});
   if(S.tab==='toolkit')afterToolkit();
-  if(S.tab==='personal')afterPersonal();}
+  if(S.tab==='personal')afterPersonal();
+  if(S.tab==='realestate')fitRE();}
 
 /* ---------- helpers ---------- */
 function lastChip(iso){var d=daysSince(iso);if(d==null)return '<span class="chip">No contact logged</span>';var c=d<=3?'g':d<=7?'a':'r';return '<span class="chip '+c+'" title="Last contact in FUB">'+(d===0?'Today':d===1?'1 day ago':d+' days ago')+'</span>';}

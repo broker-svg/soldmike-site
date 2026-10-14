@@ -14,7 +14,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600&display=swap">
 <style>
-/* HQ (host PIN): Michael's daily dashboard. Today + 3-day outlook, follow-ups, to-dos, Daily Drive, projects, workout, meals.
+/* HQ (host PIN): Michael's daily dashboard. Today, Check this, Next 3 days, Workers (Claude scheduled tasks), Daily Drive, projects.
+   Follow-ups + FUB tasks now live on the Agent Desk › Real Estate tab, which embeds this page with ?only=re.
    Same look as the back office and Leads pages. */
 :root{--navy:#1D2870;--navy2:#26338A;--ink:#141833;--red:#D7141E;--mist:#F7F8FB;--line:#DCE0EC;--muted:#545B78;--pale:#C9D0F2;--green:#1B7A3E;--amber:#9A5B00;
   --display:'Barlow Condensed','Arial Narrow',system-ui,sans-serif;--body:'Barlow',system-ui,-apple-system,'Segoe UI',sans-serif;color-scheme:light}
@@ -65,16 +66,24 @@ a{color:var(--navy)}
 /* grid */
 .wrap{max-width:1440px;margin:0 auto;padding:20px 16px 60px}
 .grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:20px;
-  grid-template-areas:"today today today today today today today today out out out out" "brief brief brief brief brief brief brief brief out out out out"
-  "fol fol fol fol fol todo todo todo todo drive drive drive" "work work work work work work meal meal meal meal meal meal" "proj proj proj proj proj proj proj proj proj proj proj proj"}
-#today{grid-area:today}#outlook{grid-area:out}#brief{grid-area:brief}#follow{grid-area:fol}#todo{grid-area:todo}#drive{grid-area:drive}#projects{grid-area:proj}#workout{grid-area:work}#meals{grid-area:meal}
+  grid-template-areas:"today today today today today today today today brief brief brief brief" "out out out out out out out out out out out out"
+  "wkr wkr wkr wkr wkr wkr wkr wkr wkr wkr wkr wkr" "drive drive drive drive proj proj proj proj proj proj proj proj"}
+#today{grid-area:today}#outlook{grid-area:out}#brief{grid-area:brief}#follow{grid-area:fol}#todo{grid-area:todo}#drive{grid-area:drive}#projects{grid-area:proj}#workers{grid-area:wkr}
+#follow,#todo{display:none}
+#outlook .days{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+/* ?only=re: just Follow-ups + FUB tasks (embedded in the Agent Desk › Real Estate tab) */
+html.re-only .bar,html.re-only .dtabs,html.re-only .hero,html.re-only .jump,html.re-only .grid>.card{display:none}
+html.re-only #follow,html.re-only #todo{display:block}
+html.re-only .wrap{padding:0 0 10px;max-width:none}
+html.re-only .grid{grid-template-areas:"fol fol fol fol fol fol todo todo todo todo todo todo"}
 @media (max-width:1180px){
-  .grid{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-areas:"today today" "out out" "brief brief" "fol todo" "drive drive" "work meal" "proj proj"}
-  #outlook .days{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-areas:"today today" "brief brief" "out out" "wkr wkr" "drive proj"}
+  html.re-only .grid{grid-template-areas:"fol todo"}
   .hero .in{grid-template-columns:1fr 1fr}.hero .mon{grid-column:1/-1}
 }
 @media (max-width:780px){
-  .grid{grid-template-columns:minmax(0,1fr);grid-template-areas:"today" "out" "brief" "fol" "todo" "drive" "work" "meal" "proj"}
+  .grid{grid-template-columns:minmax(0,1fr);grid-template-areas:"today" "brief" "out" "wkr" "drive" "proj"}
+  html.re-only .grid{grid-template-areas:"fol" "todo"}
   #outlook .days{display:flex;flex-direction:column}
   .jump{display:flex}
   .hero .in{grid-template-columns:1fr;gap:10px}.hero .dow{font-size:38px}.clock{font-size:34px}
@@ -209,7 +218,20 @@ pre.code{background:#0F1430;color:#E6E9F7;border-radius:10px;padding:12px;font-s
 .pnew{display:flex;align-items:center;justify-content:center;min-height:90px;border:2px dashed var(--line);border-radius:12px;background:none;cursor:pointer;color:var(--muted);font-weight:600;font-size:17px}
 .pnew:hover{border-color:var(--navy);color:var(--navy)}
 
-/* workout + meals */
+/* workers (Claude scheduled tasks) */
+.wtools{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+.wtools .tabs{margin:0}
+.wtools input{flex:1;min-width:180px;min-height:40px;border:1px solid var(--line);border-radius:20px;padding:0 14px;font-size:15px;background:#fff}
+.wlist{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px}
+.wk2{border:1px solid var(--line);border-radius:14px;padding:14px;background:var(--mist);display:flex;flex-direction:column;gap:6px;border-left:5px solid var(--c,var(--navy))}
+.wk2 .top{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.wk2 .top b{font-family:var(--display);font-size:22px;text-transform:uppercase;line-height:1;flex:1;min-width:0}
+.wk2 p{margin:0;font-size:15px}
+.wk2 .k{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+.wk2 .where{font-size:14px;color:var(--muted);overflow-wrap:anywhere}
+.wk2 ul{margin:0;padding-left:18px;font-size:15px}
+.wk2 details summary{cursor:pointer;font-size:14px;font-weight:600;color:var(--navy)}
+/* workout + meals (removed from HQ Oct 14 2026; styles kept for the shared plan dialogs) */
 .big{font-family:var(--display);font-weight:800;font-size:34px;text-transform:uppercase;line-height:.95;color:var(--navy)}
 .big small{display:block;font-family:var(--body);text-transform:none;font-weight:500;font-size:16px;color:var(--muted);margin-top:4px}
 .ex{display:grid;grid-template-columns:1fr auto;gap:10px;padding:9px 0;border-top:1px solid var(--line);font-size:17px}
@@ -277,13 +299,13 @@ dialog::backdrop{background:rgba(20,24,51,.6)}
     <button type="button" id="setBtn">Settings</button>
   </div>
 </div>
-<div class="dtabs"><nav aria-label="Dashboards"><a href="/hq/tasks/">Tasks</a><a href="/hq/" aria-current="page">HQ</a><a href="/hq/agents/#sellers">Sellers</a><a href="/hq/agents/#buyers">Buyers</a><a href="/hq/agents/#marketing">Marketing</a><a href="/hq/agents/#toolkit">Toolkit</a><a href="/hq/agents/#personal">Personal</a><a href="/hq/agents/#financial">Financial</a><a href="/hq/agents/#tpm">TPM</a><a href="/open-house/">Open House</a></nav></div>
+<div class="dtabs"><nav aria-label="Dashboards"><a href="/hq/tasks/">Tasks</a><a href="/hq/" aria-current="page">HQ</a><a href="/hq/agents/#realestate">Real Estate</a><a href="/hq/agents/#marketing">Marketing</a><a href="/hq/agents/#toolkit">Toolkit</a><a href="/hq/agents/#personal">Personal</a><a href="/hq/agents/#financial">Financial</a><a href="/hq/agents/#tpm">TPM</a><a href="/open-house/">Open House</a></nav></div>
 <header class="hero"><div class="in">
   <div><div class="dow" id="hDow"></div><div class="date" id="hDate"></div><div id="hHol"></div></div>
   <div><div class="clock" id="hClock"></div><div class="wx" id="hWx"></div></div>
   <div class="mon" id="hMon"></div>
 </div></header>
-<nav class="jump" aria-label="Jump to"><a href="#today">Today</a><a href="#outlook">Next 3 days</a><a href="#follow">Follow-ups</a><a href="#todo">FUB tasks</a><a href="#drive">Daily Drive</a><a href="#workout">Workout</a><a href="#meals">Meals</a><a href="#projects">Projects</a></nav>
+<nav class="jump" aria-label="Jump to"><a href="#today">Today</a><a href="#outlook">Next 3 days</a><a href="#brief">Tasks &amp; email</a><a href="#workers">Workers</a><a href="#drive">Daily Drive</a><a href="#projects">Projects</a></nav>
 
 <main class="wrap"><div class="grid">
   <section class="card" id="today"><div class="hd"><h2>Today</h2><span class="sub" id="todaySub"></span><button type="button" class="rt" id="rtBtn" aria-pressed="false">Routine <b>Off</b></button></div>
@@ -296,8 +318,7 @@ dialog::backdrop{background:rgba(20,24,51,.6)}
   <section class="card" id="todo"><div class="hd"><h2>Follow Up Boss tasks</h2><span class="sub" id="todoSub"></span></div><div class="tabs tk" id="fbTabs"></div><div id="todoList"></div></section>
   <section class="card" id="drive"><div class="hd"><h2>Daily Drive</h2></div><div id="driveBody"></div></section>
   <section class="card" id="projects"><div class="hd"><h2>Projects</h2><span class="sub" id="projSub"></span><button class="btn sm navy" type="button" id="newProj">+ New project</button></div><div class="tabs" id="projTabs"></div><div class="pgrid" id="projGrid"></div></section>
-  <section class="card" id="workout"><div class="hd"><h2>Workout</h2><span class="sub" id="gymSub"></span></div><div id="workBody"></div></section>
-  <section class="card" id="meals"><div class="hd"><h2>Today's menu</h2><button class="btn sm ghost" type="button" id="weekMenu">Week menu</button></div><div id="mealBody"></div></section>
+  <section class="card" id="workers"><div class="hd"><h2>Workers</h2><span class="sub" id="wkSub">Claude's scheduled jobs: what runs when, where it looks, and what got done</span></div><div class="wtools"><div class="tabs tk" id="wkTabs"></div><input type="search" id="wkQ" placeholder="Search workers, jobs, folders…" aria-label="Search workers"></div><div id="wkBody"><p class="empty">Loading…</p></div></section>
 </div></main>
 
 <dialog id="dlg"></dialog>
@@ -308,6 +329,7 @@ dialog::backdrop{background:rgba(20,24,51,.6)}
 <script>
 (function(){
   var SM=window.SM, esc=SM.esc;
+  if(/[?&]only=re\b/.test(location.search))document.documentElement.classList.add('re-only');
   var $=function(id){return document.getElementById(id);};
 
   // ---------- plan data (from the 2nd Brain: Daily Drive, Daily Routine, Health & Fitness) ----------
@@ -656,7 +678,6 @@ dialog::backdrop{background:rgba(20,24,51,.6)}
       var gr=allTasks().filter(function(x){return x.src!=='fub'&&x.day===day;});if(gr.length)cnt.push('<span class="chip amber">'+gr.length+' task'+(gr.length===1?'':'s')+' / reminder'+(gr.length===1?'':'s')+'</span>');
       var td=b.todos.filter(function(t){return !t.done;});if(td.length)cnt.push('<span class="chip">'+td.length+' to-do'+(td.length===1?'':'s')+'</span>');
       if(b.routineN&&!S.routine)cnt.push('<span class="chip">'+b.routineN+' routine hidden</span>');
-      var wo=WEEK[d.getDay()];cnt.push('<span class="chip green">'+esc(wo.name)+'</span>');
       return '<div class="day"><h3>'+(i===0?'Tomorrow':DOWS[d.getDay()])+' <small>'+(i===0?DOWS[d.getDay()].slice(0,3)+' ':'')+MONS[d.getMonth()].slice(0,3)+' '+d.getDate()+'</small><span class="wxs">'+esc(wx)+'</span></h3>'
         +(hol?'<div class="hol2"><span class="chip '+(hol.stat?'red':'amber')+'">'+esc(hol.name)+(hol.stat?' · stat':'')+'</span></div>':'')
         +(items?'<ul>'+items+more+'</ul>':'<p class="empty" style="padding:6px 0 0">Open day.</p>')
@@ -803,61 +824,40 @@ dialog::backdrop{background:rgba(20,24,51,.6)}
   }
   $('newProj').onclick=function(){editProject(null);};
 
-  // ---------- workout ----------
-  function workout(){
-    var w=WEEK[new Date().getDay()],done=!!S.data.logs.workout,push=!!S.data.logs.pushups,h;
-    $('gymSub').textContent=w.gym?'Gym 7:30–9 PM':'';
-    h='<div class="big">'+esc(w.name)+'<small>'+esc(w.sub)+'</small></div>';
-    if(w.ex.length)h+='<div style="margin-top:12px">'+w.ex.map(function(k){var e=EX[k],l=S.data.logs['lift:'+k],ok=l&&l.sets&&l.sets.filter(Boolean).length>=e[3];
-      return '<div class="ex'+(ok?' ok':'')+'"><b>'+esc(e[0])+'</b><span>'+esc(e[1])+(l&&l.w?' · '+esc(l.w)+' lb':'')+'</span></div>';}).join('')+'</div>'
-      +'<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px"><button class="btn navy" type="button" id="openWo">'+(done?'Workout done ✓':'Open workout')+'</button></div>';
-    else h+='<p style="margin:12px 0 0">'+esc(w.free)+'</p><label class="inline" style="border:0;margin-top:4px;padding-top:6px"><input class="ck" type="checkbox" id="restDone"'+(done?' checked':'')+'> Done</label>';
-    h+='<label class="inline"><input class="ck" type="checkbox" id="pushups"'+(push?' checked':'')+'> 25 push-ups at 8:55 AM</label>';
-    var wk='',start=addDays(fromYmd(S.today),-6);
-    for(var i=0;i<7;i++){var d=addDays(start,i),day=ymd(d),v=day===S.today?done:!!(S.data.week[day]||{}).workout;wk+='<i class="'+(v?'on':'')+(day===S.today?' today':'')+'">'+DOWS[d.getDay()].charAt(0)+'</i>';}
-    var cnt=0;for(var j=0;j<7;j++){var dj=ymd(addDays(start,j));if(dj===S.today?done:(S.data.week[dj]||{}).workout)cnt++;}
-    h+='<div class="sec" style="margin-top:14px">Last 7 days · '+cnt+' session'+(cnt===1?'':'s')+' (goal 2–3 gym)</div><div class="wk">'+wk+'</div>';
-    $('workBody').innerHTML=h;
-    if($('openWo'))$('openWo').onclick=openWorkout;
-    if($('restDone'))$('restDone').onchange=function(){log('workout',this.checked||null);workout();};
-    $('pushups').onchange=function(){log('pushups',this.checked||null);};
+  // ---------- workers (Claude scheduled tasks; Claude posts the list + each run's report) ----------
+  var WAREA={MKT:'#2B8BD9',RE:'#E8822E',TPM:'#7C83DB',FIN:'#1B7A3E',FN:'#6B7280',HQ:'#1D2870'};
+  var WST={done:['Done','green'],partial:['Partly done','amber'],needs:['Needs you','red'],failed:['Failed','red'],skipped:['Skipped','']};
+  S.wf=SM.store('hq_wf')||'all';S.wq='';
+  function workers(){
+    var W=S.workers;if(!W)return;
+    var defs=W.defs||[],runs=W.runs||{};
+    function last(d){return (runs[d.id]||[])[0];}
+    function cat(d){var r=last(d);if(!r)return 'new';return r.status==='done'?'done':r.status==='skipped'?'done':'needs';}
+    var n={all:defs.length,needs:0,done:0,new:0};defs.forEach(function(d){n[cat(d)]++;});
+    var F=[['all','All'],['needs','Needs you'],['done','Done'],['new','Not run yet']];
+    $('wkTabs').innerHTML=F.map(function(f){return '<button type="button" data-f="'+f[0]+'" aria-pressed="'+(S.wf===f[0])+'">'+f[1]+(n[f[0]]?'<span class="n">'+n[f[0]]+'</span>':'')+'</button>';}).join('');
+    [].forEach.call($('wkTabs').querySelectorAll('button'),function(b){b.onclick=function(){S.wf=b.dataset.f;SM.store('hq_wf',S.wf);workers();};});
+    var q=S.wq.toLowerCase();
+    var L=defs.filter(function(d){return (S.wf==='all'||cat(d)===S.wf)&&(!q||[d.name,d.job,d.when,d.looksIn,d.output,d.area].join(' ').toLowerCase().indexOf(q)>=0);});
+    if(!defs.length){$('wkBody').innerHTML='<p class="empty">No workers yet. Claude adds each scheduled job here when it sets one up.</p>';return;}
+    if(!L.length){$('wkBody').innerHTML='<p class="empty">Nothing matches.</p>';return;}
+    $('wkBody').innerHTML='<div class="wlist">'+L.map(function(d){var r=last(d),st=r?WST[r.status]||WST.done:null,at=r?new Date(r.at):null;
+      function li(a){return a&&a.length?'<ul>'+a.map(function(x){return '<li>'+esc(x)+'</li>';}).join('')+'</ul>':'';}
+      return '<div class="wk2" style="--c:'+(WAREA[d.area]||'#1D2870')+'"><div class="top"><b>'+esc(d.name)+'</b>'+(d.area?'<span class="chip">'+esc(d.area)+'</span>':'')+(d.enabled===false?'<span class="chip">Paused</span>':'')+'</div>'
+        +'<p>'+esc(d.job)+'</p>'
+        +'<p class="where"><span class="k">When</span> '+esc(d.when||'—')+'</p>'
+        +(d.looksIn?'<p class="where"><span class="k">Looks in</span> '+esc(d.looksIn)+'</p>':'')
+        +(d.output?'<p class="where"><span class="k">Reports to</span> '+esc(d.output)+'</p>':'')
+        +'<div class="top" style="margin-top:4px"><span class="k" style="flex:1">Last run</span>'+(r?'<span class="chip '+st[1]+'">'+st[0]+'</span><span class="muted" style="font-size:14px">'+(ymd(at)===S.today?'Today':DOWS[at.getDay()].slice(0,3)+' '+MONS[at.getMonth()].slice(0,3)+' '+at.getDate())+' · '+tm(at)+'</span>':'<span class="chip">Not run yet</span>')+'</div>'
+        +(r&&r.summary?'<p>'+esc(r.summary)+'</p>':'')
+        +(r&&r.needs&&r.needs.length?'<p class="k" style="color:var(--red)">Needs you</p>'+li(r.needs):'')
+        +(r&&r.notDone&&r.notDone.length?'<p class="k" style="color:var(--amber)">Not done</p>'+li(r.notDone):'')
+        +(r&&r.done&&r.done.length?'<details><summary>Done ('+r.done.length+')</summary>'+li(r.done)+'</details>':'')
+        +((runs[d.id]||[]).length>1?'<details><summary>Earlier runs</summary><ul>'+runs[d.id].slice(1).map(function(x){var a=new Date(x.at);return '<li>'+DOWS[a.getDay()].slice(0,3)+' '+MONS[a.getMonth()].slice(0,3)+' '+a.getDate()+': '+esc((WST[x.status]||WST.done)[0])+(x.summary?' · '+esc(x.summary):'')+'</li>';}).join('')+'</ul></details>':'')
+        +'</div>';}).join('')+'</div>';
   }
-  function openWorkout(){
-    var w=WEEK[new Date().getDay()];
-    function body(){return '<h2>'+esc(w.name)+'</h2><p class="muted" style="margin:-6px 0 0">'+esc(w.sub)+'. Progression: hit the top of the rep range with good form 2 sessions in a row, then add 5 lb.</p>'
-      +w.ex.map(function(k){var e=EX[k],l=S.data.logs['lift:'+k]||{sets:[],w:''},last=S.data.lastLift['lift:'+k],sets='';
-        for(var i=0;i<e[3];i++)sets+='<button type="button" data-k="'+k+'" data-s="'+i+'" class="'+(l.sets[i]?'on':'')+'">'+(i+1)+'</button>';
-        var hint=last&&last.w?'Last time: '+esc(last.w)+' lb'+(last.sets&&last.sets.filter(Boolean).length>=e[3]?', all sets done':''):'';
-        var noW=/plank|dead bug|side plank|bird dog|stretch/i.test(e[0]);
-        return '<div class="lift"><div class="top"><b>'+esc(e[0])+'</b><span class="muted">'+esc(e[1])+'</span></div><p class="cue">'+esc(e[2])+'</p>'
-          +'<div class="row"><div class="sets">'+sets+'</div>'+(noW?'':'<input type="text" inputmode="decimal" data-w="'+k+'" placeholder="lb" value="'+esc(l.w||'')+'" aria-label="Weight in pounds"><span class="hint">'+hint+'</span>')+'</div></div>';}).join('')
-      +'<div class="acts"><span class="muted" style="font-size:15px">Saved as you go.</span><button class="btn '+(S.data.logs.workout?'ghost':'navy')+'" type="button" id="woDone">'+(S.data.logs.workout?'Done ✓ (undo)':'Mark workout done')+'</button></div>';}
-    dialog(body());
-    var el=$('dlg');
-    el.onclick=function(e){var b=e.target.closest('[data-s]');if(!b)return;var k=b.dataset.k,l=Object.assign({sets:[],w:''},S.data.logs['lift:'+k]);l.sets=l.sets.slice();l.sets[+b.dataset.s]=l.sets[+b.dataset.s]?0:1;log('lift:'+k,l);b.classList.toggle('on');};
-    [].forEach.call(el.querySelectorAll('[data-w]'),function(i){i.onchange=function(){var k=i.dataset.w,l=Object.assign({sets:[],w:''},S.data.logs['lift:'+k]);l.w=i.value.trim().slice(0,10);log('lift:'+k,l);};});
-    $('woDone').onclick=function(){var v=!S.data.logs.workout;log('workout',v||null);if(v)toast('Workout logged. Nice work.');closeDlg();workout();};
-    el.addEventListener('close',function h(){el.removeEventListener('close',h);el.onclick=null;workout();});
-  }
-
-  // ---------- meals ----------
-  function meals(){
-    var dw=new Date().getDay(),M=MEALS[dw],eaten=S.data.logs.meals||[],water=+S.data.logs.water||0,h='';
-    h+=M.map(function(m,i){return '<label class="meal'+(eaten.indexOf(i)>=0?' ok':'')+'"><input class="ck" type="checkbox" data-m="'+i+'"'+(eaten.indexOf(i)>=0?' checked':'')+'><div><small>'+MEAL_LBL[i]+'</small>'+esc(m)+'</div></label>';}).join('');
-    h+='<div class="targets"><span class="chip navy">Protein 160 g</span><span class="chip">Carbs around training</span><span class="chip">Water 3 L</span></div>';
-    var g='';for(var i=0;i<12;i++)g+='<button type="button" data-g="'+(i+1)+'" class="'+(i<water?'on':'')+'" aria-label="'+(i+1)+' glasses"></button>';
-    h+='<div class="sec">Water · '+String(+(water*0.25).toFixed(2))+' of 3 L</div><div class="water">'+g+'</div>';
-    if(dw===0){var pr=S.data.logs.prep||[];h+='<div class="sec">Sunday meal prep</div>'+PREP.map(function(p,i){return '<label class="drv"><input class="ck" type="checkbox" data-p="'+i+'"'+(pr.indexOf(i)>=0?' checked':'')+'><div>'+esc(p)+'</div></label>';}).join('');}
-    h+='<p class="muted" style="font-size:14px;margin:10px 0 0">Go easy on processed snacks, midday refined carbs, alcohol and fast food.</p>';
-    $('mealBody').innerHTML=h;
-    [].forEach.call($('mealBody').querySelectorAll('[data-m]'),function(c){c.onchange=function(){var i=+c.dataset.m,a=(S.data.logs.meals||[]).filter(function(x){return x!==i;});if(c.checked)a.push(i);log('meals',a);meals();};});
-    [].forEach.call($('mealBody').querySelectorAll('[data-g]'),function(b){b.onclick=function(){var n=+b.dataset.g;log('water',n===water?n-1:n);meals();};});
-    [].forEach.call($('mealBody').querySelectorAll('[data-p]'),function(c){c.onchange=function(){var i=+c.dataset.p,a=(S.data.logs.prep||[]).filter(function(x){return x!==i;});if(c.checked)a.push(i);log('prep',a);};});
-  }
-  $('weekMenu').onclick=function(){var dw=new Date().getDay(),order=[1,2,3,4,5,6,0];
-    dialog('<h2>Week menu</h2><div style="overflow-x:auto"><table class="mtab"><tr><th></th><th>Breakfast</th><th>Lunch</th><th>Pre-gym</th><th>Dinner</th></tr>'
-      +order.map(function(d){return '<tr class="'+(d===dw?'today':'')+'"><th>'+DOWS[d].slice(0,3)+'</th>'+MEALS[d].map(function(m){return '<td>'+esc(m)+'</td>';}).join('')+'</tr>';}).join('')
-      +'</table></div><p class="help">From your Health &amp; Fitness plan: 4 meals, 160 g protein, 3 L water. Sunday: batch cook 2 proteins, portion, hard-boil eggs, prep greens. Ask Claude to change any meal.</p>');};
+  $('wkQ').oninput=function(){S.wq=this.value;workers();};
+  function loadWorkers(){return getJ('workers').then(function(j){S.workers=j;workers();}).catch(function(e){if(e!=='pin')$('wkBody').innerHTML='<p class="err">Could not load workers.</p>';});}
 
   // ---------- dialog + settings ----------
   function dialog(html){var d=$('dlg');d.innerHTML='<div class="dl"><button class="close" type="button" aria-label="Close">×</button>'+html+'</div>';d.querySelector('.close').onclick=closeDlg;if(!d.open)d.showModal();}
@@ -984,8 +984,8 @@ function out(o) {
     $('refresh').classList.add('spin');
     return getJ('day?today='+S.today+'&from='+encodeURIComponent(from)+'&to='+encodeURIComponent(to)+'&drive='+DRIVE.length).then(function(d){
       S.data=d;S.loadedAt=Date.now();
-      today();outlook();brief();renderTodos();drive();workout();meals();followTabs();people();
-      loadCals();loadExtra();
+      today();outlook();brief();renderTodos();drive();followTabs();people();
+      loadCals();loadExtra();loadWorkers();
       return getJ('items').then(function(j){
         if(j.items.length){S.projects=j.items;projects();return;}
         return post('seed',{items:SEED}).then(function(){return getJ('items');}).then(function(j2){S.projects=j2.items;projects();});
