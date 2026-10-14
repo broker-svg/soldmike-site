@@ -481,6 +481,7 @@ dialog::backdrop{background:rgba(20,24,51,.6)}
 .fb{border:1px solid var(--line);border-radius:12px;padding:12px 14px;min-width:0}
 .fb h3{font:700 16px var(--display);text-transform:uppercase;letter-spacing:.04em;color:var(--navy);margin:0 0 6px}
 .fb.fmiss{margin:0}.fb.fmiss h3{color:var(--amber)}
+.fb.flook{background:#FDECDF;border-color:#F4C3A1}.fb.flook h3{color:#B5480F}.fb.flook .lrows li{border-top-color:#F4C3A1}
 .fb textarea{width:100%;min-height:96px;font:inherit;font-size:15px;padding:10px;border:1px solid var(--line);border-radius:10px;resize:vertical;box-sizing:border-box}
 .fleg{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);white-space:nowrap}.fleg .lst{margin-left:6px}
 .frow{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;margin:0 0 10px}
@@ -1576,7 +1577,7 @@ function finBoard(E,F){
   var row=function(x,left,right){return '<li class="xrow">'+acctDot(x.account)+'<button type="button" class="la nmb" data-exp="'+x.id+'"><b>'+esc(x.title)+'</b><small>'+left+'</small></button><span class="lp">'+right+'</span>'+(revTag(x)||'<span></span>')+'</li>';};
   var up='<div class="fb"><h3>Coming up · next 30 days <span class="muted">'+money0(soonTot)+'</span></h3>'
     +(soon.length?'<ul class="lrows">'+soon.map(function(o){return row(o.x,'<b class="duei">'+esc(soonTxt(o.d))+'</b> · '+esc(o.x.kind==='new'?'One-off, to pay':o.x.cadence==='yearly'?'Yearly renewal':'Monthly'),money2(o.x.amount));}).join('')+'</ul>':'<p class="empty">Nothing due in the next 30 days.</p>')+'</div>';
-  /* everything under review lives here: To cancel (with Monthly / Yearly + task date) and Still deciding */
+  /* everything under review lives here: To cancel (with Monthly / Yearly + task date); undecided ones go in Things to look over, under Missing statements */
   var cadL=function(x){return x.cadence==='yearly'?'Yearly':x.cadence==='weekly'?'Weekly':x.cadence==='quarterly'?'Every 3 months':'Monthly';};
   var tdue=function(x){var t=cancelTask(x);return t&&t.due||'9';};
   canc.sort(function(a,b){return (a.cadence==='yearly')-(b.cadence==='yearly')||tdue(a).localeCompare(tdue(b));});
@@ -1588,10 +1589,12 @@ function finBoard(E,F){
         bits.push(t?(t.done?'task done: tap it, then “Stopped paying”':'task '+esc(fmtDay(t.due).replace(/^\w+, /,''))):x.task?'task on your to-do list':'no task yet: tap to add one');
         return row(x,bits.join(' · '),money2(x.amount)+'<small class="muted"> /'+perLbl(x)+'</small>');}).join('')+'</ul>'
       :'<p class="empty">Open any bill and tap “Cancel it…” to add a task to your to-do list.</p>')
-    +(dec.length?'<h3 style="margin-top:14px">Still deciding · '+dec.length+' · '+yrSave(dec)+'/yr under review</h3><ul class="lrows">'+dec.map(function(x){var n=(x.note||'').split(/(?<=\.)\s/)[0];
-        return row(x,'<b class="duei">'+cadL(x)+'</b>'+(x.cadence==='yearly'&&renewal(x)?' · renews '+esc(fmtDay(renewal(x)).replace(/^\w+, /,'')):'')+(n?' · '+esc(n):''),money2(x.amount)+'<small class="muted"> /'+perLbl(x)+'</small>');}).join('')+'</ul>':'')+'</div>';
+    +'</div>';
   var ms=miss.length||notes.length?'<div class="fb fmiss"><h3>Missing statements'+(miss.length?' · '+miss.length:'')+'</h3>'+(miss.length?'<ul>'+miss.map(function(m){return '<li><b>'+esc(m.what)+'</b>. '+esc(m.why)+'</li>';}).join('')+'</ul>':'<p class="empty">None. All statements are in.</p>')
     +(notes.length?'<p>'+notes.map(esc).join(' · ')+'</p>':'')+'</div>':'';
+  var lk=dec.length?'<div class="fb flook"><h3>Things to look over · '+dec.length+' · '+yrSave(dec)+'/yr</h3><ul class="lrows">'+dec.map(function(x){var n=(x.note||'').split(/(?<=\.)\s/)[0];
+      return row(x,'<b class="duei">'+cadL(x)+'</b>'+(x.cadence==='yearly'&&renewal(x)?' · renews '+esc(fmtDay(renewal(x)).replace(/^\w+, /,'')):'')+(n?' · '+esc(n):''),money2(x.amount)+'<small class="muted"> /'+perLbl(x)+'</small>');}).join('')+'</ul></div>':'';
+  ms+=lk;
   var A=S.finAcct,need=A?acctTodo(A).length:0;
   if(A)ms+='<div class="fb"><h3>Accountant</h3><p style="margin:0">'+(need?'<b>'+need+' thing'+(need>1?'s':'')+' needed</b> for the books. ':'Books are up to date. ')+'<a href="#fin-acct" data-goacct>See the Accountant section ↓</a></p></div>';
   var nt='<div class="fb"><h3>Notes</h3><textarea id="finNotes" rows="4" aria-label="Notes" placeholder="Anything to remember: call Intuit about the double charge, ask Rob about HST…">'+esc(S.finNotes||'')+'</textarea>'
