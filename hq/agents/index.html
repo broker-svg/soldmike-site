@@ -340,6 +340,9 @@ dialog::backdrop{background:rgba(20,24,51,.6)}
 .split{display:grid;gap:20px;grid-template-columns:minmax(0,1fr)}
 .mainc{display:grid;gap:20px;min-width:0;align-content:start}
 .rail{order:-1;display:grid;gap:20px;align-content:start;min-width:0}
+.railtop{display:grid;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));gap:20px;margin-bottom:20px;align-items:start}
+.railtop>*{margin:0}
+.railtop .feed{max-height:300px;overflow:auto;overscroll-behavior:contain}
 @media (min-width:1180px){.split{grid-template-columns:minmax(0,1fr) 360px}.rail{order:0;position:sticky;top:64px;max-height:calc(100vh - 80px);overflow:auto;overscroll-behavior:contain;padding-bottom:4px}
   .rail .card{padding:16px}.rail .hd h2{font-size:24px}.rail .hd .sub{flex-basis:100%}.rail .row .rm{flex-basis:100%}.rail .ra{margin-left:0}}
 /* expireds / fsbos */
@@ -1004,7 +1007,8 @@ function inbox(force){
 function viewBoard(){
   var kind=S.tab==='sellers'?'s':'b',B=S.board[kind],label=kind==='s'?'Sellers':'Buyers';
   var rail=feedP(kind)+(kind==='s'?todayCard():'');
-  function wrap(main){return '<div class="split"><div class="mainc">'+main+'</div><aside class="rail" aria-label="Activity and new leads">'+rail+'</aside></div>';}
+  // Activity (and, for sellers, Today) runs full width across the top so the boards below get the whole width
+  function wrap(main){return '<aside class="railtop" aria-label="Activity">'+rail+'</aside><div class="mainc">'+main+'</div>';}
   var top=focusSection(kind);
   function pipe(inner,n){return '<details class="pipe"'+(S.pipeOpen?' open':'')+' data-pipe><summary>Pipeline board'+(n!=null?' · '+n+' cards':'')+' <small>'+(kind==='s'?'Listing appointment → Follow-up & intake → Coming soon → For sale → Offer night → Sold, with each phase’s checklist':'Searching → Showings → Offer → Firm → Closed, checklists, facts, matching')+'</small></summary>'+inner+'</details>';}
   if(!B)return wrap(top+pipe('<section class="card"><p class="empty">Loading…</p></section>')+(kind==='s'?prospectsSection()+sellerRes():buyerRes()));

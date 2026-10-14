@@ -66,8 +66,8 @@ a{color:var(--navy)}
 /* grid */
 .wrap{max-width:1440px;margin:0 auto;padding:20px 16px 60px}
 .grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:20px;
-  grid-template-areas:"today today today today today today today today wkr wkr wkr wkr" "out out out out out out out out out out out out"
-  "brief brief brief brief brief brief brief brief brief brief brief brief" "proj proj proj proj proj proj proj proj proj proj proj proj"}
+  grid-template-areas:"today today today today today today today today wkr wkr wkr wkr" "brief brief brief brief brief brief brief brief brief brief brief brief"
+  "out out out out out out out out out out out out" "proj proj proj proj proj proj proj proj proj proj proj proj"}
 #today{grid-area:today}#outlook{grid-area:out}#brief{grid-area:brief}#follow{grid-area:fol}#todo{grid-area:todo}#drive{grid-area:drive}#projects{grid-area:proj}#workers{grid-area:wkr}
 #follow,#todo,#drive{display:none} /* these three show only in the Agent Desk › Real Estate tab (?only=re) */
 #workers .wlist{grid-template-columns:1fr} /* Workers sit in the right column, stacked */
@@ -84,12 +84,12 @@ html.re-only #driveBody>:not(.drv):not(.ring){grid-column:1/-1}
 html.re-only .wrap{padding:0 0 10px;max-width:none}
 html.re-only .grid{grid-template-areas:"drive drive drive drive drive drive drive drive drive drive drive drive" "fol fol fol fol fol fol todo todo todo todo todo todo"}
 @media (max-width:1180px){
-  .grid{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-areas:"today today" "wkr wkr" "out out" "brief brief" "proj proj"}
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-areas:"today today" "wkr wkr" "brief brief" "out out" "proj proj"}
   html.re-only .grid{grid-template-areas:"drive drive" "fol todo"}
   .hero .in{grid-template-columns:1fr 1fr}.hero .mon{grid-column:1/-1}
 }
 @media (max-width:780px){
-  .grid{grid-template-columns:minmax(0,1fr);grid-template-areas:"today" "wkr" "out" "brief" "proj"}
+  .grid{grid-template-columns:minmax(0,1fr);grid-template-areas:"today" "wkr" "brief" "out" "proj"}
   html.re-only .grid{grid-template-areas:"drive" "fol" "todo"}
   #outlook .days{display:flex;flex-direction:column}
   .jump{display:flex}
@@ -312,7 +312,7 @@ dialog::backdrop{background:rgba(20,24,51,.6)}
   <div><div class="clock" id="hClock"></div><div class="wx" id="hWx"></div></div>
   <div class="mon" id="hMon"></div>
 </div></header>
-<nav class="jump" aria-label="Jump to"><a href="#today">Today</a><a href="#outlook">Next 3 days</a><a href="#workers">Workers</a><a href="#brief">Tasks &amp; email</a><a href="#projects">Projects</a></nav>
+<nav class="jump" aria-label="Jump to"><a href="#today">Today</a><a href="#workers">Workers</a><a href="#brief">Tasks &amp; email</a><a href="#outlook">Next 3 days</a><a href="#projects">Projects</a></nav>
 
 <main class="wrap"><div class="grid">
   <section class="card" id="today"><div class="hd"><h2>Today</h2><span class="sub" id="todaySub"></span><button type="button" class="rt" id="rtBtn" aria-pressed="false">Routine <b>Off</b></button></div>
