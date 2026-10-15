@@ -344,6 +344,9 @@ dialog::backdrop{background:rgba(20,24,51,.6)}
 .railtop{display:grid;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));gap:20px;margin-bottom:20px;align-items:start}
 .railtop>*{margin:0}
 .railtop .feed{max-height:300px;overflow:auto;overscroll-behavior:contain}
+@media (min-width:800px){.railtop.pair{align-items:stretch}.railtop.pair .fcard.even{height:0;min-height:100%;display:flex;flex-direction:column;overflow:hidden}
+  .railtop.pair .fcard.even .feed{flex:1 1 0;min-height:0;max-height:none;overflow:hidden}.railtop.pair .fcard.even .more{flex:none}}
+@media (max-width:799px){.railtop .fcard .more.evenonly{display:none}}
 @media (min-width:1180px){.split{grid-template-columns:minmax(0,1fr) 360px}.rail{order:0;position:sticky;top:64px;max-height:calc(100vh - 80px);overflow:auto;overscroll-behavior:contain;padding-bottom:4px}
   .rail .card{padding:16px}.rail .hd h2{font-size:24px}.rail .hd .sub{flex-basis:100%}.rail .row .rm{flex-basis:100%}.rail .ra{margin-left:0}}
 /* expireds / fsbos */
@@ -790,7 +793,9 @@ function render(){var m=$('#main');
   $$('.board',m).forEach(function(b){if(sx[b.id])b.scrollLeft=sx[b.id];});
   if(S.tab==='toolkit')afterToolkit();
   if(S.tab==='personal')afterPersonal();
-  if(S.tab==='realestate')fitRE();}
+  if(S.tab==='realestate')fitRE();evenFeed();}
+window.addEventListener("resize",function(){evenFeed();});
+function evenFeed(){requestAnimationFrame(function(){$$('.fcard.even').forEach(function(c){var f=c.querySelector('.feed'),b=c.querySelector('.more.evenonly');if(f&&b)b.hidden=f.scrollHeight<=f.clientHeight+2;});});}
 
 /* ---------- helpers ---------- */
 function lastChip(iso){var d=daysSince(iso);if(d==null)return '<span class="chip">No contact logged</span>';var c=d<=3?'g':d<=7?'a':'r';return '<span class="chip '+c+'" title="Last contact in FUB">'+(d===0?'Today':d===1?'1 day ago':d+' days ago')+'</span>';}
@@ -884,14 +889,16 @@ function feed(kind){
   var chips=[['all','All activity'],['reply','Replied',cnt.reply,'g'],['engaged','Active',cnt.engaged,'n'],['waiting','Waiting',cnt.waiting,'a'],['stale','Stale',cnt.stale,'r']];
   var bar='<div class="fchips" role="toolbar" aria-label="Filter activity">'+chips.map(function(x){return '<button type="button" data-ff="'+x[0]+'" aria-pressed="'+(S.feedFilter===x[0])+'" class="'+(x[3]||'')+'">'+x[1]+(x[2]!=null?' <b>'+x[2]+'</b>':'')+'</button>';}).join('')+'</div>';
   var body;
-  if(S.feedFilter==='all'){var ev=feedEvents(kind),show=S.feedAll?ev:ev.slice(0,10);
+  var even=kind==='s'&&!S.feedAll&&S.prospects&&readyList().length>0;
+  if(S.feedFilter==='all'){var ev=feedEvents(kind),show=S.feedAll||even?ev:ev.slice(0,10);
     body=ev.length?'<ul class="feed">'+show.map(function(e){var nm=e.c.name||liveOf(kind,e.c).name||e.c.addr,lab=EV[e.k];
       return '<li class="'+lab[1]+'"><button type="button" data-view="'+kind+'" data-id="'+e.c.id+'"><i class="dot '+(lab[1]==='g'?'reply':lab[1]==='n'?'engaged':'ok')+'"></i><span>'+(lab[1]==='o'?esc(lab[0])+' <b>'+esc(nm)+'</b>':'<b>'+esc(nm)+'</b> '+esc(lab[0]))+'</span><small>'+esc(agoMs(e.t))+'</small></button></li>';}).join('')+'</ul>'
-      +(ev.length>10?'<button type="button" class="more" data-feedall>'+(S.feedAll?'Show less':'Show all '+ev.length)+'</button>':'')
+      +(even?'<button type="button" class="more evenonly" data-feedall>Show more</button>':ev.length>10?'<button type="button" class="more" data-feedall>'+(S.feedAll?'Show less':'Show all '+ev.length)+'</button>':'')
       :'<p class="empty">No activity in this window.</p>';}
   else{var L=cards.filter(function(c){return actOf(kind,c).st===S.feedFilter;}).sort(function(a,b){var x=actOf(kind,a),y=actOf(kind,b);return (y.inn||y.eng||0)-(x.inn||x.eng||0);});
-    body=L.length?'<ul class="feed">'+L.map(function(c){return '<li><button type="button" data-view="'+kind+'" data-id="'+c.id+'">'+dot(kind,c)+'<span><b>'+esc(c.name||liveOf(kind,c).name||c.addr)+'</b> '+stageName(kind,c.stage)+'</span><small>'+actChip(kind,c)+'</small></button></li>';}).join('')+'</ul>':'<p class="empty">Nobody here.</p>';}
-  return '<section class="card">'+head+bar+body+(B.liveError?'<p class="err">Follow Up Boss didn’t answer. Try Refresh.</p>':'')+'</section>';
+    body=L.length?'<ul class="feed">'+L.map(function(c){return '<li><button type="button" data-view="'+kind+'" data-id="'+c.id+'">'+dot(kind,c)+'<span><b>'+esc(c.name||liveOf(kind,c).name||c.addr)+'</b> '+stageName(kind,c.stage)+'</span><small>'+actChip(kind,c)+'</small></button></li>';}).join('')+'</ul>'+(even?'<button type="button" class="more evenonly" data-feedall>Show more</button>':S.feedAll&&kind==='s'?'<button type="button" class="more" data-feedall>Show less</button>':''):'<p class="empty">Nobody here.</p>';}
+  if(S.feedAll&&kind==='s'&&S.feedFilter==='all'&&ev.length<=10&&S.prospects&&readyList().length)body+='<button type="button" class="more" data-feedall>Show less</button>';
+  return '<section class="card fcard'+(even?' even':'')+'">'+head+bar+body+(B.liveError?'<p class="err">Follow Up Boss didn’t answer. Try Refresh.</p>':'')+'</section>';
 }
 function stageName(kind,k){var s=stagesOf(kind).filter(function(x){return x.k===k;})[0];return s?'<span class="muted" style="font-size:14px">· '+esc(s.n)+'</span>':'';}
 
@@ -1010,7 +1017,7 @@ function viewBoard(){
   var rail=feedP(kind)+(kind==='s'?todayCard():'');
   // Activity (and, for sellers, Today) runs full width across the top so the boards below get the whole width
   // sellers: Expireds & FSBOs sits right under the top row, full width
-  function wrap(main){return '<aside class="railtop" aria-label="Activity">'+rail+'</aside>'+(kind==='s'?'<div class="mainc">'+prospectsSection()+'</div>':'')+'<div class="mainc">'+main+'</div>';}
+  function wrap(main){return '<aside class="railtop'+(kind==='s'&&S.feedOn&&S.prospects&&readyList().length?' pair':'')+'" aria-label="Activity">'+rail+'</aside>'+(kind==='s'?'<div class="mainc">'+prospectsSection()+'</div>':'')+'<div class="mainc">'+main+'</div>';}
   var top=focusSection(kind);
   function pipe(inner,n){return '<details class="pipe"'+(S.pipeOpen?' open':'')+' data-pipe><summary>Pipeline board'+(n!=null?' · '+n+' cards':'')+' <small>'+(kind==='s'?'Listing appointment → Follow-up & intake → Coming soon → For sale → Offer night → Sold, with each phase’s checklist':'Searching → Showings → Offer → Firm → Closed, checklists, facts, matching')+'</small></summary>'+inner+'</details>';}
   if(!B)return wrap(top+pipe('<section class="card"><p class="empty">Loading…</p></section>')+(kind==='s'?sellerRes():buyerRes()));
