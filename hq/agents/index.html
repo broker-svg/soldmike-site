@@ -701,7 +701,7 @@ var PROMPTS={
     fields:['client','email','phone',{k:'chan',l:'Send as',opts:['Text','Email','Call notes']},{k:'last',l:'Last contact'},{k:'ctx',l:'What I want to say',ta:1,full:1}]},
   showings:{label:'Book Showings',skill:'showing-prep',lead:'Plan and book a showing tour.',
     fields:['client','phone',{k:'day',l:'Date',type:'date'},{k:'window',l:'Time window',ph:'Sat 10 AM – 1 PM'},{k:'homes',l:'Addresses / MLS® #s',ta:1,full:1}]},
-  newsletter:{label:'Newsletter',skill:'soldmike-newsletter',lead:'Build this week’s OP Team newsletter. Do NOT send it to anyone or any list. When I approve it, save it in Follow Up Boss as an email template named "OP Team Newsletter – <date>" so I can send it myself. Look up photos, prices and details from soldmike.ca (or REALTOR.ca) using the addresses; use soldmike.com links only as button links (don’t read soldmike.com listing pages). Write the subject line and preview yourself. Leave out any block I left blank. If something required is missing, ask me in one message.',
+  newsletter:{label:'Newsletter',skill:'soldmike-newsletter',lead:'Build this week’s OP Team newsletter. Do NOT send it to anyone or any list. When I approve it, save it in Follow Up Boss as an email template named "OP Team Newsletter – <date>" so I can send it myself. Look up photos, prices and details from soldmike.ca (or REALTOR.ca) using the addresses. Every for-sale listing and browse button links to soldmike.com (each listing’s soldmike.com/homes/ page); only the Sold block links to soldmike.ca. Write the subject line and preview yourself. Leave out any block I left blank. If something required is missing, ask me in one message.',
     fields:[{k:'theme',l:'Theme',opts:['Dark (charcoal)','Light (blue / white)'],req:1},{k:'vid',l:'Market Watch video link (Instagram / YouTube)',full:1},{k:'hook',l:'Video hook (optional)',full:1,ph:'Is the market starting to shift?'},
       {k:'low',l:'Listing of the Week: address',req:1,full:1},{k:'lowlink',l:'Listing of the Week: soldmike.com link (optional)',full:1},{k:'oh',l:'Open house (day + time)',ph:'Sat 2–4 PM'},{k:'clip',l:'5-sec clip or virtual tour link (for the GIF)'},
       {k:'a1',l:'Also this week #1',full:1},{k:'a2',l:'Also this week #2',full:1},{k:'a3',l:'Also this week #3',full:1},{k:'a4',l:'Also this week #4',full:1},
@@ -1865,7 +1865,7 @@ function ctxData(ctx,id){
 var cur=null;
 function openPrompt(key,ctx,id){
   var P=PROMPTS[key],d=ctxData(ctx,id),today=ymd(new Date());
-  var fields=P.fields.map(function(f){return typeof f==='string'?Object.assign({k:f},F[f]):f;});cur={P:P,fields:fields};
+  var fields=P.fields.map(function(f){return typeof f==='string'?Object.assign({k:f},F[f]):f;});cur={P:P,fields:fields,dkey:(key+(id?'-'+id:'')).toLowerCase().replace(/[^a-z0-9-]/g,'').slice(0,60)};
   function inp(f){var v=d[f.k]!=null&&d[f.k]!==''?d[f.k]:(f.type==='date'&&!f.nodef?today:''),id='f_'+f.k;
     var ctl=f.opts?'<select id="'+id+'" data-f><option value="">—</option>'+f.opts.map(function(o){return '<option'+(o===v?' selected':'')+'>'+esc(o)+'</option>';}).join('')+'</select>'
       :f.ta?'<textarea id="'+id+'" data-f placeholder="'+esc(f.ph||'')+'">'+esc(v)+'</textarea>'
@@ -1875,8 +1875,9 @@ function openPrompt(key,ctx,id){
   dlg.innerHTML='<form class="dl" id="pf"><div class="dh"><div style="flex:1;min-width:0"><h2>'+esc(P.label)+'</h2><p>Fill in what you know, copy, and paste it to Claude.'+(P.skill?' Runs the <span class="chip n">'+esc(P.skill)+'</span> skill.':'')+'</p></div><button type="button" class="x" data-close aria-label="Close">×</button></div>'
     +'<div class="fgrid">'+fields.map(inp).join('')+'</div>'
     +(P.files?'<div class="upl"><span>Files (PDFs, photos), uploaded to HQ so Claude can download them</span><label class="drop" id="upDrop">Tap to add files, or drop them here<input type="file" id="upIn" multiple accept=".pdf,image/*,.doc,.docx,.xls,.xlsx,.csv"></label><ul id="upList"></ul></div>':'')
-    +'<div class="pv"><div class="k"><span>Prompt</span><span id="pvMiss"></span></div><textarea id="pvT" readonly aria-label="Prompt text"></textarea></div></form>'
-    +'<div class="dfoot"><button type="button" class="btn" id="copyBtn">Copy prompt</button><button type="button" class="btn ghost" data-close>Close</button></div>';
+    +'<div class="pv"><div class="k"><span>Prompt</span><span id="pvMiss"></span></div><textarea id="pvT" readonly aria-label="Prompt text"></textarea></div>'
+    +'<p class="hint" id="pvSaved" style="margin:0">Not saved yet. Save keeps this form on HQ (any computer) until you clear it.</p></form>'
+    +'<div class="dfoot"><button type="button" class="btn" id="copyBtn">Copy prompt</button><button type="button" class="btn ghost" id="saveBtn">Save</button><button type="button" class="btn ghost" id="clearBtn">Clear saved</button><button type="button" class="btn ghost" data-close>Close</button></div>';
   $$('[data-f]',dlg).forEach(function(el){el.addEventListener('input',buildPrompt);});
   cur.packet=(function(){var c='abcdefghijklmnopqrstuvwxyz0123456789',a=new Uint8Array(24),o='';crypto.getRandomValues(a);for(var i=0;i<24;i++)o+=c[a[i]%36];return o;})();cur.files=[];cur.busy=0;
   if(P.files){var inEl=$('#upIn'),dr=$('#upDrop');inEl.onchange=function(){upFiles(inEl.files);inEl.value='';};
@@ -1887,7 +1888,20 @@ function openPrompt(key,ctx,id){
       post('desk/files/delete',{id:id}).catch(function(){});cur.files=cur.files.filter(function(f){return f.id!==id;});drawFiles();buildPrompt();};}
   $('#pf').onsubmit=function(e){e.preventDefault();};
   buildPrompt();if(!dlg.open)dlg.showModal();
+  loadDraft();
 }
+/* Saved forms: one per form (newsletter, intake…), stored on HQ so every computer and the workers see the same one */
+function savedNote(dr){var el=$('#pvSaved');if(!el)return;
+  el.textContent=dr&&dr.saved?'Saved '+new Date(dr.saved).toLocaleString('en-CA',{weekday:'short',month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})+'. It stays here until you clear it.':'Not saved yet. Save keeps this form on HQ (any computer) until you clear it.';}
+function loadDraft(){var c=cur;getJ('desk/draft?key='+c.dkey).then(function(j){var dr=j.draft;if(cur!==c)return;savedNote(dr);if(!dr)return;
+  c.fields.forEach(function(f){var el=document.getElementById('f_'+f.k);if(el&&dr.values&&dr.values[f.k]!=null)el.value=dr.values[f.k];});
+  if(dr.packet&&c.P.files){c.packet=dr.packet;c.files=(dr.files||[]).slice();drawFiles();}
+  buildPrompt();}).catch(function(){});}
+function saveDraft(){var c=cur,vals={};c.fields.forEach(function(f){var el=document.getElementById('f_'+f.k);if(el&&el.value.trim())vals[f.k]=el.value;});
+  post('desk/draft',{key:c.dkey,values:vals,packet:c.P.files?c.packet:null,files:(c.files||[]).filter(function(f){return f.id;})})
+   .then(function(j){savedNote(j.draft);toast('Saved. Open it any time to keep going.');}).catch(fail);}
+function clearDraft(){var c=cur;if(!confirm('Clear the saved '+c.P.label+' form? The fields stay on screen until you close it.'))return;
+  post('desk/draft',{key:c.dkey,clear:true}).then(function(){savedNote(null);toast('Saved form cleared.');}).catch(fail);}
 function fsize(n){return n>=1048576?(n/1048576).toFixed(1)+' MB':Math.max(1,Math.round(n/1024))+' KB';}
 function drawFiles(){var u=$('#upList');if(!u)return;u.innerHTML=cur.files.map(function(f){return '<li><b title="'+esc(f.name)+'">'+esc(f.name)+'</b>'+(f.id?'<span><small>'+fsize(f.size)+'</small> <button type="button" data-rmf="'+esc(f.id)+'" aria-label="Remove '+esc(f.name)+'">Remove</button></span>':'<small>'+(f.err?'<span style="color:var(--red)">'+esc(f.err)+'</span>':'Uploading…')+'</small>')+'</li>';}).join('');}
 function upFiles(list){Array.prototype.forEach.call(list,function(file){
@@ -1926,6 +1940,8 @@ document.addEventListener('click',function(e){
   var ds=t.dataset;
   if(ds.p){openPrompt(ds.p,ds.ctx,ds.id);return;}
   if(t.id==='copyBtn'){copyPrompt();return;}
+  if(t.id==='saveBtn'){saveDraft();return;}
+  if(t.id==='clearBtn'){clearDraft();return;}
   if(t.hasAttribute('data-close')){$('#dlg').close();return;}
   if(t.id==='refresh'){S.inbox=null;load(true);return;}
   if(t.id==='setBtn'){openSettings();return;}
