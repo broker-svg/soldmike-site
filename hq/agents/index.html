@@ -740,7 +740,7 @@ var S={tab:TABS.indexOf(location.hash.slice(1))>=0?location.hash.slice(1):(store
   content:null,todos:null,tk:store('desk_tk')||'scripts',lpp:store('desk_lpp')||'appt',exp:store('desk_exp')||{},coldOn:store('desk_cold')===true,side:store('desk_side')||'pre',
   view:{s:store('desk_view_s')||'list',b:store('desk_view_b')||'board'},showInbox:store('desk_inbox_on')!==false,inboxView:store('desk_inbox_view')||'cards',
   feedOn:store('desk_feed_on')!==false,feedDays:store('desk_feed_days')||2,feedFilter:'all',feedAll:false,viewing:null,
-  sel:{s:{},b:{}},listings:undefined,expenses:null,people:{s:null,b:null},focus:{s:store('desk_focus_s')||'active',b:store('desk_focus_b')||'active'},fq:{s:'',b:''},fsort:{s:'recent',b:'recent'},fall:{s:false,b:false},pipeOpen:store('desk_pipe')!==false,showSoon:store('desk_soon')!==false,personal:null,things:null,gt:null,rem:null,ptf:store('desk_ptf')||'all',ptToday:store('desk_pt_today')!==false,ptLate:store('desk_pt_late')===true,ptAll:false,thingF:'Need',grocV:store('desk_groc_v')||'mine',recV:store('desk_recv')||'monthly',grocAisle:store('desk_groc_aisle')||'',prospects:null,social:undefined,pTab:store('desk_ptab')||'exp',pFilter:{q:'',region:'',city:'',all:false},printTab:store('desk_print')||'hangers',sort:{s:store('desk_sort_s')||'stage',b:store('desk_sort_b')||'stage'},filter:{s:{q:'',stage:'',region:'',act:''},b:{q:'',stage:'',region:'',act:''}},script:'buyer',fs:store('desk_fs')||26,tagSync:false,fubApp:'https://app.followupboss.com'};
+  sel:{s:{},b:{}},listings:undefined,expenses:null,people:{s:null,b:null},focus:{s:store('desk_focus_s')||'active',b:store('desk_focus_b')||'active'},fq:{s:'',b:''},fsort:{s:'recent',b:'recent'},fall:{s:false,b:false},pipeOpen:store('desk_pipe')!==false,showSoon:store('desk_soon')!==false,personal:null,things:null,gt:null,rem:null,ptf:store('desk_ptf')||'all',ptToday:store('desk_pt_today')!==false,ptLate:store('desk_pt_late')===true,ptAll:false,thingF:'Need',grocV:store('desk_groc_v')||'mine',recV:store('desk_recv')||'monthly',grocAisle:store('desk_groc_aisle')||'',prospects:null,social:undefined,pTab:store('desk_ptab')||'exp',pShow:55,todayAll:false,pFilter:{q:'',region:'',city:'',all:false},printTab:store('desk_print')||'hangers',sort:{s:store('desk_sort_s')||'stage',b:store('desk_sort_b')||'stage'},filter:{s:{q:'',stage:'',region:'',act:''},b:{q:'',stage:'',region:'',act:''}},script:'buyer',fs:store('desk_fs')||26,tagSync:false,fubApp:'https://app.followupboss.com'};
 
 function setTab(t){S.tab=t;store('desk_tab',t);if(isRE(t))store('desk_re',t);$$('#tabnav a[data-tab]').forEach(function(a){a.setAttribute('aria-current',(a.dataset.tab===t||(a.dataset.tab==='realestate'&&isRE(t)))?'page':'false');});render();load(false);}
 $$('#tabnav a[data-tab]').forEach(function(a){a.addEventListener('click',function(e){e.preventDefault();var t=a.dataset.tab;if(t==='realestate')t=isRE(S.tab)?'realestate':(store('desk_re')||'realestate');history.replaceState(null,'','#'+t);setTab(t);window.scrollTo({top:0});});});
@@ -1288,12 +1288,12 @@ function prospectsSection(){
    +'<label class="sw"><input type="checkbox" data-pall'+(F.all?' checked':'')+'><i></i>Show relisted / sold</label></div>';
   var legend=S.pTab==='exp'?'<div class="plegend"><span><i class="pdot r"></i>30+ days</span><span><i class="pdot o"></i>8–30 days</span><span><i class="pdot y"></i>1–7 days</span><span><i class="pdot yg"></i>Expired 0–2 days (may relist)</span><span><i class="pdot g"></i>Expired 3+ days: go</span></div>'
     :'<div class="plegend"><span><i class="pdot grey"></i>Under 3 weeks</span><span><i class="pdot y"></i>3–4 weeks</span><span><i class="pdot g"></i>30+ days: call</span></div>';
-  return '<section class="card" id="prospects">'+head+tools+legend+(L.length?'<p class="lcount">'+L.length+' propert'+(L.length===1?'y':'ies')+'</p><ul class="rows">'+L.map(function(x){return pRow(x);}).join('')+'</ul>'
+  return '<section class="card" id="prospects">'+head+tools+legend+(L.length?'<p class="lcount">'+L.length+' propert'+(L.length===1?'y':'ies')+'</p><ul class="rows">'+L.slice(0,S.pShow).map(function(x){return pRow(x);}).join('')+'</ul>'+(L.length>S.pShow?'<button type="button" class="more" data-pmore>Show more ('+(L.length-S.pShow)+' left)</button>':'')
     :'<p class="empty">'+(S.pTab==='exp'?'No expireds yet. Export from your MLS and paste it to Claude with the "Build Expired List" prompt, or tap + Add.':'No FSBOs yet. Tap + Add when you find one (lawn sign, Kijiji, FSBO sites).')+'</p>')+'</section>';
 }
 function todayCard(){var R=readyList();if(!S.prospects)return '';
   return '<section class="card"><div class="hd"><h2>Today</h2><span class="sub">Door hangers + calls</span></div>'
-   +(R.length?'<ul class="rows">'+R.slice(0,12).map(function(x){return pRow(x,1);}).join('')+'</ul>'+(R.length>12?'<p class="lcount">+'+(R.length-12)+' more in Expireds & FSBOs</p>':''):'<p class="empty">Nothing due. Expireds turn green 3 days after expiry, FSBOs at 30 days on market.</p>')+'</section>';}
+   +(R.length?'<ul class="rows">'+(S.todayAll?R:R.slice(0,5)).map(function(x){return pRow(x,1);}).join('')+'</ul>'+(R.length>5?'<button type="button" class="more" data-todayall>'+(S.todayAll?'Show less':'Show more ('+(R.length-5)+')')+'</button>':''):'<p class="empty">Nothing due. Expireds turn green 3 days after expiry, FSBOs at 30 days on market.</p>')+'</section>';}
 function openProspect(id,kind){var x=id?(S.prospects||[]).filter(function(y){return y.id===+id;})[0]:{kind:kind||S.pTab,status:'active'},d=$('#dlg'),cf=false;S.viewing=null;
   d.innerHTML='<form class="dl" id="pF"><div class="dh"><h2>'+(id?'Edit':'Add')+' '+(x.kind==='fsbo'?'FSBO':'expired')+'</h2><button type="button" class="x" data-close aria-label="Close">×</button></div><div class="fgrid">'
    +sel('p_kind','List',x.kind,[['exp','Expiring / expired'],['fsbo','For sale by owner']])+sel('p_status','Status',x.status,[['active','Active (for sale)'],['expired','Expired'],['terminated','Terminated'],['relisted','Relisted'],['sold','Sold']])
@@ -1984,7 +1984,7 @@ document.addEventListener('click',function(e){
   if(ds.ws){var lk='lift:'+ds.ws,l=Object.assign({sets:[],w:''},S.personal.logs[lk]);l.sets=(l.sets||[]).slice();l.sets[+ds.s]=l.sets[+ds.s]?0:1;plog(lk,l);t.classList.toggle('on');return;}
   if(t.hasAttribute('data-wodone')){var v=!S.personal.logs.workout;plog('workout',v||null);if(v)toast('Workout logged. Nice work.');$('#dlg').close();render();return;}
   if(ds.water){var n=+ds.water,w0=+S.personal.logs.water||0;plog('water',n===w0?n-1:n);render();return;}
-  if(ds.pk2){S.pTab=ds.pk2;store('desk_ptab',ds.pk2);render();return;}
+  if(ds.pk2){S.pShow=55;S.pTab=ds.pk2;store('desk_ptab',ds.pk2);render();return;}
   if(t.hasAttribute('data-padd')){openProspect(null,S.pTab);return;}
   if(ds.pedit){openProspect(+ds.pedit);return;}
   if(ds.pact!=null&&ds.id){var pid=+ds.id,pa=ds.pact;post('desk/prospect/action',{id:pid,action:pa}).then(function(){toast(pa?ACTION_LABEL[pa]+' · saved':'Cleared');var dd=$('#dlg');if(dd.open&&$('#pF',dd))dd.close();return loadProspects();}).then(render).catch(fail);return;}
@@ -1996,6 +1996,8 @@ document.addEventListener('click',function(e){
   if(ds.iv){S.inboxView=ds.iv;store('desk_inbox_view',ds.iv);render();return;}
   if(ds.ff){S.feedFilter=ds.ff;S.feedAll=false;render();return;}
   if(t.hasAttribute('data-feedall')){S.feedAll=!S.feedAll;render();return;}
+  if(t.hasAttribute('data-todayall')){S.todayAll=!S.todayAll;render();return;}
+  if(t.hasAttribute('data-pmore')){S.pShow+=55;render();return;}
   if(t.hasAttribute('data-bulkclear')){var k3=S.tab==='sellers'?'s':'b';S.sel[k3]={};refreshList(k3);return;}
   if(t.hasAttribute('data-bulkarch')){var k4=S.tab==='sellers'?'s':'b',ids=Object.keys(S.sel[k4]).map(Number);post('desk/card/archive-many',{ids:ids}).then(function(){S.sel[k4]={};toast(ids.length+' archived');load(true);}).catch(fail);return;}
   if(ds.edit){openCard(ds.edit,+ds.id);return;}
@@ -2022,7 +2024,7 @@ document.addEventListener('change',function(e){var t=e.target,ds=t.dataset;
   if(t.hasAttribute('data-soonon')){S.showSoon=t.checked;store('desk_soon',t.checked);render();return;}
   if(ds.pmove&&t.value){movePerson(ds.pmove,+ds.id,t.value,t);return;}
   if(ds.fsort){S.fsort[ds.fsort]=t.value;render();return;}
-  if(ds.pf){S.pFilter[ds.pf]=t.value;render();return;}
+  if(ds.pf){S.pShow=55;S.pFilter[ds.pf]=t.value;render();return;}
   if(ds.tk2){var src=ds.tk2,id=ds.id,all=allPersonalTasks(),it=all.filter(function(x){return x.src===src&&String(x.id)===id;})[0];if(!it)return;
     var call=src==='g'?post('gtask',{list:it.list,id:id,done:t.checked}):src==='mine'?post('item/done',{id:+id,done:t.checked}):post('reminder',{id:id,title:it.title,done:t.checked});
     t.closest('.trow').classList.toggle('done',t.checked);
@@ -2055,7 +2057,7 @@ document.addEventListener('change',function(e){var t=e.target,ds=t.dataset;
 $('#dlg').addEventListener('click',function(e){if(e.target===$('#dlg'))$('#dlg').close();});
 document.addEventListener('toggle',function(e){if(e.target.hasAttribute&&e.target.hasAttribute('data-pipe')){S.pipeOpen=e.target.open;store('desk_pipe',S.pipeOpen);}},true);
 $('#dlg').addEventListener('close',function(){S.viewing=null;if(S.tab==='personal')render();});
-document.addEventListener('input',function(e){var t=e.target;if(t.id&&/^fq-[sb]$/.test(t.id)){S.fq[t.id.slice(3)]=t.value;render();return;}if(t.id==='pq'){S.pFilter.q=t.value;render();return;}if(t.id&&/^lq-[sb]$/.test(t.id)){var k=t.id.slice(3);S.filter[k].q=t.value;refreshList(k);}});
+document.addEventListener('input',function(e){var t=e.target;if(t.id&&/^fq-[sb]$/.test(t.id)){S.fq[t.id.slice(3)]=t.value;render();return;}if(t.id==='pq'){S.pShow=55;S.pFilter.q=t.value;render();return;}if(t.id&&/^lq-[sb]$/.test(t.id)){var k=t.id.slice(3);S.filter[k].q=t.value;refreshList(k);}});
 
 setTab(S.tab);
 })();
