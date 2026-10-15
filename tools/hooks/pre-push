@@ -1,0 +1,4 @@
+#!/bin/sh
+# Blocks a push if sitemap.xml lists a page that isn't built, is noindexed, is private or has the wrong canonical.
+# Turn on once per Mac: git config core.hooksPath tools/hooks
+python3 tools/site_check.py --local || { echo "Push blocked: fix the sitemap problems above (or run python3 build.py)."; exit 1; }

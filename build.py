@@ -941,3 +941,7 @@ os.makedirs('og', exist_ok=True)
 OG_CARDS.append({'slug': 'home', 'path': '/', 'headline': 'Selling or buying in Vaughan? Start here', 'kicker': 'Michael Barillari, Broker', 'photo': '/media/gentle-fox/twilight-street.jpg', 'layout': 'photo'})  # index.html is hand-written; its og:image points at og/home.jpg
 json.dump(OG_CARDS, open('og/cards.json', 'w'), indent=1)
 print('pages:', len(SITEMAP), 'todo items:', sum(len(i) for _, i in TODOS))
+# safeguard (Oct 14 2026): turn on the pre-push sitemap check on whichever Mac builds, then check this build
+import subprocess, sys
+subprocess.run(['git', 'config', 'core.hooksPath', 'tools/hooks'], check=False)
+subprocess.run([sys.executable, 'tools/site_check.py', '--local'], check=False)
