@@ -988,12 +988,12 @@ def rss_date(d):
     import datetime as _dt
     return _dt.datetime.strptime(d, '%Y-%m-%d').strftime('%a, %d %b %Y 09:00:00 -0400')
 os.makedirs('blog', exist_ok=True)
-open('blog/feed.xml', 'w', encoding='utf-8').write('<?xml version="1.0" encoding="UTF-8"?>\n<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel>'
+open('blog/feed.xml', 'w', encoding='utf-8').write('<?xml version="1.0" encoding="UTF-8"?>\n<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/"><channel>'
     '<title>SoldMike Blog</title><link>%s/blog/</link><description>Real results, market notes and plain answers for home sellers and buyers in Vaughan and the GTA.</description><language>en-ca</language>'
     '<atom:link href="%s/blog/feed.xml" rel="self" type="application/rss+xml"/>' % (SITE, SITE)
     + ''.join('<item><title>%s</title><link>%s/blog/%s/</link><guid isPermaLink="true">%s/blog/%s/</guid><pubDate>%s</pubDate><description>%s</description>%s</item>' % (
         e(p['title']), SITE, p['slug'], SITE, p['slug'], rss_date(p['date']), e(p.get('description', '')),
-        ('<enclosure url="%s%s" type="image/jpeg" length="0"/>' % (SITE, p['photo'])) if p.get('photo') else '') for p in POSTS)
+        '<enclosure url="%s/og/blog-%s.jpg" type="image/jpeg" length="0"/><media:content url="%s/og/blog-%s.jpg" medium="image" type="image/jpeg" width="1200" height="630"/>' % (SITE, p['slug'], SITE, p['slug'])) for p in POSTS)
     + '</channel></rss>\n')
 
 # ---------- 404, sitemap, robots, checklist ----------
