@@ -1874,7 +1874,7 @@ function openPrompt(key,ctx,id){
   var dlg=$('#dlg');
   dlg.innerHTML='<form class="dl" id="pf"><div class="dh"><div style="flex:1;min-width:0"><h2>'+esc(P.label)+'</h2><p>Fill in what you know, copy, and paste it to Claude.'+(P.skill?' Runs the <span class="chip n">'+esc(P.skill)+'</span> skill.':'')+'</p></div><button type="button" class="x" data-close aria-label="Close">×</button></div>'
     +'<div class="fgrid">'+fields.map(inp).join('')+'</div>'
-    +(P.files?'<div class="upl"><span>Files (PDFs, photos), uploaded to HQ so Claude can download them</span><label class="drop" id="upDrop">Tap to add files, or drop them here<input type="file" id="upIn" multiple accept=".pdf,image/*,.doc,.docx,.xls,.xlsx,.csv"></label><ul id="upList"></ul></div>':'')
+    +(P.files?'<div class="upl"><span>Files (PDFs, photos, short videos up to 20 MB), uploaded to HQ so Claude can download them</span><label class="drop" id="upDrop">Tap to add files, or drop them here<input type="file" id="upIn" multiple accept=".pdf,image/*,video/*,.mp4,.mov,.doc,.docx,.xls,.xlsx,.csv"></label><ul id="upList"></ul></div>':'')
     +'<div class="pv"><div class="k"><span>Prompt</span><span id="pvMiss"></span></div><textarea id="pvT" readonly aria-label="Prompt text"></textarea></div>'
     +'<p class="hint" id="pvSaved" style="margin:0">Not saved yet. Save keeps this form on HQ (any computer) until you clear it.</p></form>'
     +'<div class="dfoot"><button type="button" class="btn" id="copyBtn">Copy prompt</button><button type="button" class="btn ghost" id="saveBtn">Save</button><button type="button" class="btn ghost" id="clearBtn">Clear saved</button><button type="button" class="btn ghost" data-close>Close</button></div>';
