@@ -1294,7 +1294,7 @@ function prospectsSection(){
     if(q&&[x.addr,x.city,x.hood,x.mls,x.owner,x.note].join(' ').toLowerCase().indexOf(q)<0)return false;return true;});
   L.sort(S.pTab==='exp'?function(a,b){return String(a.expires||'9').localeCompare(String(b.expires||'9'));}:function(a,b){return String(a.listed||'9').localeCompare(String(b.listed||'9'));});
   var cities=[...new Set(P.filter(function(x){return x.kind===S.pTab&&x.city;}).map(function(x){return x.city;}))].sort();
-  var views='<div class="seg pview" role="group" aria-label="Show">'+[['todo','To do'],['done',S.pTab==='fsbo'?'Called':'Contacted'],['archived','Archive']].map(function(v){return '<button type="button" data-pview="'+v[0]+'" aria-pressed="'+(V===v[0])+'">'+v[1]+' <b>'+vc[v[0]]+'</b></button>';}).join('')+'</div>';
+  var views='<div class="seg pview" role="group" aria-label="Show">'+[['todo','To do'],['done',S.pTab==='fsbo'?'Called':'Contacted'],['archived','Archive']].map(function(v){return '<button type="button" data-plist="'+v[0]+'" aria-pressed="'+(V===v[0])+'">'+v[1]+' <b>'+vc[v[0]]+'</b></button>';}).join('')+'</div>';
   var tools=views+'<div class="ltools"><input type="search" class="search" id="pq" value="'+esc(F.q)+'" placeholder="Search address, MLS®, owner…" aria-label="Search prospects">'
    +'<select class="selsm" data-pf="region" aria-label="Region"><option value="">All regions</option>'+REGIONS.map(function(r){return '<option'+(F.region===r?' selected':'')+'>'+r+'</option>';}).join('')+'</select>'
    +'<select class="selsm" data-pf="city" aria-label="City"><option value="">All cities</option>'+cities.map(function(r){return '<option'+(F.city===r?' selected':'')+'>'+esc(r)+'</option>';}).join('')+'</select>'
@@ -2010,7 +2010,7 @@ document.addEventListener('click',function(e){
   if(ds.ff){S.feedFilter=ds.ff;S.feedAll=false;render();return;}
   if(t.hasAttribute('data-feedall')){S.feedAll=!S.feedAll;render();return;}
   if(t.hasAttribute('data-todayall')){S.todayAll=!S.todayAll;render();return;}
-  if(ds.pview){S.pView=ds.pview;S.pShow=55;render();return;}
+  if(ds.plist){S.pView=ds.plist;S.pShow=55;render();return;}
   if(ds.pcopy){(navigator.clipboard?navigator.clipboard.writeText(ds.pcopy):Promise.reject()).then(function(){toast('MLS® '+ds.pcopy+' copied');},function(){toast('MLS® '+ds.pcopy);});return;}
   if(ds.cfub){t.disabled=true;post('desk/card/fub',{id:+ds.cfub}).then(function(j){toast(j.already?'Already in Follow Up Boss':'Added to Follow Up Boss (tag Seller)');S.board.s=null;return load(true);}).then(function(){render();refreshViewing();}).catch(fail);return;}
   if(t.hasAttribute('data-pmore')){S.pShow+=55;render();return;}
