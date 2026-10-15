@@ -59,7 +59,7 @@ NAV = [
     ('Buy', [('/listings/', 'Search homes'), ('/listings/our-listings/', 'Our listings'), ('/listings/re-max-premier/', 'RE/MAX Premier listings'), ('/buy/', 'Buying with us'), ('/buy/buyer-guide/', 'Buyer guide: 15 steps'), ('/free-guide/', 'Free PDF guides'), ('/buy/pre-construction/', 'Pre-construction'), ('/saved/', 'Saved homes & searches'), ('/open-house/', 'Open houses')]),
     ('Sell', [('/sell/home-value/', "What's my home worth?"), ('/sell/', 'Selling with us'), ('/sell/seller-guide/', 'Seller guide: 15 steps'), ('/free-guide/', 'Free PDF guides'), ('/sell/cost-to-sell-vaughan/', 'Cost to sell calculator'), ('/sell/how-we-market/', 'How we market your home'), ('/sell/pre-listing/', 'Pre-listing package')]),
     ('Neighbourhoods', [('/neighbourhoods/', 'All neighbourhoods')] + [('/neighbourhoods/%s/' % s, n) for s, n in [('woodbridge', 'Woodbridge'), ('vellore', 'Vellore Village'), ('kleinburg', 'Kleinburg'), ('maple', 'Maple'), ('caledon-bolton', 'Caledon & Bolton'), ('king-city-nobleton', 'King City & Nobleton'), ('sharon-east-gwillimbury', 'Sharon & East Gwillimbury'), ('toronto', 'Toronto')]]),
-    ('Results', [('https://soldmike.ca/sellers/team-sold-listings', 'Recent sales'), ('/results/', 'Case studies'), ('/reviews/', 'Client reviews'), ('/market-reports/', 'Market reports')]),
+    ('Results', [('https://soldmike.ca/sellers/team-sold-listings', 'Recent sales'), ('/results/', 'Case studies'), ('/reviews/', 'Client reviews'), ('/blog/', 'Blog'), ('/market-reports/', 'Market reports')]),
     ('Questions', [('/questions/', 'All questions'), ('/questions/buying/', 'Buyer questions'), ('/questions/selling/', 'Seller questions')]),
     ('TorontoPropertyMedia.ca', 'https://torontopropertymedia.ca/'),
     ('About', [('/about/', 'Michael Barillari'), ('/about/the-op-team/', 'The OP Team'), ('/videos/', 'Videos'), ('/join/', 'Join the team'), ('/contact/', 'Contact')]),
@@ -393,7 +393,7 @@ P('/sell/',
   ])),
   lambda: band(head_block('Why sellers choose Michael') + '<div class="cards">' + ''.join('<div class="rv" style="background:var(--white);padding:26px 22px;display:flex;flex-direction:column;gap:10px"><b style="font-family:var(--display);font-size:22px;text-transform:uppercase;color:var(--navy)">%s</b><span style="color:var(--muted)">%s</span></div>' % (e(t), e(d)) for t, d in [
       ('2,000+ transactions of experience', 'Michael and The OP Team have handled more than 2,000 transactions combined. That experience shows up in pricing, negotiation and the details that keep a deal together.'),
-      ('Sell for more', 'Michael is a Real Estate Negotiation Expert (RENE). Priced right and launched well, homes draw multiple offers: 32 Highland Park Blvd in Markham sold $210K over asking.'),
+      ('Sell for more', 'Michael is a Real Estate Negotiation Expert (RENE). Priced right and launched well, homes draw multiple offers: 82 Highland Park Blvd in Markham sold $210K over asking.'),
       ('Sell faster', 'A strong launch brings buyers in the first week: 6 days in Markham, 15 days in Vaughan, 21 days for a $3.5M home in Toronto.'),
       ('Show your pride of ownership', 'Our own production team, Toronto Property Media, shoots every listing with photos, drone, video and twilight, so your home looks the way you know it.'),
   ]) + '</div><p style="margin-top:18px"><a href="/results/" style="font-weight:600">See recent sales</a></p>' + todo('One seller quote with name and neighbourhood'), 'tint'),
@@ -907,6 +907,91 @@ def home_nav():
 idx = open('index.html', encoding='utf-8').read()
 a, b = idx.index('<!--NAV-->') + len('<!--NAV-->'), idx.index('<!--/NAV-->')
 open('index.html', 'w', encoding='utf-8').write(idx[:a] + '\n    ' + home_nav() + '\n    ' + idx[b:])
+
+# =====================================================================
+# BLOG (Oct 14 2026): posts are Markdown files in blog/posts/ (front matter: title, slug, date, description, photo, photo_alt, tags).
+# A post is published when its date is today or earlier, so queued posts go live on the next build on/after their date.
+# Also writes blog/feed.xml (RSS) for Metricool's "Blog" connection.
+# =====================================================================
+def md_inline(s):
+    s = e(s)
+    s = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', s)
+    s = re.sub(r'(?<![*\w])\*(?!\s)(.+?)(?<!\s)\*(?![*\w])', r'<em>\1</em>', s)
+    s = re.sub(r'\[([^\]]+)\]\((https?://[^)\s]+|/[^)\s]*)\)', r'<a href="\2">\1</a>', s)
+    return s
+
+def md_html(md):
+    out, para, lst = [], [], []
+    def flush():
+        if para: out.append('<p>%s</p>' % md_inline(' '.join(para))); para.clear()
+        if lst: out.append('<ul>%s</ul>' % ''.join('<li>%s</li>' % md_inline(i) for i in lst)); lst.clear()
+    for line in md.splitlines():
+        s = line.strip()
+        if not s: flush(); continue
+        if s.startswith('## '): flush(); out.append('<h2>%s</h2>' % md_inline(s[3:])); continue
+        if s.startswith('### '): flush(); out.append('<h3>%s</h3>' % md_inline(s[4:])); continue
+        if s.startswith('- '):
+            if para: flush()
+            lst.append(s[2:]); continue
+        if lst: flush()
+        para.append(s)
+    flush()
+    return ''.join(out)
+
+def load_posts():
+    posts = []
+    for f in sorted(os.listdir('blog/posts')) if os.path.isdir('blog/posts') else []:
+        if not f.endswith('.md'): continue
+        raw = open(os.path.join('blog/posts', f), encoding='utf-8').read()
+        m = re.match(r'^---\n(.*?)\n---\n(.*)$', raw, re.S)
+        if not m: continue
+        meta = dict((k.strip(), v.strip()) for k, v in (l.split(':', 1) for l in m.group(1).splitlines() if ':' in l))
+        meta['body'] = m.group(2)
+        meta['tags'] = [x.strip() for x in meta.get('tags', '').split(',') if x.strip()]
+        posts.append(meta)
+    today = date.today().isoformat()
+    return sorted([p for p in posts if p.get('date', '9999') <= today], key=lambda p: p['date'], reverse=True)
+
+POSTS = load_posts()
+FEED_LINK = '<link rel="alternate" type="application/rss+xml" title="SoldMike Blog" href="%s/blog/feed.xml">' % SITE
+def nice_date(d):
+    y, m, dd = d.split('-')
+    return '%s %d, %s' % (['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'][int(m) - 1], int(dd), y)
+
+for post in POSTS:
+    path = '/blog/%s/' % post['slug']
+    art = {'@context': 'https://schema.org', '@type': 'BlogPosting', 'headline': post['title'], 'description': post.get('description', ''),
+           'datePublished': post['date'], 'dateModified': post['date'], 'image': SITE + post['photo'] if post.get('photo') else None,
+           'author': {'@id': SITE + '/#michael'}, 'publisher': {'@id': SITE + '/#michael'}, 'mainEntityOfPage': SITE + path}
+    P(path,
+      lambda post=post, path=path: hero([('Home', '/'), ('Blog', '/blog/'), (post['title'], path)], post['title'], e(nice_date(post['date'])) + ' · Michael Barillari, Broker', post.get('photo')),
+      lambda post=post: band('<article class="prose">%s</article>' % md_html(post['body'])
+                             + ('<p style="margin-top:22px;color:var(--muted)">Topics: %s</p>' % ', '.join(e(x) for x in post['tags']) if post['tags'] else '')
+                             + '<p style="margin-top:12px"><a href="/blog/" style="font-weight:600">More from the blog</a></p>', narrow=True),
+      lambda: cta('What could your home sell for?', 'Get a free, no-pressure home evaluation based on real recent sales.'),
+      title='%s | SoldMike' % post['title'], desc=post.get('description', '')[:300], trail=[('Blog', '/blog/'), (post['title'], path)],
+      schema=[{k: v for k, v in art.items() if v is not None}], head=FEED_LINK)
+
+P('/blog/',
+  lambda: hero([('Home', '/'), ('Blog', '/blog/')], 'The SoldMike Blog', 'Real results, local market notes and plain answers for buyers and sellers in Vaughan, York Region and the GTA.'),
+  lambda: band('<div class="cards">%s</div>' % ''.join(
+      '<a href="/blog/%s/" class="rv">%s<b>%s</b><span>%s · %s</span></a>' % (p['slug'], ('<img src="%s" alt="" loading="lazy" style="width:100%%;height:auto;border-radius:6px;margin-bottom:10px">' % p['photo']) if p.get('photo') else '', e(p['title']), e(nice_date(p['date'])), e(p.get('description', '')[:140]) + ('…' if len(p.get('description', '')) > 140 else ''))
+      for p in POSTS) if POSTS else '<p>First posts coming soon.</p>'),
+  lambda: cta('Thinking of selling?', 'Get a free, no-pressure home evaluation based on real recent sales.'),
+  title='Blog: Selling & Buying in Vaughan and the GTA | SoldMike', desc='Real results, market notes and plain answers for home sellers and buyers in Vaughan, York Region and the GTA, from Michael Barillari, Broker.',
+  trail=[('Blog', '/blog/')], head=FEED_LINK)
+
+def rss_date(d):
+    import datetime as _dt
+    return _dt.datetime.strptime(d, '%Y-%m-%d').strftime('%a, %d %b %Y 09:00:00 -0400')
+os.makedirs('blog', exist_ok=True)
+open('blog/feed.xml', 'w', encoding='utf-8').write('<?xml version="1.0" encoding="UTF-8"?>\n<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel>'
+    '<title>SoldMike Blog</title><link>%s/blog/</link><description>Real results, market notes and plain answers for home sellers and buyers in Vaughan and the GTA.</description><language>en-ca</language>'
+    '<atom:link href="%s/blog/feed.xml" rel="self" type="application/rss+xml"/>' % (SITE, SITE)
+    + ''.join('<item><title>%s</title><link>%s/blog/%s/</link><guid isPermaLink="true">%s/blog/%s/</guid><pubDate>%s</pubDate><description>%s</description>%s</item>' % (
+        e(p['title']), SITE, p['slug'], SITE, p['slug'], rss_date(p['date']), e(p.get('description', '')),
+        ('<enclosure url="%s%s" type="image/jpeg" length="0"/>' % (SITE, p['photo'])) if p.get('photo') else '') for p in POSTS)
+    + '</channel></rss>\n')
 
 # ---------- 404, sitemap, robots, checklist ----------
 PAGE = '/404'

@@ -336,6 +336,22 @@
   "layout": "photo"
  },
  {
+  "slug": "blog-how-we-sold-82-highland-park",
+  "path": "/blog/how-we-sold-82-highland-park/",
+  "headline": "How We Sold a Markham Home $210K Over Asking in 6 Days",
+  "kicker": "Blog",
+  "photo": "/media/blog/82-highland-park/front.jpg",
+  "layout": "photo"
+ },
+ {
+  "slug": "blog",
+  "path": "/blog/",
+  "headline": "Blog: Selling & Buying in Vaughan and the GTA",
+  "kicker": "Blog",
+  "photo": "/media/blog/82-highland-park/front.jpg",
+  "layout": "photo"
+ },
+ {
   "slug": "home",
   "path": "/",
   "headline": "Selling or buying in Vaughan? Start here",
