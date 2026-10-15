@@ -14,7 +14,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600&display=swap">
 <style>
-/* HQ (host PIN): Michael's daily dashboard. Today, Check this, Next 3 days, Workers (Claude scheduled tasks), Daily Drive, projects.
+/* HQ (host PIN): Michael's daily dashboard. Morning briefing, Tasks & reminders, Today, Next 2 days, Workers (Claude scheduled tasks), Daily Drive, projects.
    Follow-ups + FUB tasks now live on the Agent Desk › Real Estate tab, which embeds this page with ?only=re.
    Same look as the back office and Leads pages. */
 :root{--navy:#1D2870;--navy2:#26338A;--ink:#141833;--red:#D7141E;--mist:#F7F8FB;--line:#DCE0EC;--muted:#545B78;--pale:#C9D0F2;--green:#1B7A3E;--amber:#9A5B00;
@@ -66,12 +66,12 @@ a{color:var(--navy)}
 /* grid */
 .wrap{max-width:1440px;margin:0 auto;padding:20px 16px 60px}
 .grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:20px;
-  grid-template-areas:"today today today today today today today today wkr wkr wkr wkr" "brief brief brief brief brief brief brief brief brief brief brief brief"
+  grid-template-areas:"brief brief brief brief brief brief brief brief today today today today" "wkr wkr wkr wkr wkr wkr wkr wkr wkr wkr wkr wkr"
   "out out out out out out out out out out out out" "proj proj proj proj proj proj proj proj proj proj proj proj"}
 #today{grid-area:today}#outlook{grid-area:out}#brief{grid-area:brief}#follow{grid-area:fol}#todo{grid-area:todo}#drive{grid-area:drive}#projects{grid-area:proj}#workers{grid-area:wkr}
 #follow,#todo,#drive{display:none} /* these three show only in the Agent Desk › Real Estate tab (?only=re) */
-#workers .wlist{grid-template-columns:1fr} /* Workers sit in the right column, stacked */
-#outlook .days{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+#today,#brief{align-self:start}
+#outlook .days{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
 /* ?only=re: just Follow-ups + FUB tasks (embedded in the Agent Desk › Real Estate tab) */
 html.re-only .bar,html.re-only .dtabs,html.re-only .hero,html.re-only .jump,html.re-only .grid>.card{display:none}
 html.re-only #follow,html.re-only #todo,html.re-only #drive{display:block}
@@ -84,12 +84,12 @@ html.re-only #driveBody>:not(.drv):not(.ring){grid-column:1/-1}
 html.re-only .wrap{padding:0 0 10px;max-width:none}
 html.re-only .grid{grid-template-areas:"drive drive drive drive drive drive drive drive drive drive drive drive" "fol fol fol fol fol fol todo todo todo todo todo todo"}
 @media (max-width:1180px){
-  .grid{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-areas:"today today" "wkr wkr" "brief brief" "out out" "proj proj"}
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-areas:"brief today" "wkr wkr" "out out" "proj proj"}
   html.re-only .grid{grid-template-areas:"drive drive" "fol todo"}
   .hero .in{grid-template-columns:1fr 1fr}.hero .mon{grid-column:1/-1}
 }
 @media (max-width:780px){
-  .grid{grid-template-columns:minmax(0,1fr);grid-template-areas:"today" "wkr" "brief" "out" "proj"}
+  .grid{grid-template-columns:minmax(0,1fr);grid-template-areas:"brief" "today" "wkr" "out" "proj"}
   html.re-only .grid{grid-template-areas:"drive" "fol" "todo"}
   #outlook .days{display:flex;flex-direction:column}
   .jump{display:flex}
@@ -166,6 +166,37 @@ pre.code{background:#0F1430;color:#E6E9F7;border-radius:10px;padding:12px;font-s
 .day li b{font-weight:600;font-variant-numeric:tabular-nums;font-size:14px;color:var(--muted);padding-top:2px}
 .day li span{border-left:3px solid var(--c,var(--navy));padding-left:8px;overflow-wrap:anywhere}
 .day .cnt{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+
+/* morning briefing (7:45 AM worker) */
+#mb{margin-bottom:20px;border-top:6px solid var(--navy)}
+#mb .hd h2{font-size:36px}
+#mb .when{font-size:16px;color:var(--muted);font-weight:600}
+.mfocus{background:var(--navy);color:#fff;border-radius:14px;padding:16px 20px;margin-bottom:18px}
+.mfocus h3{font-size:20px;letter-spacing:.06em;color:var(--pale);margin-bottom:8px}
+.mfocus ol{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.mfocus li{display:grid;grid-template-columns:40px 1fr;gap:8px;font-size:21px;font-weight:600;line-height:1.25}
+.mfocus li b{font-family:var(--display);font-size:40px;line-height:.85;color:#FF5A62}
+.mfocus li small{display:block;font-size:15px;font-weight:400;color:var(--pale);margin-top:4px}
+.mfocus a{color:#fff}
+.mcols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.mcol{border:1px solid var(--line);border-radius:14px;padding:16px 18px;border-top:6px solid var(--c);min-width:0}
+.mcol h3{font-size:25px;color:var(--c);display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.mcol h3 .ct{font-family:var(--body);font-size:14px;font-weight:600;color:var(--muted);text-transform:none;white-space:nowrap}
+.mcol .grp{font-family:var(--display);font-weight:700;font-size:17px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin:16px 0 4px}
+.mi{padding:9px 0;border-top:1px solid var(--line);font-size:19px;line-height:1.3;overflow-wrap:anywhere}
+.grp+.mi{border-top:0}
+.mi b{font-weight:600}
+.mi p{margin:3px 0 0;font-size:15px;color:var(--muted)}
+.mi .chip{margin-right:6px;vertical-align:2px}
+.mcol.re{--c:var(--navy)}.mcol.fin{--c:var(--green)}.mcol.tp{--c:#1A4B6E;border-top-color:#C9A04A}
+.mfoot{margin-top:14px;font-size:14px;color:var(--muted);display:flex;gap:14px;flex-wrap:wrap}
+#mbShow{display:none;width:100%;margin-bottom:20px;min-height:52px;border:0;border-radius:12px;background:var(--navy);color:#fff;font:700 19px var(--display);text-transform:uppercase;letter-spacing:.05em;cursor:pointer;align-items:center;justify-content:center;gap:12px;padding:6px 14px;flex-wrap:wrap}
+#mbShow span{font:600 15px var(--body);text-transform:none;letter-spacing:0;color:var(--pale)}
+html.mb-off #mb{display:none}
+html.mb-off #mbShow{display:flex}
+html.re-only #mb,html.re-only #mbShow{display:none!important}
+@media (max-width:1180px){.mcols{grid-template-columns:1fr 1fr}.mcols .tp{grid-column:1/-1}}
+@media (max-width:780px){.mfocus ol,.mcols{grid-template-columns:1fr}.mcols .tp{grid-column:auto}#mb .hd h2{font-size:30px;line-height:1}#mb .when{order:3;flex-basis:100%;font-size:15px}.mi{font-size:18px}.mfocus li{font-size:19px}}
 
 /* briefing */
 .bi{display:grid;grid-template-columns:32px 1fr;gap:10px;padding:10px 0;border-top:1px solid var(--line)}
@@ -312,13 +343,16 @@ dialog::backdrop{background:rgba(20,24,51,.6)}
   <div><div class="clock" id="hClock"></div><div class="wx" id="hWx"></div></div>
   <div class="mon" id="hMon"></div>
 </div></header>
-<nav class="jump" aria-label="Jump to"><a href="#today">Today</a><a href="#workers">Workers</a><a href="#brief">Tasks &amp; email</a><a href="#outlook">Next 3 days</a><a href="#projects">Projects</a></nav>
+<nav class="jump" aria-label="Jump to"><a href="#mb">Briefing</a><a href="#brief">Tasks &amp; email</a><a href="#today">Today</a><a href="#workers">Workers</a><a href="#outlook">Next 2 days</a><a href="#projects">Projects</a></nav>
 
-<main class="wrap"><div class="grid">
+<main class="wrap">
+  <button type="button" id="mbShow">☀ Show morning briefing <span id="mbShowSub"></span></button>
+  <section class="card" id="mb"><div class="hd"><h2>Morning briefing</h2><span class="when" id="mbWhen"></span><button class="btn sm ghost" type="button" id="mbHide">Hide ▲</button></div><div id="mbBody"><p class="empty">Loading…</p></div></section>
+  <div class="grid">
   <section class="card" id="today"><div class="hd"><h2>Today</h2><span class="sub" id="todaySub"></span><button type="button" class="rt" id="rtBtn" aria-pressed="false">Routine <b>Off</b></button></div>
     <div class="sec">Schedule</div><div id="sched"><p class="empty">Loading…</p></div>
   </section>
-  <section class="card" id="outlook"><div class="hd"><h2>Next 3 days</h2></div><div class="days" id="days"></div></section>
+  <section class="card" id="outlook"><div class="hd"><h2>Next 2 days</h2></div><div class="days" id="days"></div></section>
   <section class="card" id="brief"><div class="hd sech"><h2>Tasks &amp; reminders</h2><span class="tabs tk" id="tkTg"></span></div><div class="tabs tk" id="tkTabs"></div><div id="tasks"><p class="empty">Loading…</p></div>
     <div class="sec" style="margin-top:22px">From email <span class="sub" id="briefSub"></span></div><div id="briefBody"></div></section>
   <section class="card" id="follow"><div class="hd"><h2>Follow-ups</h2></div><div class="tabs tk" id="listTabs"></div><div id="people"><p class="empty">Loading…</p></div></section>
@@ -675,15 +709,15 @@ dialog::backdrop{background:rgba(20,24,51,.6)}
       setTimeout(function(){today();outlook();fubPanel();},900);
     }).catch(function(e){c.checked=!c.checked;row.classList.toggle('done',c.checked);fail(e);});};});}
 
-  // ---------- next 3 days ----------
+  // ---------- next 2 days ----------
   function outlook(){
     if(S.data)S.evo=[];
     if(!S.data)return;
-    $('days').innerHTML=S.days.slice(1).map(function(day,i){
+    $('days').innerHTML=S.days.slice(1,3).map(function(day,i){
       var d=fromYmd(day),b=bucket(day),hol=holidayOn(day),wx='';
       if(S.wx&&S.wx.daily){var k=S.wx.daily.time.indexOf(day);if(k>=0)wx=Math.round(S.wx.daily.temperature_2m_max[k])+'° '+(WMO[S.wx.daily.weather_code[k]]||'');}
-      var items=b.ev.slice(0,8).map(function(e){S.evo.push(e);return '<li data-eo="'+(S.evo.length-1)+'"><b>'+(e.allDay?'All day':tm(e.start))+'</b><span style="--c:'+esc(e.c||'#1D2870')+'">'+esc(e.title)+'</span></li>';}).join('');
-      var more=b.ev.length>8?'<li><b></b><span class="muted">+'+(b.ev.length-8)+' more</span></li>':'';
+      var items=b.ev.slice(0,12).map(function(e){S.evo.push(e);return '<li data-eo="'+(S.evo.length-1)+'"><b>'+(e.allDay?'All day':tm(e.start))+'</b><span style="--c:'+esc(e.c||'#1D2870')+'">'+esc(e.title)+'</span></li>';}).join('');
+      var more=b.ev.length>12?'<li><b></b><span class="muted">+'+(b.ev.length-12)+' more</span></li>':'';
       var cnt=[];if(b.tasks.length)cnt.push('<span class="chip navy">'+b.tasks.length+' FUB task'+(b.tasks.length===1?'':'s')+'</span>');
       var gr=allTasks().filter(function(x){return x.src!=='fub'&&x.day===day;});if(gr.length)cnt.push('<span class="chip amber">'+gr.length+' task'+(gr.length===1?'':'s')+' / reminder'+(gr.length===1?'':'s')+'</span>');
       var td=b.todos.filter(function(t){return !t.done;});if(td.length)cnt.push('<span class="chip">'+td.length+' to-do'+(td.length===1?'':'s')+'</span>');
@@ -695,6 +729,36 @@ dialog::backdrop{background:rgba(20,24,51,.6)}
         +'<div class="cnt">'+cnt.join('')+'</div></div>';
     }).join('');
     [].forEach.call($('days').querySelectorAll('[data-eo]'),function(x){x.onclick=function(){eventInfo(S.evo[+x.dataset.eo]);};});
+  }
+
+  // ---------- morning briefing (posted by the 7:45 AM worker; workout + meals from plan.js) ----------
+  function mbHidden(){try{return localStorage.getItem('hq_mb_hidden')===S.today;}catch(e){return false;}}
+  function mbSet(off){document.documentElement.classList.toggle('mb-off',off);try{off?localStorage.setItem('hq_mb_hidden',S.today):localStorage.removeItem('hq_mb_hidden');}catch(e){}}
+  $('mbHide').onclick=function(){mbSet(true);};
+  $('mbShow').onclick=function(){mbSet(false);$('mb').scrollIntoView({block:'start'});};
+  function morning(){
+    var m=S.data.morning,fresh=!!(m&&m.day===S.today),dow=new Date().getDay();
+    document.documentElement.classList.toggle('mb-off',mbHidden()); // hidden only for the day it was hidden on: opens again each morning
+    var mi=function(it){var t=esc(it.title);if(it.link)t='<a href="'+esc(it.link)+'" target="_blank" rel="noopener">'+t+'</a>';
+      return '<div class="mi">'+(it.chip?'<span class="chip '+esc(it.tone||'')+'">'+esc(it.chip)+'</span>':'')+t+(it.why?'<p>'+esc(it.why)+'</p>':'')+'</div>';};
+    var groups=function(L){var h='',g=null;L.forEach(function(it){if(it.group!==g){g=it.group;if(g)h+='<div class="grp">'+esc(g)+'</div>';}h+=mi(it);});return h;};
+    var none=fresh?'<p class="empty">Nothing needs you here today.</p>':'<p class="empty">Not in yet. The briefing runs at 7:45 AM.</p>';
+    var col=function(cls,name,L,extra){var n=L.length;
+      return '<div class="mcol '+cls+'"><h3>'+name+'<span class="ct">'+(fresh?n+' item'+(n===1?'':'s'):'')+'</span></h3>'+(fresh&&n?groups(L):none)+(extra||'')+'</div>';};
+    // personal plan for today, always shown (not from the worker)
+    var w=WEEK[dow],ml=MEALS[dow],plan='<div class="grp">Workout today</div>'
+      +'<div class="mi"><span class="chip green">Daily</span><b>25 push-ups</b> + 30 min walk</div>'
+      +'<div class="mi"><b>'+esc(w.name)+'</b><p>'+esc(w.ex&&w.ex.length?w.sub+' · '+w.ex.map(function(k){return EX[k]?EX[k][0]:k;}).join(', '):(w.free||w.sub))+'</p></div>'
+      +'<div class="grp">Meals today</div>'
+      +'<div class="mi"><b>Breakfast</b> · '+esc(ml[0])+'</div><div class="mi"><b>Lunch</b> · '+esc(ml[1])+'</div>';
+    var re=fresh?m.re:[],fin=fresh?m.fin:[],tp=fresh?m.tpm:[],foc=fresh?m.focus:[];
+    $('mbWhen').textContent=fresh?'Ready '+tm(new Date(m.at))+(m.machine?' · ran on '+m.machine:''):(m&&m.at?'Last one '+DOWS[new Date(m.at).getDay()]+' '+tm(new Date(m.at)):'');
+    var total=re.length+fin.length+tp.length;
+    $('mbShowSub').textContent=fresh?(foc.length?foc.length+' focus item'+(foc.length===1?'':'s')+' · ':'')+total+' thing'+(total===1?'':'s')+' today':'workout + meals for today';
+    $('mbBody').innerHTML=(foc.length?'<div class="mfocus"><h3>Today\'s focus</h3><ol>'+foc.map(function(f,i){
+        return '<li><b>'+(i+1)+'</b><div>'+(f.link?'<a href="'+esc(f.link)+'" target="_blank" rel="noopener">'+esc(f.title)+'</a>':esc(f.title))+(f.why?'<small>'+esc(f.why)+'</small>':'')+'</div></li>';}).join('')+'</ol></div>':'')
+      +'<div class="mcols">'+col('re','Real Estate &amp; Marketing',re)+col('fin','Personal &amp; Financial',fin,plan)+col('tp','Toronto Property Media',tp)+'</div>'
+      +'<div class="mfoot"><span>From Gmail · Follow Up Boss · Google Calendar · Desk Financial · HQ Workers</span><span>Updates daily at 7:45 AM</span></div>';
   }
 
   // ---------- briefing ----------
@@ -994,7 +1058,7 @@ function out(o) {
     $('refresh').classList.add('spin');
     return getJ('day?today='+S.today+'&from='+encodeURIComponent(from)+'&to='+encodeURIComponent(to)+'&drive='+DRIVE.length).then(function(d){
       S.data=d;S.loadedAt=Date.now();
-      today();outlook();brief();renderTodos();drive();followTabs();people();
+      today();outlook();morning();brief();renderTodos();drive();followTabs();people();
       loadCals();loadExtra();loadWorkers();
       return getJ('items').then(function(j){
         if(j.items.length){S.projects=j.items;projects();return;}
