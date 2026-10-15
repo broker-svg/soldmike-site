@@ -185,6 +185,9 @@ LEAFLET_HEAD = '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/l
 LEAFLET_JS = '<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" defer></script>'
 LISTING_JS = '<script src="/assets/listings.js?v=5" defer></script><script src="/assets/account.js?v=5" defer></script>'
 
+# Metricool web analytics (SoldMike brand, Oct 14 2026): which social posts send visitors. Public pages only, never /hq/.
+METRICOOL_TAG = '<script>function loadScript(a){var b=document.getElementsByTagName("head")[0],c=document.createElement("script");c.type="text/javascript",c.src="https://tracker.metricool.com/resources/be.js",c.onreadystatechange=a,c.onload=a,b.appendChild(c)}loadScript(function(){beTracker.t({hash:"a339431377f1bdb0f9627a4565e5bb4c"})});</script>'
+
 # ---------- social share cards (tools/og.py renders og/<slug>.jpg from og/cards.json) ----------
 OG_CARDS = []
 OG_PHOTOS = ['/media/gentle-fox/twilight-street.jpg', '/media/gentle-fox/backyard-twilight.jpg', '/media/gentle-fox/drone-front.jpg', '/media/gentle-fox/kitchen.jpg', '/media/gentle-fox/pool.jpg', '/aerial.jpg']
@@ -208,7 +211,7 @@ def page(path, title, desc, trail, body, schema=None, noindex=False, head='', js
            '<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image">'
            '%s<link rel="icon" href="/logo.png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
            '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Barlow:wght@400;500;600&display=swap">'
-           '<link rel="stylesheet" href="/assets/site.css?v=8">%s%s</head><body>%s<main id="main">%s</main>%s<script src="/assets/site.js?v=9" defer></script>%s<script src="/assets/chat.js?v=7" defer></script></body></html>'
+           '<link rel="stylesheet" href="/assets/site.css?v=8">%s%s</head><body>%s<main id="main">%s</main>%s<script src="/assets/site.js?v=9" defer></script>%s<script src="/assets/chat.js?v=7" defer></script>' + METRICOOL_TAG + '</body></html>'
            ) % (e(title), e(desc), SITE, path, e(title), e(desc), SITE, path, og_card(path, title, trail, body),
                 '<meta name="robots" content="noindex">' if noindex else '',
                 ''.join('<script type="application/ld+json">%s</script>' % json.dumps(s, ensure_ascii=False) for s in sch), head,
