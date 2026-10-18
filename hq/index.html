@@ -170,6 +170,7 @@ pre.code{background:#0F1430;color:#E6E9F7;border-radius:10px;padding:12px;font-s
 /* morning briefing (7:45 AM worker) */
 #mb{margin-bottom:20px;border-top:6px solid var(--navy)}
 #mb .hd h2{font-size:36px}
+#mb .cos{font:600 15px var(--body);text-transform:none;letter-spacing:0;color:var(--muted);vertical-align:middle}
 #mb .when{font-size:16px;color:var(--muted);font-weight:600}
 .mfocus{background:var(--navy);color:#fff;border-radius:14px;padding:16px 20px;margin-bottom:18px}
 .mfocus h3{font-size:20px;letter-spacing:.06em;color:var(--pale);margin-bottom:8px}
@@ -357,7 +358,7 @@ dialog::backdrop{background:rgba(20,24,51,.6)}
 
 <main class="wrap">
   <button type="button" id="mbShow">☀ Show Today <span id="mbShowSub"></span></button>
-  <section class="card" id="mb"><div class="hd"><h2>Today</h2><span class="when" id="mbWhen"></span><button class="btn sm ghost" type="button" id="mbHide">Hide ▲</button></div><div id="mbBody"><p class="empty">Loading…</p></div></section>
+  <section class="card" id="mb"><div class="hd"><h2>Today <small class="cos">(Chief of Staff)</small></h2><span class="when" id="mbWhen"></span><button class="btn sm ghost" type="button" id="mbHide">Hide ▲</button></div><div id="mbBody"><p class="empty">Loading…</p></div></section>
   <div class="grid">
   <section class="card" id="today"><div class="hd"><h2>Today's calendar</h2><span class="sub" id="todaySub"></span><button type="button" class="rt" id="rtBtn" aria-pressed="false">Routine <b>Off</b></button></div>
     <div class="sec">Schedule</div><div id="sched"><p class="empty">Loading…</p></div>
