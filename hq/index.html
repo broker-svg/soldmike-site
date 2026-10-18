@@ -178,6 +178,16 @@ pre.code{background:#0F1430;color:#E6E9F7;border-radius:10px;padding:12px;font-s
 .mfocus li b{font-family:var(--display);font-size:40px;line-height:.85;color:#FF5A62}
 .mfocus li small{display:block;font-size:15px;font-weight:400;color:var(--pale);margin-top:4px}
 .mfocus a{color:#fff}
+.mmust{background:var(--navy);color:#fff;border-radius:14px;padding:16px 20px;margin-bottom:18px}
+.mmust h3{font-size:22px;letter-spacing:.06em;color:var(--pale);margin-bottom:6px;display:flex;justify-content:space-between;gap:8px}
+.mmust h3 .ct{font:600 15px var(--body);text-transform:none;letter-spacing:0}
+.mmust ol{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px 22px}
+.mmust li{display:grid;grid-template-columns:34px 1fr;gap:8px;font-size:20px;font-weight:600;line-height:1.25;padding:9px 0;border-top:1px solid rgba(255,255,255,.15)}
+.mmust li>b{font-family:var(--display);font-size:32px;line-height:.9;color:#FF5A62}
+.mmust li small{display:block;font-size:15px;font-weight:400;color:var(--pale);margin-top:3px}
+.mmust .ar{display:inline-block;font:700 12px var(--body);text-transform:uppercase;letter-spacing:.06em;background:rgba(255,255,255,.14);color:#fff;border-radius:6px;padding:2px 7px;margin-right:6px;vertical-align:3px}
+.mmust .ar.st{background:#FF5A62}
+.mmust a{color:#fff}
 .mcols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
 .mcol{border:1px solid var(--line);border-radius:14px;padding:16px 18px;border-top:6px solid var(--c);min-width:0}
 .mcol h3{font-size:25px;color:var(--c);display:flex;justify-content:space-between;align-items:baseline;gap:8px}
@@ -196,7 +206,7 @@ html.mb-off #mb{display:none}
 html.mb-off #mbShow{display:flex}
 html.re-only #mb,html.re-only #mbShow{display:none!important}
 @media (max-width:1180px){.mcols{grid-template-columns:1fr 1fr}.mcols .tp{grid-column:1/-1}}
-@media (max-width:780px){.mfocus ol,.mcols{grid-template-columns:1fr}.mcols .tp{grid-column:auto}#mb .hd h2{font-size:30px;line-height:1}#mb .when{order:3;flex-basis:100%;font-size:15px}.mi{font-size:18px}.mfocus li{font-size:19px}}
+@media (max-width:780px){.mmust ol,.mfocus ol,.mcols{grid-template-columns:1fr}.mcols .tp{grid-column:auto}#mb .hd h2{font-size:30px;line-height:1}#mb .when{order:3;flex-basis:100%;font-size:15px}.mi{font-size:18px}.mfocus li{font-size:19px}}
 
 /* briefing */
 .bi{display:grid;grid-template-columns:32px 1fr;gap:10px;padding:10px 0;border-top:1px solid var(--line)}
@@ -343,13 +353,13 @@ dialog::backdrop{background:rgba(20,24,51,.6)}
   <div><div class="clock" id="hClock"></div><div class="wx" id="hWx"></div></div>
   <div class="mon" id="hMon"></div>
 </div></header>
-<nav class="jump" aria-label="Jump to"><a href="#mb">Briefing</a><a href="#brief">Tasks &amp; email</a><a href="#today">Today</a><a href="#workers">Workers</a><a href="#outlook">Next 2 days</a><a href="#projects">Projects</a></nav>
+<nav class="jump" aria-label="Jump to"><a href="#mb">Today</a><a href="#brief">Tasks &amp; email</a><a href="#today">Calendar</a><a href="#workers">Workers</a><a href="#outlook">Next 2 days</a><a href="#projects">Projects</a></nav>
 
 <main class="wrap">
-  <button type="button" id="mbShow">☀ Show morning briefing <span id="mbShowSub"></span></button>
-  <section class="card" id="mb"><div class="hd"><h2>Morning briefing</h2><span class="when" id="mbWhen"></span><button class="btn sm ghost" type="button" id="mbHide">Hide ▲</button></div><div id="mbBody"><p class="empty">Loading…</p></div></section>
+  <button type="button" id="mbShow">☀ Show Today <span id="mbShowSub"></span></button>
+  <section class="card" id="mb"><div class="hd"><h2>Today</h2><span class="when" id="mbWhen"></span><button class="btn sm ghost" type="button" id="mbHide">Hide ▲</button></div><div id="mbBody"><p class="empty">Loading…</p></div></section>
   <div class="grid">
-  <section class="card" id="today"><div class="hd"><h2>Today</h2><span class="sub" id="todaySub"></span><button type="button" class="rt" id="rtBtn" aria-pressed="false">Routine <b>Off</b></button></div>
+  <section class="card" id="today"><div class="hd"><h2>Today's calendar</h2><span class="sub" id="todaySub"></span><button type="button" class="rt" id="rtBtn" aria-pressed="false">Routine <b>Off</b></button></div>
     <div class="sec">Schedule</div><div id="sched"><p class="empty">Loading…</p></div>
   </section>
   <section class="card" id="outlook"><div class="hd"><h2>Next 2 days</h2></div><div class="days" id="days"></div></section>
@@ -742,7 +752,7 @@ dialog::backdrop{background:rgba(20,24,51,.6)}
     var mi=function(it){var t=esc(it.title);if(it.link)t='<a href="'+esc(it.link)+'" target="_blank" rel="noopener">'+t+'</a>';
       return '<div class="mi">'+(it.chip?'<span class="chip '+esc(it.tone||'')+'">'+esc(it.chip)+'</span>':'')+t+(it.why?'<p>'+esc(it.why)+'</p>':'')+'</div>';};
     var groups=function(L){var h='',g=null;L.forEach(function(it){if(it.group!==g){g=it.group;if(g)h+='<div class="grp">'+esc(g)+'</div>';}h+=mi(it);});return h;};
-    var none=fresh?'<p class="empty">Nothing needs you here today.</p>':'<p class="empty">Not in yet. The briefing runs at 7:45 AM.</p>';
+    var none=fresh?'<p class="empty">Nothing needs you here today.</p>':'<p class="empty">Not in yet. Today\'s list runs at 7:45 AM.</p>';
     var col=function(cls,name,L,extra){var n=L.length;
       return '<div class="mcol '+cls+'"><h3>'+name+'<span class="ct">'+(fresh?n+' item'+(n===1?'':'s'):'')+'</span></h3>'+(fresh&&n?groups(L):none)+(extra||'')+'</div>';};
     // personal plan for today, always shown (not from the worker)
@@ -751,14 +761,21 @@ dialog::backdrop{background:rgba(20,24,51,.6)}
       +'<div class="mi"><b>'+esc(w.name)+'</b><p>'+esc(w.ex&&w.ex.length?w.sub+' · '+w.ex.map(function(k){return EX[k]?EX[k][0]:k;}).join(', '):(w.free||w.sub))+'</p></div>'
       +'<div class="grp">Meals today</div>'
       +'<div class="mi"><b>Breakfast</b> · '+esc(ml[0])+'</div><div class="mi"><b>Lunch</b> · '+esc(ml[1])+'</div>';
-    var re=fresh?m.re:[],fin=fresh?m.fin:[],tp=fresh?m.tpm:[],foc=fresh?m.focus:[];
+    var red=function(it){return it.tone==='red';},nr=function(L){return L.filter(function(it){return !red(it);});};
+    var R0=fresh?m.re:[],F0=fresh?m.fin:[],T0=fresh?m.tpm:[],foc=fresh?m.focus:[];
+    // Must do today = the start-here picks (focus) + every red item from all three areas, no cap
+    var must=foc.map(function(f){return Object.assign({ar:'Start here',st:1},f);}),seen={};
+    must.forEach(function(f){seen[f.title]=1;});
+    [['Real Estate',R0],['Personal',F0],['TPM',T0]].forEach(function(a){a[1].filter(red).forEach(function(it){if(!seen[it.title]){seen[it.title]=1;must.push(Object.assign({ar:a[0]},it));}});});
+    var re=nr(R0),fin=nr(F0),tp=nr(T0);
     $('mbWhen').textContent=fresh?'Ready '+tm(new Date(m.at))+(m.machine?' · ran on '+m.machine:''):(m&&m.at?'Last one '+DOWS[new Date(m.at).getDay()]+' '+tm(new Date(m.at)):'');
-    var total=re.length+fin.length+tp.length;
-    $('mbShowSub').textContent=fresh?(foc.length?foc.length+' focus item'+(foc.length===1?'':'s')+' · ':'')+total+' thing'+(total===1?'':'s')+' today':'workout + meals for today';
-    $('mbBody').innerHTML=(foc.length?'<div class="mfocus"><h3>Today\'s focus</h3><ol>'+foc.map(function(f,i){
-        return '<li><b>'+(i+1)+'</b><div>'+(f.link?'<a href="'+esc(f.link)+'" target="_blank" rel="noopener">'+esc(f.title)+'</a>':esc(f.title))+(f.why?'<small>'+esc(f.why)+'</small>':'')+'</div></li>';}).join('')+'</ol></div>':'')
+    var total=must.length+re.length+fin.length+tp.length;
+    $('mbShowSub').textContent=fresh?(must.length?must.length+' must do · ':'')+total+' thing'+(total===1?'':'s')+' today':'workout + meals for today';
+    $('mbBody').innerHTML=(must.length?'<div class="mmust"><h3>🔴 Must do today<span class="ct">'+must.length+'</span></h3><ol>'+must.map(function(f,i){
+        var t=f.link?'<a href="'+esc(f.link)+'" target="_blank" rel="noopener">'+esc(f.title)+'</a>':esc(f.title);
+        return '<li><b>'+(i+1)+'</b><div><span class="ar'+(f.st?' st':'')+'">'+esc(f.ar)+'</span>'+t+(f.why?'<small>'+esc(f.why)+'</small>':'')+'</div></li>';}).join('')+'</ol></div>':'')
       +'<div class="mcols">'+col('re','Real Estate &amp; Marketing',re)+col('fin','Personal &amp; Financial',fin,plan)+col('tp','Toronto Property Media',tp)+'</div>'
-      +'<div class="mfoot"><span>From Gmail · Follow Up Boss · Google Calendar · Desk Financial · HQ Workers</span><span>Updates daily at 7:45 AM</span></div>';
+      +'<div class="mfoot"><span>🔴 Must do · 🟡 Should do · ⚪ Can slide</span><span>From Gmail · Follow Up Boss · Google Calendar · 2nd Brain · Desk Financial · HQ Workers</span><span>Updates daily at 7:45 AM</span></div>';
   }
 
   // ---------- briefing ----------
