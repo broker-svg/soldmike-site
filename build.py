@@ -57,7 +57,7 @@ def faq_schema(qs):
 # ---------- building blocks ----------
 NAV = [
     ('Buy', [('/listings/', 'Search homes'), ('/listings/our-listings/', 'Our listings'), ('/listings/re-max-premier/', 'RE/MAX Premier listings'), ('/buy/', 'Buying with us'), ('/buy/buyer-guide/', 'Buyer guide: 15 steps'), ('/free-guide/', 'Free PDF guides'), ('/buy/pre-construction/', 'Pre-construction'), ('/saved/', 'Saved homes & searches'), ('/open-house/', 'Open houses')]),
-    ('Sell', [('/sell/home-value/', "What's my home worth?"), ('/sell/', 'Selling with us'), ('/sell/seller-guide/', 'Seller guide: 15 steps'), ('/free-guide/', 'Free PDF guides'), ('/sell/cost-to-sell-vaughan/', 'Cost to sell calculator'), ('/sell/how-we-market/', 'How we market your home'), ('/sell/pre-listing/', 'Pre-listing package')]),
+    ('Sell', [('/sell/home-value/', "What's my home worth?"), ('/sell/', 'Selling with us'), ('/sell/seller-guide/', 'Seller guide: 15 steps'), ('/free-guide/', 'Free PDF guides'), ('/sell/cost-to-sell-vaughan/', 'Cost to sell calculator'), ('/sell/how-we-market/', 'How we market your home'), ('/sell/pre-listing/', 'Pre-listing package'), ('/sell/pre-listing-checklist/', 'Pre-listing checklist')]),
     ('Neighbourhoods', [('/neighbourhoods/', 'All neighbourhoods')] + [('/neighbourhoods/%s/' % s, n) for s, n in [('woodbridge', 'Woodbridge'), ('vellore', 'Vellore Village'), ('kleinburg', 'Kleinburg'), ('maple', 'Maple'), ('caledon-bolton', 'Caledon & Bolton'), ('king-city-nobleton', 'King City & Nobleton'), ('sharon-east-gwillimbury', 'Sharon & East Gwillimbury'), ('toronto', 'Toronto')]]),
     ('Results', [('https://soldmike.ca/sellers/team-sold-listings', 'Recent sales'), ('/results/', 'Case studies'), ('/reviews/', 'Client reviews'), ('/blog/', 'Blog'), ('/market-reports/', 'Market reports')]),
     ('Questions', [('/questions/', 'All questions'), ('/questions/buying/', 'Buyer questions'), ('/questions/selling/', 'Seller questions')]),
@@ -146,10 +146,11 @@ FORMS = {
     'buyer': ('Buyer consultation', 'Book a buyer consultation', [('', 'name', 'Your name', 'text', ''), ('', 'phone', 'Phone', 'tel', ''), ('full', 'email', 'Email', 'email', ''), ('', 'area', 'Area', ['Woodbridge', 'Vaughan', 'Kleinburg', 'King', 'Caledon', 'Toronto', 'Not sure yet'], ''), ('', 'budget', 'Budget', ['Under $1M', '$1M to $1.5M', '$1.5M to $2M', '$2M to $3M', '$3M+'], '')], 'Sent. Michael will call you to set up a time.'),
     'precon': ('Pre-construction list', 'Get the VIP list', [('', 'name', 'Your name', 'text', ''), ('', 'phone', 'Phone', 'tel', ''), ('full', 'email', 'Email', 'email', ''), ('full', 'type', 'Interested in', ['Condo', 'Townhome', 'Detached', 'Investment'], '')], "You're on the list. Michael will send new launches as they come up."),
     'guide': ('Free guide', 'Get the free guide', [('', 'name', 'Your name', 'text', ''), ('', 'email', 'Email', 'email', ''), ('full', 'which', 'Which guide', ['Selling a home in Vaughan', 'Buying a home in Vaughan'], '')], 'Sent. Your guide is ready to download.'),
+    'checklist': ('Pre-listing checklist', 'Send me the checklist', [('', 'name', 'Your name', 'text', ''), ('', 'email', 'Email', 'email', ''), ('full', 'timing', 'Thinking of selling', ['In the next 3 months', 'In 3 to 12 months', 'Next year or later', 'Just getting ready'], ''), ('full', 'which', 'Download', ['Pre-listing checklist'], '')], 'Sent. Your checklist is ready to download.'),
     'join': ('Join the team', "Let's talk", [('', 'name', 'Your name', 'text', ''), ('', 'phone', 'Phone', 'tel', ''), ('full', 'email', 'Email', 'email', ''), ('full', 'stage', 'Where are you at', ['Thinking about getting licensed', 'In the licensing courses', 'Newly licensed', 'Licensed and looking for a new team'], '')], 'Sent. Michael will reach out to set up a coffee.'),
     'report': ('Market report', 'Email me the monthly report', [('', 'name', 'Your name', 'text', ''), ('', 'email', 'Email', 'email', ''), ('full', 'area', 'Area', ['Vaughan', 'Woodbridge', 'Kleinburg', 'King', 'Caledon', 'East Gwillimbury'], '')], "Done. You'll get the next report on the 5th."),
 }
-GUIDES = {'Selling a home in Vaughan': '/guides/selling-a-home-in-vaughan.pdf', 'Buying a home in Vaughan': '/guides/buying-a-home-in-vaughan.pdf'}
+GUIDES = {'Selling a home in Vaughan': '/guides/selling-a-home-in-vaughan.pdf', 'Buying a home in Vaughan': '/guides/buying-a-home-in-vaughan.pdf', 'Pre-listing checklist': '/guides/pre-listing-checklist.pdf'}
 def form(kind, uid='', pick=None):
     lead, btn, fields, done = FORMS[kind]
     if pick:  # preselect and lock one option (e.g. the seller guide on the seller guide page)
@@ -166,7 +167,7 @@ def form(kind, uid='', pick=None):
             auto = {'name': 'name', 'email': 'email', 'phone': 'tel'}.get(name, 'off')
             ctl = '<input id="%s" name="%s" type="%s" autocomplete="%s" data-label="%s"%s>' % (fid, name, typ, auto, e(label), ' placeholder="%s"' % e(ph) if ph else '')
         out += '<div%s><label for="%s">%s</label>%s</div>' % (cls, fid, e(label), ctl)
-    dl = ' data-dl="%s"' % e(json.dumps(GUIDES)) if kind == 'guide' else ''
+    dl = ' data-dl="%s"' % e(json.dumps(GUIDES)) if kind in ('guide', 'checklist') else ''
     return ('<form class="form" data-lead="%s" data-done="%s"' + dl + ' aria-label="%s">%s<button class="btn full" type="submit">%s</button>'
             '<p class="msg full" role="status"></p><p class="fine full">By sending, I agree to be contacted by RE/MAX Premier The OP Team by call, text and email. To opt out, reply STOP or click unsubscribe.</p></form>') % (e(lead), e(done), e(lead), out, e(btn))
 
@@ -799,6 +800,7 @@ P('/alerts/',
   title='Your New Listings | SoldMike', desc='New listings that match your saved search.', trail=[('Your new listings', '/alerts/')], noindex=True,
   head=LISTING_HEAD, js=LISTING_JS + ALERTS_JS)
 
+
 # ---------- pre-listing package (send to sellers before the listing appointment) ----------
 PRELIST_VIDEO = ''  # YouTube video ID for Michael's intro video, e.g. 'dQw4w9WgXcQ'; the video block shows once set
 def tiles(rows):
@@ -865,6 +867,25 @@ ROAD_CSS = '''<style>
 }
 @keyframes roadmove{to{stroke-dashoffset:-28}}
 </style>'''
+# ---------- pre-listing checklist (homeowner lead magnet; "Comment SELL" on Instagram sends people here) ----------
+CHECKLIST = [
+    ('Price it right', 'Recent sales on your street, your competition, and a list price backed by real sales.'),
+    ('Deep clean', 'Inside the appliances, showers, windows, baseboards and carpets.'),
+    ('Air it out', 'Fresh air before showings, no pet or cooking odours, a new furnace filter.'),
+    ('Declutter', 'Clear counters and closets, remove extra furniture and personal photos.'),
+    ('Small fixes', 'Taps, bulbs, scuffed walls, caulking, loose handles.'),
+    ('Exterior maintenance', 'Lawn, gardens, driveway, front door and eavestroughs.'),
+    ('Skip the expensive renos', 'You rarely get back what a big renovation costs.'),
+    ('Photo and showing day', 'Lights on, blinds open, counters clear.'),
+    ('Paperwork to gather', 'Mortgage, taxes, utilities, survey, permits and rentals.'),
+]
+P('/sell/pre-listing-checklist/',
+  lambda: hero([('Home', '/'), ('Sell', '/sell/'), ('Pre-listing checklist', '/sell/pre-listing-checklist/')], 'Your free pre-listing checklist', 'Everything to do before your home hits the market, in a 6-page PDF you can tick off as you go.', GF + 'twilight-street.jpg'),
+  lambda: band('<div class="two"><div class="stack">' + prose('<h2>Get the checklist</h2>', 'Enter your name and email and the download opens right away.') + form('checklist', '-plc') + '</div><div class="stack">' + prose('<h2>What is inside</h2>') + steps(CHECKLIST) + '</div></div>'),
+  lambda: cta("We'll do all of this with you", 'Pricing, prep, staging advice and professional photos and video. Call or text 647-694-3109, or send your address below.'),
+  title='Free Pre-Listing Checklist: Get Your Home Ready to Sell | SoldMike', desc='A free 6-page pre-listing checklist for Vaughan homeowners: pricing, deep cleaning, decluttering, small fixes, curb appeal and paperwork.',
+  trail=[('Sell', '/sell/'), ('Pre-listing checklist', '/sell/pre-listing-checklist/')])
+
 P('/sell/pre-listing/',
   lambda: road_hero([('Home', '/'), ('Sell', '/sell/'), ('Pre-listing package', '/sell/pre-listing/')], 'Your home, presented by SoldMike', 'How we price it, show it and sell it. Take a look before we meet.', GF + 'twilight-street.jpg'),
   lambda: band(statrow([('2,000+', 'transactions, Michael and The OP Team combined'), ('4.9<span style="color:var(--red)">★</span>', 'Google rating, 125 reviews'), ('2011', 'selling in Vaughan since'), ('RENE', 'Negotiation Expert · SRS · ABR®')]) + '<p class="fine" style="margin-top:16px">Transactions: The OP Team and Michael Barillari combined, as of October 2026. Google rating of The OP Team as of October 2026.</p>'),
