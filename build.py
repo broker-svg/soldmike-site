@@ -868,6 +868,7 @@ ROAD_CSS = '''<style>
 @keyframes roadmove{to{stroke-dashoffset:-28}}
 </style>'''
 # ---------- pre-listing checklist (homeowner lead magnet; "Comment SELL" on Instagram sends people here) ----------
+CHECKLIST_VIDEO = ''  # YouTube video ID for the intro video (who we are / what we do); the block shows above the form once set
 CHECKLIST = [
     ('Price it right', 'Recent sales on your street, your competition, and a list price backed by real sales.'),
     ('Deep clean', 'Inside the appliances, showers, windows, baseboards and carpets.'),
@@ -881,8 +882,9 @@ CHECKLIST = [
 ]
 P('/sell/pre-listing-checklist/',
   lambda: hero([('Home', '/'), ('Sell', '/sell/'), ('Pre-listing checklist', '/sell/pre-listing-checklist/')], 'Your free pre-listing checklist', 'Everything to do before your home hits the market, in a 6-page PDF you can tick off as you go.', GF + 'twilight-street.jpg'),
+  lambda: band(head_block('A message from Michael') + '<div style="position:relative;padding-top:56.25%%;border-radius:8px;overflow:hidden"><iframe src="https://www.youtube-nocookie.com/embed/%s" title="Michael Barillari and The OP Team" style="position:absolute;inset:0;width:100%%;height:100%%;border:0" allow="encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe></div>' % CHECKLIST_VIDEO, narrow=True) if CHECKLIST_VIDEO else '',
   lambda: band('<div class="two"><div class="stack">' + prose('<h2>Get the checklist</h2>', 'Enter your name and email and the download opens right away.') + form('checklist', '-plc') + '</div><div class="stack">' + prose('<h2>What is inside</h2>') + steps(CHECKLIST) + '</div></div>'),
-  lambda: cta("We'll do all of this with you", 'Pricing, prep, staging advice and professional photos and video. Call or text 647-694-3109, or send your address below.'),
+  lambda: '<section class="cta"><div class="wrap"><div><h2>What is your home worth?</h2><p>Your next step: a free price range based on what similar homes near you actually sold for.</p></div><p><a class="btn" href="/sell/home-value/">Get my free home value</a></p></div></section>',
   title='Free Pre-Listing Checklist: Get Your Home Ready to Sell | SoldMike', desc='A free 6-page pre-listing checklist for Vaughan homeowners: pricing, deep cleaning, decluttering, small fixes, curb appeal and paperwork.',
   trail=[('Sell', '/sell/'), ('Pre-listing checklist', '/sell/pre-listing-checklist/')])
 
