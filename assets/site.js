@@ -3,6 +3,10 @@
   // the site's own lead list (leads page); listings Worker
   var LAPI=/^(localhost|127\.0\.0\.1)$/.test(location.hostname)?'http://localhost:8787':'https://soldmike-listings.broker-e2c.workers.dev';
   window.smLeadLog=function(l){try{fetch(LAPI+'/api/lead',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(l)}).catch(function(){});}catch(x){}};
+  // InstaChat: links sent by Instagram DM carry ?ig=<code>; after a form is sent we tell the IG Worker so it can DM the next step
+  var IGDM='https://soldmike-ig-dm.broker-e2c.workers.dev';
+  try{var igq=new URLSearchParams(location.search).get('ig');if(igq)sessionStorage.setItem('sm_ig',igq);}catch(x){}
+  function igDownloaded(){try{var c=sessionStorage.getItem('sm_ig');if(c){sessionStorage.removeItem('sm_ig');fetch(IGDM+'/downloaded',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ig:c})}).catch(function(){});}}catch(x){}}
   var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // mobile menu + dropdowns
@@ -60,6 +64,7 @@
         property:'soldmike.com, '+f.dataset.lead
       })}).then(function(r){return r.json();}).then(function(r){
         if(!r.success) throw 0;
+        igDownloaded();
         // remember the lead in this browser so the listing pages can log their views/saves in FUB
         try{localStorage.setItem('sm_lead',JSON.stringify({firstName:parts[0],lastName:parts.slice(1).join(' '),email:v('email'),phone:v('phone')}));}catch(x){}
         smLeadLog({firstName:parts[0],lastName:parts.slice(1).join(' '),email:v('email'),phone:v('phone'),source:f.dataset.lead,page:location.pathname});
