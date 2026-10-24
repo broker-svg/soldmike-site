@@ -344,6 +344,14 @@
   "layout": "photo"
  },
  {
+  "slug": "blog-cost-to-sell-a-home-in-vaughan",
+  "path": "/blog/cost-to-sell-a-home-in-vaughan/",
+  "headline": "What It Really Costs to Sell a Home in Vaughan",
+  "kicker": "Blog",
+  "photo": "/aerial.jpg",
+  "layout": "photo"
+ },
+ {
   "slug": "blog-how-we-sold-82-highland-park",
   "path": "/blog/how-we-sold-82-highland-park/",
   "headline": "How We Sold a Markham Home $210K Over Asking in 6 Days",
@@ -356,7 +364,7 @@
   "path": "/blog/",
   "headline": "Blog: Selling & Buying in Vaughan and the GTA",
   "kicker": "Blog",
-  "photo": "/media/blog/82-highland-park/front.jpg",
+  "photo": "/aerial.jpg",
   "layout": "photo"
  },
  {
