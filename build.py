@@ -920,6 +920,108 @@ P('/sell/pre-listing/',
   trail=[('Sell', '/sell/'), ('Pre-listing package', '/sell/pre-listing/')], head=ROAD_CSS)
 
 
+
+# =====================================================================
+# VIDEO GUIDES (Oct 27 2026): pages for the comment keywords in the SoldMike Instagram Worker (soldmike-ig-dm).
+# Keywords are ready but OFF there until a video uses them. Forms post to that Worker's /signup (FUB lead + tags).
+# =====================================================================
+VIDEO_GUIDES = [  # (path, keyword, noun, title, intro, pdf, what is inside) - PDFs live on img.soldmike.com/guides/
+    ('condo-checklist', 'CONDO', 'checklist', 'Condo Buyer Checklist', 'Look past the price. Know your financing, your monthly costs and your plan before you buy.', 'condo-buyer-checklist.pdf', [('Get your financing straight', 'Know what you can buy before you fall for a unit.'), ('Add up the real monthly cost', 'The mortgage is only part of it.'), ('Read the status certificate', 'It tells you how healthy the building is. Have your lawyer review it.'), ('Check the building', 'Walk it like you already live there.'), ('Resale vs pre-construction', 'Different risks, different costs.'), ('Know your plan', 'The right condo depends on what you’ll do with it.'), ('Closing costs to budget', 'One-time costs on closing day.')]),
+    ('monthly-cost-worksheet', 'BUDGET', 'worksheet', 'Monthly Cost Worksheet', 'Your approval says what the bank will lend. This tells you what fits your life.', 'monthly-cost-worksheet.pdf', [('Approval vs your budget', 'Set your own limit before you search.'), ('Ownership costs', 'Fill in a monthly number for each.'), ('Running costs', 'Ask the seller for average bills.'), ('What you pay now', 'Your housing costs today.'), ('The practice test', 'New total minus what you pay now. Save the difference every month.'), ('One-time closing costs', 'Cash you need on top of the down payment.'), ('Before you search', 'Now you know your number.')]),
+    ('showing-checklist', 'SHOWING', 'checklist', 'Showing Checklist', 'Photos narrow your search. A showing tells you if the home works for you. Bring this along.', 'showing-checklist.pdf', [('Listen', 'Stand still in each room for 10 seconds.'), ('Real size', 'Picture your own furniture in every room.'), ('What’s around it', 'You’re buying the street too.'), ('Condition clues', 'Small signs point to big costs.'), ('Questions to ask', 'We’ll get the answers for you.'), ('Score this home', 'Rate it right after the showing, while it’s fresh.'), ('After the showing', 'Decide with facts, not just feelings.')]),
+    ('offer-guide', 'OFFER', 'guide', 'Offer Guide', 'Price is one part of an offer. Here’s everything a seller weighs, and how to build an offer that wins.', 'offer-guide.pdf', [('Know the value first', 'Asking price isn’t the value.'), ('Price is one part', 'Sellers compare the whole offer.'), ('Conditions: the trade-off', 'They protect you, but they make your offer weaker.'), ('Multiple offers', 'When the asking price is set to bring in offers.'), ('Your deposit', 'Have it ready before you offer.'), ('Before you sign', 'Read it all, then sign.'), ('After it’s accepted', 'The clock starts right away.')]),
+    ('deal-goes-sideways', 'CLOSING', 'guide', 'If a Deal Goes Sideways', 'Your home is sold, then the buyer might not close. Here’s what to do, step by step.', 'deal-goes-sideways.pdf', [('Know where you stand', 'Your contract and the stage of the deal matter.'), ('The first 24 hours', 'Stay calm and get it in writing.'), ('The deposit', 'It doesn’t settle everything.'), ('Extension requests', 'Don’t agree until you know how it affects you.'), ('If you’re buying too', 'Protect your own closing.'), ('Keep a record', 'Your lawyer will need it all.'), ('Next time: prevent it', 'Judge the whole offer, not just the price.')]),
+    ('red-flags-checklist', 'WALK', 'checklist', 'Red-Flags Checklist', 'You love the house. Before you offer, check for the things that make us say walk away.', 'red-flags-checklist.pdf', [('Water', 'The most common and most expensive problem.'), ('Structure', 'Get these checked by a professional.'), ('Questionable renos', 'Ask for permits and receipts.'), ('Other things to check', 'Some affect your insurance.'), ('Missing info', 'Counting on it? Verify it.'), ('The true cost', 'A home in your budget can still stretch you too far.'), ('Dig deeper, negotiate or walk', 'Sometimes the answer is keep looking.')]),
+]
+VIDEO_FOLLOW = {
+    'CONDO': 'Got a unit in mind? I\u2019ll run the real monthly numbers with you.',
+    'FORECAST': 'Want to know what this means for your home? Let\u2019s talk it through.',
+    'MARKET': 'Buying or selling in the next year? Let\u2019s map out your timing.',
+    'BUDGET': 'Send me your worksheet and we\u2019ll set your search range together.',
+    'SHOWING': 'Ready to see a few homes? I\u2019ll bring the checklist.',
+    'VALUE': 'Want me to walk through your home and pick what to fix first?',
+    'OFFER': 'Found a home you like? Let\u2019s build your offer first.',
+    'COMPS': 'Want to know exactly where your home fits? Book a quick evaluation.',
+    'CLOSING': 'Selling soon? Let\u2019s set it up so this never happens to you.',
+    'WALK': 'Looking at a home now? Send it over for an honest take.',
+}
+SNAPSHOT_AREAS = ['Woodbridge', 'Maple', 'Kleinburg', 'Concord', 'Thornhill', 'Vellore', 'Richmond Hill', 'Markham', 'King City', 'Nobleton', 'Aurora', 'Newmarket', 'Bolton', 'Brampton', 'Etobicoke', 'North York', 'Toronto']
+AI_NOTE = 'We use AI tools approved by our brokerage to help us respond to you. Your information is kept private and never sold.'
+VG_CSS = ('<style>.form .tick{display:flex;gap:10px;align-items:flex-start;font-weight:500;font-size:15px;margin:0;cursor:pointer}'
+          '.form .tick input{width:22px;min-height:22px;height:22px;margin:1px 0 0;flex:none;accent-color:#1D2870}'
+          '.form .or{font-size:14px;color:var(--muted,#4a5070);margin:-4px 0 0}.vg-dl{margin-top:18px}'
+          '.areas{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}'
+          '.areas button{font:600 16px Barlow,sans-serif;min-height:50px;border:1px solid #c9ccd9;border-radius:4px;background:#fff;color:#141833;cursor:pointer;padding:0 10px}'
+          '.areas button[aria-pressed=true]{background:#1D2870;border-color:#1D2870;color:#fff}[hidden]{display:none!important}</style>')
+
+def vg_form(button, extra='', offmarket='Also send me off-market homes, ones you won\u2019t see online'):
+    return ('<form class="form" id="vgf" novalidate>'
+            '<div class="full"><label for="vg-name">Your name <small style="font-weight:400">(optional)</small></label><input id="vg-name" name="name" autocomplete="name"></div>'
+            '<div><label for="vg-email">Email</label><input id="vg-email" name="email" type="email" autocomplete="email" inputmode="email"></div>'
+            '<div><label for="vg-phone">Phone</label><input id="vg-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel"></div>'
+            '<p class="or full">Email or phone, whichever you prefer. One is enough.</p>%s'
+            '<label class="tick full"><input type="checkbox" name="offmarket"> %s</label>'
+            '<button class="btn full" type="submit">%s</button><p class="msg full" role="status"></p>'
+            '<p class="fine full">By sending, I agree to be contacted by RE/MAX Premier The OP Team by call, text and email. To opt out, reply STOP or click unsubscribe.</p>'
+            '<p class="fine full">%s</p></form>') % (extra, offmarket, e(button), AI_NOTE)
+
+BEST = '<div class="full"><label for="vg-best">Best time to reach you</label><select id="vg-best" name="best"><option>Anytime</option><option>Morning</option><option>Afternoon</option><option>Evening</option></select></div>'
+
+# Posts to the IG Worker; carries the Instagram code (?ig=, kept by site.js as sm_ig) so the lead links to the DM
+VG_JS = r"""<script>(function(){var IG='https://soldmike-ig-dm.broker-e2c.workers.dev',f=document.getElementById('vgf');if(!f)return;
+var q=new URLSearchParams(location.search),ig=q.get('ig')||'';try{ig=ig||sessionStorage.getItem('sm_ig')||'';}catch(x){}
+var msg=f.querySelector('.msg'),btn=f.querySelector('button[type=submit]');window.vgExtra=window.vgExtra||function(){return{kind:'call',k:(q.get('k')||'').toUpperCase()};};
+f.addEventListener('submit',function(ev){ev.preventDefault();
+ var email=f.email.value.trim(),phone=f.phone.value.trim(),okE=/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email),okP=phone.replace(/\D/g,'').length>=10,x=window.vgExtra();
+ if(x===false)return;
+ if(!okE&&!okP){msg.className='msg err full';msg.textContent='Add your email or phone so Michael can reach you.';return;}
+ if(email&&!okE){msg.className='msg err full';msg.textContent='That email doesn\u2019t look right.';return;}
+ var d=Object.assign({name:f.name.value.trim(),email:okE?email:'',phone:okP?phone:'',offmarket:f.offmarket.checked,best:f.best?f.best.value:'',ig:ig,page:location.pathname},x);
+ btn.disabled=true;var t=btn.textContent;btn.textContent='Sending\u2026';msg.textContent='';
+ fetch(IG+'/signup',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)}).then(function(r){if(!r.ok)throw 0;return r.json();}).then(function(){
+  try{sessionStorage.removeItem('sm_ig');}catch(x){}
+  var p=d.name.split(/\s+/);if(window.smLeadLog)smLeadLog({firstName:p[0]||'',lastName:p.slice(1).join(' '),email:d.email,phone:d.phone,source:d.kind==='area'?'Market snapshot':'Book a call',page:location.pathname});
+  var done=d.kind==='area'?'Sent. Your '+d.area+' snapshot is on its way within one business day.':'Sent. Michael will reach out within one business day.';
+  f.reset();msg.className='msg full';msg.textContent=done;if(window.smSent)smSent(done,null);
+ }).catch(function(){msg.className='msg err full';msg.textContent='That did not go through. Call or text Michael at 647-694-3109.';}).then(function(){btn.disabled=false;btn.textContent=t;});});})();</script>"""
+
+for vpath, vkw, vnoun, vtitle, vintro, vpdf, vinside in VIDEO_GUIDES:
+    P('/guides/%s/' % vpath,
+      lambda vpath=vpath, vnoun=vnoun, vtitle=vtitle, vintro=vintro, vpdf=vpdf: hero([('Home', '/'), ('Free guides', '/free-guide/'), (vtitle, '/guides/%s/' % vpath)], vtitle,
+          '%s<br><a class="btn vg-dl" href="https://img.soldmike.com/guides/%s" target="_blank" rel="noopener">Download the %s (PDF)</a>' % (e(vintro), vpdf, vnoun), '/media/guides/%s.jpg' % vpath),
+      lambda vkw=vkw, vinside=vinside: band('<div class="two"><div class="stack">' + prose('<h2>What\u2019s inside</h2>', 'A 5-page PDF you can print or fill in on your phone.') + steps(vinside) +
+          '</div><div class="stack" id="call">' + prose('<h2>Book a quick call</h2>', e(VIDEO_FOLLOW[vkw])) + vg_form('Book a quick call', BEST) + '</div></div>'),
+      title='%s: Free Download | SoldMike' % vtitle, desc='Free %s from Michael Barillari, SoldMike: %s' % (vtitle.lower(), vintro),
+      trail=[('Free guides', '/free-guide/'), (vtitle, '/guides/%s/' % vpath)], head=VG_CSS,
+      js='<script>window.vgExtra=function(){return{kind:"call",k:%s};};</script>' % json.dumps(vkw) + VG_JS)
+
+P('/book-a-call/',
+  lambda: hero([('Home', '/'), ('Book a quick call', '/book-a-call/')], 'Book a quick call', '<span id="vgline">15 minutes, no pressure. Tell me how to reach you and I\u2019ll set it up.</span>', GF + 'twilight-street.jpg'),
+  lambda: band('<div class="two"><div class="stack">' + prose('<h2>How to reach you</h2>', 'I\u2019ll call or text you within one business day to pick a time.') + vg_form('Book my call', BEST) +
+      '</div><div class="stack">' + prose('<h2>What we\u2019ll cover</h2>') + steps([('Where you are now', 'Buying, selling or both, and your timing.'), ('Real numbers', 'Prices from actual sales near you, not list prices.'),
+      ('Your next step', 'A clear plan, even if that plan is to wait.'), ('Off-market homes', 'Homes I know about that you won\u2019t see online.')]) + '</div></div>'),
+  title='Book a Quick Call with Michael Barillari | SoldMike', desc='15 minutes with Michael Barillari, Broker: real numbers from actual sales and a clear next step.',
+  trail=[('Book a quick call', '/book-a-call/')], head=VG_CSS,
+  js='<script>(function(){var F=%s,k=(new URLSearchParams(location.search).get("k")||"").toUpperCase();if(F[k])document.getElementById("vgline").textContent=F[k]+" 15 minutes, no pressure.";})();</script>' % json.dumps(VIDEO_FOLLOW) + VG_JS)
+
+P('/market-snapshot/',
+  lambda: hero([('Home', '/'), ('Market snapshot', '/market-snapshot/')], 'What\u2019s happening in your area', 'Pick your area and I\u2019ll send you a one-page snapshot: what sold, average prices, days on market and how many homes are for sale.', '/media/guides/market-snapshot.jpg'),
+  lambda: band('<div class="two"><div class="stack">' + prose('<h2>1. Pick your area</h2>', 'Tap one.') + '<div class="areas" id="areas">' +
+      ''.join('<button type="button" aria-pressed="false">%s</button>' % e(a) for a in SNAPSHOT_AREAS) + '<button type="button" aria-pressed="false" data-other="1">Somewhere else</button></div>'
+      '<div id="otherw" hidden style="margin-top:12px"><label for="vg-other" style="font-weight:600">Your area or street</label><input id="vg-other" style="width:100%;min-height:48px;border:1px solid #c9ccd9;border-radius:4px;padding:10px 12px"></div>'
+      '</div><div class="stack">' + prose('<h2>2. Where should I send it?</h2>', 'I put each snapshot together from recent sales and send it within one business day.') +
+      vg_form('Send my snapshot', '<p class="full" id="picked" style="font-weight:700;color:#1D2870;margin:0">No area picked yet</p>', 'Also send me off-market homes, ones you won\u2019t see online').replace(
+          '<label class="tick full"><input type="checkbox" name="offmarket">', '<label class="tick full"><input type="checkbox" name="monthly"> Send me an update for my area every month</label><label class="tick full"><input type="checkbox" name="offmarket">') + '</div></div>'),
+  title='Free Market Snapshot for Your Area | SoldMike', desc='Pick your area and Michael Barillari sends a free one-page market snapshot: sales, prices, days on market and supply.',
+  trail=[('Market snapshot', '/market-snapshot/')], head=VG_CSS,
+  js=r"""<script>(function(){var area='',bs=document.querySelectorAll('#areas button'),ow=document.getElementById('otherw'),ot=document.getElementById('vg-other'),pk=document.getElementById('picked'),f=document.getElementById('vgf');
+var k=(new URLSearchParams(location.search).get('k')||'MARKET').toUpperCase();
+bs.forEach(function(b){b.addEventListener('click',function(){bs.forEach(function(x){x.setAttribute('aria-pressed','false');});b.setAttribute('aria-pressed','true');
+ if(b.dataset.other){ow.hidden=false;ot.focus();area='';pk.textContent='Type your area';}else{ow.hidden=true;area=b.textContent;pk.textContent='Area: '+area;}});});
+ot.addEventListener('input',function(){area=ot.value.trim();pk.textContent=area?'Area: '+area:'Type your area';});
+window.vgExtra=function(){if(!area){var m=f.querySelector('.msg');m.className='msg err full';m.textContent='Pick your area first.';return false;}return{kind:'area',k:k,area:area,monthly:f.monthly.checked};};})();</script>""" + VG_JS)
+
+
 # ---------- homepage menu (index.html is hand-edited; its menu comes from NAV so it always matches) ----------
 def home_nav():
     out = []

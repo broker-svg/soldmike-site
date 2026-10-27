@@ -344,6 +344,70 @@
   "layout": "photo"
  },
  {
+  "slug": "guides-condo-checklist",
+  "path": "/guides/condo-checklist/",
+  "headline": "Condo Buyer Checklist: Free Download",
+  "kicker": "Free guides",
+  "photo": "/media/guides/condo-checklist.jpg",
+  "layout": "photo"
+ },
+ {
+  "slug": "guides-monthly-cost-worksheet",
+  "path": "/guides/monthly-cost-worksheet/",
+  "headline": "Monthly Cost Worksheet: Free Download",
+  "kicker": "Free guides",
+  "photo": "/media/guides/monthly-cost-worksheet.jpg",
+  "layout": "photo"
+ },
+ {
+  "slug": "guides-showing-checklist",
+  "path": "/guides/showing-checklist/",
+  "headline": "Showing Checklist: Free Download",
+  "kicker": "Free guides",
+  "photo": "/media/guides/showing-checklist.jpg",
+  "layout": "photo"
+ },
+ {
+  "slug": "guides-offer-guide",
+  "path": "/guides/offer-guide/",
+  "headline": "Offer Guide: Free Download",
+  "kicker": "Free guides",
+  "photo": "/media/guides/offer-guide.jpg",
+  "layout": "photo"
+ },
+ {
+  "slug": "guides-deal-goes-sideways",
+  "path": "/guides/deal-goes-sideways/",
+  "headline": "If a Deal Goes Sideways: Free Download",
+  "kicker": "Free guides",
+  "photo": "/media/guides/deal-goes-sideways.jpg",
+  "layout": "photo"
+ },
+ {
+  "slug": "guides-red-flags-checklist",
+  "path": "/guides/red-flags-checklist/",
+  "headline": "Red-Flags Checklist: Free Download",
+  "kicker": "Free guides",
+  "photo": "/media/guides/red-flags-checklist.jpg",
+  "layout": "photo"
+ },
+ {
+  "slug": "book-a-call",
+  "path": "/book-a-call/",
+  "headline": "Book a Quick Call with Michael Barillari",
+  "kicker": "Book a quick call",
+  "photo": "/media/gentle-fox/twilight-street.jpg",
+  "layout": "photo"
+ },
+ {
+  "slug": "market-snapshot",
+  "path": "/market-snapshot/",
+  "headline": "Free Market Snapshot for Your Area",
+  "kicker": "Market snapshot",
+  "photo": "/media/guides/market-snapshot.jpg",
+  "layout": "photo"
+ },
+ {
   "slug": "blog-offer-nights-explained",
   "path": "/blog/offer-nights-explained/",
   "headline": "Offer Nights Explained: How to Win or Sell in a Multiple-Offer Market",
