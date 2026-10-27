@@ -344,6 +344,14 @@
   "layout": "photo"
  },
  {
+  "slug": "blog-offer-nights-explained",
+  "path": "/blog/offer-nights-explained/",
+  "headline": "Offer Nights Explained: How to Win or Sell in a Multiple-Offer Market",
+  "kicker": "Blog",
+  "photo": "/media/gentle-fox/twilight-street.jpg",
+  "layout": "photo"
+ },
+ {
   "slug": "blog-cost-to-sell-a-home-in-vaughan",
   "path": "/blog/cost-to-sell-a-home-in-vaughan/",
   "headline": "What It Really Costs to Sell a Home in Vaughan",
@@ -364,7 +372,7 @@
   "path": "/blog/",
   "headline": "Blog: Selling & Buying in Vaughan and the GTA",
   "kicker": "Blog",
-  "photo": "/aerial.jpg",
+  "photo": "/media/gentle-fox/twilight-street.jpg",
   "layout": "photo"
  },
  {
