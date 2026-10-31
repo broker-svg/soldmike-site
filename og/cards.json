@@ -408,6 +408,14 @@
   "layout": "photo"
  },
  {
+  "slug": "blog-down-payment-ontario",
+  "path": "/blog/down-payment-ontario/",
+  "headline": "How Much Do You Need for a Down Payment in Ontario?",
+  "kicker": "Blog",
+  "photo": "/media/gentle-fox/drone-front.jpg",
+  "layout": "photo"
+ },
+ {
   "slug": "blog-offer-nights-explained",
   "path": "/blog/offer-nights-explained/",
   "headline": "Offer Nights Explained: How to Win or Sell in a Multiple-Offer Market",
@@ -436,7 +444,7 @@
   "path": "/blog/",
   "headline": "Blog: Selling & Buying in Vaughan and the GTA",
   "kicker": "Blog",
-  "photo": "/media/gentle-fox/twilight-street.jpg",
+  "photo": "/media/gentle-fox/drone-front.jpg",
   "layout": "photo"
  },
  {
