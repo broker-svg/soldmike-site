@@ -408,6 +408,14 @@
   "layout": "photo"
  },
  {
+  "slug": "blog-closing-costs-buyers-vaughan",
+  "path": "/blog/closing-costs-buyers-vaughan/",
+  "headline": "Closing Costs for Buyers in Vaughan: The 2% Rule and Land Transfer Tax",
+  "kicker": "Blog",
+  "photo": "/aerial.jpg",
+  "layout": "photo"
+ },
+ {
   "slug": "blog-down-payment-ontario",
   "path": "/blog/down-payment-ontario/",
   "headline": "How Much Do You Need for a Down Payment in Ontario?",
@@ -444,7 +452,7 @@
   "path": "/blog/",
   "headline": "Blog: Selling & Buying in Vaughan and the GTA",
   "kicker": "Blog",
-  "photo": "/media/gentle-fox/drone-front.jpg",
+  "photo": "/aerial.jpg",
   "layout": "photo"
  },
  {
