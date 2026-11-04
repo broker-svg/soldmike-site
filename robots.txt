@@ -5,6 +5,7 @@ Disallow: /alerts/
 Disallow: /leads/
 Disallow: /admin/
 Disallow: /hq/
+Disallow: /vow/
 
 User-agent: GPTBot
 User-agent: OAI-SearchBot
@@ -24,6 +25,7 @@ Disallow: /alerts/
 Disallow: /leads/
 Disallow: /admin/
 Disallow: /hq/
+Disallow: /vow/
 
 User-agent: CCBot
 User-agent: Bytespider

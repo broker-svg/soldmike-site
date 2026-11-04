@@ -9,7 +9,7 @@ SITE = 'https://soldmike.com'
 PHONE = '647-694-3109'
 EMAIL = 'mike@theopteam.ca'
 ADDRESS = {'street': '3550 Rutherford Rd, Unit 80', 'city': 'Vaughan', 'region': 'ON', 'postal': 'L4H 3T8'}
-BROKERAGE = 'RE/MAX Premier The OP Team Inc., Brokerage'
+BROKERAGE = 'RE/MAX Premier The OP Team, Brokerage'
 AREAS = ['Vaughan', 'Woodbridge', 'Kleinburg', 'Maple', 'Caledon', 'King', 'East Gwillimbury', 'Toronto']
 TODOS = []
 LICENSED = 'December 2011'
@@ -84,7 +84,7 @@ def footer():
     cols = ''.join('<div><strong>%s</strong>%s</div>' % (l, ''.join('<a href="%s"%s>%s</a>' % (u, ext(u), e(t)) for u, t in items[:5])) for l, items in NAV[:4] if not isinstance(items, str))
     return ('<footer><div class="wrap"><div class="fcols">'
             '<div><img src="/logo-soldmike-white.png" alt="RE/MAX Premier The OP Team, SoldMike" style="width:220px;height:auto">'
-            '<span>Michael Barillari, Broker, SOLDMIKE. %s Independently owned and operated.</span>'
+            '<span>Michael Barillari, Broker, SOLDMIKE. %s. Independently owned and operated.</span>'
             '<span>%s, %s, %s %s</span><span>Call or text %s</span><span>%s</span><a href="/admin/" rel="nofollow" style="margin-top:6px">Team login</a></div>%s</div>'
             '<div class="legal"><span>The trademarks REALTOR®, REALTORS®, and the REALTOR® logo are controlled by The Canadian Real Estate Association (CREA) and identify real estate professionals who are members of CREA. The trademarks MLS®, Multiple Listing Service® and the associated logos are owned by CREA. <a href="/privacy/" style="color:var(--pale)">Privacy</a> · <a href="/terms/" style="color:var(--pale)">Terms</a> · <a href="/admin/" style="color:var(--pale)" rel="nofollow">Team login</a></span>'
             '<a href="https://www.realtor.ca/en" target="_blank" rel="noopener" class="rca-foot" aria-label="Powered by REALTOR.ca"><img src="https://www.realtor.ca/images/en-ca/powered_by_realtor.svg" width="125" alt="Powered by REALTOR.ca" loading="lazy" style="background:#fff;border-radius:4px;padding:4px"></a></div></div></footer>'
@@ -691,7 +691,7 @@ P('/about/',
   schema=[{'@context': 'https://schema.org', '@type': 'Person', 'name': 'Michael Barillari', 'jobTitle': 'Broker', 'worksFor': {'@type': 'Organization', 'name': BROKERAGE}, 'url': SITE + '/about/', 'image': SITE + '/mike.png', 'knowsLanguage': ['English', 'Italian'], 'hasCredential': [{'@type': 'EducationalOccupationalCredential', 'name': n} for n in DESIGNATION_NAMES], 'sameAs': PROFILES}])
 
 P('/about/the-op-team/',
-  lambda: hero([('Home', '/'), ('About', '/about/'), ('The OP Team', '/about/the-op-team/')], 'The OP Team', 'RE/MAX Premier The OP Team Inc., Brokerage.'),
+  lambda: hero([('Home', '/'), ('About', '/about/'), ('The OP Team', '/about/the-op-team/')], 'The OP Team', 'RE/MAX Premier The OP Team, Brokerage.'),
   lambda: band(prose(
       'The OP Team is a real estate team at RE/MAX Premier in Vaughan, led by Nick Oppedisano and Angela Oppedisano. The team helps buyers, sellers and investors across Toronto, York, Peel, Durham, Simcoe and Halton Hills.',
       'Together, Michael Barillari and The OP Team have more than 2,000 transactions of combined experience, and The OP Team holds a 4.9-star Google rating from 125 reviews.',
@@ -701,7 +701,7 @@ P('/about/the-op-team/',
       '<p><a class="btn ghost" href="https://theopteam.ca/" target="_blank" rel="noopener">Visit theopteam.ca</a> <a class="btn ghost" href="/reviews/">Read client reviews</a></p>') +
       todo('Team members: photo, name, role, one line each'), narrow=True),
   lambda: cta('Work with the team', 'Start with Michael. He brings in the right people at each step.', 'contact'),
-  title='The OP Team | RE/MAX Premier | SoldMike', desc='RE/MAX Premier The OP Team Inc., Brokerage: the team behind SoldMike in Vaughan and Woodbridge.',
+  title='The OP Team | RE/MAX Premier | SoldMike', desc='RE/MAX Premier The OP Team, Brokerage: the team behind SoldMike in Vaughan and Woodbridge.',
   trail=[('About', '/about/'), ('The OP Team', '/about/the-op-team/')])
 
 P('/videos/',
@@ -752,8 +752,14 @@ P('/privacy/',
       'Your saved homes, your answer to the terms-of-use notice, the random device ID and, after you send a form, your contact details (so forms fill in for you) are stored in your own browser. You can clear them at any time by clearing this site\'s data in your browser.',
       '<h2>Other services</h2>',
       'Listing photos load from CREA\'s servers and maps load from OpenStreetMap, so those services receive your IP address when you view them. We protect the listings on this site from automated copying; requests that look automated may be blocked and their IP addresses logged.',
+      '<h2 id="vow">Member area (VOW) accounts</h2>',
+      '<b>This section applies if you register for the password-protected member area at soldmike.com/vow/. You are asked to agree to it when you register.</b>',
+      '<b>What we collect and keep:</b> your name, email address, username and password (stored only in scrambled, hashed form, so nobody can read it), and the dates you accepted our Terms of Use and this policy. We keep these records while your account is active and for at least 180 days after your password expires, as the MLS® Rules require.',
+      '<b>Your activity:</b> we keep an audit trail of what you do in the member area, including when you sign in, what you search for, which listings you view, and the IP address used. It is used to protect the listing information and to meet the MLS® Rules.',
+      '<b>Sharing with PropTx: your personal information may be shared with PropTx and the real estate board that supplies the listing information, for auditing and/or legal purposes.</b> That can include your name, email address, username, account records and audit trail.',
+      '<b>Emails and follow-up:</b> your name and email go into our customer relationship system (Follow Up Boss), which sends your verification and confirmation emails and lets Michael reply to your questions. Your activity in the member area is not sent to any AI tool.',
       '<h2>Your choices</h2>',
-      'You can ask to see, correct or delete your information at any time, or ask us to stop recording the homes you view, by emailing %s.' % EMAIL) + '<div style="margin-top:20px">' + todo('Have the brokerage review this policy (PIPEDA, CASL for emails, listing activity sent to Follow Up Boss, CREA analytics)') + '</div>', narrow=True),
+      'You can ask to see, correct or delete your information at any time, or ask us to stop recording the homes you view, by emailing %s. Member area records we must keep under the MLS® Rules are deleted once that period ends.' % EMAIL) + '<div style="margin-top:20px">' + todo('Have the brokerage review this policy (PIPEDA, CASL for emails, listing activity sent to Follow Up Boss, CREA analytics)') + '</div>', narrow=True),
   title='Privacy Policy | SoldMike', desc='Privacy policy for soldmike.com.', trail=[('Privacy', '/privacy/')], noindex=True)
 
 P('/terms/',
@@ -768,8 +774,24 @@ P('/terms/',
       '<h2>Using this site</h2>',
       'This site is for consumers with a genuine interest in buying, selling or leasing real estate. Listing information is refreshed at least once every 24 hours and is deemed reliable but not guaranteed accurate. Each listing shows the brokerage that listed it; homes listed by other brokerages are not our listings, and Michael Barillari can help you with any of them as a buyer’s agent.',
       'Automated access to this site, including bots, scrapers and bulk downloading of listings, is not allowed and may be blocked. Suspected scraping is reported to CREA.',
-      'Calculators and estimates on this site are for information only and are not financial, legal or mortgage advice.') + '<div style="margin-top:20px">' + todo('Have the brokerage review these terms') + '</div>', narrow=True),
-  title='Terms of Use | SoldMike', desc='Terms of use for soldmike.com, including the CREA listing content terms.', trail=[('Terms', '/terms/')], noindex=True)
+      'Calculators and estimates on this site are for information only and are not financial, legal or mortgage advice.',
+      '<h2>Corrections</h2>',
+      '<b>Listing brokerages: report an error to %s. It will be fixed within 48 hours.</b>' % EMAIL,
+      '<h2 id="vow">Member area: Terms of Use</h2>',
+      'These terms apply only to the password-protected member area at soldmike.com/vow/ (our Virtual Office Website, or VOW). You accept them by ticking a box when you register. The rest of this site is covered by the terms above.',
+      'In these terms, “we” means Michael Barillari, Broker, and %s; “PropTx” means PropTx Innovations Inc. and the real estate board whose MLS® System supplies the listing information; and “Listing Information” means all listing information, sold information and related data shown in the member area. By accepting, you confirm and agree that:' % BROKERAGE,
+      '<ol type="a"><li>you are entering into a lawful broker-consumer relationship with us;</li>'
+      '<li>all Listing Information you get from the member area is only for your personal, non-commercial use;</li>'
+      '<li>you have a bona fide (genuine) interest in the purchase, sale or lease of real estate of the type offered through the member area;</li>'
+      '<li>you will not copy, redistribute, retransmit or otherwise use any of the data or Listing Information, except in connection with your consideration of the purchase or sale of an individual property. For greater certainty, you may not use any AI system or technology, or any other technology that has the effect of, or is intended to, collect, store, reorganize, analyze, summarize or manipulate any Listing Information or related data;</li>'
+      '<li>you will not, directly or indirectly, display, post, disseminate, distribute, publish, broadcast, transfer, sell or sublicense any Listing Information to another person or entity. For greater certainty, you may not directly or indirectly give any Listing Information to any AI system or technology, or any other technology that has the effect of, or is intended to, collect, store, reorganize, analyze, summarize or manipulate any Listing Information or related data;</li>'
+      '<li>you will not “scrape” (including “screen scraping” and “database scraping”), “data mine”, or do anything else intended to collect, store, reorganize, summarize or manipulate any Listing Information or related data; and</li>'
+      '<li>you acknowledge that PropTx owns, and holds valid proprietary rights and copyright in, the MLS® Database, the MLS® System, the Listing Information and any related information.</li></ol>',
+      '<b>No fee and no representation.</b> These terms do not cost you anything and do not create a representation agreement between you and us. Any agreement that charges you a fee or makes you our client would be a separate document, clearly labelled, and could not be accepted by clicking.',
+      '<b>Compliance access.</b> You authorize PropTx, and other members of the Association or their authorized representatives, to access the member area to verify compliance with the MLS® Rules (including the VOW Rules) and to monitor how members\u2019 listings are displayed.',
+      '<b>Accuracy.</b> Listing Information is deemed reliable but is not guaranteed accurate by PropTx.',
+      '<b>Your account.</b> One account per email address. Your password is valid for 90 days and can then be renewed. We keep a record of your account and your activity in the member area, as described in our <a href="/privacy/#vow">privacy policy</a>.') + '<div style="margin-top:20px">' + todo('Have the brokerage review these terms') + '</div>', narrow=True),
+  title='Terms of Use | SoldMike', desc='Terms of use for soldmike.com, including the CREA listing content terms and the member area terms.', trail=[('Terms', '/terms/')], noindex=True)
 
 # ---------- new-listing alerts (each visitor's own link from the alert email) ----------
 ALERTS_JS = """<script>
@@ -1136,7 +1158,7 @@ open('sitemap.xml', 'w').write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset 
 # AI crawlers may read the guides and answers, never the listing pages (CREA DDF Rules 5(k) anti-scraping; PropTx: no listing data to AI)
 AI_BOTS_OPEN = ['GPTBot', 'OAI-SearchBot', 'ChatGPT-User', 'ClaudeBot', 'Claude-SearchBot', 'Claude-User', 'PerplexityBot', 'Perplexity-User', 'Google-Extended', 'Applebot-Extended']
 AI_BOTS_BLOCKED = ['CCBot', 'Bytespider', 'meta-externalagent', 'Amazonbot', 'cohere-ai', 'Diffbot', 'Timpibot', 'AI2Bot']
-LISTING_PATHS = ['/homes/', '/listings/', '/saved/', '/alerts/', '/leads/', '/admin/', '/hq/']
+LISTING_PATHS = ['/homes/', '/listings/', '/saved/', '/alerts/', '/leads/', '/admin/', '/hq/', '/vow/']
 robots = 'User-agent: *\nAllow: /\n' + ''.join('Disallow: %s\n' % p for p in LISTING_PATHS[2:]) + '\n'
 robots += ''.join('User-agent: %s\n' % b for b in AI_BOTS_OPEN) + 'Allow: /\n' + ''.join('Disallow: %s\n' % p for p in LISTING_PATHS) + '\n'
 robots += ''.join('User-agent: %s\n' % b for b in AI_BOTS_BLOCKED) + 'Disallow: /\n\n'

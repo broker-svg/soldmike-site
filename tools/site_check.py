@@ -11,7 +11,7 @@ import json, os, random, re, sys, time, urllib.request, urllib.error
 SITE = 'https://soldmike.com'
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 14_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130 Safari/537.36 SoldMikeHealthCheck'
-PRIVATE = ('/hq/', '/admin/', '/saved/', '/alerts/', '/leads/')
+PRIVATE = ('/hq/', '/admin/', '/saved/', '/alerts/', '/leads/', '/vow/')
 problems = []
 
 

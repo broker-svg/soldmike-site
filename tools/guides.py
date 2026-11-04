@@ -236,7 +236,7 @@ def doc(kind, steps):
                  '<div class="row"><div><b>Call or text</b>647-694-3109</div><div><b>Email</b>mike@theopteam.ca</div><div><b>Web</b>soldmike.com</div></div>'
                  '<div class="row" style="margin-top:.15in"><div><b>Office</b>3550 Rutherford Rd, Unit 80, Vaughan, ON L4H 3T8</div></div></div>'
                  '<div class="desig">%s</div><a class="cta" href="https://soldmike.com/%s">%s</a>'
-                 '<div class="fine">This guide is general information, not legal, tax or mortgage advice. Rules and rates change; confirm details with your lawyer, lender and accountant. Not intended to solicit buyers or sellers already under contract. RE/MAX Premier The OP Team Inc., Brokerage. Independently owned and operated.</div></section>'
+                 '<div class="fine">This guide is general information, not legal, tax or mortgage advice. Rules and rates change; confirm details with your lawyer, lender and accountant. Not intended to solicit buyers or sellers already under contract. RE/MAX Premier The OP Team, Brokerage. Independently owned and operated.</div></section>'
                  % ('Ready when you are' if sell else 'Let’s find your home',
                     'Michael and The OP Team have more than 2,000 transactions of combined experience, with our own media team, Toronto Property Media, behind every listing.' if sell
                     else 'Michael helps buyers across Vaughan, Woodbridge, Kleinburg, King, Caledon and Toronto, in English and Italian.',

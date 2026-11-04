@@ -58,4 +58,4 @@ Grandview is a family neighbourhood with schools, parks and transit close by. Bu
 
 Every home is different, and so is every street. If you'd like to know what your home could sell for, and which strategy would get you the most, **call or text 647-694-3109** or get a free home evaluation below. No pressure, just the numbers.
 
-*Michael Barillari, Broker, RE/MAX Premier The OP Team, Brokerage. Sold price and dates from MLS® records.*
+*Michael Barillari, Broker, RE/MAX Premier The OP Team, Brokerage. Sold price and dates from our own transaction records.*
