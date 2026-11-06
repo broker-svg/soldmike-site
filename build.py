@@ -184,7 +184,7 @@ SITEMAP = []
 LISTING_HEAD = '<link rel="stylesheet" href="/assets/listings.css?v=11">'
 LEAFLET_HEAD = '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">'
 LEAFLET_JS = '<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" defer></script>'
-LISTING_JS = '<script src="/assets/listings.js?v=5" defer></script><script src="/assets/account.js?v=5" defer></script>'
+LISTING_JS = '<script src="/assets/listings.js?v=6" defer></script><script src="/assets/account.js?v=5" defer></script>'
 
 # Metricool web analytics (SoldMike brand, Oct 14 2026): which social posts send visitors. Public pages only, never /hq/.
 METRICOOL_TAG = '<script>function loadScript(a){var b=document.getElementsByTagName("head")[0],c=document.createElement("script");c.type="text/javascript",c.src="https://tracker.metricool.com/resources/be.js",c.onreadystatechange=a,c.onload=a,b.appendChild(c)}loadScript(function(){beTracker.t({hash:"a339431377f1bdb0f9627a4565e5bb4c"})});</script>'
@@ -291,7 +291,7 @@ P('/listings/home/',
   '<div class="ld" id="ld" data-listings><p class="ld-loading">Loading this home…</p></div>',
   title='Home for sale | SoldMike', desc='MLS® listing details, photos and showings with Michael Barillari, Broker.',
   trail=[('Search homes', '/listings/'), ('Listing', '/listings/home/')],
-  head=LISTING_HEAD + LEAFLET_HEAD, js=LISTING_JS + LEAFLET_JS + '<script src="/assets/home.js?v=10" defer></script>', noindex=True)  # shell for /listings/home/?id= and the Worker's /homes/ pages (the Worker strips this noindex)
+  head=LISTING_HEAD + LEAFLET_HEAD, js=LISTING_JS + LEAFLET_JS + '<script src="/assets/home.js?v=11" defer></script>', noindex=True)  # shell for /listings/home/?id= and the Worker's /homes/ pages (the Worker strips this noindex)
 
 SAVED_JS = """<script>
 document.addEventListener('DOMContentLoaded',function(){

@@ -28,8 +28,8 @@
   // one page per listing at /homes/<address-city>-<key>/ (served by the Worker); turned on once soldmike.com runs through Cloudflare
   SM.HOMES=true;
   SM.slug=function(l){var b=l.addr?l.addr+' '+l.city:'mls '+(l.mls||'')+' '+l.city;return b.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,80)+'-'+String(l.id).toLowerCase();};
-  SM.link=function(id,l){return SM.HOMES&&l&&l.city?'/homes/'+SM.slug(l)+'/':'/listings/home/?id='+encodeURIComponent(id);};
-  SM.rca=function(url,w){return '<a class="rca" href="'+esc(url)+'" target="_blank" rel="noopener" aria-label="View this listing on REALTOR.ca"><img src="'+RCA_LOGO+'" width="'+(w||90)+'" alt="Powered by REALTOR.ca" loading="lazy"></a>';};
+  SM.link=function(id,l){if(l&&l.dla)return '/homes/mls/'+encodeURIComponent(l.mls)+'/';return SM.HOMES&&l&&l.city?'/homes/'+SM.slug(l)+'/':'/listings/home/?id='+encodeURIComponent(id);};
+  SM.rca=function(url,w){if(!url)return '';return '<a class="rca" href="'+esc(url)+'" target="_blank" rel="noopener" aria-label="View this listing on REALTOR.ca"><img src="'+RCA_LOGO+'" width="'+(w||90)+'" alt="Powered by REALTOR.ca" loading="lazy"></a>';};
 
   // ---------- saved homes ----------
   SM.saved=function(){return store('sm_saved')||[];};
