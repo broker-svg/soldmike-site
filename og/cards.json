@@ -408,6 +408,14 @@
   "layout": "photo"
  },
  {
+  "slug": "blog-low-cost-fixes-before-you-sell",
+  "path": "/blog/low-cost-fixes-before-you-sell/",
+  "headline": "5 Low-Cost Fixes That Pay Off Before You Sell",
+  "kicker": "Blog",
+  "photo": "/media/gentle-fox/kitchen.jpg",
+  "layout": "photo"
+ },
+ {
   "slug": "blog-closing-costs-buyers-vaughan",
   "path": "/blog/closing-costs-buyers-vaughan/",
   "headline": "Closing Costs for Buyers in Vaughan: The 2% Rule and Land Transfer Tax",
@@ -452,7 +460,7 @@
   "path": "/blog/",
   "headline": "Blog: Selling & Buying in Vaughan and the GTA",
   "kicker": "Blog",
-  "photo": "/aerial.jpg",
+  "photo": "/media/gentle-fox/kitchen.jpg",
   "layout": "photo"
  },
  {
