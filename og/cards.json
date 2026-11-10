@@ -408,6 +408,14 @@
   "layout": "photo"
  },
  {
+  "slug": "blog-pre-construction-or-resale",
+  "path": "/blog/pre-construction-or-resale/",
+  "headline": "Pre-Construction or Resale: Which Fits Your Timeline?",
+  "kicker": "Blog",
+  "photo": "/media/gentle-fox/drone-front.jpg",
+  "layout": "photo"
+ },
+ {
   "slug": "blog-low-cost-fixes-before-you-sell",
   "path": "/blog/low-cost-fixes-before-you-sell/",
   "headline": "5 Low-Cost Fixes That Pay Off Before You Sell",
@@ -460,7 +468,7 @@
   "path": "/blog/",
   "headline": "Blog: Selling & Buying in Vaughan and the GTA",
   "kicker": "Blog",
-  "photo": "/media/gentle-fox/kitchen.jpg",
+  "photo": "/media/gentle-fox/drone-front.jpg",
   "layout": "photo"
  },
  {
