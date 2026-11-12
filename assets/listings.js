@@ -74,6 +74,8 @@
       +'<div class="fine"><span>MLS® '+esc(l.mls)+'</span>'+SM.rca(l.rca,90)+'</div></div></article>';
   };
   SM.cards=function(el,items,empty){
+    // after the IDX switch, homes saved under an old CREA key come back with their new key in `was`: swap it in the saved list
+    var s=SM.saved(),moved=false;(items||[]).forEach(function(l){var i=l.was?s.indexOf(String(l.was)):-1;if(i>=0){if(s.indexOf(String(l.id))<0)s[i]=String(l.id);else s.splice(i,1);moved=true;}});if(moved)store('sm_saved',s);
     el.innerHTML=items.length?items.map(SM.card).join(''):'<p class="empty">'+(empty||'No homes match right now. Check back tomorrow, the list refreshes every day.')+'</p>';
   };
   SM.loading=function(el,n){var h='';for(var i=0;i<(n||3);i++)h+='<div class="card lc sk"><div class="ph"></div><div class="meta"><i></i><i></i><i></i></div></div>';el.innerHTML=h;};
