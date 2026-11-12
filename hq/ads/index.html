@@ -1,0 +1,645 @@
+<!doctype html>
+<html lang="en-CA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RealView Ads | SoldMike</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+/* RealView Ads (soldmike.com/hq/ads/, host PIN): Michael's private ad-spend dashboard. READ ONLY: it shows numbers, it can never change an ad.
+   Ad numbers come from the listings Worker (/api/hq/ads/data, pulled from Meta hourly); leads come live from Follow Up Boss.
+   Same trading-desk look as RealView. Date range and source on top, campaign ticker,
+   chart of spend / leads / cost per lead with leads bars under it, cost per lead + snapshot + budget pace beside it,
+   then the ads table. One dark look on purpose (trading terminal). */
+body{margin:0}[hidden]{display:none!important}
+:root{
+  color-scheme:dark;
+  --bg:#131722; --panel:#1a1f2e; --panel2:#20263a; --line:#2c3347; --line2:#3a425a;
+  --fg:#eef1f7; --soft:#c3cad9; --muted:#8f99b0;
+  --up:#26a69a; --down:#ef5350; --blue:#2962ff; --blue-soft:#7ea2ff; --amber:#f0b24a; --red:#d7141e; --tint:#17213a; --tint-line:#2f3d63;
+  --ui:"Archivo",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --num:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,monospace;
+}
+*{box-sizing:border-box}
+html,body{background:var(--bg)}
+body{color:var(--fg);font:400 15px/1.5 var(--ui);padding-block:0 48px}
+.wrap{margin:0 auto;padding-left:max(clamp(16px,1.6vw,36px),env(safe-area-inset-left,0px));padding-right:max(clamp(16px,1.6vw,36px),env(safe-area-inset-right,0px))}
+.lab{font:600 12px/1.2 var(--ui);letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+button,select,input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--blue-soft);outline-offset:2px}
+
+/* top bar */
+.top{border-bottom:1px solid var(--line);background:var(--panel)}
+.top .wrap{display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px;padding-block:14px;position:relative}
+.brand{display:flex;align-items:baseline;gap:10px;white-space:nowrap}
+.brand b{font:700 21px/1 var(--ui);letter-spacing:-.01em}
+.brand b span{color:var(--blue-soft)}
+.brand i{font:500 12px/1 var(--ui);font-style:normal;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.topctl{flex:1 1 auto;display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;min-width:0}
+.dates{font-size:14px;color:var(--soft);white-space:nowrap}.dates b{font-weight:600;color:var(--fg)}
+.sample{font:600 12px/1 var(--ui);letter-spacing:.07em;text-transform:uppercase;color:var(--muted);border:1px solid var(--line2);border-radius:4px;padding:8px 9px;white-space:nowrap;background:none;cursor:pointer}
+.sample.ok{color:var(--up);border-color:var(--up)}.sample.wait{color:var(--amber);border-color:var(--amber)}.sample.bad{color:var(--down);border-color:var(--down)}
+.brand a{font:600 13px/1 var(--ui);color:var(--muted);text-decoration:none;border:1px solid var(--line2);border-radius:5px;padding:6px 9px}.brand a:hover{color:var(--fg)}
+.notice{margin:14px 0 0;padding:10px 14px;border:1px solid var(--amber);border-radius:6px;color:var(--fg);background:color-mix(in srgb,var(--amber) 12%,var(--panel));font-size:14px}
+dialog{background:var(--panel);color:var(--fg);border:1px solid var(--line2);border-radius:8px;padding:22px;width:min(380px,calc(100vw - 32px))}
+dialog::backdrop{background:rgba(8,10,18,.75)}
+dialog h2{margin:0 0 12px;font:700 18px/1.2 var(--ui)}
+dialog label{display:block;margin:10px 0 4px;font-size:13px;color:var(--soft)}
+dialog input{width:100%;background:var(--bg);border:1px solid var(--line2);border-radius:6px;padding:11px 12px;font-size:16px}
+dialog .row{display:flex;gap:10px;justify-content:flex-end;margin-top:16px}
+dialog button{background:var(--blue);border:0;border-radius:6px;padding:10px 16px;font-weight:600;color:#fff;cursor:pointer}
+dialog button.ghost{background:none;border:1px solid var(--line2);color:var(--soft)}
+dialog .err{color:var(--down);font-size:14px;margin:8px 0 0}
+.ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+
+/* ticker */
+.tick{border-bottom:1px solid var(--line);overflow:hidden;scrollbar-width:none}
+.tick::-webkit-scrollbar{display:none}
+.tick .row{display:flex;gap:0;width:max-content;animation:roll 60s linear infinite}
+.tick:hover .row,.tick:focus-within .row{animation-play-state:paused}
+@keyframes roll{to{transform:translateX(-12.5%)}}
+.tick button{background:none;border:0;border-right:1px solid var(--line);padding:10px 18px;cursor:pointer;display:flex;gap:10px;align-items:baseline;font-size:14px}
+.tick button:hover{background:var(--panel)}
+.tick button[aria-pressed=true]{background:var(--panel2)}
+.tick .n{color:var(--soft);font-weight:500}
+.tick .v{font-family:var(--num);font-weight:500}
+.tick .s{font:600 11px/1 var(--ui);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.chg{font-family:var(--num);font-size:13px}.chg.u{color:var(--up)}.chg.d{color:var(--down)}
+
+/* filters */
+.bar{display:flex;flex-wrap:wrap;gap:12px 22px;align-items:center;padding-block:18px 14px}
+.crumb{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:15px;color:var(--soft)}
+.crumb em{font-style:normal;color:var(--muted)}
+.crumb strong{color:var(--fg);font-weight:600}
+.crumb select{background:var(--panel);border:1px solid var(--line2);border-radius:6px;padding:7px 10px;font-weight:600}
+.seg{display:flex;border:1px solid var(--line2);border-radius:6px;overflow:hidden}
+.seg button{background:none;border:0;border-right:1px solid var(--line2);padding:8px 13px;font-size:14px;font-weight:500;color:var(--soft);cursor:pointer;white-space:nowrap}
+.seg button:last-child{border-right:0}
+.seg button:hover{background:var(--panel)}
+.seg button[aria-pressed=true]{background:var(--blue);color:#fff}
+.groups{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center}
+.groups.end{margin-left:auto}
+.fsb{background:none;border:1px solid var(--line2);border-radius:6px;padding:8px 13px;font-size:14px;font-weight:500;color:var(--soft);cursor:pointer}.fsb:hover{background:var(--panel)}
+.fsb.sm{padding:6px 10px;font-size:13px}
+
+/* main grid */
+.grid{display:grid;grid-template-columns:minmax(0,1fr) clamp(380px,24vw,560px);gap:18px;align-items:start}
+.grid.solo{grid-template-columns:minmax(0,1fr)}
+.side{display:flex;flex-direction:column}.side .pace{flex:none}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:6px;min-width:0}
+.pad{padding:18px 20px}.side .pad{padding:14px 20px}.side .pad.newest{padding:10px 20px 10px}
+.head{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-between;align-items:flex-start;padding:18px 20px 2px}
+.head h1{margin:0 0 4px;font:600 17px/1.3 var(--ui);color:var(--soft);text-wrap:balance}
+.now2{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 14px}
+.big{font:700 40px/1 var(--num);letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.sub{display:flex;flex-wrap:wrap;gap:2px 10px;align-items:baseline;font-size:14px;color:var(--muted)}
+.ohlc{font:400 13px/1.4 var(--num);color:var(--muted);padding:2px 20px 2px;min-height:20px;font-variant-numeric:tabular-nums}
+.ohlc b{color:var(--fg);font-weight:500}
+#chart{height:400px;margin:0 8px 0 12px}
+.vol{padding:2px 8px 12px 12px}
+.vol .cap{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center;padding:8px 8px 8px}
+.key{display:inline-flex;align-items:center;gap:7px;font-size:13px;color:var(--fg);background:none;border:1px solid var(--line2);border-radius:5px;padding:5px 10px;cursor:pointer}
+.key:hover{border-color:var(--blue-soft)}
+.key i{width:10px;height:10px;border-radius:2px;display:inline-block}
+.key[aria-pressed=false]{color:var(--muted);text-decoration:line-through;border-color:var(--line)}
+.key[aria-pressed=false] i{opacity:.25}
+.bars{display:flex;align-items:flex-end;height:clamp(84px,13vh,170px);border-top:1px solid var(--line)}
+.bars .g{flex:1;display:flex;align-items:flex-end;justify-content:center;gap:1px;height:100%;min-width:0;padding:0 1px}
+.bars .g span{flex:1;max-width:12px;min-width:1px;border-radius:1px 1px 0 0;display:block}
+
+/* cost per lead card */
+.mult h2,.snap h2,.sect h2,.pace h2,.newest h2{margin:0;font:600 12px/1.2 var(--ui);letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.mult .now{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;margin:12px 0 2px}
+.mult .now b{font:700 40px/1 var(--num);letter-spacing:-.03em}
+.mult p{margin:4px 0 0;color:var(--soft);font-size:14px}
+.range{position:relative;height:96px;margin:16px 6px 2px}
+.range .track{position:absolute;left:0;right:0;top:44px;height:8px;border-radius:4px;background:var(--line)}
+.range .fill{position:absolute;top:44px;height:8px;border-radius:4px;background:linear-gradient(90deg,var(--up),var(--fg) 52%,var(--amber))}
+.range .pt{position:absolute;top:0;transform:translateX(-50%);text-align:center;white-space:nowrap}
+.range .pt b{display:block;font:700 18px/1 var(--num);margin-bottom:12px}
+.range .pt i{display:block;width:2px;height:20px;margin:0 auto;background:var(--fg)}
+.range .pt span{display:block;margin-top:10px;font-size:13px;color:var(--soft)}
+.range .pt.lo b{color:var(--up)}.range .pt.hi b{color:var(--amber)}
+.range .dot{position:absolute;top:43px;width:10px;height:10px;border-radius:50%;transform:translateX(-50%);background:var(--bg);border:2px solid var(--blue-soft);cursor:help}
+.range .lim{position:absolute;top:36px;height:24px;border-left:2px dashed var(--down);transform:translateX(-1px)}
+.legend3{display:grid;gap:5px;margin-top:8px;font-size:14px;color:var(--soft)}
+.legend3 div{display:flex;gap:10px;align-items:baseline}
+.legend3 b{font-family:var(--num);min-width:52px}
+.snap,.pace{border-top:1px solid var(--line)}
+.snap dl{margin:10px 0 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:10px 16px}
+.snap dl div{min-width:0}
+.snap dt{color:var(--muted);font-size:13px;line-height:1.3}
+.snap dd{margin:2px 0 0;font:500 17px/1.3 var(--num);font-variant-numeric:tabular-nums}
+.pace .now{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px;margin:10px 0 2px}
+.pace .now b{font:700 32px/1 var(--num);letter-spacing:-.03em}
+.pace .now em{font:600 14px/1 var(--ui);font-style:normal;border-radius:4px;padding:5px 8px;background:var(--panel2)}
+.pace p{margin:4px 0 0;color:var(--soft);font-size:14px}
+.meter{position:relative;height:10px;border-radius:5px;background:var(--line);margin:12px 0 4px}
+.meter .used{position:absolute;left:0;top:0;bottom:0;border-radius:5px;background:var(--blue-soft)}
+.meter i{position:absolute;top:-5px;width:2px;height:20px;background:var(--fg);transform:translateX(-50%)}
+.meter+.t{display:flex;justify-content:space-between;font-size:12px;color:var(--muted)}
+
+/* side feed: alerts, news, lead */
+.newest{border-top:1px solid var(--line);flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0}
+#feedList{flex:1;min-height:0;overflow-y:auto;margin-top:4px}
+.thead{display:flex;flex-wrap:wrap;gap:10px 20px;justify-content:space-between;align-items:center}
+.al{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:14px;line-height:1.35}
+.al:last-child{border-bottom:0}
+.al b{display:block;font-weight:600;color:var(--fg)}
+.al span{display:block;color:var(--muted);font-size:13px}
+.al i{flex:0 0 8px;width:8px;height:8px;border-radius:50%;margin-top:6px;background:var(--blue-soft)}
+.al i.g{background:var(--up)}.al i.r{background:var(--down)}.al i.a{background:var(--amber)}
+.ag{padding:2px 0 0;font-size:14px}
+.ag .hd{display:flex;gap:12px;align-items:center}
+.ag .hd>div{min-width:0}
+.ag .hd b{display:block;font:600 16px/1.3 var(--ui)}
+.ag .hd span{display:block;color:var(--soft);font-size:13px;margin-top:2px}
+.ag .hd .av{display:grid;margin:0;width:40px;height:40px;font-size:15px;color:#fff}
+.ag .hd .fsb{margin-left:auto}
+.ag dl{margin:8px 0 0;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.35fr);gap:6px 16px}
+.ag dd.em{font-size:13px;overflow-wrap:normal;word-break:break-all}
+.ag dt{color:var(--muted);font-size:12px}.ag dd{margin:1px 0 0;font-weight:600;overflow-wrap:anywhere}
+.ag dd.n{font-family:var(--num);font-weight:500}
+.ag .fsb{flex:none;color:#fff;background:var(--blue);border-color:var(--blue)}
+.hint{color:var(--muted);font-size:14px;padding:10px 0}
+.bell{background:none;border:1px solid var(--line2);border-radius:6px;padding:10px 14px;font-weight:600;font-size:14px;cursor:pointer;white-space:nowrap}
+.bell b{display:inline-block;min-width:22px;margin-left:6px;padding:2px 6px;border-radius:10px;background:var(--red);color:#fff;font:700 12px/1.3 var(--num);text-align:center}
+.drop{position:absolute;right:max(16px,env(safe-area-inset-right,0px));top:calc(100% + 6px);width:min(440px,calc(100vw - 32px));background:var(--panel);border:1px solid var(--line2);border-radius:6px;padding:8px 16px;z-index:30;box-shadow:0 14px 34px rgba(0,0,0,.5)}
+
+/* lead cards (in place of house cards) */
+.av{width:44px;height:44px;flex:none;border-radius:50%;display:grid;place-items:center;font:700 16px/1 var(--ui);color:#fff;background:linear-gradient(160deg,hsl(var(--h) 45% 46%),hsl(var(--h) 40% 26%))}
+.lc{background:var(--bg);border:1px solid var(--line2);border-radius:6px;overflow:hidden;min-width:0;display:flex;flex-direction:column;cursor:pointer}
+.lc:hover{border-color:var(--blue-soft)}
+.lc[aria-current=true]{border-color:var(--blue);box-shadow:0 0 0 1px var(--blue)}
+.tg{font:700 13px/1.2 var(--ui);letter-spacing:.06em;text-transform:uppercase;padding:6px 10px;text-align:center}
+.tg.new{background:var(--blue);color:#fff}.tg.con{background:var(--panel2);color:var(--fg)}.tg.apt{background:var(--up);color:#fff}
+.tg.run{background:var(--up);color:#fff}.tg.pau{background:var(--amber);color:var(--bg)}.tg.stp{background:var(--red);color:#fff}
+.lp{display:flex;gap:10px;align-items:center;padding:10px 10px 4px}
+.lp b{display:block;font-weight:600;font-size:14px;color:var(--fg);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lp>div{min-width:0}
+.lt{padding:4px 10px 9px;display:grid;gap:1px;font-size:13px;line-height:1.35;color:var(--soft)}.lt b{color:var(--fg);font-weight:600;font-size:14px}
+.lt span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.strip{display:flex;gap:12px;overflow-x:auto;border-top:1px solid var(--line);padding:10px 0 4px}
+.strip .lc{flex:0 0 clamp(170px,8.4vw,210px)}
+.strip.wrap{flex-wrap:wrap;overflow:visible}
+
+/* ads table */
+.sect{margin-top:18px}
+.ph{aspect-ratio:16/10;background:linear-gradient(180deg,hsl(var(--h) 34% 34%),hsl(var(--h) 30% 16%));display:grid;place-items:center;position:relative;overflow:hidden}
+.ph svg{width:44%;height:auto;display:block;opacity:.85}.ph svg path{fill:hsl(var(--h) 20% 80%)}
+.ph small{position:absolute;left:8px;top:8px;font:600 11px/1 var(--ui);letter-spacing:.07em;text-transform:uppercase;background:rgba(0,0,0,.45);color:#fff;padding:4px 6px;border-radius:3px}
+.photos{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;padding:4px 20px 20px}
+.scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px;min-width:1100px}
+th{font:600 12px/1.2 var(--ui);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-align:left;padding:10px 14px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:11px 14px;border-bottom:1px solid var(--line);white-space:nowrap}
+tr:last-child td{border-bottom:0}
+td.r,th.r{text-align:right}
+td.n{font-family:var(--num);font-variant-numeric:tabular-nums}
+tbody tr{cursor:pointer}tbody tr:hover td{background:var(--panel2)}
+.stt{display:inline-flex;align-items:center;gap:8px;font-weight:600}
+.stt i{width:9px;height:9px;border-radius:50%}
+.stt.run{color:var(--up)}.stt.run i{background:var(--up)}
+.stt.pau{color:var(--amber)}.stt.pau i{background:var(--amber)}
+.stt.stp{color:var(--down)}.stt.stp i{background:var(--down)}
+.stt small{font-weight:400;color:var(--muted);font-size:13px}
+.pill{display:inline-block;font:700 14px/1 var(--num);padding:5px 8px;border-radius:4px;background:var(--panel2);min-width:54px;text-align:center}
+.pill.lo{color:var(--up)}.pill.hi{color:var(--amber)}.pill.over{color:#fff;background:color-mix(in srgb,var(--down) 55%,var(--panel2))}
+#segStatus button[aria-pressed=true][data-v=run]{background:var(--up);color:#fff}
+#segStatus button[aria-pressed=true][data-v=pau]{background:var(--amber);color:var(--bg)}
+#segStatus button[aria-pressed=true][data-v=stp]{background:var(--red);color:#fff}
+.tbl .thead{border-radius:5px 5px 0 0;border-bottom:1px solid var(--line)}
+.tbl[data-s=run] .thead{background:color-mix(in srgb,var(--up) 26%,var(--panel));border-top:3px solid var(--up)}
+.tbl[data-s=pau] .thead{background:color-mix(in srgb,var(--amber) 22%,var(--panel));border-top:3px solid var(--amber)}
+.tbl[data-s=stp] .thead{background:color-mix(in srgb,var(--red) 30%,var(--panel));border-top:3px solid var(--red)}
+.tbl[data-s=all] .thead{background:color-mix(in srgb,var(--blue) 26%,var(--panel));border-top:3px solid var(--blue)}
+.tbl .thead h2{color:var(--fg);font-size:13px}
+.sect>.panel.tbl>.pad:first-child{padding-block:12px}
+.tot td{font-weight:600;background:var(--panel2)}
+.toast{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);font-weight:600;font-size:14px;padding:10px 16px;border-radius:6px;z-index:40;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+.foot{color:var(--muted);font-size:13px;margin:18px 0 0;max-width:90ch}
+.miss{padding:40px 20px;color:var(--soft)}
+
+@media (min-width:1800px){body{font-size:16px}.big{font-size:46px}.mult .now b{font-size:46px}.head h1{font-size:19px}.snap dd{font-size:19px}table{font-size:15px}.tick button{font-size:15px;padding:12px 22px}.seg button{font-size:15px;padding:9px 16px}.range .pt b{font-size:20px}}
+@media (max-width:1040px){.grid{grid-template-columns:minmax(0,1fr)}.groups.end{margin-left:0}}
+@media (max-width:560px){.big{font-size:34px}.head{padding:16px 16px 6px}.pad{padding:16px}.ohlc{padding:0 16px 4px}.mult .now b{font-size:34px}.range .pt b{font-size:15px}.range .pt span{font-size:12px}.seg button{padding:8px 10px;font-size:13px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}.tick{overflow-x:auto}}
+</style>
+
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <div class="brand"><a href="/hq/">‹ HQ</a><b>SoldMike <span>RealView Ads</span></b></div>
+  <div class="topctl">
+    <div class="seg" id="segRange" role="group" aria-label="Dates"></div>
+    <div class="seg" id="segSrc" role="group" aria-label="Where the ads run"></div>
+    <span class="dates" id="dates"></span>
+  </div>
+  <button type="button" class="bell" id="bell" aria-expanded="false">Alerts<b id="bellN"></b></button>
+  <button type="button" class="fsb" id="setBtn">Settings</button>
+  <button type="button" class="sample" id="syncTag" title="Click to update from Meta now">Loading…</button>
+  <div class="drop" id="drop" hidden></div>
+</div></header>
+
+<nav class="tick" aria-label="Campaigns: cost per lead, last 7 days"><div class="row" id="tick"></div></nav>
+<div class="wrap"><p class="notice" id="notice" hidden></p></div>
+
+<main class="wrap">
+  <div class="bar">
+    <div class="crumb"><span>Ads</span><em>›</em><span id="crumbSrc"></span><em>›</em>
+      <select id="camp" aria-label="Campaign"></select></div>
+    <div class="groups end">
+      <div class="seg" id="segFocus" role="group" aria-label="What to show"></div>
+      <button type="button" class="fsb" id="fs">Full screen</button>
+    </div>
+  </div>
+
+  <div class="grid">
+    <section class="panel">
+      <div class="head">
+        <div>
+          <h1 id="title"></h1>
+          <div class="now2"><div class="big" id="big"></div>
+          <div class="sub"><span id="bigLab"></span><span class="chg" id="bigChg"></span></div></div>
+        </div>
+        <div class="groups">
+          <div class="seg" id="segView" role="group" aria-label="Show"></div>
+          <div class="seg" id="segPeriod" role="group" aria-label="Period"></div>
+          <div class="seg" id="segChart" role="group" aria-label="Chart type"><button type="button" data-t="candles">Candles</button><button type="button" data-t="line">Line</button></div>
+          <div class="seg" id="segLine" role="group" aria-label="Line colour"></div>
+        </div>
+      </div>
+      <div class="ohlc" id="ohlc"></div>
+      <div id="chart"></div>
+      <div class="vol">
+        <div class="cap"><div class="seg" id="segStrip" role="group" aria-label="Bottom strip"></div>
+          <span class="lab" id="capLab">Leads per day</span>
+          <span class="groups" id="barKeys">
+          <button type="button" class="key" data-k="leads" aria-pressed="true"><i style="background:var(--up)"></i>Leads</button></span>
+          <div class="seg" id="segStripKind" role="group" aria-label="Which leads" hidden></div></div>
+        <div class="bars" id="bars"></div>
+        <div class="strip" id="strip" hidden></div>
+      </div>
+    </section>
+
+    <aside class="panel side">
+      <div class="pad mult">
+        <h2 id="cplHead">Cost per lead</h2>
+        <div class="now"><b id="mNow"></b><span class="chg" id="mChg"></span></div>
+        <p id="mSay"></p>
+        <div class="range" id="range"></div>
+        <div class="legend3" id="legend3"></div>
+      </div>
+      <div class="pad snap">
+        <h2 id="snapHead">Snapshot</h2>
+        <dl id="snap"></dl>
+      </div>
+      <div class="pad pace">
+        <h2 id="paceHead">Budget pace</h2>
+        <div class="now"><b id="paceNow"></b><em id="paceTag"></em></div>
+        <div class="meter" id="meter"></div><div class="t"><span>$0</span><span id="paceBud"></span></div>
+        <p id="paceSay"></p>
+      </div>
+      <div class="pad newest" id="newest" hidden>
+        <div class="thead"><h2 id="feedTitle">Alerts</h2><div class="groups"><button type="button" class="fsb sm" id="feedMore">More</button><div class="seg" id="segFeed" role="group" aria-label="Alerts, news or lead"></div></div></div>
+        <div id="feedList"></div>
+      </div>
+    </aside>
+  </div>
+
+  <section class="sect">
+    <div class="panel tbl" id="tblPanel" data-s="run">
+      <div class="pad thead"><h2 id="tblTitle"></h2>
+        <div class="groups"><div class="seg" id="segStatus" role="group" aria-label="Which ads"></div><div class="seg" id="segTView" role="group" aria-label="View"></div></div></div>
+      <div class="scroll" id="tblWrap"><table><thead id="thead"></thead><tbody id="rows"></tbody></table></div>
+      <div class="photos" id="photos" hidden></div>
+    </div>
+  </section>
+
+  <div class="toast" id="toast" role="status" hidden></div>
+  <p class="foot">Read only: this page shows numbers and can never start, pause or change an ad. Seen = times your ads were shown. Taps = taps on the ad's link. Leads = forms filled in, as counted by Meta. Spend is before tax; the card charge adds 13% HST. Lead cards are your newest Follow Up Boss leads from the last 30 days.</p>
+  <dialog id="pinDlg"><form method="dialog" id="pinForm"><h2>Host only</h2><input id="pinIn" inputmode="numeric" type="password" autocomplete="off" aria-label="PIN" placeholder="PIN"><p class="err" id="pinErr" hidden>Wrong PIN</p><div class="row"><button type="submit">Continue</button></div></form></dialog>
+  <dialog id="setDlg"><form method="dialog" id="setForm"><h2>Your numbers</h2><label for="setBud">Monthly ad budget, before tax ($)</label><input id="setBud" inputmode="numeric" type="text" autocomplete="off"><label for="setLim">Cost per lead limit ($)</label><input id="setLim" inputmode="numeric" type="text" autocomplete="off"><div class="row"><button type="button" class="ghost" id="setCancel">Cancel</button><button type="submit">Save</button></div></form></dialog>
+</main>
+
+<script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
+<script>
+(function () {
+  var $ = function (s) { return document.querySelector(s); };
+  var css = function (n) { return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); };
+  function rng(seed) { var a = 2166136261; for (var i = 0; i < seed.length; i++) { a ^= seed.charCodeAt(i); a = Math.imul(a, 16777619); } return function () { a = (a + 0x6D2B79F5) | 0; var t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+  var iso = function (d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
+  var money = function (n) { return '$' + Math.round(n).toLocaleString('en-CA'); };
+  var cents = function (n) { return '$' + n.toLocaleString('en-CA', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); };
+  var cnt = function (n) { return Math.round(n).toLocaleString('en-CA'); };
+  var pct = function (a, b) { return b ? (a - b) / b * 100 : 0; };
+  var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
+  var MO = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  var MONTH = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  var TODAY = new Date(); TODAY.setHours(0, 0, 0, 0);
+  var ago = function (d) { var x = new Date(TODAY); x.setDate(x.getDate() - d); return x; };
+  var day = function (d) { return MO[d.getMonth()] + ' ' + d.getDate(); };
+  var N = 400, TAX = 0.13, LIMIT = 45, BUDGET = 3000;
+
+  // filled by ingest() from the Worker: ads + their daily numbers (Meta) and the newest leads (Follow Up Boss)
+  var CAMPS = [], SRC = {}, ADS = [], LEADS = [], META = { connected: false }, FUBAPP = 'https://app.followupboss.com';
+  var API = /^(localhost|127\.0\.0\.1)$/.test(location.hostname) ? 'http://localhost:8787' : 'https://soldmike-listings.broker-e2c.workers.dev';
+  function store(k, v) { try { if (v === undefined) return JSON.parse(localStorage.getItem(k) || 'null'); localStorage.setItem(k, JSON.stringify(v)); } catch (e) { return null; } }
+  function api(path, opt) { opt = opt || {}; opt.headers = Object.assign({ 'X-OH-Pin': store('sm_oh_pin') || '', 'Content-Type': 'application/json' }, opt.headers || {});
+    return fetch(API + '/api/hq/' + path, opt).then(function (r) { if (r.status === 401) throw 'pin'; return r.json().catch(function () { return {}; }).then(function (j) { if (!r.ok) throw j.error || ('Error ' + r.status); return j; }); }); }
+  function askPin() { return new Promise(function (res) { var d = $('#pinDlg'); $('#pinForm').onsubmit = function (e) { e.preventDefault(); store('sm_oh_pin', $('#pinIn').value.trim()); api('ads/data?days=30').then(function () { d.close(); res(); }).catch(function () { $('#pinErr').hidden = false; }); }; if (!d.open) d.showModal(); $('#pinIn').focus(); }); }
+  var hueOf = function (s) { var h = 0; s = String(s); for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % 360; return h; };
+  var srcOf = function (s) { return /facebook|instagram|meta|\bfb\b|\big\b/i.test(s) ? 'Meta' : /youtube/i.test(s) ? 'YouTube' : 'Other'; };
+  var daysAgo = function (day) { var p = String(day).slice(0, 10).split('-'); return Math.round((TODAY - new Date(+p[0], p[1] - 1, +p[2])) / 864e5); };
+  function ingest(j) {
+    META = j.meta || {}; FUBAPP = j.fubApp || FUBAPP; LIMIT = +(j.settings && j.settings.limit) || 45; BUDGET = +(j.settings && j.settings.budget) || 3000;
+    var byId = {}, all = (j.ads || []).map(function (a) { var o = { id: a.id, name: a.name || 'Ad', camp: a.camp || 'No campaign', src: a.src || 'Meta', kind: a.kind || 'Photo', st: a.status || 'stp', why: a.why || '', thumb: a.thumb || '', hue: hueOf(a.id), days: [], start: -1, end: N, created: a.created };
+      for (var d = 0; d < N; d++) o.days.push(null); byId[a.id] = o; return o; });
+    (j.daily || []).forEach(function (r) { var a = byId[r[1]], d = daysAgo(r[0]); if (!a || d < 0 || d >= N) return;
+      a.days[d] = { spend: +r[2] || 0, seen: +r[3] || 0, taps: +r[5] || 0, leads: +r[6] || 0, booked: 0 }; if (d > a.start) a.start = d; if (d < a.end) a.end = d; });
+    // keep ads that have numbers, plus anything running or paused right now
+    ADS = all.filter(function (a) { return a.start >= 0 || a.st !== 'stp'; });
+    ADS.forEach(function (a, i) { a.i = i; if (a.start < 0) { var c = a.created ? Math.max(0, daysAgo(a.created)) : 0; a.start = c; a.end = a.st === 'run' ? 0 : c; } else if (a.st === 'run') a.end = 0; });
+    SRC = {}; CAMPS = []; ADS.forEach(function (a) { if (!(a.camp in SRC)) { SRC[a.camp] = a.src; CAMPS.push([a.camp, a.src]); } });
+    var now = Date.now();
+    LEADS = (j.leads || []).map(function (p) { var w = String(p.name || '').trim().split(/\s+/), t = Date.parse(p.created);
+      return { id: p.id, name: p.name, init: ((w[0] || '?')[0] + (w.length > 1 ? w[w.length - 1][0] : '')).toUpperCase(), ad: { name: p.source || 'Unknown', src: srcOf((p.source || '') + ' ' + (p.url || '')) }, mins: isNaN(t) ? 0 : Math.max(0, Math.round((now - t) / 60000)),
+        hue: hueOf(p.name || p.id), phone: p.phone || '—', email: p.email || '—', ans: p.stage || '—', home: p.home || '—', status: p.status || 'new', tags: (p.tags || []).join(', ') || '—' }; });
+    LEADS.sort(function (a, b) { return a.mins - b.mins; });
+    if (st.camp !== 'All campaigns' && !(st.camp in SRC)) st.camp = 'All campaigns';
+  }
+  var RANGES = { today: { t: 'Today', n: 1 }, d7: { t: '7 days', n: 7 }, d30: { t: '30 days', n: 30 }, month: { t: 'This month', n: TODAY.getDate() } };
+  var PERIODS = { '1M': { n: 30, wk: false }, '3M': { n: 90, wk: false }, '6M': { n: 26, wk: true }, '1Y': { n: 52, wk: true } };
+  var st = { range: 'd7', src: 'All', camp: 'All campaigns', view: 'spend', period: '3M', candles: true, line: false, lineMode: 'white', focus: 'all', strip: 'bars', stripKind: 'all', tStatus: 'run', tView: 'list', feed: 'alerts', feedAll: false, sel: null, dropMode: 'alerts', show: { leads: true } };
+
+  var pick = function () { return ADS.filter(function (a) { return (st.src === 'All' || a.src === st.src) && (st.camp === 'All campaigns' || a.camp === st.camp); }); };
+  function agg(list, from, to) { // days ago, from >= to
+    var o = { spend: 0, seen: 0, taps: 0, leads: 0, booked: 0 };
+    list.forEach(function (a) { for (var d = to; d <= from; d++) { var x = a.days[d]; if (x) { o.spend += x.spend; o.seen += x.seen; o.taps += x.taps; o.leads += x.leads; o.booked += x.booked; } } });
+    o.cpl = o.leads ? o.spend / o.leads : null; return o;
+  }
+  var rangeN = function () { return RANGES[st.range].n; };
+  var rangeLabel = function () { var n = rangeN(); return n === 1 ? 'Today, ' + day(TODAY) : (st.range === 'month' ? 'This month' : 'Last ' + n + ' days') + ' · ' + day(ago(n - 1)) + '–' + day(TODAY); };
+  var cpl$ = function (v) { return v == null ? 'No leads yet' : money(v); };
+
+  var SNAME = { new: 'New', con: 'Contacted', apt: 'Appointment' };
+  var when = function (m) { return m < 60 ? m + ' min ago' : m < 1440 ? Math.floor(m / 60) + ' h ' + (m % 60) + ' min ago' : Math.floor(m / 1440) === 1 ? 'Yesterday' : Math.floor(m / 1440) + ' days ago'; };
+  var REG = [], reg = function (x) { REG.push(x); return REG.length - 1; };
+  var leadCard = function (p) { return '<div class="lc" data-i="' + reg(p) + '"' + (st.sel === p ? ' aria-current="true"' : '') + '><div class="tg ' + p.status + '">' + SNAME[p.status] + '</div><div class="lp"><span class="av" style="--h:' + p.hue + '">' + p.init + '</span><div><b>' + esc(p.name) + '</b></div></div><div class="lt"><span>' + esc(p.ad.name) + '</span><span>' + p.ad.src + ' · ' + when(p.mins) + '</span></div></div>'; };
+  var SVG = { Video: '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>', Photo: '<svg viewBox="0 0 24 24"><path d="M3 5h18v14H3zM5 17h14l-4.5-6-3.5 4.5-2.5-3z"/></svg>', Photos: '<svg viewBox="0 0 24 24"><path d="M5 3h16v14H5zM7 15h12l-4-5-3 4-2-2.5zM2 6h2v15h15v2H2z"/></svg>', Text: '<svg viewBox="0 0 24 24"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h10v2H4z"/></svg>' };
+  var STN = { run: 'Running', pau: 'Paused', stp: 'Stopped' };
+  var daysRun = function (a) { return a.start - a.end + 1; };
+  var stCell = function (a) { return '<span class="stt ' + a.st + '"><i></i>' + STN[a.st] + (a.st !== 'run' ? ' <small>' + (a.why ? a.why + ' · ' : '') + (a.end === 0 ? 'today' : a.end === 1 ? 'yesterday' : a.end + ' days ago') + '</small>' : '') + '</span>'; };
+
+  function seg(id, items, key, after) {
+    var el = $(id); el.innerHTML = items.map(function (x) { var v = x.v || x, t = x.t || x; return '<button type="button" data-v="' + esc(v) + '" aria-pressed="' + (st[key] === v) + '">' + esc(t) + '</button>'; }).join('');
+    el.onclick = function (e) { var b = e.target.closest('button'); if (!b) return; st[key] = b.dataset.v; if (after) after(); render(); };
+  }
+
+  // chart buckets: daily for 1M / 3M, weekly for 6M / 1Y
+  function buckets() {
+    var P = PERIODS[st.period], list = pick(), out = [];
+    if (!P.wk) for (var d = P.n - 1; d >= 0; d--) { var o = agg(list, d, d), w7 = agg(list, d + 6, d); o.time = iso(ago(d)); o.label = day(ago(d)); o.cplv = w7.cpl; out.push(o); }
+    else for (var k = P.n - 1; k >= 0; k--) { var o2 = agg(list, k * 7 + 6, k * 7); o2.time = iso(ago(k * 7 + 6)); o2.label = 'Week of ' + day(ago(k * 7 + 6)); o2.cplv = o2.cpl; out.push(o2); }
+    return out;
+  }
+  var valOf = function (b) { return st.view === 'spend' ? b.spend : st.view === 'leads' ? b.leads : b.cplv; };
+  var chart = null, series = null, lineS = null, B = [];
+  function drawChart() {
+    var box = $('#chart');
+    if (!window.LightweightCharts) { box.innerHTML = '<p class="miss">The chart library did not load. The numbers on the rest of the page still work.</p>'; return; }
+    if (!chart) {
+      chart = LightweightCharts.createChart(box, { autoSize: true,
+        layout: { background: { type: 'solid', color: 'transparent' }, textColor: css('--muted'), fontSize: window.innerWidth >= 1800 ? 15 : 13, fontFamily: 'JetBrains Mono, ui-monospace, Menlo, monospace' },
+        grid: { vertLines: { color: 'rgba(44,51,71,.45)' }, horzLines: { color: 'rgba(44,51,71,.8)' } },
+        rightPriceScale: { borderColor: css('--line'), scaleMargins: { top: 0.12, bottom: 0.1 } },
+        timeScale: { borderColor: css('--line'), fixLeftEdge: true, fixRightEdge: true },
+        crosshair: { mode: 0, vertLine: { color: css('--line2'), labelBackgroundColor: css('--blue') }, horzLine: { color: css('--line2'), labelBackgroundColor: css('--blue') } },
+        handleScroll: false, handleScale: false });
+      chart.subscribeCrosshairMove(function (p) { var t = p && p.time, b = null; if (t) { var s = typeof t === 'string' ? t : t.year + '-' + String(t.month).padStart(2, '0') + '-' + String(t.day).padStart(2, '0'); b = B.filter(function (x) { return x.time === s; })[0]; } ohlc(b || null); });
+    }
+    if (series) { chart.removeSeries(series); series = null; }
+    if (lineS) { chart.removeSeries(lineS); lineS = null; }
+    var isL = st.view === 'leads', fmt = { type: 'custom', minMove: isL ? 1 : 0.01, formatter: isL ? function (v) { return String(Math.round(v)); } : function (v) { return '$' + Math.round(v); } };
+    var prev = null, r = rng(st.view + st.period + st.src + st.camp);
+    var pts = B.map(function (b) { var v = valOf(b); if (v == null) return { time: b.time }; var o = prev == null ? v : prev, w = 0.03 + r() * 0.07; prev = v;
+      return { time: b.time, open: o, close: v, high: Math.max(o, v) * (1 + w), low: Math.max(0, Math.min(o, v) * (1 - w)) }; });
+    // cost per lead: going down is good, so a falling candle is green
+    var good = st.view === 'cpl' ? css('--down') : css('--up'), bad = st.view === 'cpl' ? css('--up') : css('--down');
+    if (st.candles) {
+      series = chart.addCandlestickSeries({ upColor: good, downColor: bad, borderUpColor: good, borderDownColor: bad, wickUpColor: good, wickDownColor: bad, priceFormat: fmt, priceLineColor: css('--line2') });
+      series.setData(pts);
+    }
+    if (st.line) {
+      lineS = chart.addLineSeries({ color: css('--fg'), lineWidth: st.candles ? 2 : 3, priceFormat: fmt, priceLineVisible: !st.candles, lastValueVisible: !st.candles, priceLineColor: css('--line2') });
+      lineS.setData(pts.map(function (p, i) { if (p.close == null) return { time: p.time }; var o = { time: p.time, value: p.close };
+        if (st.lineMode === 'trend') { var j = Math.max(0, i - 4); while (j < i && pts[j].close == null) j++; var b0 = pts[j].close || p.close, ch = (p.close - b0) / b0, upGood = st.view !== 'cpl';
+          o.color = ch > 0.04 ? (upGood ? css('--up') : css('--down')) : ch < -0.04 ? (upGood ? css('--down') : css('--up')) : css('--blue'); }
+        return o; }));
+    }
+    if (st.view === 'cpl' && (series || lineS)) (series || lineS).createPriceLine({ price: LIMIT, color: css('--down'), lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: 'Your limit' });
+    chart.timeScale().fitContent();
+    fitBars();
+  }
+  function fitBars() { requestAnimationFrame(function () { try { $('#bars').style.marginRight = chart.priceScale('right').width() + 'px'; } catch (e) {} }); }
+  window.addEventListener('resize', function () { if (chart) { fitBars(); chart.timeScale().fitContent(); } });
+  // chart + bars always fit on one screen; the side panel ends on the same line as the chart panel
+  function fitScreen() {
+    var c = $('#chart'), v = document.querySelector('.vol'), bars = $('#bars'); if (!c || !v || !c.getBoundingClientRect) return;
+    var side = document.querySelector('.side'), left = c.parentNode, two = window.innerWidth > 1040 && st.focus === 'all', nw = $('#newest');
+    if (nw) nw.hidden = true;
+    if (st.focus === 'bars') { if (side && side.style) side.style.minHeight = side.style.height = ''; if (st.strip !== 'list') bars.style.height = Math.max(200, window.innerHeight - (bars.getBoundingClientRect().top + (window.scrollY || 0)) - 28) + 'px'; return; }
+    bars.style.height = '';
+    var top = c.getBoundingClientRect().top + (window.scrollY || 0), h = Math.max(240, Math.min(1400, window.innerHeight - top - (st.focus === 'chart' ? 0 : v.offsetHeight) - 14));
+    if (side && side.style) side.style.minHeight = side.style.height = '';
+    c.style.height = h + 'px';
+    if (two && side && left && left.offsetHeight) { var d = side.offsetHeight - left.offsetHeight; if (d > 0) c.style.height = (h + d) + 'px'; else { if (nw && -d >= 150) nw.hidden = false; side.style.minHeight = side.style.height = left.offsetHeight + 'px'; } }
+    if (window.innerWidth <= 1040 && nw) nw.hidden = false;
+  }
+  window.addEventListener('resize', fitScreen);
+  function ohlc(b) {
+    if (!b) b = B[B.length - 1]; if (!b) return;
+    $('#ohlc').innerHTML = esc(b.label) + ' &nbsp; Spent <b>' + money(b.spend) + '</b> &nbsp; Seen <b>' + cnt(b.seen) + '</b> &nbsp; Taps <b>' + cnt(b.taps) + '</b> &nbsp; Leads <b>' + b.leads + '</b> &nbsp; Cost per lead <b>' + (b.cplv == null ? '—' : money(b.cplv)) + '</b>' + (PERIODS[st.period].wk ? '' : ' <span>(7-day)</span>');
+    if (st.line && st.lineMode === 'trend') $('#ohlc').innerHTML += ' &nbsp;&nbsp; Line: <b style="color:var(--up)">better</b> · <b style="color:var(--blue-soft)">steady</b> · <b style="color:var(--down)">worse</b>';
+  }
+
+  // side feed: alerts, news, or the lead that was clicked. Kept apart from render() so a click doesn't rebuild the page.
+  function leadHtml(p) {
+    if (!p) return '<p class="hint">Click any lead card to see their contact details. Double-click opens them in Follow Up Boss.</p>';
+    return '<div class="ag"><div class="hd"><span class="av" style="--h:' + p.hue + '">' + esc(p.init) + '</span><div><b>' + esc(p.name) + '</b><span>' + SNAME[p.status] + ' · came in ' + when(p.mins) + '</span></div><button type="button" class="fsb sm" data-open="1">Open in FUB</button></div>' +
+      '<dl><div><dt>Phone</dt><dd class="n">' + esc(p.phone) + '</dd></div><div><dt>Email</dt><dd class="em">' + esc(p.email) + '</dd></div><div><dt>Came from</dt><dd>' + esc(p.ad.name) + '</dd></div><div><dt>Stage in FUB</dt><dd>' + esc(p.ans) + '</dd></div><div><dt>Tags</dt><dd>' + esc(p.tags) + '</dd></div><div><dt>Address</dt><dd>' + esc(p.home) + '</dd></div></dl></div>';
+  }
+  function alerts() {
+    var al = function (k, t, d) { return '<div class="al"><i class="' + k + '"></i><div><b>' + esc(t) + '</b><span>' + esc(d) + '</span></div></div>'; }, out = [];
+    if (!META.connected) out.push(al('a', 'Meta isn’t connected yet', 'Ad numbers show here once the view-only key is added. Leads are live from Follow Up Boss.'));
+    else if (META.error) out.push(al('r', 'The last update from Meta failed', META.error));
+    var waiting = LEADS.filter(function (p) { return p.status === 'new' && p.mins >= 60 && p.mins < 4320; })[0];
+    if (waiting) out.push(al('r', waiting.name + ' hasn’t been contacted in ' + Math.floor(waiting.mins / 60) + ' h ' + (waiting.mins % 60) + ' min', 'New lead · ' + waiting.ad.name + ' · ' + waiting.phone));
+    ADS.forEach(function (a) { if (a.st !== 'run') return; var x = agg([a], 4, 0); if (x.leads === 0 && x.spend > 40) out.push(al('r', a.name + ' spent ' + money(x.spend) + ' with no leads', 'Last 5 days · ' + day(ago(4)) + '–' + day(TODAY))); });
+    ADS.forEach(function (a) { if (a.why && a.end <= 7) out.push(al('r', a.name + ' stopped running: ' + a.why, a.camp + ' · ' + (a.end === 0 ? 'today' : a.end === 1 ? 'yesterday' : a.end + ' days ago'))); });
+    ADS.forEach(function (a) { if (a.st !== 'run') return; var x = agg([a], 6, 0); if (x.cpl && x.cpl > LIMIT) out.push(al('a', 'Cost per lead on ' + a.name + ' is ' + money(x.cpl) + ', over your ' + money(LIMIT) + ' limit', 'Last 7 days · ' + x.leads + ' leads for ' + money(x.spend))); });
+    var used = agg(ADS, TODAY.getDate() - 1, 0).spend, dim = new Date(TODAY.getFullYear(), TODAY.getMonth() + 1, 0).getDate();
+    out.push(al(used / BUDGET > 0.85 ? 'r' : '', Math.round(used / BUDGET * 100) + '% of ' + MONTH[TODAY.getMonth()] + '’s budget used', money(used) + ' of ' + money(BUDGET) + ' · day ' + TODAY.getDate() + ' of ' + dim));
+    var best = CAMPS.map(function (c) { return [c[0], agg(ADS.filter(function (a) { return a.camp === c[0]; }), 0, 0).leads]; }).sort(function (a, b) { return b[1] - a[1]; })[0];
+    if (best && best[1]) out.push(al('g', best[0] + ': ' + best[1] + ' lead' + (best[1] > 1 ? 's' : '') + ' today', 'Your best campaign today'));
+    return out;
+  }
+  function renderFeed() {
+    var al = function (t, d) { return '<div class="al"><i></i><div><b>' + esc(t) + '</b><span>' + esc(d) + '</span></div></div>'; };
+    var ALERTS = alerts();
+    var NEWS = ['<p class="hint">Ad news isn’t connected yet. It will show Meta and YouTube ad rule changes.</p>'];
+    var lead = st.feed === 'lead', feed = st.feed === 'news' ? NEWS : ALERTS;
+    $('#feedTitle').textContent = lead ? 'Lead' : st.feed === 'news' ? 'Ad news' : 'Alerts';
+    $('#feedList').innerHTML = lead ? leadHtml(st.sel) : feed.slice(0, st.feedAll ? feed.length : 3).join('');
+    $('#feedMore').textContent = st.feedAll ? 'Less' : 'More (' + (feed.length - 3) + ')'; $('#feedMore').hidden = lead || feed.length <= 3; if (st.feed === 'news') $('#feedMore').hidden = true;
+    $('#drop').innerHTML = st.dropMode === 'lead' ? leadHtml(st.sel) : ALERTS.join(''); $('#bellN').textContent = ALERTS.length;
+    Array.prototype.forEach.call($('#segFeed').children || [], function (b) { b.setAttribute('aria-pressed', String(b.dataset.v === st.feed)); });
+    Array.prototype.forEach.call(document.querySelectorAll('.lc[data-i]'), function (c) { c.setAttribute('aria-current', String(REG[+c.dataset.i] === st.sel)); });
+  }
+  function showLead(p) {
+    st.sel = p; st.feed = 'lead'; var hiddenSide = $('#newest').hidden || document.querySelector('.side').hidden;
+    st.dropMode = hiddenSide ? 'lead' : 'alerts'; renderFeed();
+    if (hiddenSide) { $('#drop').hidden = false; $('#bell').setAttribute('aria-expanded', 'true'); }
+  }
+  var toastT = 0;
+  function toast(s) { var t = $('#toast'); t.textContent = s; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(function () { t.hidden = true; }, 2600); }
+
+  function render() {
+    REG.length = 0; B = buckets();
+    var nt = $('#notice'); nt.hidden = !!META.connected && !META.error && (ADS.length > 0 || !META.filled && false); if (!META.connected) nt.textContent = 'Ad numbers are waiting for Meta: the view-only key isn’t added yet. The lead cards and lead alerts are live from Follow Up Boss.'; else if (META.error) nt.textContent = 'The last update from Meta failed: ' + META.error; else if (!ADS.length) { nt.hidden = false; nt.textContent = 'Meta is connected. The first numbers are loading and should show within a few minutes.'; }
+    var tg = $('#syncTag'); tg.className = 'sample ' + (!META.connected ? 'wait' : META.error ? 'bad' : 'ok'); tg.textContent = !META.connected ? 'Meta not connected' : META.at ? 'Meta · updated ' + new Date(META.at).toLocaleTimeString('en-CA', { hour: 'numeric', minute: '2-digit' }) : 'Meta · loading';
+    var list = pick(), n = rangeN(), R = agg(list, n - 1, 0), P0 = agg(list, 2 * n - 1, n);
+    $('#dates').innerHTML = '<b>' + esc(rangeLabel()) + '</b>';
+    // ticker: each campaign's cost per lead over the last 7 days vs the 7 before
+    var tk = CAMPS.filter(function (c) { return st.src === 'All' || c[1] === st.src; }).map(function (c) { var l = ADS.filter(function (a) { return a.camp === c[0]; }), a = agg(l, 6, 0), b = agg(l, 13, 7), ch = a.cpl && b.cpl ? pct(a.cpl, b.cpl) : null;
+      return '<button type="button" data-c="' + esc(c[0]) + '" aria-pressed="' + (c[0] === st.camp) + '"><span class="s">' + c[1] + '</span><span class="n">' + esc(c[0]) + '</span><span class="v">' + (a.cpl ? money(a.cpl) : '—') + '</span>' + (ch == null ? '' : '<span class="chg ' + (ch <= 0 ? 'u' : 'd') + '">' + (ch <= 0 ? '▼ ' : '▲ +') + ch.toFixed(1) + '%</span>') + '</button>'; }).join('');
+    var tkAll = '<button type="button" data-c="All campaigns" aria-pressed="' + (st.camp === 'All campaigns') + '"><span class="n">Cost per lead · last 7 days</span><span class="v">' + cpl$(agg(ADS.filter(function (a) { return st.src === 'All' || a.src === st.src; }), 6, 0).cpl) + '</span></button>';
+    if (!ADS.length) { tkAll = '<button type="button" data-c="All campaigns"><span class="n">' + (META.connected ? 'Loading your ads from Meta' : 'Waiting for Meta') + '</span><span class="v">—</span></button><button type="button" data-c="All campaigns"><span class="n">New leads in Follow Up Boss · last 7 days</span><span class="v">' + LEADS.filter(function (p) { return p.mins < 10080; }).length + '</span></button>'; tk = ''; }
+    $('#tick').innerHTML = [0, 1, 2, 3, 4, 5, 6, 7].map(function () { return tkAll + tk; }).join('');
+    $('#camp').innerHTML = ['All campaigns'].concat(CAMPS.filter(function (c) { return st.src === 'All' || c[1] === st.src; }).map(function (c) { return c[0]; })).map(function (c) { return '<option' + (c === st.camp ? ' selected' : '') + '>' + esc(c) + '</option>'; }).join('');
+    $('#crumbSrc').textContent = st.src === 'All' ? 'All sources' : st.src;
+    Array.prototype.forEach.call($('#segChart').children, function (b) { b.setAttribute('aria-pressed', String(!!st[b.dataset.t])); });
+    $('#segLine').hidden = !st.line;
+    var solo = st.focus !== 'all', gridEl = document.querySelector('.grid'), sideEl = document.querySelector('.side'), volEl = document.querySelector('.vol');
+    gridEl.classList.toggle('solo', solo); sideEl.hidden = solo; volEl.hidden = st.focus === 'chart';
+    $('#chart').hidden = st.focus === 'bars'; $('#ohlc').hidden = st.focus === 'bars';
+    ['#segRange', '#segSrc', '#segView', '#segPeriod', '#segLine', '#segFocus', '#segStrip', '#segStripKind', '#segStatus', '#segTView', '#segFeed'].forEach(function (id) { var key = { '#segRange': 'range', '#segSrc': 'src', '#segView': 'view', '#segPeriod': 'period', '#segLine': 'lineMode', '#segFocus': 'focus', '#segStrip': 'strip', '#segStripKind': 'stripKind', '#segStatus': 'tStatus', '#segTView': 'tView', '#segFeed': 'feed' }[id];
+      Array.prototype.forEach.call($(id).children, function (b) { b.setAttribute('aria-pressed', String(b.dataset.v === st[key])); }); });
+    // headline: total over the chart period vs the period before
+    var P = PERIODS[st.period], days = P.wk ? P.n * 7 : P.n, C = agg(list, days - 1, 0), C0 = agg(list, 2 * days - 1, days);
+    var hv = st.view === 'spend' ? [C.spend, C0.spend] : st.view === 'leads' ? [C.leads, C0.leads] : [C.cpl, C0.cpl];
+    $('#title').textContent = (st.camp === 'All campaigns' ? 'All campaigns' : st.camp) + ' · ' + (st.src === 'All' ? 'All sources' : st.src);
+    $('#big').textContent = st.view === 'leads' ? cnt(hv[0]) + ' leads' : hv[0] == null ? '—' : money(hv[0]);
+    $('#bigLab').textContent = (st.view === 'spend' ? 'Spent' : st.view === 'leads' ? 'Leads' : 'Cost per lead') + ' · ' + day(ago(days - 1)) + '–' + day(TODAY);
+    var ch = hv[0] != null && hv[1] ? pct(hv[0], hv[1]) : null, better = ch != null && (st.view === 'cpl' ? ch <= 0 : st.view === 'leads' ? ch >= 0 : true);
+    $('#bigChg').className = 'chg ' + (st.view === 'spend' ? '' : better ? 'u' : 'd'); $('#bigChg').textContent = ch == null ? '' : (ch >= 0 ? '+' : '') + ch.toFixed(1) + '% vs the ' + (P.wk ? P.n + ' weeks' : P.n + ' days') + ' before';
+    drawChart(); ohlc(null);
+    // bars under the chart: leads and booked calls per bucket
+    var KEYS = [['leads', '--up']].filter(function (k) { return st.show[k[0]]; });
+    var mx = Math.max.apply(null, [1].concat(B.map(function (x) { return Math.max.apply(null, [0].concat(KEYS.map(function (k) { return x[k[0]]; }))); })));
+    $('#bars').innerHTML = B.map(function (x) { var h = function (v) { return Math.max(v ? 3 : 1, v / mx * 100).toFixed(1) + '%'; };
+      return '<div class="g" title="' + esc(x.label) + ': ' + x.leads + ' leads, ' + money(x.spend) + ' spent">' + KEYS.map(function (k) { return '<span style="height:' + h(x[k[0]]) + ';background:var(' + k[1] + ')"></span>'; }).join('') + '</div>'; }).join('');
+    var listMode = st.strip === 'list', stripEl = $('#strip');
+    $('#bars').hidden = listMode; stripEl.hidden = !listMode; $('#barKeys').hidden = listMode; $('#segStripKind').hidden = !listMode;
+    $('#capLab').textContent = listMode ? 'Newest Follow Up Boss leads first' : P.wk ? 'Leads per week' : 'Leads per day';
+    var ppl = LEADS.filter(function (p) { return (st.src === 'All' || p.ad.src === st.src) && (st.stripKind === 'all' || p.status === st.stripKind); });
+    stripEl.innerHTML = ppl.length ? ppl.slice(0, 40).map(leadCard).join('') : '<p class="hint">No new leads like this in Follow Up Boss in the last 30 days.</p>';
+    stripEl.classList.toggle('wrap', st.focus === 'bars');
+    renderFeed();
+    Array.prototype.forEach.call(document.querySelectorAll('.key'), function (b) { b.setAttribute('aria-pressed', String(st.show[b.dataset.k])); });
+    // cost per lead, with low / middle / high across the ads in these dates
+    $('#cplHead').textContent = 'Cost per lead · ' + RANGES[st.range].t.toLowerCase();
+    var mc = R.cpl && P0.cpl ? pct(R.cpl, P0.cpl) : null;
+    $('#mNow').textContent = cpl$(R.cpl); $('#mChg').className = 'chg ' + (mc != null && mc <= 0 ? 'u' : 'd'); $('#mChg').textContent = mc == null ? '' : (mc <= 0 ? '▼ ' : '▲ +') + mc.toFixed(1) + '% vs the ' + (n === 1 ? 'day' : n + ' days') + ' before';
+    $('#mSay').textContent = R.leads + ' lead' + (R.leads === 1 ? '' : 's') + ' for ' + money(R.spend) + '. Lower is better. Your limit: ' + money(LIMIT) + '.';
+    var rn = n, per = function (nn) { return list.map(function (a) { var x = agg([a], nn - 1, 0); return { a: a, x: x }; }).filter(function (o) { return o.x.leads > 0; }); }, ads = per(rn);
+    if (ads.length < 3 && rn < 7) { rn = 7; ads = per(7); }
+    if (ads.length) {
+      var cs = ads.map(function (o) { return o.x.cpl; }).sort(function (a, b) { return a - b; }), q = function (f) { return cs[Math.min(cs.length - 1, Math.floor(f * cs.length))]; };
+      var lo = cs[0], md = q(0.5), hi = cs[cs.length - 1], a0 = Math.min(lo, LIMIT) * 0.8, a1 = Math.max(hi, LIMIT) * 1.1, pos = function (v) { return ((v - a0) / (a1 - a0) * 100).toFixed(1) + '%'; };
+      var camps = {}; ads.forEach(function (o) { (camps[o.a.camp] = camps[o.a.camp] || []).push(o); });
+      var dots = Object.keys(camps).map(function (c) { var x = agg(camps[c].map(function (o) { return o.a; }), rn - 1, 0); return '<span class="dot" style="left:' + pos(x.cpl) + '" title="' + esc(c) + ': ' + money(x.cpl) + ' per lead"></span>'; }).join('');
+      $('#range').innerHTML = '<div class="track"></div><div class="fill" style="left:' + pos(lo) + ';width:calc(' + pos(hi) + ' - ' + pos(lo) + ')"></div><span class="lim" style="left:' + pos(LIMIT) + '" title="Your limit ' + money(LIMIT) + '"></span>' + dots +
+        [['lo', lo, 'Low'], ['', md, 'Middle'], ['hi', hi, 'High']].map(function (p, k) {
+          // when two marks sit close together, push their labels apart so they don't overlap
+          var gL = k > 0 ? parseFloat(pos(p[1])) - parseFloat(pos(k === 1 ? lo : md)) : 99, gR = k < 2 ? parseFloat(pos(k === 0 ? md : hi)) - parseFloat(pos(p[1])) : 99, sh = (gR < 16 ? -Math.max(0, 16 - gR) * 2.2 : 0) + (gL < 16 ? Math.max(0, 16 - gL) * 2.2 : 0);
+          var lab = sh ? ' style="transform:translateX(' + sh.toFixed(0) + 'px)"' : '';
+          return '<div class="pt ' + p[0] + '" style="left:' + pos(p[1]) + '"><b' + lab + '>' + money(p[1]) + '</b><i></i><span' + lab + '>' + p[2] + '</span></div>'; }).join('');
+      var bestA = ads.slice().sort(function (a, b) { return a.x.cpl - b.x.cpl; }), worstA = bestA[bestA.length - 1].a, bestAd = bestA[0].a;
+      $('#legend3').innerHTML = '<div><b style="color:var(--up)">' + money(lo) + '</b><span>Cheapest: ' + esc(bestAd.name) + '</span></div><div><b>' + money(md) + '</b><span>Middle of your ' + ads.length + ' ads with leads' + (rn !== n ? ' (last 7 days)' : '') + '</span></div><div><b style="color:var(--amber)">' + money(hi) + '</b><span>Costliest: ' + esc(worstA.name) + '</span></div>';
+    } else { $('#range').innerHTML = '<p class="hint">No leads in these dates yet.</p>'; $('#legend3').innerHTML = ''; }
+    // snapshot
+    $('#snapHead').textContent = 'Snapshot · ' + rangeLabel();
+    $('#snap').innerHTML = [['Spent (before tax)', cents(R.spend)], ['Card charge (+13% tax)', cents(R.spend * (1 + TAX))], ['Seen', cnt(R.seen)], ['Taps', cnt(R.taps)], ['Leads', R.leads], ['Appointments (FUB)', LEADS.filter(function (p) { return p.status === 'apt' && p.mins < n * 1440; }).length]]
+      .map(function (r) { return '<div><dt>' + r[0] + '</dt><dd>' + r[1] + '</dd></div>'; }).join('');
+    // budget pace: share of the month's budget used vs share of the month gone (all ads)
+    var dom = TODAY.getDate(), dim = new Date(TODAY.getFullYear(), TODAY.getMonth() + 1, 0).getDate(), used = agg(ADS, dom - 1, 0).spend, pu = used / BUDGET * 100, pm = dom / dim * 100, df = pu - pm, proj = used / dom * dim;
+    var tag = Math.abs(df) <= 6 ? ['On track', 'var(--up)'] : df > 6 ? ['Spending fast', 'var(--amber)'] : ['Spending slow', 'var(--blue-soft)'];
+    $('#paceHead').textContent = 'Budget pace · ' + MONTH[TODAY.getMonth()] + ' · all ads';
+    $('#paceNow').textContent = Math.round(pu) + '% used'; $('#paceTag').textContent = tag[0]; $('#paceTag').style.color = tag[1];
+    $('#meter').innerHTML = '<div class="used" style="width:' + Math.min(100, pu).toFixed(1) + '%"></div><i style="left:' + pm.toFixed(1) + '%" title="Today: ' + Math.round(pm) + '% of the month"></i>';
+    $('#paceBud').textContent = money(BUDGET) + ' budget';
+    $('#paceSay').textContent = money(used) + ' spent by day ' + dom + ' of ' + dim + ' (white line = ' + Math.round(pm) + '% of the month). At this pace the month ends near ' + money(proj) + '.';
+    // ads table
+    var pool = list.filter(function (a) { return st.tStatus === 'all' || a.st === st.tStatus; }), rowsD = pool.map(function (a) { return { a: a, x: agg([a], n - 1, 0) }; });
+    rowsD.sort(function (p, q2) { return q2.x.spend - p.x.spend || q2.a.start - p.a.start; });
+    $('#tblTitle').textContent = ({ run: 'Running ads', pau: 'Paused ads', stp: 'Stopped ads', all: 'All ads' })[st.tStatus] + ' · ' + rangeLabel();
+    $('#thead').innerHTML = '<tr><th>Ad</th><th>Campaign</th><th>Where</th><th>Status</th><th class="r">Spent</th><th class="r">Seen</th><th class="r">Taps</th><th class="r">Leads</th><th class="r">Cost per lead</th><th class="r">Days running</th></tr>';
+    var T = agg(pool, n - 1, 0);
+    $('#rows').innerHTML = rowsD.map(function (o) { var c = o.x.cpl == null ? '' : o.x.cpl > LIMIT ? 'over' : o.x.cpl <= 30 ? 'lo' : o.x.cpl >= 40 ? 'hi' : '';
+      return '<tr data-ad="' + o.a.i + '"><td>' + esc(o.a.name) + '</td><td>' + esc(o.a.camp) + '</td><td>' + o.a.src + '</td><td>' + stCell(o.a) + '</td><td class="r n">' + money(o.x.spend) + '</td><td class="r n">' + cnt(o.x.seen) + '</td><td class="r n">' + cnt(o.x.taps) + '</td><td class="r n">' + o.x.leads + '</td><td class="r">' + (o.x.cpl == null ? '<span class="pill">—</span>' : '<span class="pill ' + c + '">' + money(o.x.cpl) + '</span>') + '</td><td class="r n">' + daysRun(o.a) + '</td></tr>'; }).join('') +
+      (rowsD.length ? '<tr class="tot"><td>Total</td><td></td><td></td><td>' + rowsD.length + ' ads</td><td class="r n">' + money(T.spend) + '</td><td class="r n">' + cnt(T.seen) + '</td><td class="r n">' + cnt(T.taps) + '</td><td class="r n">' + T.leads + '</td><td class="r n">' + cpl$(T.cpl) + '</td><td></td></tr>' : '<tr><td colspan="10" class="hint">' + (META.connected ? 'No ads here.' : 'Your ads will list here once Meta is connected.') + '</td></tr>');
+    var TG = { run: 'run', pau: 'pau', stp: 'stp' };
+    $('#photos').innerHTML = rowsD.map(function (o) { return '<div class="lc" data-ad="' + o.a.i + '"><div class="ph" style="--h:' + o.a.hue + '"><small>' + o.a.kind + '</small>' + (SVG[o.a.kind] || SVG.Photo) + (o.a.thumb ? '<img src="' + esc(o.a.thumb) + '" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">' : '') + '</div><div class="tg ' + TG[o.a.st] + '">' + STN[o.a.st] + (o.a.why ? ' · ' + o.a.why : '') + '</div><div class="lt"><b>' + esc(o.a.name) + '</b><span>' + esc(o.a.camp) + ' · ' + o.a.src + '</span><span>' + money(o.x.spend) + ' · ' + o.x.leads + ' leads · ' + (o.x.cpl == null ? 'no leads' : money(o.x.cpl) + ' each') + '</span></div></div>'; }).join('');
+    $('#tblPanel').dataset.s = st.tStatus;
+    $('#tblWrap').hidden = st.tView !== 'list'; $('#photos').hidden = st.tView !== 'photos';
+    fitScreen();
+  }
+
+  // controls
+  var campReset = function () { if (st.camp !== 'All campaigns' && st.src !== 'All' && SRC[st.camp] !== st.src) st.camp = 'All campaigns'; };
+  seg('#segRange', Object.keys(RANGES).map(function (k) { return { v: k, t: RANGES[k].t }; }), 'range');
+  seg('#segSrc', [{ v: 'All', t: 'All' }, { v: 'Meta', t: 'Meta' }, { v: 'YouTube', t: 'YouTube' }, { v: 'Other', t: 'Other' }], 'src', campReset);
+  seg('#segView', [{ v: 'spend', t: 'Spend' }, { v: 'leads', t: 'Leads' }, { v: 'cpl', t: 'Cost per lead' }], 'view');
+  seg('#segPeriod', Object.keys(PERIODS), 'period');
+  seg('#segLine', [{ v: 'white', t: 'White' }, { v: 'trend', t: 'Better / worse' }], 'lineMode');
+  seg('#segStrip', [{ v: 'bars', t: 'Bars' }, { v: 'list', t: 'Lead cards' }], 'strip');
+  seg('#segStripKind', [{ v: 'all', t: 'All' }, { v: 'new', t: 'New' }, { v: 'con', t: 'Contacted' }, { v: 'apt', t: 'Appointment' }], 'stripKind');
+  seg('#segStatus', [{ v: 'run', t: 'Running' }, { v: 'pau', t: 'Paused' }, { v: 'stp', t: 'Stopped' }, { v: 'all', t: 'All' }], 'tStatus');
+  seg('#segTView', [{ v: 'list', t: 'List' }, { v: 'photos', t: 'Pictures' }], 'tView');
+  seg('#segFeed', [{ v: 'alerts', t: 'Alerts' }, { v: 'news', t: 'News' }, { v: 'lead', t: 'Lead' }], 'feed');
+  seg('#segFocus', [{ v: 'all', t: 'Everything' }, { v: 'chart', t: 'Chart only' }, { v: 'bars', t: 'Bars only' }], 'focus');
+  $('#camp').onchange = function () { st.camp = this.value; render(); };
+  $('#tick').onclick = function (e) { var b = e.target.closest('button'); if (!b) return; st.camp = b.dataset.c; render(); };
+  $('#feedMore').onclick = function () { st.feedAll = !st.feedAll; renderFeed(); if ($('#feedList').scrollTo) $('#feedList').scrollTo(0, 0); };
+  $('#bell').onclick = function () { var d = $('#drop'), was = st.dropMode; st.dropMode = 'alerts'; renderFeed(); d.hidden = was === 'alerts' ? !d.hidden : false; this.setAttribute('aria-expanded', String(!d.hidden)); };
+  // one click on a lead card shows their contact details; double-click (or the button) opens them in Follow Up Boss
+  var openFub = function (p) { p = p || st.sel; if (p && p.id) window.open(FUBAPP + '/2/people/view/' + p.id, '_blank', 'noopener'); };
+  document.addEventListener('click', function (e) { var t = e.target; if (!t || !t.closest) return; if (t.closest('[data-open]')) return openFub(st.sel);
+    var c = t.closest('[data-i]'); if (c && REG[+c.dataset.i]) return showLead(REG[+c.dataset.i]);
+    var a = t.closest('[data-ad]'); if (a) { var ad = ADS[+a.dataset.ad]; st.camp = ad.camp; render(); toast('Chart now shows ' + ad.camp + '.'); window.scrollTo({ top: 0, behavior: 'smooth' }); } });
+  document.addEventListener('dblclick', function (e) { var t = e.target; var c = t && t.closest && t.closest('[data-i]'); if (c && REG[+c.dataset.i]) openFub(REG[+c.dataset.i]); });
+  $('#segChart').onclick = function (e) { var b = e.target.closest('button'); if (!b) return; var t = b.dataset.t; st[t] = !st[t]; if (!st.candles && !st.line) st[t === 'candles' ? 'line' : 'candles'] = true; render(); };
+  $('#fs').onclick = function () { try { if (document.fullscreenElement) document.exitFullscreen(); else { var q = document.documentElement.requestFullscreen(); if (q && q.catch) q.catch(function () {}); } } catch (e) {} };
+  document.addEventListener('fullscreenchange', function () { $('#fs').textContent = document.fullscreenElement ? 'Exit full screen' : 'Full screen'; fitScreen(); });
+  document.querySelector('.vol .cap').onclick = function (e) { var b = e.target.closest('.key'); if (!b) return; st.show[b.dataset.k] = !st.show[b.dataset.k]; render(); };
+  // settings: his monthly budget and cost-per-lead limit
+  $('#setBtn').onclick = function () { $('#setBud').value = BUDGET; $('#setLim').value = LIMIT; $('#setDlg').showModal(); };
+  $('#setCancel').onclick = function () { $('#setDlg').close(); };
+  $('#setForm').onsubmit = function (e) { e.preventDefault(); var b = +String($('#setBud').value).replace(/[^0-9.]/g, ''), l = +String($('#setLim').value).replace(/[^0-9.]/g, '');
+    api('ads/settings', { method: 'POST', body: JSON.stringify({ budget: b, limit: l }) }).then(function (j) { BUDGET = j.settings.budget; LIMIT = j.settings.limit; $('#setDlg').close(); render(); toast('Saved.'); }).catch(function (x) { if (x === 'pin') return askPin(); toast('Could not save. Try again.'); }); };
+  // the Meta tag: click = pull from Meta now (read only), then reload the numbers
+  $('#syncTag').onclick = function () { if (!META.connected) return toast('Meta isn’t connected yet.'); var t = this; t.textContent = 'Updating…';
+    api('ads/sync', { method: 'POST', body: '{}' }).then(function () { return load(); }).catch(function () { toast('Could not update. Try again.'); render(); }); };
+  var loaded = false;
+  function load() { return api('ads/data?days=' + N).then(function (j) { ingest(j); loaded = true; render(); }).catch(function (e) { if (e === 'pin') return askPin().then(load); if (!loaded) render(); toast('Could not load. Check the connection.'); }); }
+  load();
+  setInterval(function () { if (!document.hidden) load(); }, 10 * 60e3);   // fresh numbers and leads every 10 minutes
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitScreen);
+})();
+</script>
+</body>
+</html>
