@@ -322,7 +322,7 @@ tbody tr{cursor:pointer}tbody tr:hover td{background:var(--panel2)}
   <div class="toast" id="toast" role="status" hidden></div>
   <p class="foot">Read only: this page shows numbers and can never start, pause or change an ad. Seen = times your ads were shown. Taps = taps on the ad's link. Leads = forms filled in, as counted by Meta. Spend is before tax; the card charge adds 13% HST. Lead cards are your newest Follow Up Boss leads from the last 30 days.</p>
   <dialog id="pinDlg"><form method="dialog" id="pinForm"><h2>Host only</h2><input id="pinIn" inputmode="numeric" type="password" autocomplete="off" aria-label="PIN" placeholder="PIN"><p class="err" id="pinErr" hidden>Wrong PIN</p><div class="row"><button type="submit">Continue</button></div></form></dialog>
-  <dialog id="setDlg"><form method="dialog" id="setForm"><h2>Your numbers</h2><label for="setBud">Monthly ad budget, before tax ($)</label><input id="setBud" inputmode="numeric" type="text" autocomplete="off"><label for="setLim">Cost per lead limit ($)</label><input id="setLim" inputmode="numeric" type="text" autocomplete="off"><div class="row"><button type="button" class="ghost" id="setCancel">Cancel</button><button type="submit">Save</button></div></form></dialog>
+  <dialog id="setDlg"><form method="dialog" id="setForm"><h2>Your numbers</h2><label for="setBud">Monthly ad budget, before tax ($). Leave empty to use the budgets set in Meta</label><input id="setBud" inputmode="numeric" type="text" autocomplete="off"><label for="setLim">Cost per lead limit ($). Leave empty for none</label><input id="setLim" inputmode="numeric" type="text" autocomplete="off"><div class="row"><button type="button" class="ghost" id="setCancel">Cancel</button><button type="submit">Save</button></div></form></dialog>
 </main>
 
 <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
@@ -342,7 +342,7 @@ tbody tr{cursor:pointer}tbody tr:hover td{background:var(--panel2)}
   var TODAY = new Date(); TODAY.setHours(0, 0, 0, 0);
   var ago = function (d) { var x = new Date(TODAY); x.setDate(x.getDate() - d); return x; };
   var day = function (d) { return MO[d.getMonth()] + ' ' + d.getDate(); };
-  var N = 400, TAX = 0.13, LIMIT = 45, BUDGET = 3000;
+  var N = 400, TAX = 0.13, LIMIT = 0, BUDGET = 0, MYBUD = 0, MB = null;
 
   // filled by ingest() from the Worker: ads + their daily numbers (Meta) and the newest leads (Follow Up Boss)
   var CAMPS = [], SRC = {}, ADS = [], LEADS = [], META = { connected: false }, FUBAPP = 'https://app.followupboss.com';
@@ -355,7 +355,7 @@ tbody tr{cursor:pointer}tbody tr:hover td{background:var(--panel2)}
   var srcOf = function (s) { return /facebook|instagram|meta|\bfb\b|\big\b/i.test(s) ? 'Meta' : /youtube/i.test(s) ? 'YouTube' : 'Other'; };
   var daysAgo = function (day) { var p = String(day).slice(0, 10).split('-'); return Math.round((TODAY - new Date(+p[0], p[1] - 1, +p[2])) / 864e5); };
   function ingest(j) {
-    META = j.meta || {}; FUBAPP = j.fubApp || FUBAPP; LIMIT = +(j.settings && j.settings.limit) || 45; BUDGET = +(j.settings && j.settings.budget) || 3000;
+    META = j.meta || {}; FUBAPP = j.fubApp || FUBAPP; LIMIT = +(j.settings && j.settings.limit) || 0; MYBUD = +(j.settings && j.settings.budget) || 0; MB = j.metaBudget || null; setBudget();
     var byId = {}, all = (j.ads || []).map(function (a) { var o = { id: a.id, name: a.name || 'Ad', camp: a.camp || 'No campaign', src: a.src || 'Meta', kind: a.kind || 'Photo', st: a.status || 'stp', why: a.why || '', thumb: a.thumb || '', hue: hueOf(a.id), days: [], start: -1, end: N, created: a.created };
       for (var d = 0; d < N; d++) o.days.push(null); byId[a.id] = o; return o; });
     (j.daily || []).forEach(function (r) { var a = byId[r[1]], d = daysAgo(r[0]); if (!a || d < 0 || d >= N) return;
@@ -440,7 +440,7 @@ tbody tr{cursor:pointer}tbody tr:hover td{background:var(--panel2)}
           o.color = ch > 0.04 ? (upGood ? css('--up') : css('--down')) : ch < -0.04 ? (upGood ? css('--down') : css('--up')) : css('--blue'); }
         return o; }));
     }
-    if (st.view === 'cpl' && (series || lineS)) (series || lineS).createPriceLine({ price: LIMIT, color: css('--down'), lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: 'Your limit' });
+    if (LIMIT && st.view === 'cpl' && (series || lineS)) (series || lineS).createPriceLine({ price: LIMIT, color: css('--down'), lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title: 'Your limit' });
     chart.timeScale().fitContent();
     fitBars();
   }
@@ -480,9 +480,9 @@ tbody tr{cursor:pointer}tbody tr:hover td{background:var(--panel2)}
     if (waiting) out.push(al('r', waiting.name + ' hasn’t been contacted in ' + Math.floor(waiting.mins / 60) + ' h ' + (waiting.mins % 60) + ' min', 'New lead · ' + waiting.ad.name + ' · ' + waiting.phone));
     ADS.forEach(function (a) { if (a.st !== 'run') return; var x = agg([a], 4, 0); if (x.leads === 0 && x.spend > 40) out.push(al('r', a.name + ' spent ' + money(x.spend) + ' with no leads', 'Last 5 days · ' + day(ago(4)) + '–' + day(TODAY))); });
     ADS.forEach(function (a) { if (a.why && a.end <= 7) out.push(al('r', a.name + ' stopped running: ' + a.why, a.camp + ' · ' + (a.end === 0 ? 'today' : a.end === 1 ? 'yesterday' : a.end + ' days ago'))); });
-    ADS.forEach(function (a) { if (a.st !== 'run') return; var x = agg([a], 6, 0); if (x.cpl && x.cpl > LIMIT) out.push(al('a', 'Cost per lead on ' + a.name + ' is ' + money(x.cpl) + ', over your ' + money(LIMIT) + ' limit', 'Last 7 days · ' + x.leads + ' leads for ' + money(x.spend))); });
+    ADS.forEach(function (a) { if (a.st !== 'run') return; var x = agg([a], 6, 0); if (LIMIT && x.cpl && x.cpl > LIMIT) out.push(al('a', 'Cost per lead on ' + a.name + ' is ' + money(x.cpl) + ', over your ' + money(LIMIT) + ' limit', 'Last 7 days · ' + x.leads + ' leads for ' + money(x.spend))); });
     var used = agg(ADS, TODAY.getDate() - 1, 0).spend, dim = new Date(TODAY.getFullYear(), TODAY.getMonth() + 1, 0).getDate();
-    out.push(al(used / BUDGET > 0.85 ? 'r' : '', Math.round(used / BUDGET * 100) + '% of ' + MONTH[TODAY.getMonth()] + '’s budget used', money(used) + ' of ' + money(BUDGET) + ' · day ' + TODAY.getDate() + ' of ' + dim));
+    if (BUDGET) out.push(al(used / BUDGET > 0.85 ? 'r' : '', Math.round(used / BUDGET * 100) + '% of ' + MONTH[TODAY.getMonth()] + '’s budget used', money(used) + ' of ' + money(BUDGET) + ' · day ' + TODAY.getDate() + ' of ' + dim));
     var best = CAMPS.map(function (c) { return [c[0], agg(ADS.filter(function (a) { return a.camp === c[0]; }), 0, 0).leads]; }).sort(function (a, b) { return b[1] - a[1]; })[0];
     if (best && best[1]) out.push(al('g', best[0] + ': ' + best[1] + ' lead' + (best[1] > 1 ? 's' : '') + ' today', 'Your best campaign today'));
     return out;
@@ -554,15 +554,15 @@ tbody tr{cursor:pointer}tbody tr:hover td{background:var(--panel2)}
     $('#cplHead').textContent = 'Cost per lead · ' + RANGES[st.range].t.toLowerCase();
     var mc = R.cpl && P0.cpl ? pct(R.cpl, P0.cpl) : null;
     $('#mNow').textContent = cpl$(R.cpl); $('#mChg').className = 'chg ' + (mc != null && mc <= 0 ? 'u' : 'd'); $('#mChg').textContent = mc == null ? '' : (mc <= 0 ? '▼ ' : '▲ +') + mc.toFixed(1) + '% vs the ' + (n === 1 ? 'day' : n + ' days') + ' before';
-    $('#mSay').textContent = R.leads + ' lead' + (R.leads === 1 ? '' : 's') + ' for ' + money(R.spend) + '. Lower is better. Your limit: ' + money(LIMIT) + '.';
+    $('#mSay').textContent = R.leads + ' lead' + (R.leads === 1 ? '' : 's') + ' for ' + money(R.spend) + '. Lower is better.' + (LIMIT ? ' Your limit: ' + money(LIMIT) + '.' : '');
     var rn = n, per = function (nn) { return list.map(function (a) { var x = agg([a], nn - 1, 0); return { a: a, x: x }; }).filter(function (o) { return o.x.leads > 0; }); }, ads = per(rn);
     if (ads.length < 3 && rn < 7) { rn = 7; ads = per(7); }
     if (ads.length) {
       var cs = ads.map(function (o) { return o.x.cpl; }).sort(function (a, b) { return a - b; }), q = function (f) { return cs[Math.min(cs.length - 1, Math.floor(f * cs.length))]; };
-      var lo = cs[0], md = q(0.5), hi = cs[cs.length - 1], a0 = Math.min(lo, LIMIT) * 0.8, a1 = Math.max(hi, LIMIT) * 1.1, pos = function (v) { return ((v - a0) / (a1 - a0) * 100).toFixed(1) + '%'; };
+      var lo = cs[0], md = q(0.5), hi = cs[cs.length - 1], a0 = Math.min(lo, LIMIT || lo) * 0.8, a1 = Math.max(hi, LIMIT || hi) * 1.1, pos = function (v) { return ((v - a0) / (a1 - a0) * 100).toFixed(1) + '%'; };
       var camps = {}; ads.forEach(function (o) { (camps[o.a.camp] = camps[o.a.camp] || []).push(o); });
       var dots = Object.keys(camps).map(function (c) { var x = agg(camps[c].map(function (o) { return o.a; }), rn - 1, 0); return '<span class="dot" style="left:' + pos(x.cpl) + '" title="' + esc(c) + ': ' + money(x.cpl) + ' per lead"></span>'; }).join('');
-      $('#range').innerHTML = '<div class="track"></div><div class="fill" style="left:' + pos(lo) + ';width:calc(' + pos(hi) + ' - ' + pos(lo) + ')"></div><span class="lim" style="left:' + pos(LIMIT) + '" title="Your limit ' + money(LIMIT) + '"></span>' + dots +
+      $('#range').innerHTML = '<div class="track"></div><div class="fill" style="left:' + pos(lo) + ';width:calc(' + pos(hi) + ' - ' + pos(lo) + ')"></div>' + (LIMIT ? '<span class="lim" style="left:' + pos(LIMIT) + '" title="Your limit ' + money(LIMIT) + '"></span>' : '') + dots +
         [['lo', lo, 'Low'], ['', md, 'Middle'], ['hi', hi, 'High']].map(function (p, k) {
           // when two marks sit close together, push their labels apart so they don't overlap
           var gL = k > 0 ? parseFloat(pos(p[1])) - parseFloat(pos(k === 1 ? lo : md)) : 99, gR = k < 2 ? parseFloat(pos(k === 0 ? md : hi)) - parseFloat(pos(p[1])) : 99, sh = (gR < 16 ? -Math.max(0, 16 - gR) * 2.2 : 0) + (gL < 16 ? Math.max(0, 16 - gL) * 2.2 : 0);
@@ -576,20 +576,20 @@ tbody tr{cursor:pointer}tbody tr:hover td{background:var(--panel2)}
     $('#snap').innerHTML = [['Spent (before tax)', cents(R.spend)], ['Card charge (+13% tax)', cents(R.spend * (1 + TAX))], ['Seen', cnt(R.seen)], ['Taps', cnt(R.taps)], ['Leads', R.leads], ['Appointments (FUB)', LEADS.filter(function (p) { return p.status === 'apt' && p.mins < n * 1440; }).length]]
       .map(function (r) { return '<div><dt>' + r[0] + '</dt><dd>' + r[1] + '</dd></div>'; }).join('');
     // budget pace: share of the month's budget used vs share of the month gone (all ads)
-    var dom = TODAY.getDate(), dim = new Date(TODAY.getFullYear(), TODAY.getMonth() + 1, 0).getDate(), used = agg(ADS, dom - 1, 0).spend, pu = used / BUDGET * 100, pm = dom / dim * 100, df = pu - pm, proj = used / dom * dim;
-    var tag = Math.abs(df) <= 6 ? ['On track', 'var(--up)'] : df > 6 ? ['Spending fast', 'var(--amber)'] : ['Spending slow', 'var(--blue-soft)'];
+    var dom = TODAY.getDate(), dim = new Date(TODAY.getFullYear(), TODAY.getMonth() + 1, 0).getDate(), used = agg(ADS, dom - 1, 0).spend, pu = BUDGET ? used / BUDGET * 100 : 0, pm = dom / dim * 100, df = pu - pm, proj = used / dom * dim;
+    var tag = !BUDGET ? ['No budget running', 'var(--blue-soft)'] : Math.abs(df) <= 6 ? ['On track', 'var(--up)'] : df > 6 ? ['Spending fast', 'var(--amber)'] : ['Spending slow', 'var(--blue-soft)'];
     $('#paceHead').textContent = 'Budget pace · ' + MONTH[TODAY.getMonth()] + ' · all ads';
     $('#paceNow').textContent = Math.round(pu) + '% used'; $('#paceTag').textContent = tag[0]; $('#paceTag').style.color = tag[1];
     $('#meter').innerHTML = '<div class="used" style="width:' + Math.min(100, pu).toFixed(1) + '%"></div><i style="left:' + pm.toFixed(1) + '%" title="Today: ' + Math.round(pm) + '% of the month"></i>';
-    $('#paceBud').textContent = money(BUDGET) + ' budget';
-    $('#paceSay').textContent = money(used) + ' spent by day ' + dom + ' of ' + dim + ' (white line = ' + Math.round(pm) + '% of the month). At this pace the month ends near ' + money(proj) + '.';
+    $('#paceBud').textContent = !BUDGET ? 'No budget' : MYBUD ? money(BUDGET) + ' budget (yours)' : money(BUDGET) + ' · Meta, ' + money(MB.daily) + ' a day';
+    $('#paceSay').textContent = money(used) + ' spent by day ' + dom + ' of ' + dim + ' (white line = ' + Math.round(pm) + '% of the month). At this pace the month ends near ' + money(proj) + '.' + (MYBUD ? '' : MB && MB.daily ? ' Budget is from Meta: the campaigns running now are set to ' + money(MB.daily) + ' a day in total, times ' + dim + ' days.' : ' No campaign with a budget is running in Meta right now.');
     // ads table
     var pool = list.filter(function (a) { return st.tStatus === 'all' || a.st === st.tStatus; }), rowsD = pool.map(function (a) { return { a: a, x: agg([a], n - 1, 0) }; });
     rowsD.sort(function (p, q2) { return q2.x.spend - p.x.spend || q2.a.start - p.a.start; });
     $('#tblTitle').textContent = ({ run: 'Running ads', pau: 'Paused ads', stp: 'Stopped ads', all: 'All ads' })[st.tStatus] + ' · ' + rangeLabel();
     $('#thead').innerHTML = '<tr><th>Ad</th><th>Campaign</th><th>Where</th><th>Status</th><th class="r">Spent</th><th class="r">Seen</th><th class="r">Taps</th><th class="r">Leads</th><th class="r">Cost per lead</th><th class="r">Days running</th></tr>';
     var T = agg(pool, n - 1, 0);
-    $('#rows').innerHTML = rowsD.map(function (o) { var c = o.x.cpl == null ? '' : o.x.cpl > LIMIT ? 'over' : o.x.cpl <= 30 ? 'lo' : o.x.cpl >= 40 ? 'hi' : '';
+    $('#rows').innerHTML = rowsD.map(function (o) { var c = o.x.cpl == null ? '' : !LIMIT ? '' : o.x.cpl > LIMIT ? 'over' : o.x.cpl <= LIMIT * 0.67 ? 'lo' : o.x.cpl >= LIMIT * 0.89 ? 'hi' : '';
       return '<tr data-ad="' + o.a.i + '"><td>' + esc(o.a.name) + '</td><td>' + esc(o.a.camp) + '</td><td>' + o.a.src + '</td><td>' + stCell(o.a) + '</td><td class="r n">' + money(o.x.spend) + '</td><td class="r n">' + cnt(o.x.seen) + '</td><td class="r n">' + cnt(o.x.taps) + '</td><td class="r n">' + o.x.leads + '</td><td class="r">' + (o.x.cpl == null ? '<span class="pill">—</span>' : '<span class="pill ' + c + '">' + money(o.x.cpl) + '</span>') + '</td><td class="r n">' + daysRun(o.a) + '</td></tr>'; }).join('') +
       (rowsD.length ? '<tr class="tot"><td>Total</td><td></td><td></td><td>' + rowsD.length + ' ads</td><td class="r n">' + money(T.spend) + '</td><td class="r n">' + cnt(T.seen) + '</td><td class="r n">' + cnt(T.taps) + '</td><td class="r n">' + T.leads + '</td><td class="r n">' + cpl$(T.cpl) + '</td><td></td></tr>' : '<tr><td colspan="10" class="hint">' + (META.connected ? 'No ads here.' : 'Your ads will list here once Meta is connected.') + '</td></tr>');
     var TG = { run: 'run', pau: 'pau', stp: 'stp' };
@@ -626,11 +626,13 @@ tbody tr{cursor:pointer}tbody tr:hover td{background:var(--panel2)}
   $('#fs').onclick = function () { try { if (document.fullscreenElement) document.exitFullscreen(); else { var q = document.documentElement.requestFullscreen(); if (q && q.catch) q.catch(function () {}); } } catch (e) {} };
   document.addEventListener('fullscreenchange', function () { $('#fs').textContent = document.fullscreenElement ? 'Exit full screen' : 'Full screen'; fitScreen(); });
   document.querySelector('.vol .cap').onclick = function (e) { var b = e.target.closest('.key'); if (!b) return; st.show[b.dataset.k] = !st.show[b.dataset.k]; render(); };
+  // budget: his own number if he typed one, else what Meta has (today's daily budgets x days in the month)
+  function setBudget() { var dim = new Date(TODAY.getFullYear(), TODAY.getMonth() + 1, 0).getDate(); BUDGET = MYBUD || (MB && MB.daily ? Math.round(MB.daily * dim) : 0); }
   // settings: his monthly budget and cost-per-lead limit
-  $('#setBtn').onclick = function () { $('#setBud').value = BUDGET; $('#setLim').value = LIMIT; $('#setDlg').showModal(); };
+  $('#setBtn').onclick = function () { $('#setBud').value = MYBUD || ''; $('#setLim').value = LIMIT || ''; $('#setDlg').showModal(); };
   $('#setCancel').onclick = function () { $('#setDlg').close(); };
   $('#setForm').onsubmit = function (e) { e.preventDefault(); var b = +String($('#setBud').value).replace(/[^0-9.]/g, ''), l = +String($('#setLim').value).replace(/[^0-9.]/g, '');
-    api('ads/settings', { method: 'POST', body: JSON.stringify({ budget: b, limit: l }) }).then(function (j) { BUDGET = j.settings.budget; LIMIT = j.settings.limit; $('#setDlg').close(); render(); toast('Saved.'); }).catch(function (x) { if (x === 'pin') return askPin(); toast('Could not save. Try again.'); }); };
+    api('ads/settings', { method: 'POST', body: JSON.stringify({ budget: b, limit: l }) }).then(function (j) { MYBUD = j.settings.budget; LIMIT = j.settings.limit; setBudget(); $('#setDlg').close(); render(); toast('Saved.'); }).catch(function (x) { if (x === 'pin') return askPin(); toast('Could not save. Try again.'); }); };
   // the Meta tag: click = pull from Meta now (read only), then reload the numbers
   $('#syncTag').onclick = function () { if (!META.connected) return toast('Meta isn’t connected yet.'); var t = this; t.textContent = 'Updating…';
     api('ads/sync', { method: 'POST', body: '{}' }).then(function () { return load(); }).catch(function () { toast('Could not update. Try again.'); render(); }); };
