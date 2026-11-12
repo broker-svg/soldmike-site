@@ -348,7 +348,7 @@ tbody tr{cursor:pointer}tbody tr:hover td{background:var(--panel2)}
   <div class="toast" id="toast" role="status" hidden></div>
   <p class="foot">Read only: this page shows numbers and can never start, pause or change an ad. Seen = times your ads were shown. Taps = taps on the ad's link. Leads = forms filled in, as counted by Meta. Spend is before tax; the card charge adds 13% HST. Lead cards are your newest Follow Up Boss leads from the last 30 days.</p>
   <dialog id="pinDlg"><form method="dialog" id="pinForm"><h2>Host only</h2><input id="pinIn" inputmode="numeric" type="password" autocomplete="off" aria-label="PIN" placeholder="PIN"><p class="err" id="pinErr" hidden>Wrong PIN</p><div class="row"><button type="submit">Continue</button></div></form></dialog>
-  <dialog id="setDlg"><form method="dialog" id="setForm"><h2>Your numbers</h2><label for="setBud">Monthly ad budget, before tax ($). Leave empty to use the budgets set in Meta</label><input id="setBud" inputmode="numeric" type="text" autocomplete="off"><label for="setLim">Cost per lead limit ($). Leave empty for none</label><input id="setLim" inputmode="numeric" type="text" autocomplete="off"><h3>Leads shown here</h3><p class="dh">A lead shows if its source is ticked. Untick a source (like Realtor.ca) to leave those leads out.</p><div class="chk" id="setSrc"></div><p class="dh">Tags that always bring a lead in, even from an unticked source.</p><div class="chk" id="setTag"></div><div class="row"><button type="button" class="ghost" id="setCancel">Cancel</button><button type="submit">Save</button></div></form></dialog>
+  <dialog id="setDlg"><form method="dialog" id="setForm"><h2>Your numbers</h2><label for="setBud">Monthly ad budget, before tax ($). Leave empty to use the budgets set in Meta</label><input id="setBud" inputmode="numeric" type="text" autocomplete="off"><label for="setLim">Cost per lead limit ($). Leave empty for none</label><input id="setLim" inputmode="numeric" type="text" autocomplete="off"><h3>Leads shown here</h3><p class="dh">A lead shows if its source is ticked. Untick a source (like Realtor.ca) to leave those leads out.</p><div class="chk" id="setSrc"></div><p class="dh">Project tags. A lead with a ticked tag always shows, even from an unticked source.</p><div class="chk" id="setTag"></div><div class="row"><button type="button" class="ghost" id="setCancel">Cancel</button><button type="submit">Save</button></div></form></dialog>
 </main>
 
 <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
@@ -371,7 +371,7 @@ tbody tr{cursor:pointer}tbody tr:hover td{background:var(--panel2)}
   var N = 400, TAX = 0.13, LIMIT = 0, BUDGET = 0, MYBUD = 0, MB = null;
 
   // filled by ingest() from the Worker: ads + their daily numbers (Meta) and the newest leads (Follow Up Boss)
-  var CAMPS = [], SRC = {}, ADS = [], LEADS = [], ALL = [], SRCOFF = [], TAGSON = [], META = { connected: false }, FUBAPP = 'https://app.followupboss.com';
+  var CAMPS = [], SRC = {}, ADS = [], LEADS = [], ALL = [], SRCOFF = [], TAGSON = [], PTAGS = [], META = { connected: false }, FUBAPP = 'https://app.followupboss.com';
   var API = /^(localhost|127\.0\.0\.1)$/.test(location.hostname) ? 'http://localhost:8787' : 'https://soldmike-listings.broker-e2c.workers.dev';
   function store(k, v) { try { if (v === undefined) return JSON.parse(localStorage.getItem(k) || 'null'); localStorage.setItem(k, JSON.stringify(v)); } catch (e) { return null; } }
   function api(path, opt) { opt = opt || {}; opt.headers = Object.assign({ 'X-OH-Pin': store('sm_oh_pin') || '', 'Content-Type': 'application/json' }, opt.headers || {});
@@ -381,7 +381,7 @@ tbody tr{cursor:pointer}tbody tr:hover td{background:var(--panel2)}
   var srcOf = function (s) { return /facebook|instagram|meta|\bfb\b|\big\b/i.test(s) ? 'Meta' : /youtube/i.test(s) ? 'YouTube' : 'Other'; };
   var daysAgo = function (day) { var p = String(day).slice(0, 10).split('-'); return Math.round((TODAY - new Date(+p[0], p[1] - 1, +p[2])) / 864e5); };
   function ingest(j) {
-    META = j.meta || {}; FUBAPP = j.fubApp || FUBAPP; LIMIT = +(j.settings && j.settings.limit) || 0; SRCOFF = (j.settings && j.settings.srcOff) || []; TAGSON = (j.settings && j.settings.tagsOn) || []; MYBUD = +(j.settings && j.settings.budget) || 0; MB = j.metaBudget || null; setBudget();
+    META = j.meta || {}; FUBAPP = j.fubApp || FUBAPP; LIMIT = +(j.settings && j.settings.limit) || 0; SRCOFF = (j.settings && j.settings.srcOff) || []; TAGSON = (j.settings && j.settings.tagsOn) || []; PTAGS = j.projectTags || []; MYBUD = +(j.settings && j.settings.budget) || 0; MB = j.metaBudget || null; setBudget();
     var byId = {}, all = (j.ads || []).map(function (a) { var o = { id: a.id, name: a.name || 'Ad', camp: a.camp || 'No campaign', src: a.src || 'Meta', kind: a.kind || 'Photo', st: a.status || 'stp', why: a.why || '', thumb: a.thumb || '', hue: hueOf(a.id), days: [], start: -1, end: N, created: a.created };
       for (var d = 0; d < N; d++) o.days.push(null); byId[a.id] = o; return o; });
     (j.daily || []).forEach(function (r) { var a = byId[r[1]], d = daysAgo(r[0]); if (!a || d < 0 || d >= N) return;
@@ -690,9 +690,10 @@ tbody tr{cursor:pointer}tbody tr:hover td{background:var(--panel2)}
   // settings: his monthly budget and cost-per-lead limit
   $('#setBtn').onclick = function () { $('#setBud').value = MYBUD || ''; $('#setLim').value = LIMIT || '';
     var box = function (kind, k, n, on) { return '<label class="ck"><input type="checkbox" data-' + kind + '="' + esc(k) + '"' + (on ? ' checked' : '') + '><span>' + esc(k) + '</span><em>' + n + '</em></label>'; };
-    var srcs = tally(function (p) { return [p.ad.name]; }), tags = tally(function (p) { return p.tagList; });
+    var srcs = tally(function (p) { return [p.ad.name]; }), cnt0 = {}; tally(function (p) { return p.tagList; }).forEach(function (x) { cnt0[x[0]] = x[1]; });
+    // only the project tags (and any he ticked before), not every tag in Follow Up Boss
+    var tags = PTAGS.concat(TAGSON.filter(function (g) { return PTAGS.indexOf(g) < 0; })).map(function (g) { return [g, cnt0[g] || 0]; });
     $('#setSrc').innerHTML = srcs.map(function (x) { return box('src', x[0], x[1], SRCOFF.indexOf(x[0]) < 0); }).join('') || '<p class="dh">No leads in the last 30 days.</p>';
-    TAGSON.forEach(function (g) { if (!tags.some(function (x) { return x[0] === g; })) tags.push([g, 0]); });
     $('#setTag').innerHTML = tags.map(function (x) { return box('tag', x[0], x[1], TAGSON.indexOf(x[0]) >= 0); }).join('') || '<p class="dh">No tags on these leads.</p>';
     $('#setDlg').showModal(); };
   $('#setCancel').onclick = function () { $('#setDlg').close(); };
