@@ -1,4 +1,4 @@
-/* Live MLS® listings for soldmike.com (CREA DDF® National Shared Pool).
+/* Live MLS® listings for soldmike.com (PropTx IDX from the switch; CREA DDF® before it).
    Data comes from our own Cloudflare Worker; this file only renders it.
    Rules followed here: brokerage on every card, "Powered by REALTOR.ca" logo linked to the
    listing on REALTOR.ca, CREA photos shown as supplied, terms-of-use notice that must be
@@ -95,11 +95,11 @@
   }
   SM.areas=areas;
 
-  // ---------- terms of use notice (CREA DDF® rule 6(d): accept or dismiss) ----------
+  // ---------- terms of use notice with the PropTx IDX 6.3(k) bona fide interest notice: accept or dismiss ----------
   function terms(){
     if(store('sm_terms'))return;
     var d=document.createElement('div');d.className='terms-bar';d.setAttribute('role','region');d.setAttribute('aria-label','Terms of use');
-    d.innerHTML='<p>Listings on this site come from members of The Canadian Real Estate Association (CREA). By using this site you agree to our <a href="/terms/">Terms of Use</a>, including that listing content is for your personal, non-commercial use only.</p><div><button type="button" class="btn" data-t="accept">Accept</button><button type="button" class="btn ghost" data-t="dismiss">Dismiss</button></div>';
+    d.innerHTML='<p>The information provided herein must only be used by consumers that have a bona fide interest in the purchase, sale, or lease of real estate and may not be used for any commercial purpose or any other purpose. By using this site you agree to our <a href="/terms/">Terms of Use</a>.</p><div><button type="button" class="btn" data-t="accept">Accept</button><button type="button" class="btn ghost" data-t="dismiss">Dismiss</button></div>';
     d.addEventListener('click',function(e){var b=e.target.closest('[data-t]');if(!b)return;store('sm_terms',{v:1,a:b.dataset.t,at:new Date().toISOString()});d.remove();});
     document.body.appendChild(d);
   }

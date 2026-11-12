@@ -197,7 +197,7 @@ dialog form{display:flex;flex-direction:column;gap:12px}
   function publicHome(){
     app.innerHTML='<div class="bar"><a href="/"><img src="'+LOGO+'" alt="SoldMike home"></a><b>Open houses</b><a href="/listings/" style="color:#fff;font-size:15px">Search homes</a></div>'
       +'<div class="wrap pub" data-listings><h2>Upcoming open houses</h2><div id="pl"><p class="muted">Loading…</p></div>'
-      +'<p class="fine">The information contained on this site is based in whole or in part on information that is provided by members of The Canadian Real Estate Association (CREA), who are responsible for its accuracy. CREA reproduces and distributes this information as a service for its members and assumes no responsibility for its accuracy.</p>'
+      +'<p class="fine">Listings on this site come from PropTx through the IDX program and show each listing brokerage. Listing information is deemed reliable but is not guaranteed accurate by PROPTX.</p><p class="fine"><b>The information provided herein must only be used by consumers that have a bona fide interest in the purchase, sale, or lease of real estate and may not be used for any commercial purpose or any other purpose.</b></p>'
       +'<button type="button" class="hostlink" id="hl">Host login</button></div>';
     document.getElementById('hl').onclick=function(){askPin().then(function(){history.replaceState(null,'','/open-house/');hostHome();}).catch(function(){});};
     SM.get('/api/oh/public').then(function(r){
