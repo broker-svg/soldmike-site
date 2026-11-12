@@ -219,13 +219,15 @@ tbody tr{cursor:pointer}tbody tr:hover td{background:var(--panel2)}
 .tbl .thead h2{color:var(--fg);font-size:13px}
 .sect>.panel.tbl>.pad:first-child{padding-block:12px}
 .tot td{font-weight:600;background:var(--panel2)}
-.leadbar{display:flex;align-items:center;gap:10px;padding:10px 12px 10px 20px;border-bottom:1px solid var(--line);min-width:0}
+.leadbar{display:flex;align-items:center;gap:6px;padding:10px 8px 10px 20px;border-bottom:1px solid var(--line);min-width:0}
 .leadbar[hidden]{display:none}
 .leadbar .av{width:32px;height:32px;font-size:13px}
 .leadbar .who{min-width:0;flex:1}
 .leadbar .who b{display:block;font:600 14px/1.25 var(--ui);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .leadbar .who span{display:block;color:var(--soft);font-size:12px;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .leadbar .go{flex:none;color:#fff;background:var(--blue);border-color:var(--blue)}
+.leadbar .fsb.sm{flex:none;padding:5px 8px;font-size:12px}
+.ag .acts{display:flex;gap:6px;margin-top:8px}.ag .acts .fsb{color:var(--soft);background:none;border-color:var(--line2)}
 .leadbar .x{flex:none;background:none;border:0;color:var(--muted);font-size:20px;line-height:1;padding:6px 8px;cursor:pointer}
 .leadbar .x:hover{color:var(--fg)}
 .side.haslead #cplHead{display:none}
@@ -359,7 +361,7 @@ tbody tr{cursor:pointer}tbody tr:hover td{background:var(--panel2)}
   var N = 400, TAX = 0.13, LIMIT = 0, BUDGET = 0, MYBUD = 0, MB = null;
 
   // filled by ingest() from the Worker: ads + their daily numbers (Meta) and the newest leads (Follow Up Boss)
-  var CAMPS = [], SRC = {}, ADS = [], LEADS = [], META = { connected: false }, FUBAPP = 'https://app.followupboss.com';
+  var CAMPS = [], SRC = {}, ADS = [], LEADS = [], ALL = [], META = { connected: false }, FUBAPP = 'https://app.followupboss.com';
   var API = /^(localhost|127\.0\.0\.1)$/.test(location.hostname) ? 'http://localhost:8787' : 'https://soldmike-listings.broker-e2c.workers.dev';
   function store(k, v) { try { if (v === undefined) return JSON.parse(localStorage.getItem(k) || 'null'); localStorage.setItem(k, JSON.stringify(v)); } catch (e) { return null; } }
   function api(path, opt) { opt = opt || {}; opt.headers = Object.assign({ 'X-OH-Pin': store('sm_oh_pin') || '', 'Content-Type': 'application/json' }, opt.headers || {});
@@ -381,8 +383,8 @@ tbody tr{cursor:pointer}tbody tr:hover td{background:var(--panel2)}
     var now = Date.now();
     LEADS = (j.leads || []).map(function (p) { var w = String(p.name || '').trim().split(/\s+/), t = Date.parse(p.created);
       return { id: p.id, name: p.name, init: ((w[0] || '?')[0] + (w.length > 1 ? w[w.length - 1][0] : '')).toUpperCase(), ad: { name: p.source || 'Unknown', src: srcOf((p.source || '') + ' ' + (p.url || '')) }, mins: isNaN(t) ? 0 : Math.max(0, Math.round((now - t) / 60000)),
-        hue: hueOf(p.name || p.id), phone: p.phone || '—', email: p.email || '—', ans: p.stage || '—', home: p.home || '—', status: p.status || 'new', tags: (p.tags || []).join(', ') || '—' }; });
-    LEADS.sort(function (a, b) { return a.mins - b.mins; });
+        hue: hueOf(p.name || p.id), phone: p.phone || '—', email: p.email || '—', ans: p.stage || '—', home: p.home || '—', hide: (j.leadState || {})[p.id] || '', status: p.status || 'new', tags: (p.tags || []).join(', ') || '—' }; });
+    LEADS.sort(function (a, b) { return a.mins - b.mins; }); ALL = LEADS; regroup();
     if (st.camp !== 'All campaigns' && !(st.camp in SRC)) st.camp = 'All campaigns';
   }
   var RANGES = { today: { t: 'Today', n: 1 }, d7: { t: '7 days', n: 7 }, d30: { t: '30 days', n: 30 }, month: { t: 'This month', n: TODAY.getDate() } };
@@ -484,7 +486,7 @@ tbody tr{cursor:pointer}tbody tr:hover td{background:var(--panel2)}
   // side feed: alerts, news, or the lead that was clicked. Kept apart from render() so a click doesn't rebuild the page.
   function leadHtml(p) {
     if (!p) return '<p class="hint">Click any lead card to see their contact details. Double-click opens them in Follow Up Boss.</p>';
-    return '<div class="ag"><div class="hd"><span class="av" style="--h:' + p.hue + '">' + esc(p.init) + '</span><div><b>' + esc(p.name) + '</b><span>' + SNAME[p.status] + ' · came in ' + when(p.mins) + '</span></div><button type="button" class="fsb sm" data-open="1">Open in FUB</button></div>' +
+    return '<div class="ag"><div class="hd"><span class="av" style="--h:' + p.hue + '">' + esc(p.init) + '</span><div><b>' + esc(p.name) + '</b><span>' + SNAME[p.status] + ' · came in ' + when(p.mins) + '</span></div><button type="button" class="fsb sm" data-open="1">Open in FUB</button></div><div class="acts">' + leadBtns(p) + '</div>' +
       '<dl><div><dt>Phone</dt><dd class="n">' + esc(p.phone) + '</dd></div><div><dt>Email</dt><dd class="em">' + esc(p.email) + '</dd></div><div><dt>Came from</dt><dd>' + esc(p.ad.name) + '</dd></div><div><dt>Stage in FUB</dt><dd>' + esc(p.ans) + '</dd></div><div><dt>Tags</dt><dd>' + esc(p.tags) + '</dd></div><div><dt>Address</dt><dd>' + esc(p.home) + '</dd></div></dl></div>';
   }
   function alerts() {
@@ -517,6 +519,15 @@ tbody tr{cursor:pointer}tbody tr:hover td{background:var(--panel2)}
   }
   // the clicked lead as one slim row: top of the side panel (in place of the Cost per lead title), bottom of it in full screen,
   // or a small bar at the bottom of the screen when the side panel is off. Never a floating card over the numbers.
+  // hidden and trashed leads are left out everywhere except the Hidden view (page only; Follow Up Boss is untouched)
+  function regroup() { LEADS = ALL.filter(function (p) { return !p.hide; }); }
+  function setLead(p, state) {
+    api('ads/lead', { method: 'POST', body: JSON.stringify({ id: p.id, state: state }) }).then(function () {
+      p.hide = state; regroup(); st.sel = null; st.feed = 'alerts'; render();
+      toast(state === 'h' ? 'Hidden. Find them under Hidden.' : state === 't' ? 'Removed from this page. Still in Follow Up Boss.' : 'Back on the list.');
+    }).catch(function (x) { if (x === 'pin') return askPin(); toast('Could not save. Try again.'); });
+  }
+  var leadBtns = function (p) { return (p.hide === 'h' ? '<button type="button" class="fsb sm" data-lead="">Unhide</button>' : '<button type="button" class="fsb sm" data-lead="h">Hide</button>') + '<button type="button" class="fsb sm" data-lead="t">Trash</button>'; };
   function leadBar() {
     var bar = $('#leadBar'), side = document.querySelector('.side'), p = st.sel; if (!bar) return;
     var inSide = !!side && !side.hidden, feedOn = inSide && !$('#newest').hidden, show = !!p && st.feed === 'lead' && !feedOn;
@@ -524,7 +535,7 @@ tbody tr{cursor:pointer}tbody tr:hover td{background:var(--panel2)}
     if (!show) { bar.hidden = true; return; }
     if (inSide) { if (bar.parentNode !== side) side.insertBefore(bar, side.firstChild); } else if (bar.parentNode !== document.body) document.body.appendChild(bar);
     bar.classList.toggle('float', !inSide);
-    bar.innerHTML = '<span class="av" style="--h:' + p.hue + '">' + esc(p.init) + '</span><div class="who"><b>' + esc(p.name) + '</b><span>' + SNAME[p.status] + ' · came in ' + when(p.mins) + '</span></div><button type="button" class="fsb sm go" data-open="1">Open in FUB</button><button type="button" class="x" data-leadx="1" aria-label="Close">×</button>';
+    bar.innerHTML = '<div class="who"><b>' + esc(p.name) + '</b><span>' + SNAME[p.status] + ' · came in ' + when(p.mins) + '</span></div><button type="button" class="fsb sm go" data-open="1">Open in FUB</button>' + leadBtns(p) + '<button type="button" class="x" data-leadx="1" aria-label="Close">×</button>';
     bar.hidden = false;
   }
   function showLead(p) {
@@ -572,8 +583,8 @@ tbody tr{cursor:pointer}tbody tr:hover td{background:var(--panel2)}
     var listMode = st.strip === 'list', stripEl = $('#strip');
     $('#bars').hidden = listMode; stripEl.hidden = !listMode; $('#barKeys').hidden = listMode; $('#segStripKind').hidden = !listMode;
     $('#capLab').textContent = listMode ? 'Newest Follow Up Boss leads first' : P.wk ? 'Leads per week' : 'Leads per day';
-    var ppl = LEADS.filter(function (p) { return (st.src === 'All' || p.ad.src === st.src) && (st.stripKind === 'all' || p.status === st.stripKind); });
-    stripEl.innerHTML = ppl.length ? ppl.slice(0, 40).map(leadCard).join('') : '<p class="hint">No new leads like this in Follow Up Boss in the last 30 days.</p>';
+    var ppl = st.stripKind === 'hid' ? ALL.filter(function (p) { return p.hide === 'h'; }) : LEADS.filter(function (p) { return (st.src === 'All' || p.ad.src === st.src) && (st.stripKind === 'all' || p.status === st.stripKind); });
+    stripEl.innerHTML = ppl.length ? ppl.slice(0, 40).map(leadCard).join('') : '<p class="hint">' + (st.stripKind === 'hid' ? 'No hidden leads.' : 'No new leads like this in Follow Up Boss in the last 30 days.') + '</p>';
     stripEl.classList.toggle('wrap', st.focus === 'bars');
     renderFeed();
     Array.prototype.forEach.call(document.querySelectorAll('.key'), function (b) { b.setAttribute('aria-pressed', String(st.show[b.dataset.k])); });
@@ -634,7 +645,7 @@ tbody tr{cursor:pointer}tbody tr:hover td{background:var(--panel2)}
   seg('#segPeriod', Object.keys(PERIODS), 'period');
   seg('#segLine', [{ v: 'white', t: 'White' }, { v: 'trend', t: 'Better / worse' }], 'lineMode');
   seg('#segStrip', [{ v: 'bars', t: 'Bars' }, { v: 'list', t: 'Lead cards' }], 'strip');
-  seg('#segStripKind', [{ v: 'all', t: 'All' }, { v: 'new', t: 'New' }, { v: 'con', t: 'Contacted' }, { v: 'apt', t: 'Appointment' }], 'stripKind');
+  seg('#segStripKind', [{ v: 'all', t: 'All' }, { v: 'new', t: 'New' }, { v: 'con', t: 'Contacted' }, { v: 'apt', t: 'Appointment' }, { v: 'hid', t: 'Hidden' }], 'stripKind');
   seg('#segStatus', [{ v: 'run', t: 'Running' }, { v: 'pau', t: 'Paused' }, { v: 'stp', t: 'Stopped' }, { v: 'all', t: 'All' }], 'tStatus');
   seg('#segTView', [{ v: 'list', t: 'List' }, { v: 'photos', t: 'Pictures' }], 'tView');
   seg('#segFeed', [{ v: 'alerts', t: 'Alerts' }, { v: 'news', t: 'News' }, { v: 'lead', t: 'Lead' }], 'feed');
@@ -645,7 +656,8 @@ tbody tr{cursor:pointer}tbody tr:hover td{background:var(--panel2)}
   $('#bell').onclick = function () { var d = $('#drop'), was = st.dropMode; st.dropMode = 'alerts'; renderFeed(); d.hidden = was === 'alerts' ? !d.hidden : false; this.setAttribute('aria-expanded', String(!d.hidden)); };
   // one click on a lead card shows their contact details; double-click (or the button) opens them in Follow Up Boss
   var openFub = function (p) { p = p || st.sel; if (p && p.id) window.open(FUBAPP + '/2/people/view/' + p.id, '_blank', 'noopener'); };
-  document.addEventListener('click', function (e) { var t = e.target; if (!t || !t.closest) return; if (t.closest('[data-leadx]')) { st.sel = null; st.feed = 'alerts'; renderFeed(); return; } if (t.closest('[data-open]')) return openFub(st.sel);
+  document.addEventListener('click', function (e) { var t = e.target; if (!t || !t.closest) return; var lb = t.closest('[data-lead]'); if (lb && st.sel) { var s = lb.dataset.lead; if (s === 't' && !confirm('Remove ' + st.sel.name + ' from this page for good? They stay in Follow Up Boss.')) return; return setLead(st.sel, s); }
+    if (t.closest('[data-leadx]')) { st.sel = null; st.feed = 'alerts'; renderFeed(); return; } if (t.closest('[data-open]')) return openFub(st.sel);
     var c = t.closest('[data-i]'); if (c && REG[+c.dataset.i]) return showLead(REG[+c.dataset.i]);
     var a = t.closest('[data-ad]'); if (a) { var ad = ADS[+a.dataset.ad]; st.camp = ad.camp; render(); toast('Chart now shows ' + ad.camp + '.'); window.scrollTo({ top: 0, behavior: 'smooth' }); } });
   document.addEventListener('dblclick', function (e) { var t = e.target; var c = t && t.closest && t.closest('[data-i]'); if (c && REG[+c.dataset.i]) openFub(REG[+c.dataset.i]); });
