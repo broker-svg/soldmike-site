@@ -392,7 +392,8 @@ tbody tr{cursor:pointer}tbody tr:hover td{background:var(--panel2)}
     SRC = {}; CAMPS = []; ADS.forEach(function (a) { if (!(a.camp in SRC)) { SRC[a.camp] = a.src; CAMPS.push([a.camp, a.src]); } });
     var now = Date.now();
     LEADS = (j.leads || []).map(function (p) { var w = String(p.name || '').trim().split(/\s+/), t = Date.parse(p.created);
-      return { id: p.id, name: p.name, init: ((w[0] || '?')[0] + (w.length > 1 ? w[w.length - 1][0] : '')).toUpperCase(), ad: { name: p.source || 'Unknown', src: srcOf((p.source || '') + ' ' + (p.url || '')) }, mins: isNaN(t) ? 0 : Math.max(0, Math.round((now - t) / 60000)),
+      var tg = p.tags || [], paid = tg.indexOf('Meta Ad') >= 0, adc = (tg.filter(function (g) { return g.indexOf('Ad: ') === 0; })[0] || '').slice(4);
+      return { id: p.id, paid: paid, adCamp: adc, name: p.name, init: ((w[0] || '?')[0] + (w.length > 1 ? w[w.length - 1][0] : '')).toUpperCase(), ad: { name: p.source || 'Unknown', src: paid ? 'Meta' : srcOf((p.source || '') + ' ' + (p.url || '')) }, mins: isNaN(t) ? 0 : Math.max(0, Math.round((now - t) / 60000)),
         hue: hueOf(p.name || p.id), phone: p.phone || '—', email: p.email || '—', ans: p.stage || '—', home: p.home || '—', hide: (j.leadState || {})[p.id] || '', tagList: p.tags || [], status: p.status || 'new', existing: !!p.existing, tags: (p.tags || []).slice(-6).join(', ') || '—' }; });
     LEADS.sort(function (a, b) { return a.mins - b.mins; }); ALL = LEADS; regroup();
     if (st.camp !== 'All campaigns' && !(st.camp in SRC)) st.camp = 'All campaigns';
@@ -531,7 +532,7 @@ tbody tr{cursor:pointer}tbody tr:hover td{background:var(--panel2)}
   // or a small bar at the bottom of the screen when the side panel is off. Never a floating card over the numbers.
   // hidden and trashed leads are left out everywhere except the Hidden view (page only; Follow Up Boss is untouched)
   // a lead shows if its source is ticked in Settings, or it carries one of the ticked tags
-  function shown(p) { return SRCOFF.indexOf(p.ad.name) < 0 || p.tagList.some(function (g) { return TAGSON.indexOf(g) >= 0; }); }
+  function shown(p) { return p.paid || SRCOFF.indexOf(p.ad.name) < 0 || p.tagList.some(function (g) { return TAGSON.indexOf(g) >= 0; }); }
   function regroup() { LEADS = ALL.filter(function (p) { return !p.hide && shown(p); }); }
   function setLead(p, state) {
     api('ads/lead', { method: 'POST', body: JSON.stringify({ id: p.id, state: state }) }).then(function () {
@@ -554,7 +555,7 @@ tbody tr{cursor:pointer}tbody tr:hover td{background:var(--panel2)}
     if (!show) { bar.hidden = true; return; }
     if (inSide) { if (bar.parentNode !== side) side.insertBefore(bar, side.firstChild); } else if (bar.parentNode !== document.body) document.body.appendChild(bar);
     bar.classList.toggle('float', !inSide);
-    bar.innerHTML = '<div class="who"><b>' + esc(p.name) + '</b><span>' + SNAME[p.status] + ' · ' + (p.existing ? 'existing contact' : 'came in ' + when(p.mins)) + '</span></div><button type="button" class="fsb sm go" data-open="1">Open in FUB</button>' + leadBtns(p) + '<button type="button" class="x" data-leadx="1" aria-label="Close">×</button>';
+    bar.innerHTML = '<div class="who"><b>' + esc(p.name) + '</b><span>' + SNAME[p.status] + (p.paid ? ' · Paid ad' : '') + ' · ' + (p.existing ? 'existing contact' : 'came in ' + when(p.mins)) + '</span></div><button type="button" class="fsb sm go" data-open="1">Open in FUB</button>' + leadBtns(p) + '<button type="button" class="x" data-leadx="1" aria-label="Close">×</button>';
     bar.hidden = false;
   }
   function showLead(p) {
@@ -602,8 +603,8 @@ tbody tr{cursor:pointer}tbody tr:hover td{background:var(--panel2)}
     var listMode = st.strip === 'list', stripEl = $('#strip');
     $('#bars').hidden = listMode; stripEl.hidden = !listMode; $('#barKeys').hidden = listMode; $('#segStripKind').hidden = !listMode; leadSrcOpts(listMode);
     $('#capLab').textContent = listMode ? 'Newest Follow Up Boss leads first' : P.wk ? 'Leads per week' : 'Leads per day';
-    var ppl = st.stripKind === 'hid' ? ALL.filter(function (p) { return p.hide === 'h'; }) : LEADS.filter(function (p) { return (st.src === 'All' || p.ad.src === st.src) && (st.stripKind === 'all' || p.status === st.stripKind) && (!st.leadSrc || p.ad.name === st.leadSrc); });
-    stripEl.innerHTML = ppl.length ? ppl.slice(0, 40).map(leadCard).join('') : '<p class="hint">' + (st.stripKind === 'hid' ? 'No hidden leads.' : 'No new leads like this in Follow Up Boss in the last 30 days.') + '</p>';
+    var ppl = st.stripKind === 'hid' ? ALL.filter(function (p) { return p.hide === 'h'; }) : LEADS.filter(function (p) { return (st.src === 'All' || p.ad.src === st.src) && (st.stripKind === 'all' || (st.stripKind === 'paid' ? p.paid && (st.camp === 'All campaigns' || p.adCamp.slice(0, 76) === st.camp.slice(0, 76)) : p.status === st.stripKind)) && (!st.leadSrc || p.ad.name === st.leadSrc); });
+    stripEl.innerHTML = ppl.length ? ppl.slice(0, 40).map(leadCard).join('') : '<p class="hint">' + (st.stripKind === 'hid' ? 'No hidden leads.' : st.stripKind === 'paid' ? 'No sign-ups tagged as coming from a paid ad yet' + (st.camp === 'All campaigns' ? '' : ' for this campaign') + '. They show here once the ad links carry the label.' : 'No new leads like this in Follow Up Boss in the last 30 days.') + '</p>';
     stripEl.classList.toggle('wrap', st.focus === 'bars');
     renderFeed();
     Array.prototype.forEach.call(document.querySelectorAll('.key'), function (b) { b.setAttribute('aria-pressed', String(st.show[b.dataset.k])); });
@@ -665,7 +666,7 @@ tbody tr{cursor:pointer}tbody tr:hover td{background:var(--panel2)}
   seg('#segLine', [{ v: 'white', t: 'White' }, { v: 'trend', t: 'Better / worse' }], 'lineMode');
   seg('#segStrip', [{ v: 'bars', t: 'Bars' }, { v: 'list', t: 'Lead cards' }], 'strip');
   $('#leadSrc').onchange = function () { st.leadSrc = this.value; render(); };
-  seg('#segStripKind', [{ v: 'all', t: 'All' }, { v: 'new', t: 'New' }, { v: 'con', t: 'Contacted' }, { v: 'apt', t: 'Appointment' }, { v: 'hid', t: 'Hidden' }], 'stripKind');
+  seg('#segStripKind', [{ v: 'all', t: 'All' }, { v: 'paid', t: 'From ads' }, { v: 'new', t: 'New' }, { v: 'con', t: 'Contacted' }, { v: 'apt', t: 'Appointment' }, { v: 'hid', t: 'Hidden' }], 'stripKind');
   seg('#segStatus', [{ v: 'run', t: 'Running' }, { v: 'pau', t: 'Paused' }, { v: 'stp', t: 'Stopped' }, { v: 'all', t: 'All' }], 'tStatus');
   seg('#segTView', [{ v: 'list', t: 'List' }, { v: 'photos', t: 'Pictures' }], 'tView');
   seg('#segFeed', [{ v: 'alerts', t: 'Alerts' }, { v: 'news', t: 'News' }, { v: 'lead', t: 'Lead' }], 'feed');
