@@ -44,7 +44,7 @@ button,select,input{font:inherit;color:inherit}
 .sample.ok{color:var(--up);border-color:var(--up)}.sample.wait{color:var(--amber);border-color:var(--amber)}.sample.bad{color:var(--down);border-color:var(--down)}
 .brand a{font:600 13px/1 var(--ui);color:var(--muted);text-decoration:none;border:1px solid var(--line2);border-radius:5px;padding:6px 9px}.brand a:hover{color:var(--fg)}
 .notice{margin:14px 0 0;padding:10px 14px;border:1px solid var(--amber);border-radius:6px;color:var(--fg);background:color-mix(in srgb,var(--amber) 12%,var(--panel));font-size:14px}
-dialog{background:var(--panel);color:var(--fg);border:1px solid var(--line2);border-radius:8px;padding:22px;width:min(380px,calc(100vw - 32px))}
+dialog{background:var(--panel);color:var(--fg);border:1px solid var(--line2);border-radius:8px;padding:22px;width:min(420px,calc(100vw - 32px))}
 dialog::backdrop{background:rgba(8,10,18,.75)}
 dialog h2{margin:0 0 12px;font:700 18px/1.2 var(--ui)}
 dialog label{display:block;margin:10px 0 4px;font-size:13px;color:var(--soft)}
@@ -52,6 +52,15 @@ dialog input{width:100%;background:var(--bg);border:1px solid var(--line2);borde
 dialog .row{display:flex;gap:10px;justify-content:flex-end;margin-top:16px}
 dialog button{background:var(--blue);border:0;border-radius:6px;padding:10px 16px;font-weight:600;color:#fff;cursor:pointer}
 dialog button.ghost{background:none;border:1px solid var(--line2);color:var(--soft)}
+dialog{max-height:calc(100vh - 32px);overflow:auto}
+dialog h3{margin:18px 0 2px;font:700 15px/1.2 var(--ui)}
+dialog .dh{margin:4px 0 6px;font-size:12px;color:var(--muted)}
+dialog .chk{max-height:150px;overflow:auto;border:1px solid var(--line2);border-radius:6px;padding:4px 10px;background:var(--bg)}
+dialog label.ck{display:flex;align-items:center;gap:8px;margin:0;padding:5px 0;font-size:14px;color:var(--fg);cursor:pointer}
+dialog label.ck input{width:16px;height:16px;flex:none;padding:0;accent-color:var(--blue)}
+dialog label.ck span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+dialog label.ck em{font-style:normal;color:var(--muted);font-size:12px}
+.lsel{background:var(--panel);border:1px solid var(--line2);border-radius:6px;padding:6px 8px;font-size:13px;font-weight:600;max-width:220px}
 dialog .err{color:var(--down);font-size:14px;margin:8px 0 0}
 .ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 
@@ -294,7 +303,8 @@ tbody tr{cursor:pointer}tbody tr:hover td{background:var(--panel2)}
           <span class="lab" id="capLab">Leads per day</span>
           <span class="groups" id="barKeys">
           <button type="button" class="key" data-k="leads" aria-pressed="true"><i style="background:var(--up)"></i>Leads</button></span>
-          <div class="seg" id="segStripKind" role="group" aria-label="Which leads" hidden></div></div>
+          <div class="seg" id="segStripKind" role="group" aria-label="Which leads" hidden></div>
+          <select id="leadSrc" class="lsel" aria-label="Lead source" hidden></select></div>
         <div class="bars" id="bars"></div>
         <div class="strip" id="strip" hidden></div>
       </div>
@@ -338,7 +348,7 @@ tbody tr{cursor:pointer}tbody tr:hover td{background:var(--panel2)}
   <div class="toast" id="toast" role="status" hidden></div>
   <p class="foot">Read only: this page shows numbers and can never start, pause or change an ad. Seen = times your ads were shown. Taps = taps on the ad's link. Leads = forms filled in, as counted by Meta. Spend is before tax; the card charge adds 13% HST. Lead cards are your newest Follow Up Boss leads from the last 30 days.</p>
   <dialog id="pinDlg"><form method="dialog" id="pinForm"><h2>Host only</h2><input id="pinIn" inputmode="numeric" type="password" autocomplete="off" aria-label="PIN" placeholder="PIN"><p class="err" id="pinErr" hidden>Wrong PIN</p><div class="row"><button type="submit">Continue</button></div></form></dialog>
-  <dialog id="setDlg"><form method="dialog" id="setForm"><h2>Your numbers</h2><label for="setBud">Monthly ad budget, before tax ($). Leave empty to use the budgets set in Meta</label><input id="setBud" inputmode="numeric" type="text" autocomplete="off"><label for="setLim">Cost per lead limit ($). Leave empty for none</label><input id="setLim" inputmode="numeric" type="text" autocomplete="off"><div class="row"><button type="button" class="ghost" id="setCancel">Cancel</button><button type="submit">Save</button></div></form></dialog>
+  <dialog id="setDlg"><form method="dialog" id="setForm"><h2>Your numbers</h2><label for="setBud">Monthly ad budget, before tax ($). Leave empty to use the budgets set in Meta</label><input id="setBud" inputmode="numeric" type="text" autocomplete="off"><label for="setLim">Cost per lead limit ($). Leave empty for none</label><input id="setLim" inputmode="numeric" type="text" autocomplete="off"><h3>Leads shown here</h3><p class="dh">A lead shows if its source is ticked. Untick a source (like Realtor.ca) to leave those leads out.</p><div class="chk" id="setSrc"></div><p class="dh">Tags that always bring a lead in, even from an unticked source.</p><div class="chk" id="setTag"></div><div class="row"><button type="button" class="ghost" id="setCancel">Cancel</button><button type="submit">Save</button></div></form></dialog>
 </main>
 
 <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
@@ -361,7 +371,7 @@ tbody tr{cursor:pointer}tbody tr:hover td{background:var(--panel2)}
   var N = 400, TAX = 0.13, LIMIT = 0, BUDGET = 0, MYBUD = 0, MB = null;
 
   // filled by ingest() from the Worker: ads + their daily numbers (Meta) and the newest leads (Follow Up Boss)
-  var CAMPS = [], SRC = {}, ADS = [], LEADS = [], ALL = [], META = { connected: false }, FUBAPP = 'https://app.followupboss.com';
+  var CAMPS = [], SRC = {}, ADS = [], LEADS = [], ALL = [], SRCOFF = [], TAGSON = [], META = { connected: false }, FUBAPP = 'https://app.followupboss.com';
   var API = /^(localhost|127\.0\.0\.1)$/.test(location.hostname) ? 'http://localhost:8787' : 'https://soldmike-listings.broker-e2c.workers.dev';
   function store(k, v) { try { if (v === undefined) return JSON.parse(localStorage.getItem(k) || 'null'); localStorage.setItem(k, JSON.stringify(v)); } catch (e) { return null; } }
   function api(path, opt) { opt = opt || {}; opt.headers = Object.assign({ 'X-OH-Pin': store('sm_oh_pin') || '', 'Content-Type': 'application/json' }, opt.headers || {});
@@ -371,7 +381,7 @@ tbody tr{cursor:pointer}tbody tr:hover td{background:var(--panel2)}
   var srcOf = function (s) { return /facebook|instagram|meta|\bfb\b|\big\b/i.test(s) ? 'Meta' : /youtube/i.test(s) ? 'YouTube' : 'Other'; };
   var daysAgo = function (day) { var p = String(day).slice(0, 10).split('-'); return Math.round((TODAY - new Date(+p[0], p[1] - 1, +p[2])) / 864e5); };
   function ingest(j) {
-    META = j.meta || {}; FUBAPP = j.fubApp || FUBAPP; LIMIT = +(j.settings && j.settings.limit) || 0; MYBUD = +(j.settings && j.settings.budget) || 0; MB = j.metaBudget || null; setBudget();
+    META = j.meta || {}; FUBAPP = j.fubApp || FUBAPP; LIMIT = +(j.settings && j.settings.limit) || 0; SRCOFF = (j.settings && j.settings.srcOff) || []; TAGSON = (j.settings && j.settings.tagsOn) || []; MYBUD = +(j.settings && j.settings.budget) || 0; MB = j.metaBudget || null; setBudget();
     var byId = {}, all = (j.ads || []).map(function (a) { var o = { id: a.id, name: a.name || 'Ad', camp: a.camp || 'No campaign', src: a.src || 'Meta', kind: a.kind || 'Photo', st: a.status || 'stp', why: a.why || '', thumb: a.thumb || '', hue: hueOf(a.id), days: [], start: -1, end: N, created: a.created };
       for (var d = 0; d < N; d++) o.days.push(null); byId[a.id] = o; return o; });
     (j.daily || []).forEach(function (r) { var a = byId[r[1]], d = daysAgo(r[0]); if (!a || d < 0 || d >= N) return;
@@ -383,13 +393,13 @@ tbody tr{cursor:pointer}tbody tr:hover td{background:var(--panel2)}
     var now = Date.now();
     LEADS = (j.leads || []).map(function (p) { var w = String(p.name || '').trim().split(/\s+/), t = Date.parse(p.created);
       return { id: p.id, name: p.name, init: ((w[0] || '?')[0] + (w.length > 1 ? w[w.length - 1][0] : '')).toUpperCase(), ad: { name: p.source || 'Unknown', src: srcOf((p.source || '') + ' ' + (p.url || '')) }, mins: isNaN(t) ? 0 : Math.max(0, Math.round((now - t) / 60000)),
-        hue: hueOf(p.name || p.id), phone: p.phone || '—', email: p.email || '—', ans: p.stage || '—', home: p.home || '—', hide: (j.leadState || {})[p.id] || '', status: p.status || 'new', tags: (p.tags || []).join(', ') || '—' }; });
+        hue: hueOf(p.name || p.id), phone: p.phone || '—', email: p.email || '—', ans: p.stage || '—', home: p.home || '—', hide: (j.leadState || {})[p.id] || '', tagList: p.tags || [], status: p.status || 'new', tags: (p.tags || []).join(', ') || '—' }; });
     LEADS.sort(function (a, b) { return a.mins - b.mins; }); ALL = LEADS; regroup();
     if (st.camp !== 'All campaigns' && !(st.camp in SRC)) st.camp = 'All campaigns';
   }
   var RANGES = { today: { t: 'Today', n: 1 }, d7: { t: '7 days', n: 7 }, d30: { t: '30 days', n: 30 }, month: { t: 'This month', n: TODAY.getDate() } };
   var PERIODS = { '1M': { n: 30, wk: false }, '3M': { n: 90, wk: false }, '6M': { n: 26, wk: true }, '1Y': { n: 52, wk: true } };
-  var st = { range: 'd7', src: 'All', camp: 'All campaigns', view: 'spend', period: '3M', candles: true, line: false, lineMode: 'white', focus: 'all', strip: 'bars', stripKind: 'all', tStatus: 'run', tView: 'list', feed: 'alerts', feedAll: false, sel: null, dropMode: 'alerts', show: { leads: true } };
+  var st = { range: 'd7', src: 'All', camp: 'All campaigns', view: 'spend', period: '3M', candles: true, line: false, lineMode: 'white', focus: 'all', strip: 'bars', stripKind: 'all', tStatus: 'run', tView: 'list', feed: 'alerts', feedAll: false, leadSrc: '', sel: null, dropMode: 'alerts', show: { leads: true } };
 
   var pick = function () { return ADS.filter(function (a) { return (st.src === 'All' || a.src === st.src) && (st.camp === 'All campaigns' || a.camp === st.camp); }); };
   function agg(list, from, to) { // days ago, from >= to
@@ -520,7 +530,9 @@ tbody tr{cursor:pointer}tbody tr:hover td{background:var(--panel2)}
   // the clicked lead as one slim row: top of the side panel (in place of the Cost per lead title), bottom of it in full screen,
   // or a small bar at the bottom of the screen when the side panel is off. Never a floating card over the numbers.
   // hidden and trashed leads are left out everywhere except the Hidden view (page only; Follow Up Boss is untouched)
-  function regroup() { LEADS = ALL.filter(function (p) { return !p.hide; }); }
+  // a lead shows if its source is ticked in Settings, or it carries one of the ticked tags
+  function shown(p) { return SRCOFF.indexOf(p.ad.name) < 0 || p.tagList.some(function (g) { return TAGSON.indexOf(g) >= 0; }); }
+  function regroup() { LEADS = ALL.filter(function (p) { return !p.hide && shown(p); }); }
   function setLead(p, state) {
     api('ads/lead', { method: 'POST', body: JSON.stringify({ id: p.id, state: state }) }).then(function () {
       p.hide = state; regroup(); st.sel = null; st.feed = 'alerts'; render();
@@ -528,6 +540,13 @@ tbody tr{cursor:pointer}tbody tr:hover td{background:var(--panel2)}
     }).catch(function (x) { if (x === 'pin') return askPin(); toast('Could not save. Try again.'); });
   }
   var leadBtns = function (p) { return (p.hide === 'h' ? '<button type="button" class="fsb sm" data-lead="">Unhide</button>' : '<button type="button" class="fsb sm" data-lead="h">Hide</button>') + '<button type="button" class="fsb sm" data-lead="t">Trash</button>'; };
+  function tally(get) { var m = {}; ALL.forEach(function (p) { if (p.hide === 't') return; get(p).forEach(function (k) { m[k] = (m[k] || 0) + 1; }); }); return Object.keys(m).sort(function (a, b) { return m[b] - m[a] || a.localeCompare(b); }).map(function (k) { return [k, m[k]]; }); }
+  function leadSrcOpts(on) {
+    var el = $('#leadSrc'); if (!el) return; el.hidden = !on; if (!on) return;
+    var m = {}; LEADS.forEach(function (p) { m[p.ad.name] = (m[p.ad.name] || 0) + 1; });
+    var ks = Object.keys(m).sort(function (a, b) { return m[b] - m[a]; }); if (st.leadSrc && !m[st.leadSrc]) st.leadSrc = '';
+    el.innerHTML = '<option value="">All sources (' + LEADS.length + ')</option>' + ks.map(function (k) { return '<option value="' + esc(k) + '"' + (k === st.leadSrc ? ' selected' : '') + '>' + esc(k) + ' (' + m[k] + ')</option>'; }).join('');
+  }
   function leadBar() {
     var bar = $('#leadBar'), side = document.querySelector('.side'), p = st.sel; if (!bar) return;
     var inSide = !!side && !side.hidden, feedOn = inSide && !$('#newest').hidden, show = !!p && st.feed === 'lead' && !feedOn;
@@ -581,9 +600,9 @@ tbody tr{cursor:pointer}tbody tr:hover td{background:var(--panel2)}
     $('#bars').innerHTML = B.map(function (x) { var h = function (v) { return Math.max(v ? 3 : 1, v / mx * 100).toFixed(1) + '%'; };
       return '<div class="g" title="' + esc(x.label) + ': ' + x.leads + ' leads, ' + money(x.spend) + ' spent">' + KEYS.map(function (k) { return '<span style="height:' + h(x[k[0]]) + ';background:var(' + k[1] + ')"></span>'; }).join('') + '</div>'; }).join('');
     var listMode = st.strip === 'list', stripEl = $('#strip');
-    $('#bars').hidden = listMode; stripEl.hidden = !listMode; $('#barKeys').hidden = listMode; $('#segStripKind').hidden = !listMode;
+    $('#bars').hidden = listMode; stripEl.hidden = !listMode; $('#barKeys').hidden = listMode; $('#segStripKind').hidden = !listMode; leadSrcOpts(listMode);
     $('#capLab').textContent = listMode ? 'Newest Follow Up Boss leads first' : P.wk ? 'Leads per week' : 'Leads per day';
-    var ppl = st.stripKind === 'hid' ? ALL.filter(function (p) { return p.hide === 'h'; }) : LEADS.filter(function (p) { return (st.src === 'All' || p.ad.src === st.src) && (st.stripKind === 'all' || p.status === st.stripKind); });
+    var ppl = st.stripKind === 'hid' ? ALL.filter(function (p) { return p.hide === 'h'; }) : LEADS.filter(function (p) { return (st.src === 'All' || p.ad.src === st.src) && (st.stripKind === 'all' || p.status === st.stripKind) && (!st.leadSrc || p.ad.name === st.leadSrc); });
     stripEl.innerHTML = ppl.length ? ppl.slice(0, 40).map(leadCard).join('') : '<p class="hint">' + (st.stripKind === 'hid' ? 'No hidden leads.' : 'No new leads like this in Follow Up Boss in the last 30 days.') + '</p>';
     stripEl.classList.toggle('wrap', st.focus === 'bars');
     renderFeed();
@@ -645,6 +664,7 @@ tbody tr{cursor:pointer}tbody tr:hover td{background:var(--panel2)}
   seg('#segPeriod', Object.keys(PERIODS), 'period');
   seg('#segLine', [{ v: 'white', t: 'White' }, { v: 'trend', t: 'Better / worse' }], 'lineMode');
   seg('#segStrip', [{ v: 'bars', t: 'Bars' }, { v: 'list', t: 'Lead cards' }], 'strip');
+  $('#leadSrc').onchange = function () { st.leadSrc = this.value; render(); };
   seg('#segStripKind', [{ v: 'all', t: 'All' }, { v: 'new', t: 'New' }, { v: 'con', t: 'Contacted' }, { v: 'apt', t: 'Appointment' }, { v: 'hid', t: 'Hidden' }], 'stripKind');
   seg('#segStatus', [{ v: 'run', t: 'Running' }, { v: 'pau', t: 'Paused' }, { v: 'stp', t: 'Stopped' }, { v: 'all', t: 'All' }], 'tStatus');
   seg('#segTView', [{ v: 'list', t: 'List' }, { v: 'photos', t: 'Pictures' }], 'tView');
@@ -668,10 +688,20 @@ tbody tr{cursor:pointer}tbody tr:hover td{background:var(--panel2)}
   // budget: his own number if he typed one, else what Meta has (today's daily budgets x days in the month)
   function setBudget() { var dim = new Date(TODAY.getFullYear(), TODAY.getMonth() + 1, 0).getDate(); BUDGET = MYBUD || (MB && MB.daily ? Math.round(MB.daily * dim) : 0); }
   // settings: his monthly budget and cost-per-lead limit
-  $('#setBtn').onclick = function () { $('#setBud').value = MYBUD || ''; $('#setLim').value = LIMIT || ''; $('#setDlg').showModal(); };
+  $('#setBtn').onclick = function () { $('#setBud').value = MYBUD || ''; $('#setLim').value = LIMIT || '';
+    var box = function (kind, k, n, on) { return '<label class="ck"><input type="checkbox" data-' + kind + '="' + esc(k) + '"' + (on ? ' checked' : '') + '><span>' + esc(k) + '</span><em>' + n + '</em></label>'; };
+    var srcs = tally(function (p) { return [p.ad.name]; }), tags = tally(function (p) { return p.tagList; });
+    $('#setSrc').innerHTML = srcs.map(function (x) { return box('src', x[0], x[1], SRCOFF.indexOf(x[0]) < 0); }).join('') || '<p class="dh">No leads in the last 30 days.</p>';
+    TAGSON.forEach(function (g) { if (!tags.some(function (x) { return x[0] === g; })) tags.push([g, 0]); });
+    $('#setTag').innerHTML = tags.map(function (x) { return box('tag', x[0], x[1], TAGSON.indexOf(x[0]) >= 0); }).join('') || '<p class="dh">No tags on these leads.</p>';
+    $('#setDlg').showModal(); };
   $('#setCancel').onclick = function () { $('#setDlg').close(); };
   $('#setForm').onsubmit = function (e) { e.preventDefault(); var b = +String($('#setBud').value).replace(/[^0-9.]/g, ''), l = +String($('#setLim').value).replace(/[^0-9.]/g, '');
-    api('ads/settings', { method: 'POST', body: JSON.stringify({ budget: b, limit: l }) }).then(function (j) { MYBUD = j.settings.budget; LIMIT = j.settings.limit; setBudget(); $('#setDlg').close(); render(); toast('Saved.'); }).catch(function (x) { if (x === 'pin') return askPin(); toast('Could not save. Try again.'); }); };
+    var pick = function (sel, attr, want) { return Array.prototype.filter.call(document.querySelectorAll(sel), function (c) { return c.checked === want; }).map(function (c) { return c.getAttribute(attr); }); };
+    // sources unticked now, plus ones unticked before that have no lead in the last 30 days (so they stay off)
+    var seen = Array.prototype.map.call(document.querySelectorAll('#setSrc input'), function (c) { return c.getAttribute('data-src'); });
+    var off = pick('#setSrc input', 'data-src', false).concat(SRCOFF.filter(function (k) { return seen.indexOf(k) < 0; }));
+    api('ads/settings', { method: 'POST', body: JSON.stringify({ budget: b, limit: l, srcOff: off, tagsOn: pick('#setTag input', 'data-tag', true) }) }).then(function (j) { MYBUD = j.settings.budget; LIMIT = j.settings.limit; SRCOFF = j.settings.srcOff || []; TAGSON = j.settings.tagsOn || []; regroup(); st.sel = null; setBudget(); $('#setDlg').close(); render(); toast('Saved.'); }).catch(function (x) { if (x === 'pin') return askPin(); toast('Could not save. Try again.'); }); };
   // the Meta tag: click = pull from Meta now (read only), then reload the numbers
   $('#syncTag').onclick = function () { if (!META.connected) return toast('Meta isn’t connected yet.'); var t = this; t.textContent = 'Updating…';
     api('ads/sync', { method: 'POST', body: '{}' }).then(function () { return load(); }).catch(function () { toast('Could not update. Try again.'); render(); }); };
