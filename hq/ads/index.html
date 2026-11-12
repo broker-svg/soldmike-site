@@ -219,6 +219,19 @@ tbody tr{cursor:pointer}tbody tr:hover td{background:var(--panel2)}
 .tbl .thead h2{color:var(--fg);font-size:13px}
 .sect>.panel.tbl>.pad:first-child{padding-block:12px}
 .tot td{font-weight:600;background:var(--panel2)}
+.leadbar{display:flex;align-items:center;gap:10px;padding:10px 12px 10px 20px;border-bottom:1px solid var(--line);min-width:0}
+.leadbar[hidden]{display:none}
+.leadbar .av{width:32px;height:32px;font-size:13px}
+.leadbar .who{min-width:0;flex:1}
+.leadbar .who b{display:block;font:600 14px/1.25 var(--ui);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.leadbar .who span{display:block;color:var(--soft);font-size:12px;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.leadbar .go{flex:none;color:#fff;background:var(--blue);border-color:var(--blue)}
+.leadbar .x{flex:none;background:none;border:0;color:var(--muted);font-size:20px;line-height:1;padding:6px 8px;cursor:pointer}
+.leadbar .x:hover{color:var(--fg)}
+.side.haslead #cplHead{display:none}
+:root:fullscreen .side .leadbar{order:9;margin-top:auto;border-bottom:0;border-top:1px solid var(--line)}
+:root:fullscreen .side.haslead #cplHead{display:block}
+.leadbar.float{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(18px + env(safe-area-inset-bottom,0px));width:min(460px,calc(100vw - 32px));background:var(--panel);border:1px solid var(--line2);border-radius:6px;z-index:30;box-shadow:0 14px 34px rgba(0,0,0,.5)}
 .toast{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);font-weight:600;font-size:14px;padding:10px 16px;border-radius:6px;z-index:40;box-shadow:0 10px 30px rgba(0,0,0,.5)}
 .foot{color:var(--muted);font-size:13px;margin:18px 0 0;max-width:90ch}
 .miss{padding:40px 20px;color:var(--soft)}
@@ -286,6 +299,7 @@ tbody tr{cursor:pointer}tbody tr:hover td{background:var(--panel2)}
     </section>
 
     <aside class="panel side">
+      <div class="leadbar" id="leadBar" hidden></div>
       <div class="pad mult">
         <h2 id="cplHead">Cost per lead</h2>
         <div class="now"><b id="mNow"></b><span class="chg" id="mChg"></span></div>
@@ -447,7 +461,8 @@ tbody tr{cursor:pointer}tbody tr:hover td{background:var(--panel2)}
   function fitBars() { requestAnimationFrame(function () { try { $('#bars').style.marginRight = chart.priceScale('right').width() + 'px'; } catch (e) {} }); }
   window.addEventListener('resize', function () { if (chart) { fitBars(); chart.timeScale().fitContent(); } });
   // chart + bars always fit on one screen; the side panel ends on the same line as the chart panel
-  function fitScreen() {
+  function fitScreen() { fitScreen0(); leadBar(); }
+  function fitScreen0() {
     var c = $('#chart'), v = document.querySelector('.vol'), bars = $('#bars'); if (!c || !v || !c.getBoundingClientRect) return;
     var side = document.querySelector('.side'), left = c.parentNode, two = window.innerWidth > 1040 && st.focus === 'all', nw = $('#newest');
     if (nw) nw.hidden = true;
@@ -498,11 +513,23 @@ tbody tr{cursor:pointer}tbody tr:hover td{background:var(--panel2)}
     $('#drop').innerHTML = st.dropMode === 'lead' ? leadHtml(st.sel) : ALERTS.join(''); $('#bellN').textContent = ALERTS.length;
     Array.prototype.forEach.call($('#segFeed').children || [], function (b) { b.setAttribute('aria-pressed', String(b.dataset.v === st.feed)); });
     Array.prototype.forEach.call(document.querySelectorAll('.lc[data-i]'), function (c) { c.setAttribute('aria-current', String(REG[+c.dataset.i] === st.sel)); });
+    leadBar();
+  }
+  // the clicked lead as one slim row: top of the side panel (in place of the Cost per lead title), bottom of it in full screen,
+  // or a small bar at the bottom of the screen when the side panel is off. Never a floating card over the numbers.
+  function leadBar() {
+    var bar = $('#leadBar'), side = document.querySelector('.side'), p = st.sel; if (!bar) return;
+    var inSide = !!side && !side.hidden, feedOn = inSide && !$('#newest').hidden, show = !!p && st.feed === 'lead' && !feedOn;
+    if (side) side.classList.toggle('haslead', show && inSide);
+    if (!show) { bar.hidden = true; return; }
+    if (inSide) { if (bar.parentNode !== side) side.insertBefore(bar, side.firstChild); } else if (bar.parentNode !== document.body) document.body.appendChild(bar);
+    bar.classList.toggle('float', !inSide);
+    bar.innerHTML = '<span class="av" style="--h:' + p.hue + '">' + esc(p.init) + '</span><div class="who"><b>' + esc(p.name) + '</b><span>' + SNAME[p.status] + ' · came in ' + when(p.mins) + '</span></div><button type="button" class="fsb sm go" data-open="1">Open in FUB</button><button type="button" class="x" data-leadx="1" aria-label="Close">×</button>';
+    bar.hidden = false;
   }
   function showLead(p) {
     st.sel = p; st.feed = 'lead'; var hiddenSide = $('#newest').hidden || document.querySelector('.side').hidden;
-    st.dropMode = hiddenSide ? 'lead' : 'alerts'; renderFeed();
-    if (hiddenSide) { $('#drop').hidden = false; $('#bell').setAttribute('aria-expanded', 'true'); }
+    st.dropMode = 'alerts'; $('#drop').hidden = true; $('#bell').setAttribute('aria-expanded', 'false'); renderFeed();
   }
   var toastT = 0;
   function toast(s) { var t = $('#toast'); t.textContent = s; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(function () { t.hidden = true; }, 2600); }
@@ -618,7 +645,7 @@ tbody tr{cursor:pointer}tbody tr:hover td{background:var(--panel2)}
   $('#bell').onclick = function () { var d = $('#drop'), was = st.dropMode; st.dropMode = 'alerts'; renderFeed(); d.hidden = was === 'alerts' ? !d.hidden : false; this.setAttribute('aria-expanded', String(!d.hidden)); };
   // one click on a lead card shows their contact details; double-click (or the button) opens them in Follow Up Boss
   var openFub = function (p) { p = p || st.sel; if (p && p.id) window.open(FUBAPP + '/2/people/view/' + p.id, '_blank', 'noopener'); };
-  document.addEventListener('click', function (e) { var t = e.target; if (!t || !t.closest) return; if (t.closest('[data-open]')) return openFub(st.sel);
+  document.addEventListener('click', function (e) { var t = e.target; if (!t || !t.closest) return; if (t.closest('[data-leadx]')) { st.sel = null; st.feed = 'alerts'; renderFeed(); return; } if (t.closest('[data-open]')) return openFub(st.sel);
     var c = t.closest('[data-i]'); if (c && REG[+c.dataset.i]) return showLead(REG[+c.dataset.i]);
     var a = t.closest('[data-ad]'); if (a) { var ad = ADS[+a.dataset.ad]; st.camp = ad.camp; render(); toast('Chart now shows ' + ad.camp + '.'); window.scrollTo({ top: 0, behavior: 'smooth' }); } });
   document.addEventListener('dblclick', function (e) { var t = e.target; var c = t && t.closest && t.closest('[data-i]'); if (c && REG[+c.dataset.i]) openFub(REG[+c.dataset.i]); });
