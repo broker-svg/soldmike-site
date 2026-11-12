@@ -237,6 +237,12 @@ tbody tr{cursor:pointer}tbody tr:hover td{background:var(--panel2)}
 .leadbar .go{flex:none;color:#fff;background:var(--blue);border-color:var(--blue)}
 .leadbar .fsb.sm{flex:none;padding:5px 8px;font-size:12px}
 .ag .acts{display:flex;gap:6px;margin-top:8px}.ag .acts .fsb{color:var(--soft);background:none;border-color:var(--line2)}
+.leadbar .proj{display:none}
+:root:fullscreen .side .leadbar{flex-wrap:wrap;padding-top:14px}
+:root:fullscreen .side .leadbar .proj{display:block;flex:0 0 100%;min-width:0;margin-bottom:10px;padding-bottom:12px;border-bottom:1px solid var(--line)}
+.leadbar .proj small{display:block;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.08em}
+.leadbar .proj b{display:block;font:700 20px/1.25 var(--ui);margin-top:3px}
+.leadbar .proj span{display:block;color:var(--soft);font-size:13px;margin-top:4px;overflow-wrap:anywhere}
 .leadbar .x{flex:none;background:none;border:0;color:var(--muted);font-size:20px;line-height:1;padding:6px 8px;cursor:pointer}
 .leadbar .x:hover{color:var(--fg)}
 .side.haslead #cplHead{display:none}
@@ -498,7 +504,7 @@ tbody tr{cursor:pointer}tbody tr:hover td{background:var(--panel2)}
   function leadHtml(p) {
     if (!p) return '<p class="hint">Click any lead card to see their contact details. Double-click opens them in Follow Up Boss.</p>';
     return '<div class="ag"><div class="hd"><span class="av" style="--h:' + p.hue + '">' + esc(p.init) + '</span><div><b>' + esc(p.name) + '</b><span>' + SNAME[p.status] + ' · ' + (p.existing ? 'existing contact' : 'came in ' + when(p.mins)) + '</span></div><button type="button" class="fsb sm" data-open="1">Open in FUB</button></div><div class="acts">' + leadBtns(p) + '</div>' +
-      '<dl><div><dt>Phone</dt><dd class="n">' + esc(p.phone) + '</dd></div><div><dt>Email</dt><dd class="em">' + esc(p.email) + '</dd></div><div><dt>Came from</dt><dd>' + esc(p.ad.name) + '</dd></div><div><dt>Stage in FUB</dt><dd>' + esc(p.ans) + '</dd></div><div><dt>Tags</dt><dd>' + esc(p.tags) + '</dd></div><div><dt>Address</dt><dd>' + esc(p.home) + '</dd></div></dl></div>';
+      '<dl><div><dt>Phone</dt><dd class="n">' + esc(p.phone) + '</dd></div><div><dt>Email</dt><dd class="em">' + esc(p.email) + '</dd></div><div><dt>Came from</dt><dd>' + esc(p.ad.name) + '</dd></div><div><dt>Looking at</dt><dd>' + esc(projectsOf(p).join(' + ') || '—') + '</dd></div><div><dt>Stage in FUB</dt><dd>' + esc(p.ans) + '</dd></div><div><dt>Tags</dt><dd>' + esc(p.tags) + '</dd></div><div><dt>Address</dt><dd>' + esc(p.home) + '</dd></div></dl></div>';
   }
   function alerts() {
     var al = function (k, t, d) { return '<div class="al"><i class="' + k + '"></i><div><b>' + esc(t) + '</b><span>' + esc(d) + '</span></div></div>'; }, out = [];
@@ -548,6 +554,13 @@ tbody tr{cursor:pointer}tbody tr:hover td{background:var(--panel2)}
     var ks = Object.keys(m).sort(function (a, b) { return m[b] - m[a]; }); if (st.leadSrc && !m[st.leadSrc]) st.leadSrc = '';
     el.innerHTML = '<option value="">All sources (' + LEADS.length + ')</option>' + ks.map(function (k) { return '<option value="' + esc(k) + '"' + (k === st.leadSrc ? ' selected' : '') + '>' + esc(k) + ' (' + m[k] + ')</option>'; }).join('');
   }
+  function projectsOf(p) {
+    var known = {}, strip = function (s) { return / VIP$/.test(s) ? s.replace(/ VIP$/, '') : ''; };
+    ALL.forEach(function (q) { var a = strip(q.ad.name); if (a) known[a] = 1; q.tagList.forEach(function (g) { var b = strip(g); if (b) known[b] = 1; }); });
+    var out = [], own = strip(p.ad.name); if (own) out.push(own);
+    p.tagList.forEach(function (g) { if (known[g] && out.indexOf(g) < 0) out.push(g); });
+    return out;
+  }
   function leadBar() {
     var bar = $('#leadBar'), side = document.querySelector('.side'), p = st.sel; if (!bar) return;
     var inSide = !!side && !side.hidden, feedOn = inSide && !$('#newest').hidden, show = !!p && st.feed === 'lead' && !feedOn;
@@ -555,7 +568,8 @@ tbody tr{cursor:pointer}tbody tr:hover td{background:var(--panel2)}
     if (!show) { bar.hidden = true; return; }
     if (inSide) { if (bar.parentNode !== side) side.insertBefore(bar, side.firstChild); } else if (bar.parentNode !== document.body) document.body.appendChild(bar);
     bar.classList.toggle('float', !inSide);
-    bar.innerHTML = '<div class="who"><b>' + esc(p.name) + '</b><span>' + SNAME[p.status] + (p.paid ? ' · Paid ad' : '') + ' · ' + (p.existing ? 'existing contact' : 'came in ' + when(p.mins)) + '</span></div><button type="button" class="fsb sm go" data-open="1">Open in FUB</button>' + leadBtns(p) + '<button type="button" class="x" data-leadx="1" aria-label="Close">×</button>';
+    var pj = projectsOf(p);
+    bar.innerHTML = '<div class="proj"><small>Looking at</small><b>' + esc(pj.join(' + ') || 'No project tag') + '</b>' + (p.paid ? '<span>From a paid ad' + (p.adCamp ? ': ' + esc(p.adCamp) : '') + '</span>' : '<span>Source: ' + esc(p.ad.name) + '</span>') + '</div><div class="who"><b>' + esc(p.name) + '</b><span>' + SNAME[p.status] + (p.paid ? ' · Paid ad' : '') + ' · ' + (p.existing ? 'existing contact' : 'came in ' + when(p.mins)) + '</span></div><button type="button" class="fsb sm go" data-open="1">Open in FUB</button>' + leadBtns(p) + '<button type="button" class="x" data-leadx="1" aria-label="Close">×</button>';
     bar.hidden = false;
   }
   function showLead(p) {
