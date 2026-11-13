@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="en-CA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Leads (mockup) | SoldMike HQ</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#1D2870">
+<link rel="icon" href="/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600&display=swap">
+<style>
+/* HQ › Leads MOCKUP (Nov 13, 2026). Made-up leads only: no real lead data, no API calls.
+   Layout follows a CRM "People list + person page" workflow, in SoldMike's own look.
+   Wiring plan: 2nd Brain/Systems/HQ Leads.md */
+:root{--navy:#1D2870;--navy2:#26338A;--ink:#141833;--red:#D7141E;--mist:#F7F8FB;--line:#DCE0EC;--muted:#545B78;--pale:#C9D0F2;--green:#1B7A3E;--amber:#9A5B00;
+  --display:'Barlow Condensed','Arial Narrow',system-ui,sans-serif;--body:'Barlow',system-ui,-apple-system,'Segoe UI',sans-serif;color-scheme:light}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:var(--mist);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.45;-webkit-tap-highlight-color:transparent}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--red);outline-offset:2px}
+[hidden]{display:none!important}
+h1,h2,h3{font-family:var(--display);font-weight:800;text-transform:uppercase;line-height:.95;margin:0}
+a{color:var(--navy)}
+.muted{color:var(--muted)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 18px;border:0;border-radius:10px;background:var(--red);color:#fff;font-weight:600;font-size:16px;cursor:pointer;text-decoration:none;white-space:nowrap}
+.btn.navy{background:var(--navy)}
+.btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--line)}
+.chip{display:inline-flex;align-items:center;gap:4px;font-size:13px;font-weight:600;padding:2px 9px;border-radius:20px;background:var(--mist);border:1px solid var(--line);color:var(--muted);white-space:nowrap}
+.chip.red{background:#FDECEC;border-color:#F3C2C4;color:var(--red)}
+.chip.green{background:#E7F4EC;border-color:#B9DEC6;color:var(--green)}
+.chip.navy{background:#E9ECFA;border-color:var(--pale);color:var(--navy)}
+.chip.amber{background:#FFF4E0;border-color:#F1D39C;color:var(--amber)}
+
+/* top bar + HQ tabs (same as HQ) */
+.bar{background:var(--navy);color:#fff;padding:calc(12px + env(safe-area-inset-top,0px)) 16px 12px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px}
+.bar>:last-child{justify-self:end}
+.bar img{height:42px;width:auto;display:block}
+.bar b{font-family:var(--display);font-size:24px;text-transform:uppercase;letter-spacing:.04em}
+.bar a.lnk{border:1px solid #4A5592;color:#fff;border-radius:8px;min-height:40px;padding:0 14px;font-size:15px;display:inline-flex;align-items:center;text-decoration:none}
+.dtabs{background:var(--navy2);border-top:1px solid #3A4799}
+.dtabs nav{max-width:1440px;margin:0 auto;display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;padding:0 12px}
+.dtabs nav::-webkit-scrollbar{display:none}
+.dtabs a{flex:none;display:inline-flex;align-items:center;min-height:52px;padding:0 16px;color:var(--pale);text-decoration:none;font-family:var(--display);font-weight:700;font-size:21px;text-transform:uppercase;letter-spacing:.04em;border-bottom:4px solid transparent}
+.dtabs a[aria-current="page"]{color:#fff;border-bottom-color:var(--red)}
+.mock{background:#FFF4E0;border-bottom:1px solid #F1D39C;color:var(--amber);font-size:15px;font-weight:600;padding:8px 16px;text-align:center}
+@media (max-width:780px){.bar b{display:none}.bar{grid-template-columns:auto 1fr}}
+
+.wrap{max-width:1440px;margin:0 auto;padding:18px 16px 60px}
+
+/* ===== list ===== */
+.lhd{display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.lhd h1{font-size:40px;flex:1}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:14px}
+.stat{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 14px}
+.stat b{display:block;font-family:var(--display);font-size:32px;line-height:1;font-variant-numeric:tabular-nums}
+.stat span{color:var(--muted);font-size:14px}
+@media (max-width:560px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.lhd h1{font-size:34px}}
+.tools{display:flex;flex-direction:column;gap:10px;margin-bottom:12px}
+.search{width:100%;min-height:52px;border:1px solid var(--line);border-radius:10px;padding:0 16px;background:#fff;font-size:18px}
+.filters{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.filters::-webkit-scrollbar{display:none}
+.filters select,.fbtn{flex:none;min-height:40px;padding:0 14px;border-radius:20px;border:1px solid var(--line);background:#fff;font-weight:600;font-size:15px;cursor:pointer}
+.fbtn[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:#fff}
+.count{font-size:15px;color:var(--muted);margin:0 0 8px}
+
+/* table (desktop) */
+.tbl{width:100%;border-collapse:separate;border-spacing:0;background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden;font-size:15px}
+.tbl th{font-family:var(--display);text-transform:uppercase;font-size:15px;letter-spacing:.03em;text-align:left;color:var(--muted);padding:10px 12px;background:var(--mist);border-bottom:1px solid var(--line);white-space:nowrap}
+.tbl td{padding:12px;border-bottom:1px solid var(--line);vertical-align:middle}
+.tbl tr:last-child td{border-bottom:0}
+.tbl tbody tr{cursor:pointer}
+.tbl tbody tr:hover td{background:#F1F3FB}
+.tbl .nm b{display:block;font-size:16px}
+.tbl .nm small{color:var(--muted)}
+.tbl .num{font-variant-numeric:tabular-nums;white-space:nowrap}
+.av{width:38px;height:38px;border-radius:50%;background:var(--pale);color:var(--navy);font-weight:700;display:inline-flex;align-items:center;justify-content:center;flex:none;font-size:15px}
+.who{display:flex;gap:10px;align-items:center}
+.dot{width:9px;height:9px;border-radius:50%;display:inline-block;background:var(--line)}
+.dot.on{background:var(--green)}
+/* cards (phone) */
+.cards{display:none;flex-direction:column;gap:10px}
+.lc{display:grid;grid-template-columns:auto 1fr auto;gap:2px 12px;align-items:start;padding:14px;border:1px solid var(--line);border-radius:14px;background:#fff;width:100%;text-align:left;cursor:pointer}
+.lc .av{grid-row:span 2}
+.lc b{font-size:18px}
+.lc .when{color:var(--muted);font-size:14px;white-space:nowrap}
+.lc .last{grid-column:2/-1;color:var(--muted);font-size:15px}
+.lc .chips{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+@media (max-width:900px){.tbl{display:none}.cards{display:flex}}
+
+/* ===== person page ===== */
+.back{background:none;border:0;color:var(--navy);font-weight:600;font-size:16px;cursor:pointer;padding:0;margin-bottom:12px;display:inline-flex;gap:6px;align-items:center;min-height:40px}
+.phd{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px;display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin-bottom:16px}
+.phd .av{width:64px;height:64px;font-size:24px}
+.phd .id{flex:1;min-width:220px}
+.phd h1{font-size:38px}
+.phd .sub{color:var(--muted);font-size:15px;margin-top:4px}
+.phd .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.acts{display:flex;flex-wrap:wrap;gap:8px}
+.cols{display:grid;grid-template-columns:300px minmax(0,1fr) 330px;gap:16px;align-items:start}
+.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px;min-width:0}
+.card+.card{margin-top:16px}
+.card h3{font-size:22px;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.card h3 .n{font-family:var(--body);font-size:13px;font-weight:600;color:var(--muted);text-transform:none}
+.kv{display:grid;grid-template-columns:110px 1fr;gap:8px 10px;font-size:15px}
+.kv dt{color:var(--muted)}
+.kv dd{margin:0;overflow-wrap:anywhere}
+.ptabs{display:none;gap:6px;margin-bottom:12px;position:sticky;top:0;z-index:3;background:var(--mist);padding:8px 0}
+.ptabs button{flex:1;min-height:42px;border-radius:21px;border:1px solid var(--line);background:#fff;font-weight:600;font-size:15px;cursor:pointer}
+.ptabs button[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:#fff}
+@media (max-width:1180px){.cols{grid-template-columns:280px minmax(0,1fr)}.cols .right{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:16px}.cols .right .card+.card{margin-top:0}}
+@media (max-width:780px){
+  .cols{grid-template-columns:minmax(0,1fr)}.cols .right{display:block}.cols .right .card+.card{margin-top:16px}
+  .ptabs{display:flex}
+  .cols>[data-pane]{display:none}.cols>[data-pane].show{display:block}
+  .phd h1{font-size:32px}.acts{width:100%}.acts .btn{flex:1 1 40%}
+}
+/* timeline */
+.tfil{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-bottom:6px}
+.tfil::-webkit-scrollbar{display:none}
+.tfil button{flex:none;min-height:34px;padding:0 12px;border-radius:17px;border:1px solid var(--line);background:#fff;font-size:14px;font-weight:600;cursor:pointer}
+.tfil button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
+.note{display:flex;gap:8px;margin-bottom:10px}
+.note input{flex:1;min-width:0;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:0 12px;font-size:16px}
+.tl{list-style:none;margin:0;padding:0}
+.tl li{display:grid;grid-template-columns:34px 1fr;gap:10px;padding:12px 0;border-top:1px solid var(--line)}
+.tl li:first-child{border-top:0}
+.ic{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;background:var(--mist);border:1px solid var(--line)}
+.ic.view{background:#E9ECFA;border-color:var(--pale)}
+.ic.save{background:#FDECEC;border-color:#F3C2C4}
+.ic.inquiry{background:#FFF4E0;border-color:#F1D39C}
+.ic.openhouse{background:#E7F4EC;border-color:#B9DEC6}
+.ic.alert{background:#EEF0F5}
+.tl b{font-size:15px}
+.tl .what{font-size:15px}
+.tl .t{color:var(--muted);font-size:13px}
+.tl .q{margin-top:4px;padding:8px 10px;background:var(--mist);border-radius:8px;font-size:15px}
+/* saved searches + homes */
+.ss{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--line)}
+.ss:first-of-type{border-top:0}
+.ss b{font-size:15px}
+.ss small{display:block;color:var(--muted);font-size:13px}
+.tog{min-height:38px;min-width:58px;padding:0 12px;border-radius:19px;border:1px solid var(--line);background:#fff;font-weight:600;cursor:pointer;flex:none;font-size:14px}
+.tog[aria-pressed="true"]{background:var(--green);border-color:var(--green);color:#fff}
+.home{display:grid;grid-template-columns:64px 1fr;gap:10px;padding:10px 0;border-top:1px solid var(--line);font-size:15px}
+.home:first-of-type{border-top:0}
+.ph{width:64px;height:48px;border-radius:8px;background:linear-gradient(135deg,#C9D0F2,#8E9AD6)}
+.home small{display:block;color:var(--muted);font-size:13px}
+.vow{display:flex;gap:10px;align-items:center;padding:12px;border-radius:12px;background:var(--mist);border:1px solid var(--line);font-size:15px}
+.vow.on{background:#E7F4EC;border-color:#B9DEC6}
+.foot{font-size:14px;color:var(--muted);margin-top:18px}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:12px 18px;border-radius:10px;font-size:15px;box-shadow:0 10px 30px rgba(0,0,0,.25);z-index:10;max-width:calc(100vw - 32px)}
+</style>
+</head>
+<body>
+<div class="bar">
+  <a href="/hq/" aria-label="HQ"><img src="/logo-soldmike-white.png" alt="SoldMike"></a>
+  <b>Leads</b>
+  <a class="lnk" href="/hq/">Back to HQ</a>
+</div>
+<div class="dtabs"><nav aria-label="Dashboards"><a href="/hq/tasks/">Tasks</a><a href="/hq/">HQ</a><a href="/hq/agents/#realestate">Real Estate</a><a href="/hq/agents/#marketing">Marketing</a><a href="/hq/agents/#toolkit">Toolkit</a><a href="/hq/agents/#personal">Personal</a><a href="/hq/agents/#financial">Financial</a><a href="/hq/agents/#tpm">TPM</a><a href="/open-house/">Open House</a><a href="/hq/leads/" aria-current="page">Leads</a><a href="/hq/ads/" target="_blank" rel="noopener">Ads</a><a href="/vow/realview" target="_blank" rel="noopener">RealView</a></nav></div>
+<div class="mock">MOCKUP · made-up people and homes · buttons don't change anything</div>
+<main class="wrap" id="app"></main>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+(function(){
+  // ---------- made-up data (nothing here is a real person or listing) ----------
+  var NOW=Date.now(), H=36e5, D=864e5;
+  function at(ms){return new Date(NOW-ms).toISOString();}
+  var STREETS=['Maple Grove Dr','Birchwood Cres','Harbour Pine Ave','Stoneview Rd','Willowcrest Blvd','Cedar Ridge Way','Orchard Hill Ct','Lakeshore Mews','Foxglove St','Juniper Trail'];
+  var CITIES=['Vaughan','Woodbridge','Maple','Kleinburg','Richmond Hill','King City'];
+  function home(i){return {addr:(12+i*37)%180+' '+STREETS[i%STREETS.length],city:CITIES[i%CITIES.length],price:[1189000,1349900,989000,1625000,849900,2195000,1099000,1478000,764900,1899000][i%10],beds:[3,4,2,4,2,5,3,4,2,5][i%10],mls:'X'+(9100000+i*4137)};}
+  var LEADS=[
+    {id:1,first:'Jordan',last:'Pellegrino',src:'Website sign-in',stage:'Hot buyer',tags:['Searching','Detached'],vow:true,alerts:true,email:'jordan.p@example.com',phone:'(905) 555-0142',seen:20*60e3,created:9*D,price:'$1.2M – $1.5M',areas:'Vaughan, Kleinburg',ss:[['Detached in Kleinburg, 4+ beds, $1.2M–$1.6M',1,6,2*H],['Woodbridge semis under $1.1M',0,3,5*D]],homes:[1,3,5],ev:[['view',20*60e3,3],['save',25*60e3,5],['alert',3*H,null,'Daily alert: 2 new homes for "Detached in Kleinburg"'],['inquiry',1*D,1,'Is the basement finished? Can we see it Saturday?'],['view',1*D+H,1],['signin',9*D,null,'Signed in with Google (VOW account made)']]},
+    {id:2,first:'Priya',last:'Raman',src:'Open house',stage:'New',tags:['Open house'],vow:false,alerts:false,email:'priya.r@example.com',phone:'(416) 555-0187',seen:2*H,created:2*H,price:'',areas:'',ss:[],homes:[],ev:[['openhouse',2*H,2,'Signed in at the open house · Working with an agent: No']]},
+    {id:3,first:'Marco',last:'DeLuca',src:'Listing inquiry',stage:'Nurture',tags:['Seller?'],vow:false,alerts:true,email:'mdeluca@example.com',phone:'(905) 555-0119',seen:5*H,created:21*D,price:'$900K – $1.1M',areas:'Maple',ss:[['Townhouses in Maple under $1M',1,11,5*H]],homes:[8],ev:[['alert',5*H,null,'Daily alert: 1 new home for "Townhouses in Maple"'],['view',6*D,8],['inquiry',21*D,4,'What did the one on Foxglove sell for?']]},
+    {id:4,first:'Alicia',last:'Moreau',src:'Mika chat',stage:'Warm',tags:['Condo','First-time buyer'],vow:true,alerts:true,email:'alicia.m@example.com',phone:'',seen:1*D,created:4*D,price:'$650K – $850K',areas:'Vaughan Metropolitan Centre',ss:[['Condos near VMC subway, 2 beds, under $850K',1,4,1*D]],homes:[4,8],ev:[['view',1*D,4],['save',1*D+20*60e3,4],['chat',4*D,null,'Asked Mika about 2-bed condos near the subway'],['signin',4*D,null,'Signed in with Google (VOW account made)']]},
+    {id:5,first:'Daniel',last:'Okafor',src:'Website form',stage:'New',tags:['Home value'],vow:false,alerts:false,email:'d.okafor@example.com',phone:'(647) 555-0164',seen:1*D+3*H,created:1*D+3*H,price:'',areas:'Woodbridge',ss:[],homes:[],ev:[['form',1*D+3*H,null,'Home value request: 3-bed semi in Woodbridge']]},
+    {id:6,first:'Sofia',last:'Grieco',src:'Website sign-in',stage:'Hot buyer',tags:['Searching','Appointment'],vow:true,alerts:true,email:'sofia.g@example.com',phone:'(905) 555-0103',seen:2*D,created:30*D,price:'$1.6M – $2.2M',areas:'King City, Kleinburg',ss:[['Estate homes in King, 5 beds, $1.8M+',1,9,2*D],['Kleinburg detached $1.6M–$2.2M',1,5,3*D]],homes:[3,5,9],ev:[['save',2*D,9],['view',2*D+H,9],['openhouse',6*D,5,'Signed in at the open house'],['alert',3*D,null,'Daily alert: 3 new homes for "Kleinburg detached"']]},
+    {id:7,first:'Kevin',last:'Tran',src:'Open house',stage:'Nurture',tags:['Open house','Investor'],vow:false,alerts:true,email:'ktran@example.com',phone:'(416) 555-0158',seen:3*D,created:12*D,price:'',areas:'Richmond Hill',ss:[['Richmond Hill houses with a basement suite',1,2,3*D]],homes:[],ev:[['alert',3*D,null,'Weekly alert: 2 new homes'],['openhouse',12*D,4,'Signed in at the open house · Working with an agent: Not sure']]},
+    {id:8,first:'Hannah',last:'Liu',src:'Website',stage:'Unknown',tags:[],vow:false,alerts:false,email:'hannah.liu@example.com',phone:'',seen:4*D,created:4*D,price:'',areas:'',ss:[],homes:[2],ev:[['save',4*D,2],['view',4*D+10*60e3,2]]},
+    {id:9,first:'Anthony',last:'Ferraro',src:'Listing inquiry',stage:'Warm',tags:['Searching'],vow:true,alerts:false,email:'aferraro@example.com',phone:'(905) 555-0171',seen:6*D,created:15*D,price:'$1.0M – $1.3M',areas:'Woodbridge',ss:[['Woodbridge detached under $1.3M',0,7,9*D]],homes:[6],ev:[['inquiry',6*D,6,'Any offers registered?'],['stop',8*D,null,'Turned alerts off from the email link']]},
+    {id:10,first:'Grace',last:'Mensah',src:'Website form',stage:'New',tags:['Rental'],vow:false,alerts:true,email:'gmensah@example.com',phone:'(647) 555-0136',seen:9*D,created:9*D,price:'$2,800/mo max',areas:'Vaughan',ss:[['2-bed rentals in Vaughan up to $2,800',1,14,1*D]],homes:[],ev:[['form',9*D,null,'Rental help form']]},
+    {id:11,first:'Luca',last:'Benedetti',src:'Mika chat',stage:'Nurture',tags:[],vow:false,alerts:false,email:'luca.b@example.com',phone:'',seen:14*D,created:14*D,price:'',areas:'',ss:[],homes:[],ev:[['chat',14*D,null,'Asked Mika how long homes take to sell in Maple']]},
+    {id:12,first:'Rebecca',last:'Stone',src:'Open house',stage:'Closed',tags:['Past client'],vow:true,alerts:false,email:'rstone@example.com',phone:'(905) 555-0190',seen:26*D,created:60*D,price:'',areas:'Maple',ss:[],homes:[7],ev:[['view',26*D,7],['openhouse',60*D,7,'Signed in at the open house']]}
+  ];
+  var KIND={view:['👁','Viewed'],save:['♥','Saved'],inquiry:['?','Asked about'],openhouse:['🏠','Open house sign-in'],alert:['✉','Alert sent'],signin:['🔑','Signed in'],form:['📝','Form'],chat:['💬','Mika chat'],stop:['⛔','Stopped alerts'],note:['✎','Note']};
+  LEADS.forEach(function(l){
+    l.views=l.ev.filter(function(e){return e[0]==='view';}).length+(l.id%3)*2;
+    l.saves=l.homes.length;
+    l.inq=l.ev.filter(function(e){return e[0]==='inquiry';}).length;
+    l.lastEv=l.ev[0];
+  });
+
+  // ---------- helpers ----------
+  var app=document.getElementById('app'), F={q:'',src:'',ss:false,vow:false,alerts:false};
+  function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+  function ago(ms){var s=ms/1000;if(s<90)return 'just now';if(s<3600)return Math.round(s/60)+' min ago';if(s<86400)return Math.round(s/3600)+' h ago';if(s<86400*14){var d=Math.round(s/86400);return d===1?'yesterday':d+' days ago';}return new Date(NOW-ms).toLocaleDateString('en-CA',{month:'short',day:'numeric'});}
+  function money(n){return '$'+n.toLocaleString('en-CA');}
+  function nm(l){return l.first+' '+l.last;}
+  function ini(l){return (l.first[0]+l.last[0]).toUpperCase();}
+  function stageChip(s){var c={'Hot buyer':'red','Warm':'amber','New':'navy','Closed':'green'}[s]||'';return '<span class="chip '+c+'">'+esc(s)+'</span>';}
+  function lastLine(l){var e=l.lastEv,k=KIND[e[0]],h=e[2]!=null?home(e[2]).addr:(e[3]||'');return k[0]+' '+k[1]+(h?': '+h:'');}
+  function toast(t){var el=document.getElementById('toast');el.textContent=t;el.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(function(){el.hidden=true;},2600);}
+  var SOURCES=LEADS.map(function(l){return l.src;}).filter(function(s,i,a){return a.indexOf(s)===i;}).sort();
+
+  // ---------- leads list ----------
+  function list(){
+    var sorted=LEADS.slice().sort(function(a,b){return a.seen-b.seen;});
+    app.innerHTML='<div class="lhd"><h1>Website leads</h1><span class="muted" style="font-size:15px">Newest activity first</span></div>'
+      +'<div class="stats">'
+      +'<div class="stat"><b>'+LEADS.length+'</b><span>leads</span></div>'
+      +'<div class="stat"><b>'+LEADS.filter(function(l){return l.seen<7*D;}).length+'</b><span>active this week</span></div>'
+      +'<div class="stat"><b>'+LEADS.reduce(function(n,l){return n+l.ss.filter(function(s){return s[1];}).length;},0)+'</b><span>saved searches on</span></div>'
+      +'<div class="stat"><b>'+LEADS.filter(function(l){return l.vow;}).length+'</b><span>VOW members</span></div></div>'
+      +'<div class="tools"><input class="search" id="q" type="search" placeholder="Search name, email, phone, tag or area" autocomplete="off" value="'+esc(F.q)+'">'
+      +'<div class="filters"><select id="fsrc" aria-label="Source"><option value="">All sources</option>'+SOURCES.map(function(s){return '<option'+(F.src===s?' selected':'')+'>'+esc(s)+'</option>';}).join('')+'</select>'
+      +'<button class="fbtn" type="button" data-f="ss" aria-pressed="'+F.ss+'">Has saved search</button>'
+      +'<button class="fbtn" type="button" data-f="vow" aria-pressed="'+F.vow+'">VOW member</button>'
+      +'<button class="fbtn" type="button" data-f="alerts" aria-pressed="'+F.alerts+'">Alerts on</button></div></div>'
+      +'<p class="count" id="cnt"></p>'
+      +'<table class="tbl"><thead><tr><th>Name</th><th>Source</th><th>Stage &amp; tags</th><th>Last activity</th><th>Saved searches</th><th class="num">Views · Saves · Asks</th><th>Alerts</th></tr></thead><tbody id="tb"></tbody></table>'
+      +'<div class="cards" id="cards"></div>'
+      +'<p class="foot">Every lead from soldmike.com: website sign-ins, forms, open house sign-ins, Mika chats and listing questions. Follow Up Boss stays your CRM (it gets the activity and a link). Tap a lead to see everything they did on the site.</p>';
+    var t;document.getElementById('q').oninput=function(){var v=this.value;clearTimeout(t);t=setTimeout(function(){F.q=v;draw(sorted);},150);};
+    document.getElementById('fsrc').onchange=function(){F.src=this.value;draw(sorted);};
+    [].forEach.call(app.querySelectorAll('.fbtn'),function(b){b.onclick=function(){F[b.dataset.f]=!F[b.dataset.f];b.setAttribute('aria-pressed',F[b.dataset.f]);draw(sorted);};});
+    draw(sorted);
+  }
+  function draw(sorted){
+    var q=F.q.trim().toLowerCase();
+    var rows=sorted.filter(function(l){
+      if(F.src&&l.src!==F.src)return false;
+      if(F.ss&&!l.ss.length)return false;
+      if(F.vow&&!l.vow)return false;
+      if(F.alerts&&!l.alerts)return false;
+      if(q&&[nm(l),l.email,l.phone,l.src,l.stage,l.tags.join(' '),l.areas].join(' ').toLowerCase().indexOf(q)<0)return false;
+      return true;});
+    document.getElementById('cnt').textContent=rows.length+' of '+LEADS.length+' leads';
+    if(!rows.length){document.getElementById('tb').innerHTML='<tr><td colspan="7" class="muted" style="text-align:center;padding:24px">No leads match.</td></tr>';document.getElementById('cards').innerHTML='<p class="muted" style="text-align:center">No leads match.</p>';return;}
+    document.getElementById('tb').innerHTML=rows.map(function(l){
+      var on=l.ss.filter(function(s){return s[1];}).length;
+      return '<tr data-id="'+l.id+'"><td><div class="who"><span class="av">'+ini(l)+'</span><div class="nm"><b>'+esc(nm(l))+'</b><small>'+esc(l.email)+'</small></div></div></td>'
+        +'<td>'+esc(l.src)+(l.vow?' <span class="chip green">VOW</span>':'')+'</td>'
+        +'<td>'+stageChip(l.stage)+' '+l.tags.map(function(x){return '<span class="chip">'+esc(x)+'</span>';}).join(' ')+'</td>'
+        +'<td><b>'+esc(ago(l.seen))+'</b><br><small class="muted">'+esc(lastLine(l))+'</small></td>'
+        +'<td>'+(l.ss.length?on+' on'+(l.ss.length>on?' · '+(l.ss.length-on)+' off':''):'<span class="muted">None</span>')+'</td>'
+        +'<td class="num">'+l.views+' · '+l.saves+' · '+l.inq+'</td>'
+        +'<td><span class="dot'+(l.alerts?' on':'')+'"></span> '+(l.alerts?'On':'Off')+'</td></tr>';
+    }).join('');
+    document.getElementById('cards').innerHTML=rows.map(function(l){
+      var c=[stageChip(l.stage)];if(l.vow)c.push('<span class="chip green">VOW</span>');
+      if(l.ss.length)c.push('<span class="chip navy">'+l.ss.length+' saved search'+(l.ss.length>1?'es':'')+'</span>');
+      if(l.views)c.push('<span class="chip">'+l.views+' viewed</span>');if(l.saves)c.push('<span class="chip">'+l.saves+' saved</span>');if(l.inq)c.push('<span class="chip amber">'+l.inq+' asked</span>');
+      c.push('<span class="chip'+(l.alerts?' green':'')+'">Alerts '+(l.alerts?'on':'off')+'</span>');
+      return '<button class="lc" type="button" data-id="'+l.id+'"><span class="av">'+ini(l)+'</span><b>'+esc(nm(l))+'</b><span class="when">'+esc(ago(l.seen))+'</span><span class="last">'+esc(l.src)+' · '+esc(lastLine(l))+'</span><span class="chips">'+c.join('')+'</span></button>';
+    }).join('');
+    [].forEach.call(app.querySelectorAll('[data-id]'),function(r){r.onclick=function(){location.hash='#lead-'+r.dataset.id;};});
+  }
+
+  // ---------- person page ----------
+  function person(id){
+    var l=LEADS.filter(function(x){return x.id===id;})[0];if(!l){location.hash='';return;}
+    scrollTo(0,0);
+    var tf='all';
+    var details='<div class="card"><h3>Contact</h3><dl class="kv">'
+      +'<dt>Email</dt><dd><a href="mailto:'+esc(l.email)+'">'+esc(l.email)+'</a></dd>'
+      +'<dt>Phone</dt><dd>'+(l.phone?'<a href="tel:'+esc(l.phone)+'">'+esc(l.phone)+'</a>':'<span class="muted">None given</span>')+'</dd>'
+      +'<dt>Source</dt><dd>'+esc(l.src)+'</dd>'
+      +'<dt>Stage</dt><dd>'+stageChip(l.stage)+'</dd>'
+      +'<dt>Tags</dt><dd>'+(l.tags.length?l.tags.map(function(x){return '<span class="chip">'+esc(x)+'</span>';}).join(' '):'<span class="muted">None</span>')+'</dd>'
+      +'<dt>Price range</dt><dd>'+(l.price?esc(l.price):'<span class="muted">Not known</span>')+'</dd>'
+      +'<dt>Areas</dt><dd>'+(l.areas?esc(l.areas):'<span class="muted">Not known</span>')+'</dd>'
+      +'<dt>First seen</dt><dd>'+esc(ago(l.created))+'</dd>'
+      +'<dt>Last active</dt><dd>'+esc(ago(l.seen))+'</dd>'
+      +'<dt>Emails</dt><dd>'+(l.alerts?'<b style="color:var(--green)">New-listing alerts on</b>':'<span class="muted">Alerts off</span>')+'</dd></dl></div>'
+      +'<div class="card"><h3>VOW member</h3><div class="vow'+(l.vow?' on':'')+'">'+(l.vow?'✅ <div><b>Member</b><br><small class="muted">Signed in with Google · can see sold prices</small></div>':'— <div><b>Not a member</b><br><small class="muted">Hasn\'t made a VOW account</small></div>')+'</div></div>'
+      +'<div class="card"><h3>Follow Up Boss</h3><p style="margin:0 0 10px;font-size:15px" class="muted">FUB gets this lead\'s activity plus a link back here. Listing details stay on the website.</p><a class="btn navy" href="#" data-fub style="width:100%">Open in Follow Up Boss</a></div>';
+    var right='<div class="right" data-pane="homes"><div class="card"><h3>Saved searches <span class="n">'+l.ss.length+'</span></h3>'+(l.ss.length?l.ss.map(function(s,i){
+        return '<div class="ss"><div><b>'+esc(s[0])+'</b><small>'+s[2]+' homes matched · last alert '+esc(ago(s[3]))+'</small></div><button class="tog" type="button" data-s="'+i+'" aria-pressed="'+(!!s[1])+'">'+(s[1]?'On':'Off')+'</button></div>';
+      }).join(''):'<p class="muted" style="margin:0;font-size:15px">No saved searches.</p>')+'</div>'
+      +'<div class="card"><h3>Saved homes <span class="n">'+l.homes.length+'</span></h3>'+(l.homes.length?l.homes.map(function(i){var h=home(i);
+        return '<div class="home"><span class="ph" aria-hidden="true"></span><div><b>'+esc(h.addr)+'</b><small>'+esc(h.city)+' · '+money(h.price)+' · '+h.beds+' beds · MLS® '+esc(h.mls)+'</small></div></div>';
+      }).join(''):'<p class="muted" style="margin:0;font-size:15px">No saved homes.</p>')+'</div></div>';
+    var mid='<div class="card"><h3>Activity <span class="n">'+l.ev.length+' events</span></h3>'
+      +'<div class="note"><input id="noteIn" placeholder="Add a note (stays on the website record)"><button class="btn navy" type="button" id="noteBtn">Add</button></div>'
+      +'<div class="tfil" id="tfil">'+[['all','All'],['view','Viewed'],['save','Saved'],['inquiry','Asked'],['openhouse','Open house'],['alert','Alerts']].map(function(x){return '<button type="button" data-k="'+x[0]+'" aria-pressed="'+(x[0]==='all')+'">'+x[1]+'</button>';}).join('')+'</div>'
+      +'<ul class="tl" id="tl"></ul></div>';
+    app.innerHTML='<button class="back" type="button" id="back">← All leads</button>'
+      +'<div class="phd"><span class="av">'+ini(l)+'</span><div class="id"><h1>'+esc(nm(l))+'</h1><div class="sub">'+esc(l.src)+' · last active '+esc(ago(l.seen))+'</div><div class="tags">'+stageChip(l.stage)+(l.vow?'<span class="chip green">VOW member</span>':'')+'<span class="chip'+(l.alerts?' green':'')+'">Alerts '+(l.alerts?'on':'off')+'</span></div></div>'
+      +'<div class="acts">'+(l.phone?'<a class="btn ghost" href="tel:'+esc(l.phone)+'">Call</a><a class="btn ghost" href="sms:'+esc(l.phone)+'">Text</a>':'')+'<a class="btn ghost" href="mailto:'+esc(l.email)+'">Email</a><a class="btn navy" href="#" data-fub>Open in FUB</a></div></div>'
+      +'<div class="ptabs" id="ptabs"><button type="button" data-p="act" aria-pressed="true">Activity</button><button type="button" data-p="info" aria-pressed="false">Details</button><button type="button" data-p="homes" aria-pressed="false">Searches</button></div>'
+      +'<div class="cols"><div data-pane="info">'+details+'</div><div data-pane="act" class="show">'+mid+'</div>'+right+'</div>';
+    function tl(){
+      document.getElementById('tl').innerHTML=l.ev.filter(function(e){return tf==='all'||e[0]===tf;}).map(function(e){
+        var k=KIND[e[0]],h=e[2]!=null?home(e[2]):null;
+        var what=h?'<div class="what"><a href="#" data-home>'+esc(h.addr)+', '+esc(h.city)+'</a> · '+money(h.price)+'</div>':'';
+        var q=e[3]?(e[0]==='inquiry'?'<div class="q">“'+esc(e[3])+'”</div>':'<div class="what">'+esc(e[3])+'</div>'):'';
+        return '<li><span class="ic '+e[0]+'" aria-hidden="true">'+k[0]+'</span><div><b>'+k[1]+'</b> <span class="t">'+esc(ago(e[1]))+'</span>'+what+q+'</div></li>';
+      }).join('')||'<li><span></span><span class="muted">Nothing of this kind yet.</span></li>';
+      [].forEach.call(document.querySelectorAll('[data-home]'),function(a){a.onclick=function(ev){ev.preventDefault();toast('Mockup: opens the listing page on soldmike.com');};});
+    }
+    tl();
+    document.getElementById('back').onclick=function(){location.hash='';};
+    [].forEach.call(document.querySelectorAll('#tfil button'),function(b){b.onclick=function(){tf=b.dataset.k;[].forEach.call(document.querySelectorAll('#tfil button'),function(x){x.setAttribute('aria-pressed',x===b);});tl();};});
+    [].forEach.call(document.querySelectorAll('#ptabs button'),function(b){b.onclick=function(){[].forEach.call(document.querySelectorAll('#ptabs button'),function(x){x.setAttribute('aria-pressed',x===b);});
+      [].forEach.call(document.querySelectorAll('.cols [data-pane]'),function(p){p.classList.toggle('show',p.dataset.pane===b.dataset.p);});};});
+    [].forEach.call(document.querySelectorAll('[data-fub]'),function(a){a.onclick=function(ev){ev.preventDefault();toast('Mockup: opens this person in Follow Up Boss');};});
+    [].forEach.call(document.querySelectorAll('.tog'),function(b){b.onclick=function(){var s=l.ss[+b.dataset.s];s[1]=s[1]?0:1;b.setAttribute('aria-pressed',!!s[1]);b.textContent=s[1]?'On':'Off';toast('Mockup: alert '+(s[1]?'on':'off')+' (not saved)');};});
+    document.getElementById('noteBtn').onclick=function(){var v=document.getElementById('noteIn').value.trim();if(!v)return;l.ev.unshift(['note',0,null,v]);document.getElementById('noteIn').value='';tl();toast('Mockup: note added on this page only');};
+  }
+
+  function route(){var m=location.hash.match(/^#lead-(\d+)$/);if(m)person(+m[1]);else list();}
+  addEventListener('hashchange',route);route();
+})();
+</script>
+</body>
+</html>
