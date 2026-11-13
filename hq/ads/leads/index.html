@@ -74,6 +74,7 @@ td:first-child{font-family:var(--ui);white-space:normal}
 .tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:4px}
 .tag{display:inline-block;font:600 14px var(--ui);padding:3px 8px;border-radius:5px;white-space:nowrap}
 .t-new{background:#3d2a12;color:var(--amber)} .t-con{background:#1d2a4d;color:var(--blue-soft)} .t-apt{background:#123a36;color:#5fd3c5}
+.t-miss{background:#3d1a1d;color:#ff8a87} .lead.miss{flex-wrap:wrap}
 .t-paid{background:#123a36;color:#5fd3c5} .t-again{background:#262b3b;color:var(--soft)}
 .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .btn{font:600 15px var(--ui);padding:8px 12px;border-radius:7px;border:1px solid var(--line2);background:transparent;color:var(--soft);cursor:pointer}
@@ -207,14 +208,14 @@ dialog button{font:inherit;margin-top:12px;padding:9px 16px;border-radius:7px;bo
     names.sort(function (x, y) { return ((CS[y] || {}).spend || 0) - ((CS[x] || {}).spend || 0); });
     GROUPS = names.map(function (c, i) { return { k: c, n: shortCamp(c), c: PAL[i % PAL.length] }; });
     if (L.some(function (l) { return l.g === '?'; })) GROUPS.push({ k: '?', n: 'Ad, campaign not known', c: '--muted' });
-    var n = L.length, again = L.filter(function (l) { return l.again; }).length, notYet = L.filter(function (l) { return l.status === 'new'; }).length;
+    var n = L.length, again = L.filter(function (l) { return l.again; }).length, notYet = L.filter(function (l) { return l.status === 'new'; }).length, miss = L.filter(function (l) { return l.status === 'missing'; }).length;
     var pn = PREV ? prep(PREV.leads).length : null, delta = pn ? Math.round((n - pn) / pn * 100) : null;
     var K = [
       ['Leads from ads', n, pn == null ? '' : pn === 0 ? 'none ' + R.pl : (delta >= 0 ? '▲ ' : '▼ ') + Math.abs(delta) + '% vs ' + R.pl, 'hero'],
       ['Spent on ads', '$' + spend.toFixed(2), '$' + (spend * 1.13).toFixed(2) + ' with tax'],
       ['Cost per lead', n ? '$' + (spend / n).toFixed(2) : '–', n ? 'spent ÷ ad leads in FUB' : 'no ad leads yet'],
       ['Not contacted yet', notYet, notYet ? 'call these first' : 'all reached', notYet ? 'warn' : ''],
-      ['Signed up again', again, 'already in FUB before'],
+      miss ? ['Not in Follow Up Boss', miss, 'from the Facebook form, call them', 'warn'] : ['Signed up again', again, 'already in FUB before'],
       ["Meta's count", metaLeads, metaLeads === n ? 'matches FUB' : metaLeads > n ? (metaLeads - n) + ' more than FUB' : (n - metaLeads) + ' fewer than FUB', metaLeads > n ? 'warn' : '']
     ];
     $('#kpis').innerHTML = K.map(function (k) { return '<div class="kpi ' + (k[3] || '') + '"><span class="l">' + k[0] + '</span><span class="v">' + k[1] + '</span><span class="s">' + esc(k[2]) + '</span></div>'; }).join('');
@@ -248,10 +249,12 @@ dialog button{font:inherit;margin-top:12px;padding:9px 16px;border-radius:7px;bo
 
     // Meta vs FUB check, per campaign
     var cks = [];
-    GROUPS.forEach(function (g) { if (g.k === '?') return; var m = L.filter(function (l) { return l.g === g.k; }).length, c = CS[g.k]; if (!c) return;
+    GROUPS.forEach(function (g) { if (g.k === '?') return; var m = L.filter(function (l) { return l.g === g.k && l.status !== 'missing'; }).length, c = CS[g.k]; if (!c) return;
       if (c.meta > m) cks.push(['--amber', g.n + ': Meta counted ' + c.meta + ', Follow Up Boss has ' + m + '. ' + (c.meta - m) + ' to look for (a lead that never reached FUB, or one whose ad label was lost).']); });
     var unk = L.filter(function (l) { return l.g === '?'; }).length;
     if (unk) cks.push(['--blue-soft', unk + ' ad lead' + (unk > 1 ? 's' : '') + ' with no campaign name: they came from an ad, but the link carried no campaign label.']);
+    if (miss) cks.unshift(['--down', miss + ' Facebook form lead' + (miss > 1 ? 's' : '') + ' never reached Follow Up Boss. They are in the list below, marked red, with phone and email.']);
+    if (DATA.formError) cks.push(['--muted', 'Facebook form leads are not read straight from Meta yet (' + DATA.formError.replace(/^Meta: /, '').slice(0, 90) + ').']);
     if (!cks.length && (metaLeads || n)) cks.push(['--up', 'Every ad lead Meta counted is in Follow Up Boss.']);
     $('#checkCard').hidden = !cks.length;
     $('#checks').innerHTML = cks.map(function (c) { return '<div class="check" style="--c:var(' + c[0] + ')"><span>' + esc(c[1]) + '</span></div>'; }).join('');
@@ -288,10 +291,10 @@ dialog button{font:inherit;margin-top:12px;padding:9px 16px;border-radius:7px;bo
         html += '<div class="day"><span>' + nm + ' · ' + MON[+p[1] - 1] + ' ' + (+p[2]) + '</span><span>' + counts[l.day] + (counts[l.day] === 1 ? ' lead' : ' leads') + '</span></div>';
       }
       var from = l.campaign ? shortCamp(l.campaign) : 'Ad · ' + l.source;
-      var st = { new: ['t-new', 'Not contacted'], con: ['t-con', 'Contacted'], apt: ['t-apt', 'Appointment'] }[l.status];
-      html += '<a class="lead" href="' + FUBAPP + '/2/people/view/' + l.id + '" target="_blank" rel="noopener"><span><span class="nm">' + esc(l.name) + '</span><br><span class="sub">' + esc(from) + '</span>'
+      var st = { new: ['t-new', 'Not contacted'], con: ['t-con', 'Contacted'], apt: ['t-apt', 'Appointment'], missing: ['t-miss', 'Not in Follow Up Boss'] }[l.status] || ['t-con', l.status];
+      html += (l.id ? '<a class="lead" href="' + FUBAPP + '/2/people/view/' + l.id + '" target="_blank" rel="noopener">' : '<div class="lead miss">') + '<span><span class="nm">' + esc(l.name) + '</span><br><span class="sub">' + esc(from) + '</span>'
         + '<span class="tags">' + (l.again ? '<span class="tag t-again">Signed up again</span>' : '') + '</span></span>'
-        + '<span class="rt"><span class="tm">' + when(l) + '</span><span class="tag ' + st[0] + '">' + st[1] + '</span></span></a>';
+        + '<span class="rt"><span class="tm">' + when(l) + '</span><span class="tag ' + st[0] + '">' + st[1] + '</span></span>' + (l.id ? '</a>' : (l.phone || l.email ? '<span class="sub" style="flex-basis:100%">' + esc([l.phone, l.email].filter(Boolean).join(' · ')) + '</span>' : '') + '</div>');
     });
     $('#list').innerHTML = html;
   }
