@@ -153,12 +153,14 @@ FORMS = {
     'report': ('Market report', 'Email me the monthly report', [('', 'name', 'Your name', 'text', ''), ('', 'email', 'Email', 'email', ''), ('full', 'area', 'Area', ['Vaughan', 'Woodbridge', 'Kleinburg', 'King', 'Caledon', 'East Gwillimbury'], '')], "Done. You'll get the next report on the 5th."),
 }
 GUIDES = {'Selling a home in Vaughan': '/guides/selling-a-home-in-vaughan.pdf', 'Buying a home in Vaughan': '/guides/buying-a-home-in-vaughan.pdf', 'Pre-listing checklist': '/guides/pre-listing-checklist.pdf'}
+OPTIONAL_PHONE = {'value'}  # forms where the phone label + box say (optional)
 def form(kind, uid='', pick=None):
     lead, btn, fields, done = FORMS[kind]
     if pick:  # preselect and lock one option (e.g. the seller guide on the seller guide page)
         fields = [(sp, n, l, [pick] if n == 'which' else t, ph) for sp, n, l, t, ph in fields]
     out = ''
     for span, name, label, typ, ph in fields:
+        opt = False
         fid = '%s-%s%s' % (kind, name, uid)
         cls = ' class="full"' if span else ''
         if isinstance(typ, list):
@@ -167,8 +169,11 @@ def form(kind, uid='', pick=None):
             ctl = '<textarea id="%s" name="%s" data-label="%s"></textarea>' % (fid, name, e(label))
         else:
             auto = {'name': 'name', 'email': 'email', 'phone': 'tel'}.get(name, 'off')
+            opt = kind in OPTIONAL_PHONE and name == 'phone'
+            if opt: ph = '(optional)'
             ctl = '<input id="%s" name="%s" type="%s" autocomplete="%s" data-label="%s"%s>' % (fid, name, typ, auto, e(label), ' placeholder="%s"' % e(ph) if ph else '')
-        out += '<div%s><label for="%s">%s</label>%s</div>' % (cls, fid, e(label), ctl)
+        lab = e(label) + (' <span style="font-weight:400;color:#5b6378">(optional)</span>' if not isinstance(typ, list) and typ != 'area' and opt else '')
+        out += '<div%s><label for="%s">%s</label>%s</div>' % (cls, fid, lab, ctl)
     dl = ' data-dl="%s"' % e(json.dumps(GUIDES)) if kind in ('guide', 'checklist') else ''
     return ('<form class="form" data-lead="%s" data-done="%s"' + dl + ' aria-label="%s">%s<button class="btn full" type="submit">%s</button>'
             '<p class="msg full" role="status"></p><p class="fine full">By sending, I agree to be contacted by RE/MAX Premier The OP Team by call, text and email. To opt out, reply STOP or click unsubscribe.</p></form>') % (e(lead), e(done), e(lead), out, e(btn))
