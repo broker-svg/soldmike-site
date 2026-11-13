@@ -10,6 +10,8 @@ PHONE = '647-694-3109'
 EMAIL = 'mike@theopteam.ca'
 ADDRESS = {'street': '3550 Rutherford Rd, Unit 80', 'city': 'Vaughan', 'region': 'ON', 'postal': 'L4H 3T8'}
 BROKERAGE = 'RE/MAX Premier The OP Team, Brokerage'
+# PropTx IDX 6.3(k): wording PropTx gives in the agreement
+BONA_FIDE = 'The information provided herein must only be used by consumers that have a bona fide interest in the purchase, sale, or lease of real estate and may not be used for any commercial purpose or any other purpose.'
 AREAS = ['Vaughan', 'Woodbridge', 'Kleinburg', 'Maple', 'Caledon', 'King', 'East Gwillimbury', 'Toronto']
 TODOS = []
 LICENSED = 'December 2011'
@@ -86,9 +88,9 @@ def footer():
             '<div><img src="/logo-soldmike-white.png" alt="RE/MAX Premier The OP Team, SoldMike" style="width:220px;height:auto">'
             '<span>Michael Barillari, Broker, SOLDMIKE. %s. Independently owned and operated.</span>'
             '<span>%s, %s, %s %s</span><span>Call or text %s</span><span>%s</span><a href="/admin/" rel="nofollow" style="margin-top:6px">Team login</a></div>%s</div>'
-            '<div class="legal"><span>The trademarks REALTOR®, REALTORS®, and the REALTOR® logo are controlled by The Canadian Real Estate Association (CREA) and identify real estate professionals who are members of CREA. The trademarks MLS®, Multiple Listing Service® and the associated logos are owned by CREA. <a href="/privacy/" style="color:var(--pale)">Privacy</a> · <a href="/terms/" style="color:var(--pale)">Terms</a> · <a href="/admin/" style="color:var(--pale)" rel="nofollow">Team login</a></span>'
-            '<a href="https://www.realtor.ca/en" target="_blank" rel="noopener" class="rca-foot" aria-label="Powered by REALTOR.ca"><img src="https://www.realtor.ca/images/en-ca/powered_by_realtor.svg" width="125" alt="Powered by REALTOR.ca" loading="lazy" style="background:#fff;border-radius:4px;padding:4px"></a></div></div></footer>'
-            ) % (BROKERAGE, ADDRESS['street'], ADDRESS['city'], ADDRESS['region'], ADDRESS['postal'], PHONE, EMAIL, cols)
+            '<div class="legal"><span><b>%s</b> Listing information is deemed reliable but is not guaranteed accurate by PROPTX.</span><span>The trademarks REALTOR®, REALTORS®, and the REALTOR® logo are controlled by The Canadian Real Estate Association (CREA) and identify real estate professionals who are members of CREA. The trademarks MLS®, Multiple Listing Service® and the associated logos are owned by CREA. <a href="/privacy/" style="color:var(--pale)">Privacy</a> · <a href="/terms/" style="color:var(--pale)">Terms</a> · <a href="/admin/" style="color:var(--pale)" rel="nofollow">Team login</a></span>'
+            '</div></div></footer>'
+            ) % (BONA_FIDE, BROKERAGE, ADDRESS['street'], ADDRESS['city'], ADDRESS['region'], ADDRESS['postal'], PHONE, EMAIL, cols)
 
 def hero(trail, h1, lede, photo=None):
     cr = '<nav class="crumbs" aria-label="Breadcrumb">' + ' / '.join(
@@ -174,7 +176,9 @@ def form(kind, uid='', pick=None):
 def cta(h, p, kind='value'):
     return '<section class="cta"><div class="wrap"><div><h2>%s</h2><p>%s</p></div>%s</div></section>' % (e(h), p, form(kind, '-cta'))
 
-CREA_NOTE = ('<p class="crea-note">The information contained on this site is based in whole or in part on information that is provided by members of The Canadian Real Estate Association (CREA), who are responsible for its accuracy. CREA reproduces and distributes this information as a service for its members and assumes no responsibility for its accuracy. Listings refresh every day. Deemed reliable but not guaranteed.</p>')
+# PropTx IDX (from the IDX switch): 6.3(i) PROPTX notice and 6.3(k) bona fide interest notice wherever listings show
+CREA_NOTE = ('<p class="crea-note">Listings on this site come from PropTx through the IDX program and show each listing brokerage. Listings refresh at least every 24 hours. Listing information is deemed reliable but is not guaranteed accurate by PROPTX.</p>'
+             '<p class="crea-note"><b>' + BONA_FIDE + '</b></p>')
 def live_grid(area, n=3):
     """Live MLS® listings for an area, filled by /assets/listings.js from the listings Worker."""
     return '<div class="lgrid" data-listings data-area="%s" data-n="%d"></div>' % (area, n)
@@ -259,7 +263,7 @@ def SEARCH_BLOCK(fixed=None, empty=''):
     '<div class="ls-wrap" id="lsWrap" data-view="list"><div class="ls-listcol"><div class="lgrid" id="lsList"__EMPTY__></div><button class="btn navy" id="lsMore" type="button" hidden>Show more homes</button></div>'
     '<div class="ls-mapcol"><div><div id="lsMap" role="region" aria-label="Map of results"></div><button class="btn navy" id="lsArea" type="button" hidden>Search this map area</button>'
     '<p style="margin:10px 0 0;font-size:14px"><button type="button" id="lsClearArea" style="border:0;background:none;padding:0;color:var(--navy);font-weight:600;cursor:pointer;text-decoration:underline">Clear map area</button></p></div></div></div>'
-    '<div class="rca-row"><a class="btn ghost" href="/saved/">Your saved homes</a><a href="https://www.realtor.ca/en" target="_blank" rel="noopener"><img src="https://www.realtor.ca/images/en-ca/powered_by_realtor.svg" width="125" alt="Powered by REALTOR.ca"></a></div>'
+    '<div class="rca-row"><a class="btn ghost" href="/saved/">Your saved homes</a></div>'
     + CREA_NOTE + '</div>').replace('__EMPTY__', (' data-empty="%s"' % e(empty)) if empty else '')
 
 P('/listings/',
@@ -538,7 +542,7 @@ for slug, name, intro, photo, pockets in HOODS:
           ('Most common home type', '[Detached]'), ('Homes the OP Team has sold here', '[X]')]) +
           '</div><div class="stack"><h2>Pockets of %s</h2>' % e(name) + cards([('/listings/?area=%s' % slug, p, w) for p, w in (HOOD_INFO[slug]['pockets'] if slug in HOOD_INFO else [(p, '') for p in pockets])]) + '</div></div>'),
       lambda name=name, slug=slug: band(head_block('For sale in %s' % name, 'The newest MLS® listings, refreshed every day.') + live_grid(slug, 6) +
-          '<div class="rca-row"><a class="btn navy" href="/listings/?area=%s">See all %s listings</a><a href="https://www.realtor.ca/en" target="_blank" rel="noopener"><img src="https://www.realtor.ca/images/en-ca/powered_by_realtor.svg" width="125" alt="Powered by REALTOR.ca"></a></div>' % (slug, e(name)) + CREA_NOTE, 'tint'),
+          '<div class="rca-row"><a class="btn navy" href="/listings/?area=%s">See all %s listings</a></div>' % (slug, e(name)) + CREA_NOTE, 'tint'),
       lambda name=name, slug=slug: band(head_block('Living in %s' % name) + living(slug, name), narrow=True),
       lambda name=name, qs=qs: band(head_block('%s questions, answered' % name) + faq(qs), 'tint'),
       lambda name=name: cta('Own in %s? See what it is worth.' % name, 'A price range based on real sales on your street.'),
@@ -746,12 +750,12 @@ P('/privacy/',
       'When you fill in a form on this site, sign in at one of our open houses, book a showing or ask about a home, we collect the details you give us, such as your name, email, phone and property address, to reply to you and provide real estate services. Your information goes to Michael Barillari and is stored in our customer relationship system (Follow Up Boss). We do not sell your information.',
       '<h2>Homes you view and save</h2>',
       'After you have sent us your contact details, the listings you view and save on this site (address, MLS® number, price and a link) are recorded in your file in our customer relationship system, so Michael can follow up with homes that fit. This is done automatically by the website. If you have not given us your contact details, your browsing is not linked to you.',
-      '<h2>Listing statistics for CREA</h2>',
-      'Listings on this site come from The Canadian Real Estate Association (CREA). When you open a listing, we send CREA a record of the view with a random device ID and your IP address, as CREA requires, so listing brokerages can see where their listings are viewed. No name, email or phone number is sent.',
+      '<h2>Visitor activity record</h2>',
+      'Listings on this site come from PropTx through its IDX program. As PropTx requires, we keep a record of visits to listing pages and listing searches (date and time, IP address, browser type and the listing or search). We keep it for about 13 months and share it only with PropTx if it asks, to check the site is used properly. No name, email or phone number is in this record.',
       '<h2>Stored in your browser</h2>',
       'Your saved homes, your answer to the terms-of-use notice, the random device ID and, after you send a form, your contact details (so forms fill in for you) are stored in your own browser. You can clear them at any time by clearing this site\'s data in your browser.',
       '<h2>Other services</h2>',
-      'Listing photos load from CREA\'s servers and maps load from OpenStreetMap, so those services receive your IP address when you view them. We protect the listings on this site from automated copying; requests that look automated may be blocked and their IP addresses logged.',
+      'Listing photos load from PropTx\'s servers and maps load from OpenStreetMap, so those services receive your IP address when you view them. We protect the listings on this site from automated copying; requests that look automated may be blocked and their IP addresses logged.',
       '<h2 id="vow">Member area (VOW) accounts</h2>',
       '<p><b>This section applies if you register for the password-protected member area at soldmike.com/vow/. You are asked to agree to it when you register.</b></p>',
       '<p><b>What we collect and keep:</b> your name, email address, username and password (stored only in scrambled, hashed form, so nobody can read it), and the dates you accepted our Terms of Use and this policy. We keep these records while your account is active and for at least 180 days after your password expires, as the MLS® Rules require.</p>',
@@ -770,11 +774,13 @@ P('/terms/',
       'This website is operated by Michael Barillari, Broker, of %s, a brokerage and salesperson who are members of The Canadian Real Estate Association (CREA).' % BROKERAGE,
       '<h2>Listing content</h2>',
       'REALTOR®, REALTORS®, and the REALTOR® logo are certification marks that are owned by REALTOR® Canada Inc. and licensed exclusively to The Canadian Real Estate Association (CREA). These certification marks identify real estate professionals who are members of CREA and who must abide by CREA’s By-Laws, Rules, and the REALTOR® Code. The MLS® trademark and the MLS® logo are owned by CREA and identify the quality of services provided by real estate professionals who are members of CREA.',
-      'The information contained on this site is based in whole or in part on information that is provided by members of The Canadian Real Estate Association (CREA), who are responsible for its accuracy. CREA reproduces and distributes this information as a service for its members and assumes no responsibility for its accuracy.',
+      'Listings on this site come from PropTx Innovations Inc. through its IDX program. Each listing shows the brokerage that listed it. Listing information is deemed reliable but is not guaranteed accurate by PROPTX. This site does not provide full access to the PropTx MLS® System.',
+      'Map pins are approximate: they show the centre of each listing\'s postal code, not the exact house. Postal code locations from <a href="https://www.geonames.org/" target="_blank" rel="noopener">GeoNames</a> (CC BY 4.0).',
+      '<p><b>%s</b></p>' % BONA_FIDE,
       'The listing content on this website is protected by copyright and other laws, and is intended solely for the private, non-commercial use by individuals. Any other reproduction, distribution or use of the content, in whole or in part, is specifically forbidden. The prohibited uses include commercial use, “screen scraping”, “database scraping”, and any other activity intended to collect, store, reorganize or manipulate data on the pages produced by or displayed on this website.',
       '<h2>Using this site</h2>',
       'This site is for consumers with a genuine interest in buying, selling or leasing real estate. Listing information is refreshed at least once every 24 hours and is deemed reliable but not guaranteed accurate. Each listing shows the brokerage that listed it; homes listed by other brokerages are not our listings, and Michael Barillari can help you with any of them as a buyer’s agent.',
-      'Automated access to this site, including bots, scrapers and bulk downloading of listings, is not allowed and may be blocked. Suspected scraping is reported to CREA.',
+      'Automated access to this site, including bots, scrapers and bulk downloading of listings, is not allowed and may be blocked. Suspected scraping is reported to PropTx.',
       'Calculators and estimates on this site are for information only and are not financial, legal or mortgage advice.',
       '<h2>Corrections</h2>',
       '<p><b>Listing brokerages: report an error to %s. It will be fixed within 48 hours.</b></p>' % EMAIL,
@@ -792,7 +798,7 @@ P('/terms/',
       '<p><b>Compliance access.</b> You authorize PropTx, and other members of the Association or their authorized representatives, to access the member area to verify compliance with the MLS® Rules (including the VOW Rules) and to monitor how members\u2019 listings are displayed.</p>',
       '<p><b>Accuracy.</b> Listing Information is deemed reliable but is not guaranteed accurate by PropTx.</p>',
       '<p><b>Your account.</b> One account per email address. Your password is valid for 90 days and can then be renewed. We keep a record of your account and your activity in the member area, as described in our <a href="/privacy/#vow">privacy policy</a>.</p>') + '<div style="margin-top:20px">' + todo('Have the brokerage review these terms') + '</div>', narrow=True),
-  title='Terms of Use | SoldMike', desc='Terms of use for soldmike.com, including the CREA listing content terms and the member area terms.', trail=[('Terms', '/terms/')], noindex=True)
+  title='Terms of Use | SoldMike', desc='Terms of use for soldmike.com, including the listing content terms and the member area terms.', trail=[('Terms', '/terms/')], noindex=True)
 
 # ---------- new-listing alerts (each visitor's own link from the alert email) ----------
 ALERTS_JS = """<script>
@@ -817,7 +823,7 @@ ALERTS_JS = """<script>
 P('/alerts/',
   lambda: hero([('Home', '/'), ('Your new listings', '/alerts/')], 'Your new listings', '<span id="alHead">Loading…</span>'),
   lambda: band('<p id="alLabel" style="font-weight:600;color:var(--navy);margin:0 0 18px"></p><div class="lgrid" id="alBox"></div>'
-      '<div class="rca-row"><a class="btn ghost" href="/listings/">Search all homes</a><a href="https://www.realtor.ca/en" target="_blank" rel="noopener"><img src="https://www.realtor.ca/images/en-ca/powered_by_realtor.svg" width="125" alt="Powered by REALTOR.ca"></a></div>'
+      '<div class="rca-row"><a class="btn ghost" href="/listings/">Search all homes</a></div>'
       '<div id="alStop" hidden style="margin-top:28px;padding-top:20px;border-top:1px solid var(--line)"><p>Don’t want these emails any more?</p><button class="btn ghost" type="button" id="alStopBtn">Stop new-listing emails</button></div>'
       + CREA_NOTE, 'lsband'),
   title='Your New Listings | SoldMike', desc='New listings that match your saved search.', trail=[('Your new listings', '/alerts/')], noindex=True,
