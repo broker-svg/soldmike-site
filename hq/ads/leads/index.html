@@ -9,7 +9,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
 <style>
-/* AdsView › Leads (soldmike.com/hq/ads/leads/, host PIN). Every lead that came into Follow Up Boss in the chosen dates:
+/* AdsView › Leads (soldmike.com/hq/ads/leads/, host PIN). Every lead that came into Follow Up Boss FROM AN AD in the chosen dates
+   (Michael, Nov 13: "the whole point of it is from ads"), by campaign, with Meta spend and Meta's own count beside it:
    new people plus existing contacts who signed up or asked again (FUB merges those and shows a Lead Alert).
    Data: /api/hq/ads/newleads (listings Worker). Read only: nothing here changes Follow Up Boss or Meta.
    Phone first, big text (approved Nov 13, 2026: body ~19px, nothing under 14px). Same dark look as the AdsView dashboard. */
@@ -104,17 +105,17 @@ dialog button{font:inherit;margin-top:12px;padding:9px 16px;border-radius:7px;bo
   </section>
 
   <section class="card">
-    <h2>Where they came from <small id="srcSub"></small></h2>
-    <div class="tbl"><table><thead><tr><th>Source</th><th>Leads</th><th>Share</th><th>Not yet</th></tr></thead><tbody id="srcRows"></tbody></table></div>
+    <h2>By campaign <small id="srcSub"></small></h2>
+    <div class="tbl"><table><thead><tr><th>Campaign</th><th>Leads</th><th>Meta</th><th>Spent</th><th>Per lead</th></tr></thead><tbody id="srcRows"></tbody></table></div>
   </section>
 
   <section class="card" id="checkCard" hidden>
-    <h2>Ad lead check <small>Meta's count vs Follow Up Boss</small></h2>
+    <h2>Did every ad lead reach Follow Up Boss? <small>Meta's count vs FUB</small></h2>
     <div id="checks"></div>
   </section>
 
   <section class="card">
-    <h2><span>Every lead</span><small>newest first · tap a name to open it in Follow Up Boss</small></h2>
+    <h2><span>Every ad lead</span><small>newest first · tap a name to open it in Follow Up Boss</small></h2>
     <div class="row"><button type="button" class="btn" id="copyBtn">Copy names</button><button type="button" class="btn" id="filtBtn" aria-pressed="false">Only not contacted</button></div>
     <div id="list"></div>
   </section>
@@ -172,16 +173,12 @@ dialog button{font:inherit;margin-top:12px;padding:9px 16px;border-radius:7px;bo
     return R;
   }
 
-  // ----- sources: paid ads, project pages, then the biggest others -----
-  var GROUPS = [
-    { k: 'paid', n: 'Paid ads (Meta)', c: '--up', test: function (l) { return l.paid; } },
-    { k: 'proj', n: 'Project pages, not paid', c: '--blue-soft', test: function (l) { return !!l.project; } },
-    { k: 'rca', n: 'Realtor.ca', c: '--amber', test: function (l) { return /realtor\.ca/i.test(l.source); } },
-    { k: 'site', n: 'soldmike.com', c: '--soft', test: function (l) { return /soldmike/i.test(l.source); } },
-    { k: 'oth', n: 'Everything else', c: '--muted', test: function () { return true; } }
-  ];
-  function groupOf(l) { for (var i = 0; i < GROUPS.length; i++) if (GROUPS[i].test(l)) return GROUPS[i].k; return 'oth'; }
-
+  // ----- groups = ad campaigns (built each load from Meta's campaigns and the leads' campaigns) -----
+  var PAL = ['--up', '--blue-soft', '--amber', '--down', '#b48cf2', '#f28cc4', '--soft'];
+  var GROUPS = [];
+  function shortCamp(c) { var p = String(c || '').split(' - '); if (/^op team$/i.test(p[0]) && p.length > 1) p.shift(); return (p[0] || 'Ad') + (/facebook form/i.test(c) ? ' · Facebook form' : /website/i.test(c) ? ' · website' : ''); }
+  function groupOf(l) { return l.campaign || '?'; }
+  function colOf(c) { return c.charAt(0) === '#' ? c : col(c); }
   var RANGE = store('adsview_leads_range') || '7d', DATA = null, PREV = null, D14 = null, ONLYNEW = false, CSS = getComputedStyle(document.documentElement);
   function col(v) { return CSS.getPropertyValue(v).trim(); }
 
@@ -197,21 +194,28 @@ dialog button{font:inherit;margin-top:12px;padding:9px 16px;border-radius:7px;bo
   }
 
   function render() {
-    var R = rangeOf(RANGE), L = DATA.leads.map(function (l) { l.g = groupOf(l); l.day = dayKey(new Date(l.at)); return l; });
-    $('#rangeTxt').innerHTML = 'Showing <b>' + esc(R.label) + '</b>' + (PREV ? ' · compared with ' + esc(R.pl) : '') + ' · from Follow Up Boss, live';
-    // spend over the same Toronto days (Meta reports by the ad account's day)
-    var ka = key(R.a), kb = key(addD(R.b, -1)), spend = 0, metaLeads = 0, metaByDay = {};
-    DATA.metaDays.forEach(function (d) { if (d[0] >= ka && d[0] <= kb) { spend += d[1]; metaLeads += d[2]; metaByDay[d[0]] = d[2]; } });
-    var n = L.length, paid = L.filter(function (l) { return l.paid; }).length, again = L.filter(function (l) { return l.again; }).length;
-    var notYet = L.filter(function (l) { return l.status === 'new'; }).length, appt = L.filter(function (l) { return l.status === 'apt'; }).length;
-    var pn = PREV ? PREV.leads.length : null, delta = pn ? Math.round((n - pn) / pn * 100) : null;
+    var R = rangeOf(RANGE);
+    // only leads that came in from an ad: a labelled landing-page link (tag Meta Ad) or a Facebook lead form
+    var prep = function (list) { return list.filter(function (l) { return l.paid; }).map(function (l) { l.g = groupOf(l); l.day = dayKey(new Date(l.at)); return l; }); };
+    var L = prep(DATA.leads);
+    $('#rangeTxt').innerHTML = 'Showing <b>' + esc(R.label) + '</b>' + (PREV ? ' · compared with ' + esc(R.pl) : '') + ' · leads from Follow Up Boss, spend from Meta';
+    var ka = key(R.a), kb = key(addD(R.b, -1)), spend = 0, metaLeads = 0, CS = {};
+    (DATA.campDays || []).forEach(function (d) { if (d[0] >= ka && d[0] <= kb) { var c = CS[d[1]] = CS[d[1]] || { spend: 0, meta: 0 }; c.spend += d[2]; c.meta += d[3]; spend += d[2]; metaLeads += d[3]; } });
+    // campaigns shown: any that spent in these days or brought a lead, biggest spend first
+    var names = Object.keys(CS).filter(function (c) { return CS[c].spend > 0 || CS[c].meta > 0; });
+    L.forEach(function (l) { if (l.g !== '?' && names.indexOf(l.g) < 0) names.push(l.g); });
+    names.sort(function (x, y) { return ((CS[y] || {}).spend || 0) - ((CS[x] || {}).spend || 0); });
+    GROUPS = names.map(function (c, i) { return { k: c, n: shortCamp(c), c: PAL[i % PAL.length] }; });
+    if (L.some(function (l) { return l.g === '?'; })) GROUPS.push({ k: '?', n: 'Ad, campaign not known', c: '--muted' });
+    var n = L.length, again = L.filter(function (l) { return l.again; }).length, notYet = L.filter(function (l) { return l.status === 'new'; }).length;
+    var pn = PREV ? prep(PREV.leads).length : null, delta = pn ? Math.round((n - pn) / pn * 100) : null;
     var K = [
-      ['New leads', n, pn == null ? '' : pn === 0 ? pn + ' ' + R.pl : (delta >= 0 ? '▲ ' : '▼ ') + Math.abs(delta) + '% vs ' + R.pl, 'hero'],
-      ['From paid ads', paid, n ? Math.round(paid / n * 100) + '% of all leads' : '–'],
-      ['Signed up again', again, 'existing contacts'],
+      ['Leads from ads', n, pn == null ? '' : pn === 0 ? 'none ' + R.pl : (delta >= 0 ? '▲ ' : '▼ ') + Math.abs(delta) + '% vs ' + R.pl, 'hero'],
+      ['Spent on ads', '$' + spend.toFixed(2), '$' + (spend * 1.13).toFixed(2) + ' with tax'],
+      ['Cost per lead', n ? '$' + (spend / n).toFixed(2) : '–', n ? 'spent ÷ ad leads in FUB' : 'no ad leads yet'],
       ['Not contacted yet', notYet, notYet ? 'call these first' : 'all reached', notYet ? 'warn' : ''],
-      ['Ad spend', '$' + spend.toFixed(2), '$' + (spend * 1.13).toFixed(2) + ' with tax'],
-      ['Per paid lead', paid ? '$' + (spend / paid).toFixed(2) : '–', paid ? 'spend ÷ paid leads in FUB' : 'no paid leads']
+      ['Signed up again', again, 'already in FUB before'],
+      ["Meta's count", metaLeads, metaLeads === n ? 'matches FUB' : metaLeads > n ? (metaLeads - n) + ' more than FUB' : (n - metaLeads) + ' fewer than FUB', metaLeads > n ? 'warn' : '']
     ];
     $('#kpis').innerHTML = K.map(function (k) { return '<div class="kpi ' + (k[3] || '') + '"><span class="l">' + k[0] + '</span><span class="v">' + k[1] + '</span><span class="s">' + esc(k[2]) + '</span></div>'; }).join('');
 
@@ -227,28 +231,28 @@ dialog button{font:inherit;margin-top:12px;padding:9px 16px;border-radius:7px;bo
         if (key(s) >= key(R.b)) break; B.push({ lab: MON[s.m], k0: key(s) < ka ? ka : key(s), k1: key(e1) }); }
     }
     // Today / Yesterday: the chart shows the last 14 days (fetched separately) so the day can be read against normal
-    var pool = D14 ? D14.leads.map(function (l) { l.g = groupOf(l); l.day = dayKey(new Date(l.at)); return l; }) : L;
+    var pool = D14 ? prep(D14.leads) : L;
+    pool.forEach(function (l) { if (!GROUPS.some(function (g) { return g.k === l.g; })) GROUPS.push({ k: l.g, n: l.g === '?' ? 'Ad, campaign not known' : shortCamp(l.g), c: l.g === '?' ? '--muted' : PAL[GROUPS.length % PAL.length] }); });
     B.forEach(function (b) { b.v = {}; b.t = 0; pool.forEach(function (l) { if (l.day >= b.k0 && l.day <= b.k1) { b.v[l.g] = (b.v[l.g] || 0) + 1; b.t++; } }); });
-    $('#chTitle').textContent = 'New leads per ' + R.unit;
+    $('#chTitle').textContent = 'Ad leads per ' + R.unit;
     $('#chSub').textContent = RANGE === 'today' || RANGE === 'yday' ? 'last 2 weeks, ' + (RANGE === 'today' ? 'today' : 'yesterday') + ' outlined' : R.unit === 'week' ? 'last bar = this week so far' : R.unit === 'month' ? 'last bar = this month so far' : '';
-    $('#legend').innerHTML = GROUPS.map(function (g) { return '<span style="--c:var(' + g.c + ')">' + g.n + '</span>'; }).join('');
+    $('#legend').innerHTML = GROUPS.map(function (g) { return '<span style="--c:' + (g.c.charAt(0) === '#' ? g.c : 'var(' + g.c + ')') + '">' + esc(g.n) + '</span>'; }).join('');
     drawChart(B);
 
-    // sources
+    // by campaign: FUB leads, Meta's count, spend, cost per lead
     $('#srcSub').textContent = R.label.split(' (')[0];
-    $('#srcRows').innerHTML = GROUPS.map(function (g) {
-      var m = L.filter(function (l) { return l.g === g.k; }), v = m.length, ny = m.filter(function (l) { return l.status === 'new'; }).length;
-      return '<tr><td><span class="dot" style="background:var(' + g.c + ')"></span>' + g.n + '</td><td>' + v + '</td><td>' + (n ? Math.round(v / n * 100) + '%' : '–') + '</td><td>' + (v ? ny : '–') + '</td></tr>';
-    }).join('') + '<tr><td><b>All</b></td><td><b>' + n + '</b></td><td>100%</td><td><b>' + notYet + '</b></td></tr>';
+    $('#srcRows').innerHTML = GROUPS.filter(function (g) { return CS[g.k] || L.some(function (l) { return l.g === g.k; }); }).map(function (g) {
+      var m = L.filter(function (l) { return l.g === g.k; }).length, c = CS[g.k] || { spend: 0, meta: 0 };
+      return '<tr><td><span class="dot" style="background:' + colOf(g.c) + '"></span>' + esc(g.n) + '</td><td>' + m + '</td><td>' + (g.k === '?' ? '–' : c.meta) + '</td><td>' + (g.k === '?' ? '–' : '$' + c.spend.toFixed(2)) + '</td><td>' + (m && c.spend ? '$' + (c.spend / m).toFixed(2) : '–') + '</td></tr>';
+    }).join('') + '<tr><td><b>All ads</b></td><td><b>' + n + '</b></td><td><b>' + metaLeads + '</b></td><td><b>$' + spend.toFixed(2) + '</b></td><td><b>' + (n ? '$' + (spend / n).toFixed(2) : '–') + '</b></td></tr>';
 
-    // Meta vs FUB check (paid leads only, days with Meta numbers)
+    // Meta vs FUB check, per campaign
     var cks = [];
-    if (metaLeads || paid) {
-      var diff = metaLeads - paid;
-      cks.push(diff > 0 ? ['--amber', 'Meta counted ' + metaLeads + ' ad leads, Follow Up Boss has ' + paid + ' tagged Meta Ad. ' + diff + ' to look for: a Facebook-form lead that never reached FUB, or a sign-up whose ad label was lost.']
-        : diff < 0 ? ['--blue-soft', 'Follow Up Boss has ' + paid + ' leads tagged Meta Ad, Meta counted ' + metaLeads + '. Normal: Meta only counts people it can match to the ad.']
-        : ['--up', 'Meta counted ' + metaLeads + ' ad leads and all ' + paid + ' are in Follow Up Boss.']);
-    }
+    GROUPS.forEach(function (g) { if (g.k === '?') return; var m = L.filter(function (l) { return l.g === g.k; }).length, c = CS[g.k]; if (!c) return;
+      if (c.meta > m) cks.push(['--amber', g.n + ': Meta counted ' + c.meta + ', Follow Up Boss has ' + m + '. ' + (c.meta - m) + ' to look for (a lead that never reached FUB, or one whose ad label was lost).']); });
+    var unk = L.filter(function (l) { return l.g === '?'; }).length;
+    if (unk) cks.push(['--blue-soft', unk + ' ad lead' + (unk > 1 ? 's' : '') + ' with no campaign name: they came from an ad, but the link carried no campaign label.']);
+    if (!cks.length && (metaLeads || n)) cks.push(['--up', 'Every ad lead Meta counted is in Follow Up Boss.']);
     $('#checkCard').hidden = !cks.length;
     $('#checks').innerHTML = cks.map(function (c) { return '<div class="check" style="--c:var(' + c[0] + ')"><span>' + esc(c[1]) + '</span></div>'; }).join('');
     renderList(L);
@@ -264,7 +268,7 @@ dialog button{font:inherit;margin-top:12px;padding:9px 16px;border-radius:7px;bo
     var longLab = B.length && B[0].lab.length > 3, every = Math.max(1, Math.ceil(B.length / (longLab ? 5 : 9)));
     B.forEach(function (b, i) {
       var x = L0 + i * bw + bw * .14, w = bw * .72, acc = 0;
-      GROUPS.forEach(function (g) { var c = b.v[g.k] || 0; if (!c) return; s.append(el('rect', { x: x, y: y(acc + c), width: w, height: y(acc) - y(acc + c), fill: col(g.c) })); acc += c; });
+      GROUPS.forEach(function (g) { var c = b.v[g.k] || 0; if (!c) return; s.append(el('rect', { x: x, y: y(acc + c), width: w, height: y(acc) - y(acc + c), fill: colOf(g.c) })); acc += c; });
       if (b.hi) s.append(el('rect', { x: x - 2, y: y(Math.max(acc, 0)) - 2, width: w + 4, height: Bt - y(acc) + 2, fill: 'none', stroke: col('--fg'), 'stroke-width': 2 }));
       if (acc && B.length <= 16) s.append(el('text', { x: x + w / 2, y: y(acc) - 5, 'text-anchor': 'middle', 'font-size': 13, 'font-weight': 700, fill: col('--fg'), 'font-family': 'JetBrains Mono' }, acc));
       if (i % every === 0) s.append(el('text', { x: x + w / 2, y: Bt + 20, 'text-anchor': 'middle', 'font-size': 13, fill: col('--muted'), 'font-family': 'JetBrains Mono' }, b.lab));
@@ -275,7 +279,7 @@ dialog button{font:inherit;margin-top:12px;padding:9px 16px;border-radius:7px;bo
   function renderList(L) {
     var M = ONLYNEW ? L.filter(function (l) { return l.status === 'new'; }) : L, html = '', cur = '', t = today();
     var tk = key(t), yk = key(addD(t, -1));
-    if (!M.length) { $('#list').innerHTML = '<p class="empty">' + (ONLYNEW ? 'Everyone in these dates has been contacted.' : 'No leads came in on these dates.') + '</p>'; return; }
+    if (!M.length) { $('#list').innerHTML = '<p class="empty">' + (ONLYNEW ? 'Everyone in these dates has been contacted.' : 'No leads came in from ads on these dates.') + '</p>'; return; }
     var counts = {}; M.forEach(function (l) { counts[l.day] = (counts[l.day] || 0) + 1; });
     M.forEach(function (l) {
       if (l.day !== cur) {
@@ -283,10 +287,10 @@ dialog button{font:inherit;margin-top:12px;padding:9px 16px;border-radius:7px;bo
         var nm = l.day === tk ? 'Today' : l.day === yk ? 'Yesterday' : WD[dt.getUTCDay()];
         html += '<div class="day"><span>' + nm + ' · ' + MON[+p[1] - 1] + ' ' + (+p[2]) + '</span><span>' + counts[l.day] + (counts[l.day] === 1 ? ' lead' : ' leads') + '</span></div>';
       }
-      var from = l.paid ? 'Paid ad' + (l.ad ? ': ' + l.ad.replace(/^OP Team - /, '') : '') : l.project ? l.project + ' page' : l.source;
+      var from = l.campaign ? shortCamp(l.campaign) : 'Ad · ' + l.source;
       var st = { new: ['t-new', 'Not contacted'], con: ['t-con', 'Contacted'], apt: ['t-apt', 'Appointment'] }[l.status];
-      html += '<a class="lead" href="' + FUBAPP + '/2/people/view/' + l.id + '" target="_blank" rel="noopener"><span><span class="nm">' + esc(l.name) + '</span><br><span class="sub">' + esc(l.project && l.paid ? l.project + ' · ' : '') + esc(from) + '</span>'
-        + '<span class="tags">' + (l.paid ? '<span class="tag t-paid">Paid ad</span>' : '') + (l.again ? '<span class="tag t-again">Signed up again</span>' : '') + '</span></span>'
+      html += '<a class="lead" href="' + FUBAPP + '/2/people/view/' + l.id + '" target="_blank" rel="noopener"><span><span class="nm">' + esc(l.name) + '</span><br><span class="sub">' + esc(from) + '</span>'
+        + '<span class="tags">' + (l.again ? '<span class="tag t-again">Signed up again</span>' : '') + '</span></span>'
         + '<span class="rt"><span class="tm">' + when(l) + '</span><span class="tag ' + st[0] + '">' + st[1] + '</span></span></a>';
     });
     $('#list').innerHTML = html;
@@ -294,12 +298,12 @@ dialog button{font:inherit;margin-top:12px;padding:9px 16px;border-radius:7px;bo
 
   $('#copyBtn').onclick = function () {
     if (!DATA) return;
-    var R = rangeOf(RANGE), lines = ['New leads, ' + R.label + ' (' + DATA.leads.length + ')'];
-    DATA.leads.forEach(function (l) { lines.push(l.day + ' ' + when(l) + ' · ' + l.name + ' · ' + (l.paid ? 'Paid ad' : l.project ? l.project + ' page' : l.source) + (l.again ? ' · signed up again' : '')); });
+    var R = rangeOf(RANGE), AL = DATA.leads.filter(function (l) { return l.paid; }), lines = ['Leads from ads, ' + R.label + ' (' + AL.length + ')'];
+    AL.forEach(function (l) { lines.push(l.day + ' ' + when(l) + ' · ' + l.name + ' · ' + (l.campaign ? shortCamp(l.campaign) : 'ad') + (l.again ? ' · signed up again' : '')); });
     var txt = lines.join('\n');
-    (navigator.clipboard ? navigator.clipboard.writeText(txt) : Promise.reject()).then(function () { toast('Copied ' + DATA.leads.length + ' names'); }).catch(function () { toast('Could not copy'); });
+    (navigator.clipboard ? navigator.clipboard.writeText(txt) : Promise.reject()).then(function () { toast('Copied ' + AL.length + ' names'); }).catch(function () { toast('Could not copy'); });
   };
-  $('#filtBtn').onclick = function () { ONLYNEW = !ONLYNEW; this.setAttribute('aria-pressed', ONLYNEW); this.classList.toggle('chip', false); this.style.borderColor = ONLYNEW ? col('--blue') : ''; this.style.color = ONLYNEW ? '#fff' : ''; if (DATA) renderList(DATA.leads); };
+  $('#filtBtn').onclick = function () { ONLYNEW = !ONLYNEW; this.setAttribute('aria-pressed', ONLYNEW); this.classList.toggle('chip', false); this.style.borderColor = ONLYNEW ? col('--blue') : ''; this.style.color = ONLYNEW ? '#fff' : ''; if (DATA) renderList(DATA.leads.filter(function (l) { return l.paid; })); };
 
   $('#chips').innerHTML = RANGES.map(function (r) { return '<button type="button" class="chip' + (r[0] === RANGE ? ' on' : '') + '" data-r="' + r[0] + '">' + r[1] + '</button>'; }).join('');
   $('#chips').onclick = function (e) { var b = e.target.closest('.chip'); if (!b) return; RANGE = b.dataset.r; store('adsview_leads_range', RANGE); [].forEach.call(document.querySelectorAll('#chips .chip'), function (x) { x.classList.toggle('on', x === b); }); load(); };
