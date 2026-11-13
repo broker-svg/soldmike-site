@@ -58,7 +58,7 @@ def faq_schema(qs):
 
 # ---------- building blocks ----------
 NAV = [
-    ('Buy', [('/listings/', 'Search homes'), ('/listings/our-listings/', 'Our listings'), ('/listings/re-max-premier/', 'RE/MAX Premier listings'), ('/buy/', 'Buying with us'), ('/buy/buyer-guide/', 'Buyer guide: 15 steps'), ('/free-guide/', 'Free PDF guides'), ('/buy/pre-construction/', 'Pre-construction'), ('/saved/', 'Saved homes & searches'), ('/open-house/', 'Open houses')]),
+    ('Buy', [('/listings/', 'Search homes'), ('/listings/our-listings/', 'OP Team listings'), ('/listings/re-max-premier/', 'RE/MAX Premier listings'), ('/buy/', 'Buying with us'), ('/buy/buyer-guide/', 'Buyer guide: 15 steps'), ('/free-guide/', 'Free PDF guides'), ('/buy/pre-construction/', 'Pre-construction'), ('/saved/', 'Saved homes & searches'), ('/open-house/', 'Open houses')]),
     ('Sell', [('/sell/home-value/', "What's my home worth?"), ('/sell/', 'Selling with us'), ('/sell/seller-guide/', 'Seller guide: 15 steps'), ('/free-guide/', 'Free PDF guides'), ('/sell/cost-to-sell-vaughan/', 'Cost to sell calculator'), ('/sell/how-we-market/', 'How we market your home'), ('/sell/pre-listing/', 'Pre-listing package'), ('/sell/pre-listing-checklist/', 'Pre-listing checklist')]),
     ('Neighbourhoods', [('/neighbourhoods/', 'All neighbourhoods')] + [('/neighbourhoods/%s/' % s, n) for s, n in [('woodbridge', 'Woodbridge'), ('vellore', 'Vellore Village'), ('kleinburg', 'Kleinburg'), ('maple', 'Maple'), ('caledon-bolton', 'Caledon & Bolton'), ('king-city-nobleton', 'King City & Nobleton'), ('sharon-east-gwillimbury', 'Sharon & East Gwillimbury'), ('toronto', 'Toronto')]]),
     ('Results', [('/vow/search?status=sold&team=1', 'Our team\'s sales'), ('/vow/', 'All recent sales'), ('/results/', 'Case studies'), ('/reviews/', 'Client reviews'), ('/blog/', 'Blog'), ('/market-reports/', 'Market reports')]),
@@ -276,11 +276,11 @@ P('/listings/',
   head=LISTING_HEAD + LEAFLET_HEAD, js=LISTING_JS + LEAFLET_JS + '<script src="/assets/search.js?v=5" defer></script>')
 
 P('/listings/our-listings/',
-  lambda: hero([('Home', '/'), ('Search homes', '/listings/'), ('Our listings', '/listings/our-listings/')], 'Our listings', 'Homes listed by Michael Barillari and RE/MAX Premier The OP Team, updated every day. Book a showing or ask Michael anything about them.'),
+  lambda: hero([('Home', '/'), ('Search homes', '/listings/'), ('OP Team listings', '/listings/our-listings/')], 'OP Team listings', 'Homes listed by Michael Barillari and RE/MAX Premier The OP Team, updated every day. Book a showing or ask Michael anything about them.'),
   lambda: band(SEARCH_BLOCK({'team': '1'}, 'No homes listed by The OP Team match right now. New listings show up here automatically.'), 'lsband'),
-  title='Our Listings | Michael Barillari, RE/MAX Premier The OP Team',
+  title='OP Team Listings | Michael Barillari, RE/MAX Premier The OP Team',
   desc='Homes for sale listed by Michael Barillari and RE/MAX Premier The OP Team in Vaughan and the GTA, updated every day.',
-  trail=[('Search homes', '/listings/'), ('Our listings', '/listings/our-listings/')],
+  trail=[('Search homes', '/listings/'), ('OP Team listings', '/listings/our-listings/')],
   head=LISTING_HEAD + LEAFLET_HEAD, js=LISTING_JS + LEAFLET_JS + '<script src="/assets/search.js?v=5" defer></script>')
 
 P('/listings/re-max-premier/',
