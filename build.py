@@ -153,7 +153,6 @@ FORMS = {
     'report': ('Market report', 'Email me the monthly report', [('', 'name', 'Your name', 'text', ''), ('', 'email', 'Email', 'email', ''), ('full', 'area', 'Area', ['Vaughan', 'Woodbridge', 'Kleinburg', 'King', 'Caledon', 'East Gwillimbury'], '')], "Done. You'll get the next report on the 5th."),
 }
 GUIDES = {'Selling a home in Vaughan': '/guides/selling-a-home-in-vaughan.pdf', 'Buying a home in Vaughan': '/guides/buying-a-home-in-vaughan.pdf', 'Pre-listing checklist': '/guides/pre-listing-checklist.pdf'}
-OPTIONAL_PHONE = {'value'}  # forms where the phone label + box say (optional)
 def form(kind, uid='', pick=None):
     lead, btn, fields, done = FORMS[kind]
     if pick:  # preselect and lock one option (e.g. the seller guide on the seller guide page)
@@ -169,7 +168,7 @@ def form(kind, uid='', pick=None):
             ctl = '<textarea id="%s" name="%s" data-label="%s"></textarea>' % (fid, name, e(label))
         else:
             auto = {'name': 'name', 'email': 'email', 'phone': 'tel'}.get(name, 'off')
-            opt = kind in OPTIONAL_PHONE and name == 'phone'
+            opt = name == 'phone'  # phone is never required (name + email or phone), so say so
             if opt: ph = '(optional)'
             ctl = '<input id="%s" name="%s" type="%s" autocomplete="%s" data-label="%s"%s>' % (fid, name, typ, auto, e(label), ' placeholder="%s"' % e(ph) if ph else '')
         lab = e(label) + (' <span style="font-weight:400;color:#5b6378">(optional)</span>' if not isinstance(typ, list) and typ != 'area' and opt else '')
@@ -300,7 +299,7 @@ P('/listings/home/',
   '<div class="ld" id="ld" data-listings><p class="ld-loading">Loading this home…</p></div>',
   title='Home for sale | SoldMike', desc='MLS® listing details, photos and showings with Michael Barillari, Broker.',
   trail=[('Search homes', '/listings/'), ('Listing', '/listings/home/')],
-  head=LISTING_HEAD + LEAFLET_HEAD, js=LISTING_JS + LEAFLET_JS + '<script src="/assets/home.js?v=11" defer></script>', noindex=True)  # shell for /listings/home/?id= and the Worker's /homes/ pages (the Worker strips this noindex)
+  head=LISTING_HEAD + LEAFLET_HEAD, js=LISTING_JS + LEAFLET_JS + '<script src="/assets/home.js?v=12" defer></script>', noindex=True)  # shell for /listings/home/?id= and the Worker's /homes/ pages (the Worker strips this noindex)
 
 SAVED_JS = """<script>
 document.addEventListener('DOMContentLoaded',function(){

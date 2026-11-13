@@ -108,7 +108,7 @@
       +'<form id="inq" data-kind="showing"><div class="only-showing"><span class="lbl">Pick a day to see it</span><div class="days" id="days"></div></div>'
       +'<div class="only-showing"><label for="b-time">Time</label><select id="b-time" name="time"><option>Morning</option><option selected>Afternoon</option><option>Evening</option></select></div>'
       +'<div class="only-ask" hidden><label for="b-msg">Your question</label><textarea id="b-msg" name="message" rows="4">Hi Michael, I would like more information about '+esc(where)+'.</textarea></div>'
-      +'<div class="two"><div><label for="b-name">Name</label><input id="b-name" name="name" autocomplete="name" value="'+esc(nm)+'"></div><div><label for="b-phone">Phone</label><input id="b-phone" name="phone" type="tel" autocomplete="tel" value="'+esc(lead.phone||'')+'"></div></div>'
+      +'<div class="two"><div><label for="b-name">Name</label><input id="b-name" name="name" autocomplete="name" value="'+esc(nm)+'"></div><div><label for="b-phone">Phone <span style="font-weight:400;color:#5b6378">(optional)</span></label><input id="b-phone" name="phone" type="tel" autocomplete="tel" placeholder="(optional)" value="'+esc(lead.phone||'')+'"></div></div>'
       +'<div><label for="b-email">Email</label><input id="b-email" name="email" type="email" autocomplete="email" value="'+esc(lead.email||'')+'"></div>'
       +'<button class="btn" type="submit" id="inqBtn">Request a showing</button><p class="ok msg" role="status"></p>'
       +'<p class="fine">By sending, I agree to be contacted by RE/MAX Premier The OP Team by call, text and email. To opt out, reply STOP or click unsubscribe.</p></form>'
