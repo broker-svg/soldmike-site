@@ -202,6 +202,8 @@ dialog button{font:inherit;margin-top:12px;padding:9px 16px;border-radius:7px;bo
     $('#rangeTxt').innerHTML = 'Showing <b>' + esc(R.label) + '</b>' + (PREV ? ' · compared with ' + esc(R.pl) : '') + ' · leads from Follow Up Boss, spend from Meta';
     var ka = key(R.a), kb = key(addD(R.b, -1)), spend = 0, metaLeads = 0, CS = {};
     (DATA.campDays || []).forEach(function (d) { if (d[0] >= ka && d[0] <= kb) { var c = CS[d[1]] = CS[d[1]] || { spend: 0, meta: 0 }; c.spend += d[2]; c.meta += d[3]; spend += d[2]; metaLeads += d[3]; } });
+    // the same person sending a Facebook form twice: Meta counts 2, it is 1 lead
+    Object.keys(DATA.repeats || {}).forEach(function (k) { if (CS[k]) { CS[k].meta -= DATA.repeats[k]; metaLeads -= DATA.repeats[k]; } });
     // campaigns shown: any that spent in these days or brought a lead, biggest spend first
     var names = Object.keys(CS).filter(function (c) { return CS[c].spend > 0 || CS[c].meta > 0; });
     L.forEach(function (l) { if (l.g !== '?' && names.indexOf(l.g) < 0) names.push(l.g); });
