@@ -149,6 +149,16 @@ a{color:var(--navy)}
 .vow{display:flex;gap:10px;align-items:center;padding:12px;border-radius:12px;background:var(--mist);border:1px solid var(--line);font-size:15px}
 .vow.on{background:#E7F4EC;border-color:#B9DEC6}
 .foot{font-size:14px;color:var(--muted);margin-top:18px}
+/* website sign-in (soldmike.com/leads/ way in) */
+html.site .dtabs{display:none}
+.signin{max-width:420px;margin:24px auto 0;background:#fff;border:1px solid var(--line);border-radius:16px;padding:24px;box-shadow:0 24px 60px -30px rgba(20,24,51,.45);display:flex;flex-direction:column;gap:12px}
+.signin h1{font-size:38px}
+.signin label{font-weight:600;font-size:15px;display:flex;flex-direction:column;gap:6px}
+.signin input[type=email],.signin input[type=password]{min-height:52px;border:1px solid var(--line);border-radius:10px;padding:0 14px;font-size:18px}
+.signin .keep{flex-direction:row;align-items:center;gap:10px;font-weight:500}
+.signin .keep input{width:22px;height:22px}
+.signin .btn{width:100%;min-height:52px;font-size:18px}
+.ways{max-width:420px;margin:16px auto 0;font-size:14px;color:var(--muted)}
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:12px 18px;border-radius:10px;font-size:15px;box-shadow:0 10px 30px rgba(0,0,0,.25);z-index:10;max-width:calc(100vw - 32px)}
 </style>
 </head>
@@ -156,10 +166,10 @@ a{color:var(--navy)}
 <div class="bar">
   <a href="/hq/" aria-label="HQ"><img src="/logo-soldmike-white.png" alt="SoldMike"></a>
   <b>Leads</b>
-  <a class="lnk" href="/hq/">Back to HQ</a>
+  <a class="lnk" href="/hq/" id="barLnk">Back to HQ</a>
 </div>
 <div class="dtabs"><nav aria-label="Dashboards"><a href="/hq/tasks/">Tasks</a><a href="/hq/">HQ</a><a href="/hq/agents/#realestate">Real Estate</a><a href="/hq/agents/#marketing">Marketing</a><a href="/hq/agents/#toolkit">Toolkit</a><a href="/hq/agents/#personal">Personal</a><a href="/hq/agents/#financial">Financial</a><a href="/hq/agents/#tpm">TPM</a><a href="/open-house/">Open House</a><a href="/hq/leads/" aria-current="page">Leads</a><a href="/hq/ads/" target="_blank" rel="noopener">Ads</a><a href="/vow/realview" target="_blank" rel="noopener">RealView</a></nav></div>
-<div class="mock">MOCKUP · made-up people and homes · buttons don't change anything</div>
+<div class="mock">MOCKUP · made-up people and homes · buttons don't change anything · <a href="?from=site#signin" id="mockWay" style="color:inherit">See the website sign-in</a></div>
 <main class="wrap" id="app"></main>
 <div class="toast" id="toast" hidden></div>
 
@@ -311,7 +321,25 @@ a{color:var(--navy)}
     document.getElementById('noteBtn').onclick=function(){var v=document.getElementById('noteIn').value.trim();if(!v)return;l.ev.unshift(['note',0,null,v]);document.getElementById('noteIn').value='';tl();toast('Mockup: note added on this page only');};
   }
 
-  function route(){var m=location.hash.match(/^#lead-(\d+)$/);if(m)person(+m[1]);else list();}
+  // ---------- two ways in ----------
+  // 1) soldmike.com/leads/ : its own sign-in page (this mockup: ?from=site). 2) HQ › Leads tab: already signed in with the HQ PIN, opens straight to the list.
+  var SITE=/[?&]from=site/.test(location.search);
+  function signedIn(){try{return sessionStorage.getItem('mock_leads_in')==='1';}catch(e){return false;}}
+  if(SITE){document.documentElement.classList.add('site');var bl=document.getElementById('barLnk');bl.textContent='Sign out';bl.href='#';
+    bl.onclick=function(ev){ev.preventDefault();try{sessionStorage.removeItem('mock_leads_in');}catch(e){}location.hash='#signin';route();};
+    var mw=document.getElementById('mockWay');mw.textContent='See the HQ way in';mw.href='/hq/leads/';}
+  function signin(){
+    app.innerHTML='<form class="signin" id="sf"><h1>Leads sign-in</h1><p class="muted" style="margin:0;font-size:15px">soldmike.com/leads · for Michael (and team members he adds)</p>'
+      +'<label>Email<input type="email" autocomplete="username" placeholder="you@example.com" required></label>'
+      +'<label>Password<input type="password" autocomplete="current-password" placeholder="••••••••" required></label>'
+      +'<label class="keep"><input type="checkbox" checked> Keep me signed in on this phone</label>'
+      +'<button class="btn" type="submit">Sign in</button><a href="#" id="fg" style="font-size:15px;text-align:center">Forgot password?</a></form>'
+      +'<p class="ways"><b>Two ways in, same dashboard:</b> sign in here on soldmike.com/leads, or tap the <b>Leads</b> tab in HQ (HQ already knows it\'s you, so it opens straight to the list).</p>';
+    document.getElementById('sf').onsubmit=function(ev){ev.preventDefault();try{sessionStorage.setItem('mock_leads_in','1');}catch(e){}toast('Mockup: any email and password work');location.hash='';route();};
+    document.getElementById('fg').onclick=function(ev){ev.preventDefault();toast('Mockup: would email a reset link');};
+  }
+
+  function route(){var bl=document.getElementById('barLnk');if(SITE&&(location.hash==='#signin'||!signedIn())){bl.hidden=true;signin();return;}bl.hidden=false;var m=location.hash.match(/^#lead-(\d+)$/);if(m)person(+m[1]);else list();}
   addEventListener('hashchange',route);route();
 })();
 </script>
