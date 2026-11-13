@@ -150,8 +150,9 @@ a{color:var(--navy)}
 .vow.on{background:#E7F4EC;border-color:#B9DEC6}
 .foot{font-size:14px;color:var(--muted);margin-top:18px}
 /* ===== round 2 (Nov 13): width switch, tasks, notes, waiting clock, viewed strip, search homes + map ===== */
-html.wide .wrap,html.wide .dtabs nav{max-width:none}
-.toprow{display:flex;justify-content:space-between;align-items:center;gap:12px}
+html.wide .wrap,html.wide .dtabs nav{max-width:1760px}
+@media (min-width:1181px){html.wide .cols{grid-template-columns:340px minmax(0,1fr) 400px}}
+.toprow{display:flex;justify-content:space-between;align-items:center;gap:8px 12px}
 .wbtn{min-height:40px;padding:0 14px;border-radius:20px;border:1px solid var(--line);background:#fff;font-weight:600;font-size:15px;cursor:pointer;flex:none}
 @media (max-width:1180px){.wbtn{display:none}}
 .stat.act b{color:var(--red)}
@@ -169,8 +170,7 @@ html.wide .wrap,html.wide .dtabs nav{max-width:none}
 .addrow{display:flex;gap:8px;margin-top:10px}
 .addrow input{flex:1;min-width:0;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:0 12px;font-size:16px}
 /* notes */
-.notes textarea{display:block;width:100%;min-height:84px;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font:inherit;font-size:16px;resize:vertical}
-.notes .btn{margin-top:8px}
+.notes textarea{display:block;width:100%;min-height:170px;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font:inherit;font-size:16px;resize:vertical}
 .nt{padding:10px 12px;border-radius:10px;background:#FFFBEA;border:1px solid #F1E2A6;margin-top:8px;font-size:15px;display:flex;gap:10px;justify-content:space-between;align-items:flex-start}
 .nt.pin{border-color:#D9A91A;border-width:2px}
 .nt small{display:block;color:var(--muted);font-size:13px;margin-top:2px}
@@ -197,28 +197,53 @@ html.wide .wrap,html.wide .dtabs nav{max-width:none}
 .map svg{display:block;width:100%;height:auto}
 .map small{display:block;padding:6px 10px;color:var(--muted);font-size:13px}
 @media (max-width:780px){.sgrid{grid-template-columns:minmax(0,1fr)}.map{position:static;order:-1}.bh{grid-template-columns:auto 132px 1fr}.bh .pic{width:132px;height:92px}}
-/* viewed homes strip (rolls along the bottom on desktop, swipes on phone) */
-.strip{position:fixed;left:0;right:0;bottom:0;z-index:5;background:var(--ink);color:#fff;display:flex;align-items:stretch;border-top:3px solid var(--red)}
-.strip .lab{flex:none;display:flex;flex-direction:column;justify-content:center;gap:4px;padding:0 16px;background:var(--navy);font-family:var(--display);font-weight:800;text-transform:uppercase;font-size:21px;line-height:1;z-index:1}
-.strip .lab small{font-family:var(--body);font-weight:500;text-transform:none;font-size:13px;color:var(--pale)}
-.roll{overflow:hidden;flex:1;min-width:0}
-.rtrack{display:flex;width:max-content;padding:10px 0;animation:roll 70s linear infinite}
+/* viewed homes strip: Rolling (fixed along the bottom), Still (sits at the bottom of the page), or Off. Swipes on phone. */
+.strip{position:fixed;left:0;right:0;bottom:0;z-index:5;background:var(--ink);color:#fff;border-top:3px solid var(--red)}
+.shead{display:flex;align-items:center;gap:6px 10px;padding:8px 14px 0;flex-wrap:wrap}
+.shead b{font-family:var(--display);font-weight:800;text-transform:uppercase;font-size:20px;line-height:1}
+.shead small{color:var(--pale);font-size:13px;margin-right:6px}
+.sfil{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;max-width:100%}
+.sfil::-webkit-scrollbar{display:none}
+.sfil button{flex:none;min-height:32px;padding:0 12px;border-radius:16px;border:1px solid #5A66A8;background:transparent;color:#fff;font-size:14px;font-weight:600;cursor:pointer}
+.sfil button[aria-pressed="true"]{background:#fff;color:var(--ink);border-color:#fff}
+.roll{overflow:hidden;min-width:0}
+.rtrack{display:flex;width:max-content;padding:8px 0 10px;animation:roll 70s linear infinite}
 .roll:hover .rtrack,.roll:focus-within .rtrack{animation-play-state:paused}
 @keyframes roll{to{transform:translateX(-50%)}}
-.vc{flex:none;display:flex;gap:10px;align-items:center;background:#232A52;border-radius:12px;padding:6px 16px 6px 6px;margin-right:12px;font-size:14px;color:#fff;text-decoration:none}
+.vc{flex:none;display:flex;gap:10px;align-items:center;background:#232A52;border:0;border-radius:12px;padding:6px 16px 6px 6px;margin-right:12px;font:inherit;font-size:14px;color:#fff;text-decoration:none;text-align:left;cursor:pointer}
 .vc .pic{width:150px;height:100px}
 .vc b{display:block;font-size:15px;white-space:nowrap}
 .vc small{display:block;color:var(--pale);white-space:nowrap}
 .vc .chip{margin-bottom:3px}
-body.hasstrip .wrap{padding-bottom:170px}
-body.hasstrip .toast{bottom:150px}
+.rtrack .none{padding:18px 14px;color:var(--pale);font-size:15px}
+.strip.few .rtrack,.strip.still .rtrack{animation:none;padding-left:12px}
+.strip.still{position:static;border-top:0;border-radius:14px;margin-top:16px;overflow:hidden}
+.strip.still .roll{overflow-x:auto}
+body.hasstrip .wrap{padding-bottom:215px}
+body.hasstrip .toast{bottom:195px}
+.seg{display:inline-flex;align-items:center;gap:6px;font-size:14px;color:var(--muted);font-weight:600}
+.seg span{display:inline-flex;border:1px solid var(--line);border-radius:20px;overflow:hidden;background:#fff}
+.seg button{min-height:38px;padding:0 12px;border:0;background:none;font-weight:600;font-size:14px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--navy);color:#fff}
+.wctl{display:inline-flex;gap:8px}
+.toprow{flex-wrap:wrap}
+.toprow .ctl{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+html.fs .bar,html.fs .dtabs{display:none}
+.rbox{margin-top:8px}
+.rbox textarea,.canvas textarea{display:block;width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font:inherit;font-size:16px;resize:vertical}
+.rbox textarea{min-height:90px}
+.rbox .btn{margin-top:8px}
+.canvas textarea{min-height:62vh;font-size:18px;line-height:1.55}
+.nbtns{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.nbtns .btn{margin-top:0}
 @media (max-width:780px){
-  .strip{position:static;flex-direction:column;border-radius:14px;border-top:0;margin-bottom:12px;overflow:hidden}
-  .strip .lab{flex-direction:row;align-items:baseline;justify-content:space-between;padding:10px 14px 0;background:none}
+  .strip{position:static;border-radius:14px;border-top:0;margin-bottom:12px;overflow:hidden}
+  .strip.still{margin-top:16px}
   .roll{overflow-x:auto;scrollbar-width:none}.roll::-webkit-scrollbar{display:none}
   .rtrack{animation:none;padding:10px 0 12px 12px}.vc.dup{display:none}
   .vc{flex-direction:column;align-items:flex-start;padding:6px 6px 10px}.vc .pic{width:210px;height:140px}.vc>div{padding:0 6px}
   body.hasstrip .wrap{padding-bottom:60px}body.hasstrip .toast{bottom:24px}
+  .seg span{flex:1}.seg{width:100%}.seg button{flex:1}
 }
 @media (prefers-reduced-motion:reduce){.rtrack{animation:none}.roll{overflow-x:auto}.vc.dup{display:none}}
 /* website sign-in (soldmike.com/leads/ way in) */
@@ -241,7 +266,7 @@ html.site .dtabs{display:none}
   <a class="lnk" href="/hq/" id="barLnk">Back to HQ</a>
 </div>
 <div class="dtabs"><nav aria-label="Dashboards"><a href="/hq/tasks/">Tasks</a><a href="/hq/">HQ</a><a href="/hq/agents/#realestate">Real Estate</a><a href="/hq/agents/#marketing">Marketing</a><a href="/hq/agents/#toolkit">Toolkit</a><a href="/hq/agents/#personal">Personal</a><a href="/hq/agents/#financial">Financial</a><a href="/hq/agents/#tpm">TPM</a><a href="/open-house/">Open House</a><a href="/hq/leads/" aria-current="page">Leads</a><a href="/hq/ads/" target="_blank" rel="noopener">Ads</a><a href="/vow/realview" target="_blank" rel="noopener">RealView</a></nav></div>
-<div class="mock">MOCKUP round 2 · made-up people, homes and photos · buttons don't change anything · <a href="?from=site#signin" id="mockWay" style="color:inherit">See the website sign-in</a></div>
+<div class="mock">MOCKUP round 3 · made-up people, homes and photos · buttons don't change anything · <a href="?from=site#signin" id="mockWay" style="color:inherit">See the website sign-in</a></div>
 <main class="wrap" id="app"></main>
 <div class="toast" id="toast" hidden></div>
 
@@ -267,7 +292,7 @@ html.site .dtabs{display:none}
     {id:11,first:'Luca',last:'Benedetti',src:'Mika chat',stage:'Nurture',tags:[],vow:false,alerts:false,email:'luca.b@example.com',phone:'',seen:14*D,created:14*D,price:'',areas:'',ss:[],homes:[],ev:[['chat',14*D,null,'Asked Mika how long homes take to sell in Maple']]},
     {id:12,first:'Rebecca',last:'Stone',src:'Open house',stage:'Closed',tags:['Past client'],vow:true,alerts:false,email:'rstone@example.com',phone:'(905) 555-0190',seen:26*D,created:60*D,price:'',areas:'Maple',ss:[],homes:[7],ev:[['view',26*D,7],['openhouse',60*D,7,'Signed in at the open house']]}
   ];
-  var KIND={view:['👁','Viewed'],save:['♥','Saved'],inquiry:['?','Asked about'],openhouse:['🏠','Open house sign-in'],alert:['✉','Alert sent'],signin:['🔑','Signed in'],form:['📝','Form'],chat:['💬','Mika chat'],stop:['⛔','Stopped alerts'],note:['✎','Note']};
+  var KIND={view:['👁','Viewed'],save:['♥','Saved'],inquiry:['?','Asked about'],openhouse:['🏠','Open house sign-in'],alert:['✉','Alert sent'],signin:['🔑','Signed in'],form:['📝','Form'],chat:['💬','Mika chat'],stop:['⛔','Stopped alerts'],note:['✎','Note'],reply:['↩','You replied']};
   LEADS.forEach(function(l){
     l.views=l.ev.filter(function(e){return e[0]==='view';}).length+(l.id%3)*2;
     l.saves=l.homes.length;
@@ -303,15 +328,20 @@ html.site .dtabs{display:none}
   function waitChip(l){var w=waitInfo(l);return w?'<span class="chip '+(w.over?'red':'amber')+'">⏱ Waiting '+dur(w.ms)+'</span>':'<span class="chip green">✓ Nothing open</span>';}
   function pic(i){var u=[212,28,150,340,45,265,190,12,95,230][i%10];
     return '<svg viewBox="0 0 150 100" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="150" height="100" fill="hsl('+u+',55%,84%)"/><circle cx="124" cy="20" r="9" fill="#fff" opacity=".7"/><rect y="74" width="150" height="26" fill="hsl(112,28%,56%)"/><rect x="36" y="42" width="78" height="38" fill="hsl('+u+',22%,96%)"/><path d="M28 44 75 15 122 44Z" fill="hsl('+u+',32%,34%)"/><rect x="68" y="58" width="14" height="22" fill="hsl('+u+',40%,28%)"/><rect x="45" y="52" width="15" height="12" fill="#9FC3E8"/><rect x="90" y="52" width="15" height="12" fill="#9FC3E8"/></svg>';}
-  function viewed(l){var out=[],got={};function add(i,ms,k){if(got[i])return;got[i]=1;out.push({i:i,ms:ms,k:k});}
-    l.ev.forEach(function(e){if(e[2]!=null&&(e[0]==='view'||e[0]==='save'||e[0]==='inquiry'))add(e[2],e[1],e[0]);});
+  function viewed(l){var out=[],got={};function add(i,ms,k,ei){if(got[i])return;got[i]=1;out.push({i:i,ms:ms,k:k,ev:ei,n:1+((i+l.id)%3),sv:k==='save'||l.homes.indexOf(i)>=0});}
+    l.ev.forEach(function(e){if(e[2]!=null&&(e[0]==='view'||e[0]==='save'||e[0]==='inquiry'))add(e[2],e[1],e[0],e);});
     l.homes.forEach(function(i,n){add(i,l.seen+(n+1)*D,'save');});
     if(out.length)for(var n=0;out.length<6&&n<10;n++)add((l.id*3+n)%10,l.seen+(n+4)*D,'view');
     return out.sort(function(a,b){return a.ms-b.ms;});}
-  var WIDE=false;try{WIDE=localStorage.getItem('leads_wide')==='1';}catch(e){}
+  var WIDE=false,FS=false,STRIP='roll';try{WIDE=localStorage.getItem('leads_wide')==='1';STRIP=localStorage.getItem('leads_strip')||'roll';}catch(e){}
   document.documentElement.classList.toggle('wide',WIDE);
-  function wideBtn(){return '<button class="wbtn" type="button" data-wide>'+(WIDE?'Standard width':'Full width')+'</button>';}
-  document.addEventListener('click',function(ev){var b=ev.target.closest&&ev.target.closest('[data-wide]');if(!b)return;WIDE=!WIDE;try{localStorage.setItem('leads_wide',WIDE?'1':'0');}catch(e){}document.documentElement.classList.toggle('wide',WIDE);b.textContent=WIDE?'Standard width':'Full width';});
+  function wideBtn(){return '<span class="wctl"><button class="wbtn" type="button" data-wide>'+(WIDE?'Standard width':'Wider')+'</button><button class="wbtn" type="button" data-fs>'+(FS?'Exit full screen':'Full screen')+'</button></span>';}
+  function setFs(on){FS=on;document.documentElement.classList.toggle('fs',FS);[].forEach.call(document.querySelectorAll('[data-fs]'),function(x){x.textContent=FS?'Exit full screen':'Full screen';});}
+  document.addEventListener('fullscreenchange',function(){if(!document.fullscreenElement&&FS)setFs(false);});
+  document.addEventListener('click',function(ev){var c=ev.target.closest?function(s){return ev.target.closest(s);}:function(){return null;},b;
+    if((b=c('[data-wide]'))){WIDE=!WIDE;try{localStorage.setItem('leads_wide',WIDE?'1':'0');}catch(e){}document.documentElement.classList.toggle('wide',WIDE);b.textContent=WIDE?'Standard width':'Wider';return;}
+    if(c('[data-fs]')){setFs(!FS);try{if(FS)document.documentElement.requestFullscreen();else if(document.fullscreenElement)document.exitFullscreen();}catch(e){}}
+  });
 
   // ---------- leads list ----------
   function list(){
@@ -394,7 +424,7 @@ html.site .dtabs{display:none}
   function person(id){
     var l=LEADS.filter(function(x){return x.id===id;})[0];if(!l){location.hash='';return;}
     scrollTo(0,0);
-    var tf='all',nsOpen=false,vh=viewed(l),E=l.eval;
+    var tf='all',sf='all',replyIdx=-1,nsOpen=false,vh=viewed(l),E=l.eval;
     var evalCard=E?'<div class="card"><h3>Home evaluation</h3><dl class="kv">'
       +'<dt>Address</dt><dd><b>'+esc(E.addr)+'</b></dd><dt>Type</dt><dd>'+esc(E.type)+'</dd><dt>Beds · baths</dt><dd>'+E.beds+' · '+E.baths+'</dd><dt>Size</dt><dd>'+esc(E.sqft)+' sq ft</dd><dt>Timeline</dt><dd>'+esc(E.when)+'</dd><dt>They said</dt><dd>'+esc(E.notes)+'</dd></dl>'
       +'<a class="btn" href="#" data-rv style="width:100%;margin-top:14px">Open in RealView</a><p class="muted" style="margin:10px 0 0;font-size:14px">Opens RealView with the address and details already filled in.</p></div>':'';
@@ -411,7 +441,7 @@ html.site .dtabs{display:none}
       +'<dt>Emails</dt><dd>'+(l.alerts?'<b style="color:var(--green)">New-listing alerts on</b>':'<span class="muted">Alerts off</span>')+'</dd>'
       +'<dt>VOW</dt><dd>'+(l.vow?'<b style="color:var(--green)">Member</b> · can see sold prices':'<span class="muted">Not a member</span>')+'</dd></dl>'
       +'<a class="btn navy" href="#" data-fub style="width:100%;margin-top:14px">Open in Follow Up Boss</a><p class="muted" style="margin:10px 0 0;font-size:14px">Notes, tasks and activity here are also written to Follow Up Boss.</p></div>';
-    var mid='<div class="card notes"><h3>Notes <span class="n" id="notesN"></span></h3><textarea id="noteIn" placeholder="Type a note about this lead"></textarea><button class="btn navy" type="button" id="noteBtn">Save note</button><div id="notesBox"></div></div>'
+    var mid='<div class="card notes"><h3>Notes <span class="n" id="notesN"></span></h3><textarea id="noteIn" placeholder="Type a note about this lead"></textarea><div class="nbtns"><button class="btn navy" type="button" id="noteBtn">Save note</button><button class="btn ghost" type="button" id="canvasBtn">Open notes page</button></div><div id="notesBox"></div></div>'
       +'<div class="card"><h3>Activity <span class="n">what they did on the site</span></h3>'
       +'<div class="tfil" id="tfil">'+[['all','All'],['view','Viewed'],['save','Saved'],['inquiry','Asked'],['openhouse','Open house'],['alert','Alerts'],['note','Notes']].map(function(x){return '<button type="button" data-k="'+x[0]+'" aria-pressed="'+(x[0]==='all')+'">'+x[1]+'</button>';}).join('')+'</div>'
       +'<ul class="tl" id="tl"></ul></div>';
@@ -419,22 +449,45 @@ html.site .dtabs{display:none}
       +'<div class="card"><h3>Saved homes <span class="n">'+l.homes.length+'</span></h3>'+(l.homes.length?l.homes.map(function(i){var h=home(i);
         return '<div class="home"><span class="pic">'+pic(i)+'</span><div><b>'+esc(h.addr)+'</b><small>'+homeLine(h)+'</small><small>MLS® '+esc(h.mls)+'</small></div></div>';
       }).join(''):'<p class="muted" style="margin:0;font-size:15px">No saved homes.</p>')+'</div></div>';
-    function vcard(v,n,dup){var h=home(v.i);return '<a class="vc'+(dup?' dup':'')+'" href="#" data-home'+(dup?' tabindex="-1" aria-hidden="true"':'')+'><span class="pic">'+pic(v.i)+'</span><div>'+(n===0?'<span class="chip red">Newest</span>':'')+'<b>'+esc(h.addr)+'</b><small>'+homeLine(h)+'</small><small>'+(v.k==='save'?'♥ Saved ':v.k==='inquiry'?'? Asked ':'👁 Viewed ')+esc(ago(v.ms))+'</small></div></a>';}
-    var strip=vh.length?'<div class="strip" id="strip"><div class="lab">Viewed homes<small>'+vh.length+' homes · newest first</small></div><div class="roll"><div class="rtrack">'+vh.map(function(v,n){return vcard(v,n,0);}).join('')+vh.map(function(v,n){return vcard(v,n,1);}).join('')+'</div></div></div>':'';
-    document.body.classList.toggle('hasstrip',!!vh.length);
-    app.innerHTML='<div class="toprow"><button class="back" type="button" id="back">← All leads</button>'+wideBtn()+'</div>'
+    function vcard(v,n,dup){var h=home(v.i),ask=v.k==='inquiry';
+      return '<button type="button" class="vc'+(dup?' dup':'')+'" '+(ask?'data-ask="'+vh.indexOf(v)+'"':'data-home')+(dup?' tabindex="-1" aria-hidden="true"':'')+'><span class="pic">'+pic(v.i)+'</span><div>'+(n===0&&sf==='all'?'<span class="chip red">Newest</span>':'')+'<b>'+esc(h.addr)+'</b><small>'+homeLine(h)+'</small><small>'+(ask?'? Asked about it · tap to reply':(v.sv?'♥ Saved · ':'')+'👁 Viewed '+(v.n>1?v.n+' times':'once')+' · '+esc(ago(v.ms)))+'</small></div></button>';}
+    function stripSeg(){return vh.length?'<span class="seg">Viewed homes <span>'+[['roll','Rolling'],['still','Still'],['off','Off']].map(function(x){return '<button type="button" data-strip="'+x[0]+'" aria-pressed="'+(STRIP===x[0])+'">'+x[1]+'</button>';}).join('')+'</span></span>':'';}
+    function drawStrip(){
+      var top=document.getElementById('stripTop'),bot=document.getElementById('stripBot');top.innerHTML='';bot.innerHTML='';
+      var on=vh.length&&STRIP!=='off';document.body.classList.toggle('hasstrip',!!on&&STRIP==='roll');
+      if(!on)return;
+      var rows=vh.filter(function(v){return sf==='all'||(sf==='multi'&&v.n>1)||(sf==='save'&&v.sv)||(sf==='inquiry'&&v.k==='inquiry');});
+      var still=STRIP==='still',few=rows.length<4;
+      (still?bot:top).innerHTML='<div class="strip'+(still?' still':'')+(few?' few':'')+'" id="strip"><div class="shead"><b>Viewed homes</b><small>'+rows.length+' of '+vh.length+' · newest first</small><div class="sfil">'
+        +[['all','All'],['multi','Viewed 2+ times'],['save','Saved'],['inquiry','Asked about']].map(function(x){return '<button type="button" data-sf="'+x[0]+'" aria-pressed="'+(sf===x[0])+'">'+x[1]+'</button>';}).join('')+'</div></div>'
+        +'<div class="roll"><div class="rtrack">'+(rows.length?rows.map(function(v,n){return vcard(v,n,0);}).join('')+(still||few?'':rows.map(function(v,n){return vcard(v,n,1);}).join('')):'<span class="none">None of this kind yet.</span>')+'</div></div></div>';
+    }
+    app.innerHTML='<div class="toprow"><button class="back" type="button" id="back">← All leads</button><span class="ctl">'+stripSeg()+wideBtn()+'</span></div>'
       +'<div class="phd"><span class="av">'+ini(l)+'</span><div class="id"><h1>'+esc(nm(l))+'</h1><div class="sub">'+esc(l.src)+' · last active '+esc(ago(l.seen))+'</div><div class="tags"><span id="hdWait"></span>'+stageChip(l.stage)+(l.vow?'<span class="chip green">VOW member</span>':'')+'<span class="chip'+(l.alerts?' green':'')+'">Alerts '+(l.alerts?'on':'off')+'</span></div></div>'
       +'<div class="acts">'+(l.phone?'<a class="btn ghost" href="tel:'+esc(l.phone)+'">Call</a><a class="btn ghost" href="sms:'+esc(l.phone)+'">Text</a>':'')+'<a class="btn ghost" href="#" data-mail>Email</a><a class="btn navy" href="#" data-fub>Open in FUB</a></div></div>'
-      +strip
+      +'<div id="stripTop"></div>'
       +'<div class="ptabs" id="ptabs"><button type="button" data-p="act" aria-pressed="true">Activity</button><button type="button" data-p="homes" aria-pressed="false">Tasks &amp; searches</button><button type="button" data-p="info" aria-pressed="false">Details</button></div>'
-      +'<div class="cols"><div data-pane="info">'+details+'</div><div data-pane="act" class="show">'+mid+'</div>'+right+'</div>';
+      +'<div class="cols"><div data-pane="info">'+details+'</div><div data-pane="act" class="show">'+mid+'</div>'+right+'</div><div id="stripBot"></div>';
     function tl(){
-      document.getElementById('tl').innerHTML=l.ev.filter(function(e){return tf==='all'||e[0]===tf;}).map(function(e){
-        var k=KIND[e[0]],h=e[2]!=null?home(e[2]):null;
+      document.getElementById('tl').innerHTML=l.ev.map(function(e,i){return {e:e,i:i};}).filter(function(r){return tf==='all'||r.e[0]===tf;}).map(function(r){
+        var e=r.e,k=KIND[e[0]],h=e[2]!=null?home(e[2]):null;
         var what=h?'<div class="what"><a href="#" data-home>'+esc(h.addr)+', '+esc(h.city)+'</a> · '+money(h.price)+'</div>':'';
         var q=e[3]?(e[0]==='inquiry'?'<div class="q">“'+esc(e[3])+'”</div>':'<div class="what">'+esc(e[3])+'</div>'):'';
-        return '<li><span class="ic '+e[0]+'" aria-hidden="true">'+k[0]+'</span><div><b>'+k[1]+'</b> <span class="t">'+esc(ago(e[1]))+'</span>'+what+q+'</div></li>';
+        var rp=e[0]!=='inquiry'?'':(replyIdx===r.i?'<div class="rbox"><textarea id="replyIn" placeholder="Type your reply to '+esc(l.first)+'" aria-label="Your reply"></textarea><button class="btn navy" type="button" id="replySend">Send reply</button></div>':'<button class="pinb" type="button" data-reply="'+r.i+'" style="margin-top:6px">Reply</button>');
+        return '<li id="ev'+r.i+'"><span class="ic '+e[0]+'" aria-hidden="true">'+k[0]+'</span><div><b>'+k[1]+'</b> <span class="t">'+esc(ago(e[1]))+'</span>'+what+q+rp+'</div></li>';
       }).join('')||'<li><span></span><span class="muted">Nothing of this kind yet.</span></li>';
+    }
+    function openReply(i){replyIdx=i;tf='all';[].forEach.call(document.querySelectorAll('#tfil button'),function(x){x.setAttribute('aria-pressed',x.dataset.k==='all');});
+      var tab=document.querySelector('#ptabs [data-p="act"]');if(tab&&tab.getAttribute('aria-pressed')!=='true')tab.click();
+      tl();var li=document.getElementById('ev'+i);if(li)li.scrollIntoView({block:'center'});var ta=document.getElementById('replyIn');if(ta)ta.focus();}
+    function openCanvas(){
+      var ov=document.createElement('div');ov.className='ov';
+      ov.innerHTML='<div class="sheet canvas" role="dialog" aria-modal="true" aria-label="Notes page"><div class="shd"><div><h3>Notes: '+esc(nm(l))+'</h3><small class="muted">A working page for this lead: call notes, plans, anything. It stays with the lead.</small></div><button class="btn navy" type="button" data-x>Done</button></div><textarea id="canvasIn" placeholder="Start typing…" aria-label="Notes page"></textarea></div>';
+      var ta=ov.querySelector('textarea');ta.value=l.canvas||'';
+      function shut(){l.canvas=ta.value;ov.remove();removeEventListener('keydown',key);drawNotes();if(l.canvas.trim())toast('Mockup: notes page kept on this page only. It would also go to Follow Up Boss.');}
+      function key(e){if(e.key==='Escape')shut();}
+      ov.onclick=function(e){if(e.target===ov||e.target.closest('[data-x]'))shut();};
+      addEventListener('keydown',key);document.body.appendChild(ov);ta.focus();
     }
     function drawTasks(){
       var open=l.tasks.filter(function(k){return !k.done;}).length;
@@ -450,7 +503,7 @@ html.site .dtabs{display:none}
     function drawNotes(){
       var rows=l.notes.map(function(n,i){return {n:n,i:i};}).sort(function(a,b){return (b.n.pin-a.n.pin)||(a.n.at-b.n.at);});
       document.getElementById('notesN').textContent=l.notes.length?l.notes.length+'':'';
-      document.getElementById('notesBox').innerHTML=rows.map(function(r){return '<div class="nt'+(r.n.pin?' pin':'')+'"><div>'+esc(r.n.t)+'<small>'+(r.n.pin?'📌 Pinned · ':'')+esc(ago(r.n.at))+'</small></div><button class="pinb" type="button" data-pin="'+r.i+'">'+(r.n.pin?'Unpin':'Pin')+'</button></div>';}).join('');
+      document.getElementById('notesBox').innerHTML=(l.canvas&&l.canvas.trim()?'<div class="nt pin"><div><b>Notes page</b><br>'+esc(l.canvas.trim().slice(0,160))+(l.canvas.trim().length>160?'…':'')+'</div><button class="pinb" type="button" id="canvasOpen">Open</button></div>':'')+rows.map(function(r){return '<div class="nt'+(r.n.pin?' pin':'')+'"><div>'+esc(r.n.t)+'<small>'+(r.n.pin?'📌 Pinned · ':'')+esc(ago(r.n.at))+'</small></div><button class="pinb" type="button" data-pin="'+r.i+'">'+(r.n.pin?'Unpin':'Pin')+'</button></div>';}).join('');
     }
     function drawSearch(){
       document.getElementById('cSearch').innerHTML='<h3>Saved searches <span class="n">'+l.ss.length+'</span></h3>'+(l.ss.length?l.ss.map(function(s,i){
@@ -461,11 +514,18 @@ html.site .dtabs{display:none}
         +'<label><input type="checkbox" id="nsTpl"> Save as a template for other leads</label><button class="btn" type="button" id="mkS" style="width:100%">Create search + turn alerts on</button></div>'
         :'<button class="btn ghost" type="button" id="newS" style="width:100%;margin-top:10px">+ New search for this lead</button>');
     }
-    tl();drawTasks();drawNotes();drawSearch();
+    tl();drawTasks();drawNotes();drawSearch();drawStrip();
     app.onclick=function(ev){
       var t=ev.target,el,c=function(s){return t.closest?t.closest(s):null;};
       if(c('#back')){location.hash='';return;}
-      if(c('[data-home]')){ev.preventDefault();toast('Mockup: opens the listing page on soldmike.com');return;}
+      if((el=c('[data-strip]'))){STRIP=el.dataset.strip;try{localStorage.setItem('leads_strip',STRIP);}catch(e){}[].forEach.call(document.querySelectorAll('[data-strip]'),function(x){x.setAttribute('aria-pressed',x===el);});drawStrip();return;}
+      if((el=c('[data-sf]'))){sf=el.dataset.sf;drawStrip();return;}
+      if((el=c('[data-ask]'))){openReply(l.ev.indexOf(vh[+el.dataset.ask].ev));return;}
+      if((el=c('[data-reply]'))){openReply(+el.dataset.reply);return;}
+      if(c('#replySend')){var rv=document.getElementById('replyIn').value.trim();if(!rv)return;var src=l.ev[replyIdx];replyIdx=-1;l.ev.unshift(['reply',0,src?src[2]:null,rv]);
+        var open=l.tasks.filter(function(k){return !k.done&&k.t.indexOf('Reply to their question')===0;})[0];if(open)open.done=true;tl();drawTasks();toast('Mockup: reply would be sent through Follow Up Boss and logged there'+(open?'. Task ticked off.':''));return;}
+      if(c('#canvasBtn')||c('#canvasOpen')){openCanvas();return;}
+      if(c('[data-home]')){ev.preventDefault();toast('Mockup: opens that property page on soldmike.com');return;}
       if(c('[data-fub]')){ev.preventDefault();toast('Mockup: opens this person in Follow Up Boss');return;}
       if(c('[data-mail]')){ev.preventDefault();toast('Mockup: opens the email box in Follow Up Boss, so your reply is logged');return;}
       if(c('[data-rv]')){ev.preventDefault();toast('Mockup: opens RealView with this address filled in. You just hit Enter.');return;}
