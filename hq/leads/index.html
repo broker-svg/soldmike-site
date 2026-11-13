@@ -51,7 +51,7 @@ a{color:var(--navy)}
 /* ===== list ===== */
 .lhd{display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:12px}
 .lhd h1{font-size:40px;flex:1}
-.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:14px}
+.stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-bottom:14px}
 .stat{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 14px}
 .stat b{display:block;font-family:var(--display);font-size:32px;line-height:1;font-variant-numeric:tabular-nums}
 .stat span{color:var(--muted);font-size:14px}
@@ -142,13 +142,85 @@ a{color:var(--navy)}
 .ss small{display:block;color:var(--muted);font-size:13px}
 .tog{min-height:38px;min-width:58px;padding:0 12px;border-radius:19px;border:1px solid var(--line);background:#fff;font-weight:600;cursor:pointer;flex:none;font-size:14px}
 .tog[aria-pressed="true"]{background:var(--green);border-color:var(--green);color:#fff}
-.home{display:grid;grid-template-columns:64px 1fr;gap:10px;padding:10px 0;border-top:1px solid var(--line);font-size:15px}
+.home{display:grid;grid-template-columns:132px 1fr;gap:10px;padding:10px 0;border-top:1px solid var(--line);font-size:15px}
 .home:first-of-type{border-top:0}
 .ph{width:64px;height:48px;border-radius:8px;background:linear-gradient(135deg,#C9D0F2,#8E9AD6)}
 .home small{display:block;color:var(--muted);font-size:13px}
 .vow{display:flex;gap:10px;align-items:center;padding:12px;border-radius:12px;background:var(--mist);border:1px solid var(--line);font-size:15px}
 .vow.on{background:#E7F4EC;border-color:#B9DEC6}
 .foot{font-size:14px;color:var(--muted);margin-top:18px}
+/* ===== round 2 (Nov 13): width switch, tasks, notes, waiting clock, viewed strip, search homes + map ===== */
+html.wide .wrap,html.wide .dtabs nav{max-width:none}
+.toprow{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.wbtn{min-height:40px;padding:0 14px;border-radius:20px;border:1px solid var(--line);background:#fff;font-weight:600;font-size:15px;cursor:pointer;flex:none}
+@media (max-width:1180px){.wbtn{display:none}}
+.stat.act b{color:var(--red)}
+.pic{display:block;border-radius:10px;overflow:hidden;background:var(--pale);flex:none}
+.pic svg{display:block;width:100%;height:100%}
+.home .pic{width:132px;height:92px}
+/* tasks */
+.task{display:grid;grid-template-columns:auto 1fr;gap:10px;padding:10px 0;border-top:1px solid var(--line);align-items:start}
+.task:first-of-type{border-top:0}
+.tk{width:30px;height:30px;border-radius:8px;border:2px solid #AEB5CF;background:#fff;cursor:pointer;color:#fff;font-weight:700;font-size:16px;line-height:1;padding:0}
+.tk[aria-pressed="true"]{background:var(--green);border-color:var(--green)}
+.task b{font-size:15px;display:block}
+.task small{color:var(--muted);font-size:13px}
+.task.done b{text-decoration:line-through;color:var(--muted);font-weight:500}
+.addrow{display:flex;gap:8px;margin-top:10px}
+.addrow input{flex:1;min-width:0;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:0 12px;font-size:16px}
+/* notes */
+.notes textarea{display:block;width:100%;min-height:84px;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font:inherit;font-size:16px;resize:vertical}
+.notes .btn{margin-top:8px}
+.nt{padding:10px 12px;border-radius:10px;background:#FFFBEA;border:1px solid #F1E2A6;margin-top:8px;font-size:15px;display:flex;gap:10px;justify-content:space-between;align-items:flex-start}
+.nt.pin{border-color:#D9A91A;border-width:2px}
+.nt small{display:block;color:var(--muted);font-size:13px;margin-top:2px}
+.pinb{flex:none;min-height:34px;padding:0 10px;border-radius:17px;border:1px solid var(--line);background:#fff;font-size:13px;font-weight:600;cursor:pointer}
+/* saved search: tap to open, new search, templates */
+.slink{background:none;border:0;padding:0;text-align:left;cursor:pointer;color:var(--navy);font-weight:600;font-size:15px;text-decoration:underline;text-underline-offset:3px}
+.newbox{margin-top:10px;padding:12px;border-radius:12px;background:var(--mist);border:1px solid var(--line);font-size:15px}
+.newbox input[type=text]{width:100%;min-height:46px;border:1px solid var(--line);border-radius:10px;padding:0 12px;font-size:16px;background:#fff}
+.newbox .tp{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.newbox .tp button{min-height:36px;padding:0 12px;border-radius:18px;border:1px solid var(--pale);background:#E9ECFA;color:var(--navy);font-size:14px;font-weight:600;cursor:pointer;text-align:left}
+.newbox label{display:flex;align-items:center;gap:8px;margin:8px 0}
+.newbox label input{width:20px;height:20px}
+.ov{position:fixed;inset:0;background:rgba(20,24,51,.55);z-index:20;display:flex;align-items:center;justify-content:center;padding:12px}
+.sheet{background:#fff;border-radius:16px;padding:18px;width:100%;max-width:1080px;max-height:92vh;overflow:auto}
+.shd{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:10px}
+.shd h3{font-size:26px}
+.sgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:start}
+.bh{display:grid;grid-template-columns:auto 200px 1fr;gap:12px;padding:10px 0;border-top:1px solid var(--line);align-items:center;font-size:15px}
+.bh:first-child{border-top:0}
+.bh .pic{width:200px;height:134px}
+.bh small{display:block;color:var(--muted);font-size:14px}
+.pinno{width:28px;height:28px;border-radius:50%;background:var(--red);color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:14px}
+.map{border:1px solid var(--line);border-radius:12px;overflow:hidden;position:sticky;top:0}
+.map svg{display:block;width:100%;height:auto}
+.map small{display:block;padding:6px 10px;color:var(--muted);font-size:13px}
+@media (max-width:780px){.sgrid{grid-template-columns:minmax(0,1fr)}.map{position:static;order:-1}.bh{grid-template-columns:auto 132px 1fr}.bh .pic{width:132px;height:92px}}
+/* viewed homes strip (rolls along the bottom on desktop, swipes on phone) */
+.strip{position:fixed;left:0;right:0;bottom:0;z-index:5;background:var(--ink);color:#fff;display:flex;align-items:stretch;border-top:3px solid var(--red)}
+.strip .lab{flex:none;display:flex;flex-direction:column;justify-content:center;gap:4px;padding:0 16px;background:var(--navy);font-family:var(--display);font-weight:800;text-transform:uppercase;font-size:21px;line-height:1;z-index:1}
+.strip .lab small{font-family:var(--body);font-weight:500;text-transform:none;font-size:13px;color:var(--pale)}
+.roll{overflow:hidden;flex:1;min-width:0}
+.rtrack{display:flex;width:max-content;padding:10px 0;animation:roll 70s linear infinite}
+.roll:hover .rtrack,.roll:focus-within .rtrack{animation-play-state:paused}
+@keyframes roll{to{transform:translateX(-50%)}}
+.vc{flex:none;display:flex;gap:10px;align-items:center;background:#232A52;border-radius:12px;padding:6px 16px 6px 6px;margin-right:12px;font-size:14px;color:#fff;text-decoration:none}
+.vc .pic{width:150px;height:100px}
+.vc b{display:block;font-size:15px;white-space:nowrap}
+.vc small{display:block;color:var(--pale);white-space:nowrap}
+.vc .chip{margin-bottom:3px}
+body.hasstrip .wrap{padding-bottom:170px}
+body.hasstrip .toast{bottom:150px}
+@media (max-width:780px){
+  .strip{position:static;flex-direction:column;border-radius:14px;border-top:0;margin-bottom:12px;overflow:hidden}
+  .strip .lab{flex-direction:row;align-items:baseline;justify-content:space-between;padding:10px 14px 0;background:none}
+  .roll{overflow-x:auto;scrollbar-width:none}.roll::-webkit-scrollbar{display:none}
+  .rtrack{animation:none;padding:10px 0 12px 12px}.vc.dup{display:none}
+  .vc{flex-direction:column;align-items:flex-start;padding:6px 6px 10px}.vc .pic{width:210px;height:140px}.vc>div{padding:0 6px}
+  body.hasstrip .wrap{padding-bottom:60px}body.hasstrip .toast{bottom:24px}
+}
+@media (prefers-reduced-motion:reduce){.rtrack{animation:none}.roll{overflow-x:auto}.vc.dup{display:none}}
 /* website sign-in (soldmike.com/leads/ way in) */
 html.site .dtabs{display:none}
 .signin{max-width:420px;margin:24px auto 0;background:#fff;border:1px solid var(--line);border-radius:16px;padding:24px;box-shadow:0 24px 60px -30px rgba(20,24,51,.45);display:flex;flex-direction:column;gap:12px}
@@ -169,7 +241,7 @@ html.site .dtabs{display:none}
   <a class="lnk" href="/hq/" id="barLnk">Back to HQ</a>
 </div>
 <div class="dtabs"><nav aria-label="Dashboards"><a href="/hq/tasks/">Tasks</a><a href="/hq/">HQ</a><a href="/hq/agents/#realestate">Real Estate</a><a href="/hq/agents/#marketing">Marketing</a><a href="/hq/agents/#toolkit">Toolkit</a><a href="/hq/agents/#personal">Personal</a><a href="/hq/agents/#financial">Financial</a><a href="/hq/agents/#tpm">TPM</a><a href="/open-house/">Open House</a><a href="/hq/leads/" aria-current="page">Leads</a><a href="/hq/ads/" target="_blank" rel="noopener">Ads</a><a href="/vow/realview" target="_blank" rel="noopener">RealView</a></nav></div>
-<div class="mock">MOCKUP · made-up people and homes · buttons don't change anything · <a href="?from=site#signin" id="mockWay" style="color:inherit">See the website sign-in</a></div>
+<div class="mock">MOCKUP round 2 · made-up people, homes and photos · buttons don't change anything · <a href="?from=site#signin" id="mockWay" style="color:inherit">See the website sign-in</a></div>
 <main class="wrap" id="app"></main>
 <div class="toast" id="toast" hidden></div>
 
@@ -204,7 +276,7 @@ html.site .dtabs{display:none}
   });
 
   // ---------- helpers ----------
-  var app=document.getElementById('app'), F={q:'',src:'',ss:false,vow:false,alerts:false};
+  var app=document.getElementById('app'), F={q:'',src:'',act:false,ss:false,vow:false,alerts:false};
   function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
   function ago(ms){var s=ms/1000;if(s<90)return 'just now';if(s<3600)return Math.round(s/60)+' min ago';if(s<86400)return Math.round(s/3600)+' h ago';if(s<86400*14){var d=Math.round(s/86400);return d===1?'yesterday':d+' days ago';}return new Date(NOW-ms).toLocaleDateString('en-CA',{month:'short',day:'numeric'});}
   function money(n){return '$'+n.toLocaleString('en-CA');}
@@ -215,22 +287,50 @@ html.site .dtabs{display:none}
   function toast(t){var el=document.getElementById('toast');el.textContent=t;el.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(function(){el.hidden=true;},2600);}
   var SOURCES=LEADS.map(function(l){return l.src;}).filter(function(s,i,a){return a.indexOf(s)===i;}).sort();
 
+  // ---------- round 2: tasks + waiting clock, notes, sample photos, viewed homes, search templates (all made up) ----------
+  var TASK={inquiry:['Reply to their question',H],form:['Call about their form',15*60e3],openhouse:['Follow up after the open house',D],save:['Follow up on the saved home',D],chat:['Follow up on the Mika chat',D],signin:['Welcome call: new website account',D]};
+  var OPEN={1:1,2:1,4:1,5:1,9:1};
+  var NOTES={1:[{t:'Pre-approved to $1.5M with their bank. Wants a finished basement and a quiet street.',at:2*D,pin:1},{t:'Left a voicemail, asked for Saturday morning.',at:1*D,pin:0}],6:[{t:'Selling in King first. Needs a 90-day closing.',at:5*D,pin:1}]};
+  var TPL=['Detached, Vellore Village, 2,500 to 3,000 sq ft','Condos near VMC subway, 2 beds, under $850K','Townhouses in Maple under $1M'];
+  LEADS.forEach(function(l){
+    var n=OPEN[l.id]||0;
+    l.tasks=l.ev.filter(function(e){return TASK[e[0]];}).slice(0,3).map(function(e,i){return {t:TASK[e[0]][0]+(e[2]!=null?': '+home(e[2]).addr:''),at:e[1],target:TASK[e[0]][1],done:i>=n,auto:1};});
+    l.notes=NOTES[l.id]||[];
+    if(l.id===5)l.eval={addr:'48 Orchard Hill Ct, Woodbridge',type:'Semi-detached',beds:3,baths:3,sqft:'1,500 to 2,000',when:'Selling in 3 to 6 months',notes:'Finished basement, new roof in 2023'};
+  });
+  function dur(ms){var m=Math.max(1,Math.round(ms/60e3));if(m<60)return m+' min';var h=Math.round(ms/H);if(h<48)return h+' h';return Math.round(ms/D)+' days';}
+  function waitInfo(l){var o=l.tasks.filter(function(k){return !k.done;});if(!o.length)return null;return {ms:Math.max.apply(null,o.map(function(k){return k.at;})),over:o.some(function(k){return k.at>k.target;})};}
+  function waitChip(l){var w=waitInfo(l);return w?'<span class="chip '+(w.over?'red':'amber')+'">⏱ Waiting '+dur(w.ms)+'</span>':'<span class="chip green">✓ Nothing open</span>';}
+  function pic(i){var u=[212,28,150,340,45,265,190,12,95,230][i%10];
+    return '<svg viewBox="0 0 150 100" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="150" height="100" fill="hsl('+u+',55%,84%)"/><circle cx="124" cy="20" r="9" fill="#fff" opacity=".7"/><rect y="74" width="150" height="26" fill="hsl(112,28%,56%)"/><rect x="36" y="42" width="78" height="38" fill="hsl('+u+',22%,96%)"/><path d="M28 44 75 15 122 44Z" fill="hsl('+u+',32%,34%)"/><rect x="68" y="58" width="14" height="22" fill="hsl('+u+',40%,28%)"/><rect x="45" y="52" width="15" height="12" fill="#9FC3E8"/><rect x="90" y="52" width="15" height="12" fill="#9FC3E8"/></svg>';}
+  function viewed(l){var out=[],got={};function add(i,ms,k){if(got[i])return;got[i]=1;out.push({i:i,ms:ms,k:k});}
+    l.ev.forEach(function(e){if(e[2]!=null&&(e[0]==='view'||e[0]==='save'||e[0]==='inquiry'))add(e[2],e[1],e[0]);});
+    l.homes.forEach(function(i,n){add(i,l.seen+(n+1)*D,'save');});
+    if(out.length)for(var n=0;out.length<6&&n<10;n++)add((l.id*3+n)%10,l.seen+(n+4)*D,'view');
+    return out.sort(function(a,b){return a.ms-b.ms;});}
+  var WIDE=false;try{WIDE=localStorage.getItem('leads_wide')==='1';}catch(e){}
+  document.documentElement.classList.toggle('wide',WIDE);
+  function wideBtn(){return '<button class="wbtn" type="button" data-wide>'+(WIDE?'Standard width':'Full width')+'</button>';}
+  document.addEventListener('click',function(ev){var b=ev.target.closest&&ev.target.closest('[data-wide]');if(!b)return;WIDE=!WIDE;try{localStorage.setItem('leads_wide',WIDE?'1':'0');}catch(e){}document.documentElement.classList.toggle('wide',WIDE);b.textContent=WIDE?'Standard width':'Full width';});
+
   // ---------- leads list ----------
   function list(){
     var sorted=LEADS.slice().sort(function(a,b){return a.seen-b.seen;});
-    app.innerHTML='<div class="lhd"><h1>Website leads</h1><span class="muted" style="font-size:15px">Newest activity first</span></div>'
+    app.innerHTML='<div class="lhd"><h1>Website leads</h1><span class="muted" style="font-size:15px">Newest activity first</span>'+wideBtn()+'</div>'
       +'<div class="stats">'
+      +'<div class="stat act"><b>'+LEADS.filter(function(l){return waitInfo(l);}).length+'</b><span>need action</span></div>'
       +'<div class="stat"><b>'+LEADS.length+'</b><span>leads</span></div>'
       +'<div class="stat"><b>'+LEADS.filter(function(l){return l.seen<7*D;}).length+'</b><span>active this week</span></div>'
       +'<div class="stat"><b>'+LEADS.reduce(function(n,l){return n+l.ss.filter(function(s){return s[1];}).length;},0)+'</b><span>saved searches on</span></div>'
       +'<div class="stat"><b>'+LEADS.filter(function(l){return l.vow;}).length+'</b><span>VOW members</span></div></div>'
       +'<div class="tools"><input class="search" id="q" type="search" placeholder="Search name, email, phone, tag or area" autocomplete="off" value="'+esc(F.q)+'">'
       +'<div class="filters"><select id="fsrc" aria-label="Source"><option value="">All sources</option>'+SOURCES.map(function(s){return '<option'+(F.src===s?' selected':'')+'>'+esc(s)+'</option>';}).join('')+'</select>'
+      +'<button class="fbtn" type="button" data-f="act" aria-pressed="'+F.act+'">Needs action</button>'
       +'<button class="fbtn" type="button" data-f="ss" aria-pressed="'+F.ss+'">Has saved search</button>'
       +'<button class="fbtn" type="button" data-f="vow" aria-pressed="'+F.vow+'">VOW member</button>'
       +'<button class="fbtn" type="button" data-f="alerts" aria-pressed="'+F.alerts+'">Alerts on</button></div></div>'
       +'<p class="count" id="cnt"></p>'
-      +'<table class="tbl"><thead><tr><th>Name</th><th>Source</th><th>Stage &amp; tags</th><th>Last activity</th><th>Saved searches</th><th class="num">Views · Saves · Asks</th><th>Alerts</th></tr></thead><tbody id="tb"></tbody></table>'
+      +'<table class="tbl"><thead><tr><th>Name</th><th>Waiting on you</th><th>Source</th><th>Stage &amp; tags</th><th>Last activity</th><th>Saved searches</th><th class="num">Views · Saves · Asks</th></tr></thead><tbody id="tb"></tbody></table>'
       +'<div class="cards" id="cards"></div>'
       +'<p class="foot">Every lead from soldmike.com: website sign-ins, forms, open house sign-ins, Mika chats and listing questions. Follow Up Boss stays your CRM (it gets the activity and a link). Tap a lead to see everything they did on the site.</p>';
     var t;document.getElementById('q').oninput=function(){var v=this.value;clearTimeout(t);t=setTimeout(function(){F.q=v;draw(sorted);},150);};
@@ -242,6 +342,7 @@ html.site .dtabs{display:none}
     var q=F.q.trim().toLowerCase();
     var rows=sorted.filter(function(l){
       if(F.src&&l.src!==F.src)return false;
+      if(F.act&&!waitInfo(l))return false;
       if(F.ss&&!l.ss.length)return false;
       if(F.vow&&!l.vow)return false;
       if(F.alerts&&!l.alerts)return false;
@@ -252,15 +353,15 @@ html.site .dtabs{display:none}
     document.getElementById('tb').innerHTML=rows.map(function(l){
       var on=l.ss.filter(function(s){return s[1];}).length;
       return '<tr data-id="'+l.id+'"><td><div class="who"><span class="av">'+ini(l)+'</span><div class="nm"><b>'+esc(nm(l))+'</b><small>'+esc(l.email)+'</small></div></div></td>'
+        +'<td>'+waitChip(l)+'</td>'
         +'<td>'+esc(l.src)+(l.vow?' <span class="chip green">VOW</span>':'')+'</td>'
         +'<td>'+stageChip(l.stage)+' '+l.tags.map(function(x){return '<span class="chip">'+esc(x)+'</span>';}).join(' ')+'</td>'
         +'<td><b>'+esc(ago(l.seen))+'</b><br><small class="muted">'+esc(lastLine(l))+'</small></td>'
         +'<td>'+(l.ss.length?on+' on'+(l.ss.length>on?' · '+(l.ss.length-on)+' off':''):'<span class="muted">None</span>')+'</td>'
-        +'<td class="num">'+l.views+' · '+l.saves+' · '+l.inq+'</td>'
-        +'<td><span class="dot'+(l.alerts?' on':'')+'"></span> '+(l.alerts?'On':'Off')+'</td></tr>';
+        +'<td class="num">'+l.views+' · '+l.saves+' · '+l.inq+'</td></tr>';
     }).join('');
     document.getElementById('cards').innerHTML=rows.map(function(l){
-      var c=[stageChip(l.stage)];if(l.vow)c.push('<span class="chip green">VOW</span>');
+      var c=[waitChip(l),stageChip(l.stage)];if(l.vow)c.push('<span class="chip green">VOW</span>');
       if(l.ss.length)c.push('<span class="chip navy">'+l.ss.length+' saved search'+(l.ss.length>1?'es':'')+'</span>');
       if(l.views)c.push('<span class="chip">'+l.views+' viewed</span>');if(l.saves)c.push('<span class="chip">'+l.saves+' saved</span>');if(l.inq)c.push('<span class="chip amber">'+l.inq+' asked</span>');
       c.push('<span class="chip'+(l.alerts?' green':'')+'">Alerts '+(l.alerts?'on':'off')+'</span>');
@@ -270,12 +371,35 @@ html.site .dtabs{display:none}
   }
 
   // ---------- person page ----------
+  function homeLine(h){return esc(h.city)+' · '+money(h.price)+' · '+h.beds+' beds';}
+  function mapSvg(n){
+    var P=[[118,96],[262,128],[176,214],[318,236]],s='<svg viewBox="0 0 400 320" role="img" aria-label="Mockup map of the search area"><rect width="400" height="320" fill="#EEF1F6"/>'
+      +'<path d="M0 250 Q90 220 160 262 T400 240 V320 H0Z" fill="#CFE3F5"/><rect x="204" y="34" width="92" height="62" rx="10" fill="#D5EBD3"/>'
+      +'<g stroke="#fff" stroke-width="12" fill="none" stroke-linecap="round"><path d="M-10 150 H410"/><path d="M150 -10 V330"/><path d="M300 -10 V250"/><path d="M-10 60 H410"/><path d="M40 330 L230 150"/></g>'
+      +'<g stroke="#fff" stroke-width="5" fill="none"><path d="M60 60 V150"/><path d="M225 60 V150"/><path d="M150 105 H300"/><path d="M150 200 H300"/><path d="M360 60 V240"/></g>';
+    for(var i=0;i<n&&i<P.length;i++)s+='<g><path d="M'+P[i][0]+' '+(P[i][1]+18)+' l-11 -17 a13 13 0 1 1 22 0z" fill="#D7141E"/><text x="'+P[i][0]+'" y="'+(P[i][1]-1)+'" text-anchor="middle" font-size="13" font-weight="700" fill="#fff" font-family="system-ui,sans-serif">'+(i+1)+'</text></g>';
+    return s+'</svg>';
+  }
+  function openSearch(l,idx){
+    var s=l.ss[idx],hs=[0,1,2,3].map(function(k){return (idx*3+l.id+k)%10;});
+    var ov=document.createElement('div');ov.className='ov';
+    ov.innerHTML='<div class="sheet" role="dialog" aria-modal="true" aria-label="Homes in this saved search"><div class="shd"><div><h3>'+esc(s[0])+'</h3><small class="muted">'+s[2]+' homes match · newest 4 shown · alerts '+(s[1]?'on':'off')+'</small></div><button class="btn ghost" type="button" data-x>Close</button></div>'
+      +'<div class="sgrid"><div>'+hs.map(function(i,n){var h=home(i);return '<div class="bh"><span class="pinno">'+(n+1)+'</span><span class="pic">'+pic(i)+'</span><div><b>'+esc(h.addr)+'</b><small>'+homeLine(h)+'</small><small>MLS® '+esc(h.mls)+' · listed '+(n*2+1)+' days ago</small></div></div>';}).join('')+'</div>'
+      +'<div class="map">'+mapSvg(hs.length)+'<small>Mockup map. The real one shows the search area with a pin for each home.</small></div></div></div>';
+    function shut(){ov.remove();removeEventListener('keydown',key);}
+    function key(e){if(e.key==='Escape')shut();}
+    ov.onclick=function(e){if(e.target===ov||e.target.closest('[data-x]'))shut();};
+    addEventListener('keydown',key);document.body.appendChild(ov);ov.querySelector('[data-x]').focus();
+  }
   function person(id){
     var l=LEADS.filter(function(x){return x.id===id;})[0];if(!l){location.hash='';return;}
     scrollTo(0,0);
-    var tf='all';
-    var details='<div class="card"><h3>Contact</h3><dl class="kv">'
-      +'<dt>Email</dt><dd><a href="mailto:'+esc(l.email)+'">'+esc(l.email)+'</a></dd>'
+    var tf='all',nsOpen=false,vh=viewed(l),E=l.eval;
+    var evalCard=E?'<div class="card"><h3>Home evaluation</h3><dl class="kv">'
+      +'<dt>Address</dt><dd><b>'+esc(E.addr)+'</b></dd><dt>Type</dt><dd>'+esc(E.type)+'</dd><dt>Beds · baths</dt><dd>'+E.beds+' · '+E.baths+'</dd><dt>Size</dt><dd>'+esc(E.sqft)+' sq ft</dd><dt>Timeline</dt><dd>'+esc(E.when)+'</dd><dt>They said</dt><dd>'+esc(E.notes)+'</dd></dl>'
+      +'<a class="btn" href="#" data-rv style="width:100%;margin-top:14px">Open in RealView</a><p class="muted" style="margin:10px 0 0;font-size:14px">Opens RealView with the address and details already filled in.</p></div>':'';
+    var details=evalCard+'<div class="card"><h3>Contact</h3><dl class="kv">'
+      +'<dt>Email</dt><dd>'+esc(l.email)+'</dd>'
       +'<dt>Phone</dt><dd>'+(l.phone?'<a href="tel:'+esc(l.phone)+'">'+esc(l.phone)+'</a>':'<span class="muted">None given</span>')+'</dd>'
       +'<dt>Source</dt><dd>'+esc(l.src)+'</dd>'
       +'<dt>Stage</dt><dd>'+stageChip(l.stage)+'</dd>'
@@ -284,23 +408,25 @@ html.site .dtabs{display:none}
       +'<dt>Areas</dt><dd>'+(l.areas?esc(l.areas):'<span class="muted">Not known</span>')+'</dd>'
       +'<dt>First seen</dt><dd>'+esc(ago(l.created))+'</dd>'
       +'<dt>Last active</dt><dd>'+esc(ago(l.seen))+'</dd>'
-      +'<dt>Emails</dt><dd>'+(l.alerts?'<b style="color:var(--green)">New-listing alerts on</b>':'<span class="muted">Alerts off</span>')+'</dd></dl></div>'
-      +'<div class="card"><h3>VOW member</h3><div class="vow'+(l.vow?' on':'')+'">'+(l.vow?'✅ <div><b>Member</b><br><small class="muted">Signed in with Google · can see sold prices</small></div>':'— <div><b>Not a member</b><br><small class="muted">Hasn\'t made a VOW account</small></div>')+'</div></div>'
-      +'<div class="card"><h3>Follow Up Boss</h3><p style="margin:0 0 10px;font-size:15px" class="muted">FUB gets this lead\'s activity plus a link back here. Listing details stay on the website.</p><a class="btn navy" href="#" data-fub style="width:100%">Open in Follow Up Boss</a></div>';
-    var right='<div class="right" data-pane="homes"><div class="card"><h3>Saved searches <span class="n">'+l.ss.length+'</span></h3>'+(l.ss.length?l.ss.map(function(s,i){
-        return '<div class="ss"><div><b>'+esc(s[0])+'</b><small>'+s[2]+' homes matched · last alert '+esc(ago(s[3]))+'</small></div><button class="tog" type="button" data-s="'+i+'" aria-pressed="'+(!!s[1])+'">'+(s[1]?'On':'Off')+'</button></div>';
-      }).join(''):'<p class="muted" style="margin:0;font-size:15px">No saved searches.</p>')+'</div>'
-      +'<div class="card"><h3>Saved homes <span class="n">'+l.homes.length+'</span></h3>'+(l.homes.length?l.homes.map(function(i){var h=home(i);
-        return '<div class="home"><span class="ph" aria-hidden="true"></span><div><b>'+esc(h.addr)+'</b><small>'+esc(h.city)+' · '+money(h.price)+' · '+h.beds+' beds · MLS® '+esc(h.mls)+'</small></div></div>';
-      }).join(''):'<p class="muted" style="margin:0;font-size:15px">No saved homes.</p>')+'</div></div>';
-    var mid='<div class="card"><h3>Activity <span class="n">'+l.ev.length+' events</span></h3>'
-      +'<div class="note"><input id="noteIn" placeholder="Add a note (stays on the website record)"><button class="btn navy" type="button" id="noteBtn">Add</button></div>'
-      +'<div class="tfil" id="tfil">'+[['all','All'],['view','Viewed'],['save','Saved'],['inquiry','Asked'],['openhouse','Open house'],['alert','Alerts']].map(function(x){return '<button type="button" data-k="'+x[0]+'" aria-pressed="'+(x[0]==='all')+'">'+x[1]+'</button>';}).join('')+'</div>'
+      +'<dt>Emails</dt><dd>'+(l.alerts?'<b style="color:var(--green)">New-listing alerts on</b>':'<span class="muted">Alerts off</span>')+'</dd>'
+      +'<dt>VOW</dt><dd>'+(l.vow?'<b style="color:var(--green)">Member</b> · can see sold prices':'<span class="muted">Not a member</span>')+'</dd></dl>'
+      +'<a class="btn navy" href="#" data-fub style="width:100%;margin-top:14px">Open in Follow Up Boss</a><p class="muted" style="margin:10px 0 0;font-size:14px">Notes, tasks and activity here are also written to Follow Up Boss.</p></div>';
+    var mid='<div class="card notes"><h3>Notes <span class="n" id="notesN"></span></h3><textarea id="noteIn" placeholder="Type a note about this lead"></textarea><button class="btn navy" type="button" id="noteBtn">Save note</button><div id="notesBox"></div></div>'
+      +'<div class="card"><h3>Activity <span class="n">what they did on the site</span></h3>'
+      +'<div class="tfil" id="tfil">'+[['all','All'],['view','Viewed'],['save','Saved'],['inquiry','Asked'],['openhouse','Open house'],['alert','Alerts'],['note','Notes']].map(function(x){return '<button type="button" data-k="'+x[0]+'" aria-pressed="'+(x[0]==='all')+'">'+x[1]+'</button>';}).join('')+'</div>'
       +'<ul class="tl" id="tl"></ul></div>';
-    app.innerHTML='<button class="back" type="button" id="back">← All leads</button>'
-      +'<div class="phd"><span class="av">'+ini(l)+'</span><div class="id"><h1>'+esc(nm(l))+'</h1><div class="sub">'+esc(l.src)+' · last active '+esc(ago(l.seen))+'</div><div class="tags">'+stageChip(l.stage)+(l.vow?'<span class="chip green">VOW member</span>':'')+'<span class="chip'+(l.alerts?' green':'')+'">Alerts '+(l.alerts?'on':'off')+'</span></div></div>'
-      +'<div class="acts">'+(l.phone?'<a class="btn ghost" href="tel:'+esc(l.phone)+'">Call</a><a class="btn ghost" href="sms:'+esc(l.phone)+'">Text</a>':'')+'<a class="btn ghost" href="mailto:'+esc(l.email)+'">Email</a><a class="btn navy" href="#" data-fub>Open in FUB</a></div></div>'
-      +'<div class="ptabs" id="ptabs"><button type="button" data-p="act" aria-pressed="true">Activity</button><button type="button" data-p="info" aria-pressed="false">Details</button><button type="button" data-p="homes" aria-pressed="false">Searches</button></div>'
+    var right='<div class="right" data-pane="homes"><div class="card" id="cTasks"></div><div class="card" id="cSearch"></div>'
+      +'<div class="card"><h3>Saved homes <span class="n">'+l.homes.length+'</span></h3>'+(l.homes.length?l.homes.map(function(i){var h=home(i);
+        return '<div class="home"><span class="pic">'+pic(i)+'</span><div><b>'+esc(h.addr)+'</b><small>'+homeLine(h)+'</small><small>MLS® '+esc(h.mls)+'</small></div></div>';
+      }).join(''):'<p class="muted" style="margin:0;font-size:15px">No saved homes.</p>')+'</div></div>';
+    function vcard(v,n,dup){var h=home(v.i);return '<a class="vc'+(dup?' dup':'')+'" href="#" data-home'+(dup?' tabindex="-1" aria-hidden="true"':'')+'><span class="pic">'+pic(v.i)+'</span><div>'+(n===0?'<span class="chip red">Newest</span>':'')+'<b>'+esc(h.addr)+'</b><small>'+homeLine(h)+'</small><small>'+(v.k==='save'?'♥ Saved ':v.k==='inquiry'?'? Asked ':'👁 Viewed ')+esc(ago(v.ms))+'</small></div></a>';}
+    var strip=vh.length?'<div class="strip" id="strip"><div class="lab">Viewed homes<small>'+vh.length+' homes · newest first</small></div><div class="roll"><div class="rtrack">'+vh.map(function(v,n){return vcard(v,n,0);}).join('')+vh.map(function(v,n){return vcard(v,n,1);}).join('')+'</div></div></div>':'';
+    document.body.classList.toggle('hasstrip',!!vh.length);
+    app.innerHTML='<div class="toprow"><button class="back" type="button" id="back">← All leads</button>'+wideBtn()+'</div>'
+      +'<div class="phd"><span class="av">'+ini(l)+'</span><div class="id"><h1>'+esc(nm(l))+'</h1><div class="sub">'+esc(l.src)+' · last active '+esc(ago(l.seen))+'</div><div class="tags"><span id="hdWait"></span>'+stageChip(l.stage)+(l.vow?'<span class="chip green">VOW member</span>':'')+'<span class="chip'+(l.alerts?' green':'')+'">Alerts '+(l.alerts?'on':'off')+'</span></div></div>'
+      +'<div class="acts">'+(l.phone?'<a class="btn ghost" href="tel:'+esc(l.phone)+'">Call</a><a class="btn ghost" href="sms:'+esc(l.phone)+'">Text</a>':'')+'<a class="btn ghost" href="#" data-mail>Email</a><a class="btn navy" href="#" data-fub>Open in FUB</a></div></div>'
+      +strip
+      +'<div class="ptabs" id="ptabs"><button type="button" data-p="act" aria-pressed="true">Activity</button><button type="button" data-p="homes" aria-pressed="false">Tasks &amp; searches</button><button type="button" data-p="info" aria-pressed="false">Details</button></div>'
       +'<div class="cols"><div data-pane="info">'+details+'</div><div data-pane="act" class="show">'+mid+'</div>'+right+'</div>';
     function tl(){
       document.getElementById('tl').innerHTML=l.ev.filter(function(e){return tf==='all'||e[0]===tf;}).map(function(e){
@@ -309,16 +435,53 @@ html.site .dtabs{display:none}
         var q=e[3]?(e[0]==='inquiry'?'<div class="q">“'+esc(e[3])+'”</div>':'<div class="what">'+esc(e[3])+'</div>'):'';
         return '<li><span class="ic '+e[0]+'" aria-hidden="true">'+k[0]+'</span><div><b>'+k[1]+'</b> <span class="t">'+esc(ago(e[1]))+'</span>'+what+q+'</div></li>';
       }).join('')||'<li><span></span><span class="muted">Nothing of this kind yet.</span></li>';
-      [].forEach.call(document.querySelectorAll('[data-home]'),function(a){a.onclick=function(ev){ev.preventDefault();toast('Mockup: opens the listing page on soldmike.com');};});
     }
-    tl();
-    document.getElementById('back').onclick=function(){location.hash='';};
-    [].forEach.call(document.querySelectorAll('#tfil button'),function(b){b.onclick=function(){tf=b.dataset.k;[].forEach.call(document.querySelectorAll('#tfil button'),function(x){x.setAttribute('aria-pressed',x===b);});tl();};});
-    [].forEach.call(document.querySelectorAll('#ptabs button'),function(b){b.onclick=function(){[].forEach.call(document.querySelectorAll('#ptabs button'),function(x){x.setAttribute('aria-pressed',x===b);});
-      [].forEach.call(document.querySelectorAll('.cols [data-pane]'),function(p){p.classList.toggle('show',p.dataset.pane===b.dataset.p);});};});
-    [].forEach.call(document.querySelectorAll('[data-fub]'),function(a){a.onclick=function(ev){ev.preventDefault();toast('Mockup: opens this person in Follow Up Boss');};});
-    [].forEach.call(document.querySelectorAll('.tog'),function(b){b.onclick=function(){var s=l.ss[+b.dataset.s];s[1]=s[1]?0:1;b.setAttribute('aria-pressed',!!s[1]);b.textContent=s[1]?'On':'Off';toast('Mockup: alert '+(s[1]?'on':'off')+' (not saved)');};});
-    document.getElementById('noteBtn').onclick=function(){var v=document.getElementById('noteIn').value.trim();if(!v)return;l.ev.unshift(['note',0,null,v]);document.getElementById('noteIn').value='';tl();toast('Mockup: note added on this page only');};
+    function drawTasks(){
+      var open=l.tasks.filter(function(k){return !k.done;}).length;
+      var rows=l.tasks.map(function(k,i){return {k:k,i:i};}).sort(function(a,b){return (a.k.done-b.k.done)||(b.k.at-a.k.at);});
+      document.getElementById('cTasks').innerHTML='<h3>Tasks <span class="n">'+open+' open · '+(l.tasks.length-open)+' done</span></h3>'
+        +(rows.length?rows.map(function(r){var k=r.k,left=k.target-k.at;
+          var sub=k.done?'Done':(left<0?'<b style="color:var(--red)">Overdue by '+dur(-left)+'</b>':'Due in '+dur(left));
+          return '<div class="task'+(k.done?' done':'')+'"><button class="tk" type="button" data-t="'+r.i+'" aria-pressed="'+k.done+'" aria-label="'+(k.done?'Mark not done':'Mark done')+': '+esc(k.t)+'">'+(k.done?'✓':'')+'</button><div><b>'+esc(k.t)+'</b><small>'+sub+(k.auto?' · made automatically':'')+'</small></div></div>';
+        }).join(''):'<p class="muted" style="margin:0;font-size:15px">Nothing to do for this lead.</p>')
+        +'<div class="addrow"><input id="taskIn" placeholder="Add a task" aria-label="Add a task"><button class="btn navy" type="button" id="taskBtn">Add</button></div>';
+      document.getElementById('hdWait').innerHTML=waitChip(l);
+    }
+    function drawNotes(){
+      var rows=l.notes.map(function(n,i){return {n:n,i:i};}).sort(function(a,b){return (b.n.pin-a.n.pin)||(a.n.at-b.n.at);});
+      document.getElementById('notesN').textContent=l.notes.length?l.notes.length+'':'';
+      document.getElementById('notesBox').innerHTML=rows.map(function(r){return '<div class="nt'+(r.n.pin?' pin':'')+'"><div>'+esc(r.n.t)+'<small>'+(r.n.pin?'📌 Pinned · ':'')+esc(ago(r.n.at))+'</small></div><button class="pinb" type="button" data-pin="'+r.i+'">'+(r.n.pin?'Unpin':'Pin')+'</button></div>';}).join('');
+    }
+    function drawSearch(){
+      document.getElementById('cSearch').innerHTML='<h3>Saved searches <span class="n">'+l.ss.length+'</span></h3>'+(l.ss.length?l.ss.map(function(s,i){
+        return '<div class="ss"><div><button class="slink" type="button" data-open="'+i+'">'+esc(s[0])+'</button><small>'+s[2]+' homes match · '+(s[3]?'last alert '+esc(ago(s[3])):'just made')+' · tap to see the homes</small></div><button class="tog" type="button" data-s="'+i+'" aria-pressed="'+(!!s[1])+'">'+(s[1]?'On':'Off')+'</button></div>';
+      }).join(''):'<p class="muted" style="margin:0;font-size:15px">No saved searches.</p>')
+      +(nsOpen?'<div class="newbox"><b>New search for '+esc(l.first)+'</b><p class="muted" style="margin:4px 0 8px;font-size:14px">Type it the way you\'d say it, or tap a template.</p><input type="text" id="nsIn" placeholder="Detached, Vellore Village, 2,500 to 3,000 sq ft" aria-label="Describe the search">'
+        +'<div class="tp">'+TPL.map(function(t,i){return '<button type="button" data-tpl="'+i+'">'+esc(t)+'</button>';}).join('')+'</div>'
+        +'<label><input type="checkbox" id="nsTpl"> Save as a template for other leads</label><button class="btn" type="button" id="mkS" style="width:100%">Create search + turn alerts on</button></div>'
+        :'<button class="btn ghost" type="button" id="newS" style="width:100%;margin-top:10px">+ New search for this lead</button>');
+    }
+    tl();drawTasks();drawNotes();drawSearch();
+    app.onclick=function(ev){
+      var t=ev.target,el,c=function(s){return t.closest?t.closest(s):null;};
+      if(c('#back')){location.hash='';return;}
+      if(c('[data-home]')){ev.preventDefault();toast('Mockup: opens the listing page on soldmike.com');return;}
+      if(c('[data-fub]')){ev.preventDefault();toast('Mockup: opens this person in Follow Up Boss');return;}
+      if(c('[data-mail]')){ev.preventDefault();toast('Mockup: opens the email box in Follow Up Boss, so your reply is logged');return;}
+      if(c('[data-rv]')){ev.preventDefault();toast('Mockup: opens RealView with this address filled in. You just hit Enter.');return;}
+      if((el=c('.tk'))){var k=l.tasks[+el.dataset.t];k.done=!k.done;drawTasks();toast('Mockup: would also '+(k.done?'complete':'reopen')+' this task in Follow Up Boss');return;}
+      if(c('#taskBtn')){var ti=document.getElementById('taskIn').value.trim();if(!ti)return;l.tasks.unshift({t:ti,at:0,target:D,done:false,auto:0});drawTasks();toast('Mockup: would also add this task in Follow Up Boss');return;}
+      if(c('#noteBtn')){var ni=document.getElementById('noteIn'),nv=ni.value.trim();if(!nv)return;l.notes.unshift({t:nv,at:0,pin:0});l.ev.unshift(['note',0,null,nv]);ni.value='';drawNotes();tl();toast('Mockup: would also add this note in Follow Up Boss');return;}
+      if((el=c('[data-pin]'))){var nt=l.notes[+el.dataset.pin];nt.pin=nt.pin?0:1;drawNotes();return;}
+      if((el=c('.tog'))){var s=l.ss[+el.dataset.s];s[1]=s[1]?0:1;drawSearch();toast('Mockup: alert '+(s[1]?'on':'off')+' (not saved)');return;}
+      if((el=c('[data-open]'))){openSearch(l,+el.dataset.open);return;}
+      if(c('#newS')){nsOpen=true;drawSearch();document.getElementById('nsIn').focus();return;}
+      if((el=c('[data-tpl]'))){document.getElementById('nsIn').value=TPL[+el.dataset.tpl];return;}
+      if(c('#mkS')){var si=document.getElementById('nsIn').value.trim();if(!si)return;var keep=document.getElementById('nsTpl').checked;l.ss.unshift([si,1,5,0]);if(keep&&TPL.indexOf(si)<0)TPL.push(si);nsOpen=false;drawSearch();toast('Mockup: search made, alerts on'+(keep?', saved as a template':'')+'. Also goes to Follow Up Boss.');return;}
+      if((el=c('#tfil button'))){tf=el.dataset.k;[].forEach.call(document.querySelectorAll('#tfil button'),function(x){x.setAttribute('aria-pressed',x===el);});tl();return;}
+      if((el=c('#ptabs button'))){[].forEach.call(document.querySelectorAll('#ptabs button'),function(x){x.setAttribute('aria-pressed',x===el);});
+        [].forEach.call(document.querySelectorAll('.cols [data-pane]'),function(p){p.classList.toggle('show',p.dataset.pane===el.dataset.p);});return;}
+    };
   }
 
   // ---------- two ways in ----------
@@ -339,7 +502,7 @@ html.site .dtabs{display:none}
     document.getElementById('fg').onclick=function(ev){ev.preventDefault();toast('Mockup: would email a reset link');};
   }
 
-  function route(){var bl=document.getElementById('barLnk');if(SITE&&(location.hash==='#signin'||!signedIn())){bl.hidden=true;signin();return;}bl.hidden=false;var m=location.hash.match(/^#lead-(\d+)$/);if(m)person(+m[1]);else list();}
+  function route(){app.onclick=null;document.body.classList.remove('hasstrip');var bl=document.getElementById('barLnk');if(SITE&&(location.hash==='#signin'||!signedIn())){bl.hidden=true;signin();return;}bl.hidden=false;var m=location.hash.match(/^#lead-(\d+)$/);if(m)person(+m[1]);else list();}
   addEventListener('hashchange',route);route();
 })();
 </script>
