@@ -408,6 +408,14 @@
   "layout": "photo"
  },
  {
+  "slug": "blog-selling-with-tenants-ontario",
+  "path": "/blog/selling-with-tenants-ontario/",
+  "headline": "Selling a House With Tenants in Ontario: N12 Notices and Timing",
+  "kicker": "Blog",
+  "photo": "/media/gentle-fox/backyard-twilight.jpg",
+  "layout": "photo"
+ },
+ {
   "slug": "blog-pre-construction-or-resale",
   "path": "/blog/pre-construction-or-resale/",
   "headline": "Pre-Construction or Resale: Which Fits Your Timeline?",
@@ -468,7 +476,7 @@
   "path": "/blog/",
   "headline": "Blog: Selling & Buying in Vaughan and the GTA",
   "kicker": "Blog",
-  "photo": "/media/gentle-fox/drone-front.jpg",
+  "photo": "/media/gentle-fox/backyard-twilight.jpg",
   "layout": "photo"
  },
  {
