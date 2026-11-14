@@ -56,10 +56,28 @@ def faq_schema(qs):
     return {'@context': 'https://schema.org', '@type': 'FAQPage', 'mainEntity': [
         {'@type': 'Question', 'name': q, 'acceptedAnswer': {'@type': 'Answer', 'text': a}} for q, a in qs if not a.startswith('[')]}
 
+# ---------- preconstruction projects (Nov 14 2026): each has its own registration page on another address; /preconstruction/ and the menu list them ----------
+PRECON = [
+    {'name': 'Uptown Woodbridge', 'url': 'https://uptownwoodbridge.pages.dev/', 'img': '/media/precon/uptown.jpg', 'tag': 'Now selling',
+     'by': 'Fieldgate Homes', 'where': 'Weston Rd. & Teston Rd., North Vaughan', 'what': 'Freehold towns and singles', 'price': 'From $699,990', 'go': 'Get the price list'},
+    {'name': 'Cavallo Estates', 'url': 'https://cavalloestates.pages.dev/', 'img': '/media/precon/cavallo.jpg', 'tag': 'Private pre-launch',
+     'by': 'Treasure Hill', 'where': 'Hwy 27 & 15th Sideroad, Nobleton', 'what': '2 and 3-car detached homes and bungalows', 'price': 'From $999,900', 'go': 'Join the pre-launch list'},
+    {'name': 'The Valley Woodbridge', 'url': 'https://thevalleywoodbridgevip.ca/', 'img': '/media/precon/valley.jpg', 'tag': 'Phase 1 registration',
+     'by': 'Marycroft Homes, Remington Homes and Poetry Living', 'where': 'Old Woodbridge, on the former Board of Trade Golf Club', 'what': 'Detached homes on 40\u2019 and 45\u2019 lots', 'price': 'From $1.759M', 'go': 'Register for VIP access'},
+    {'name': 'New Kleinburg', 'url': 'https://broker-svg.github.io/soldmike-tools/new-kleinburg-vip/', 'img': '/media/precon/kleinburg.jpg', 'tag': 'Coming soon',
+     'by': 'Fieldgate Homes', 'where': 'Major Mackenzie Dr. & Hwy 427, Kleinburg', 'what': 'Freehold towns, semis and 30\u2019 singles', 'price': 'From $979,990', 'go': 'Register for VIP access'},
+]
+def precon_cards():
+    return '<div class="pcs">%s</div>' % ''.join(
+        '<a class="pc rv" href="%s" target="_blank" rel="noopener"><div class="ph"><img src="%s" alt="%s, %s" loading="lazy" width="1200" height="800"><span class="tag">%s</span></div>'
+        '<div class="bd"><b>%s</b><span class="by">By %s</span><span>%s</span><span class="by">%s</span><span class="from">%s</span><span class="go">%s \u2192</span></div></a>'
+        % (p['url'], p['img'], e(p['name']), e(p['where']), e(p['tag']), e(p['name']), e(p['by']), e(p['what']), e(p['where']), e(p['price']), e(p['go'])) for p in PRECON)
+
 # ---------- building blocks ----------
 NAV = [
     ('Buy', [('/listings/', 'Search homes'), ('/listings/our-listings/', 'OP Team listings'), ('/listings/re-max-premier/', 'RE/MAX Premier listings'), ('/buy/', 'Buying with us'), ('/buy/buyer-guide/', 'Buyer guide: 15 steps'), ('/free-guide/', 'Free PDF guides'), ('/buy/pre-construction/', 'Pre-construction'), ('/saved/', 'Saved homes & searches'), ('/open-house/', 'Open houses')]),
     ('Sell', [('/sell/home-value/', "What's my home worth?"), ('/sell/', 'Selling with us'), ('/vow/search?status=sold&team=1', 'Our team\'s sales'), ('/sell/seller-guide/', 'Seller guide: 15 steps'), ('/free-guide/', 'Free PDF guides'), ('/sell/cost-to-sell-vaughan/', 'Cost to sell calculator'), ('/sell/how-we-market/', 'How we market your home'), ('/sell/pre-listing/', 'Pre-listing package'), ('/sell/pre-listing-checklist/', 'Pre-listing checklist')]),
+    ('Preconstruction', [('/preconstruction/', 'All projects')] + [(p['url'], p['name']) for p in PRECON] + [('/buy/pre-construction/', 'Buying pre-construction')]),
     ('Neighbourhoods', [('/neighbourhoods/', 'All neighbourhoods')] + [('/neighbourhoods/%s/' % s, n) for s, n in [('woodbridge', 'Woodbridge'), ('vellore', 'Vellore Village'), ('kleinburg', 'Kleinburg'), ('maple', 'Maple'), ('caledon-bolton', 'Caledon & Bolton'), ('king-city-nobleton', 'King City & Nobleton'), ('sharon-east-gwillimbury', 'Sharon & East Gwillimbury'), ('toronto', 'Toronto')]]),
     ('Results', [('/vow/search?status=sold&team=1', 'Our team\'s sales'), ('/vow/', 'All recent sales'), ('/results/', 'Case studies'), ('/reviews/', 'Client reviews'), ('/blog/', 'Blog'), ('/market-reports/', 'Market reports')]),
     ('Questions', [('/questions/', 'All questions'), ('/questions/buying/', 'Buyer questions'), ('/questions/selling/', 'Seller questions')]),
@@ -83,7 +101,7 @@ def header(path):
             '<nav class="nav" id="nav" aria-label="Main">%s<a class="btn" href="/sell/home-value/">Home value</a></nav></div></header>') % ''.join(out)
 
 def footer():
-    cols = ''.join('<div><strong>%s</strong>%s</div>' % (l, ''.join('<a href="%s"%s>%s</a>' % (u, ext(u), e(t)) for u, t in items[:5])) for l, items in NAV[:4] if not isinstance(items, str))
+    cols = ''.join('<div><strong>%s</strong>%s</div>' % (l, ''.join('<a href="%s"%s>%s</a>' % (u, ext(u), e(t)) for u, t in items[:5])) for l, items in NAV if l in ('Buy', 'Sell', 'Neighbourhoods', 'Results'))
     return ('<footer><div class="wrap"><div class="fcols">'
             '<div><img src="/logo-soldmike-white.png" alt="RE/MAX Premier The OP Team, SoldMike" style="width:220px;height:auto">'
             '<span>Michael Barillari, Broker, SOLDMIKE. %s. Independently owned and operated.</span>'
@@ -220,7 +238,7 @@ def page(path, title, desc, trail, body, schema=None, noindex=False, head='', js
            '<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image">'
            '%s<link rel="icon" href="/logo.png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
            '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Barlow:wght@400;500;600&display=swap">'
-           '<link rel="stylesheet" href="/assets/site.css?v=8">%s%s</head><body>%s<main id="main">%s</main>%s<script src="/assets/site.js?v=10" defer></script>%s<script src="/assets/chat.js?v=7" defer></script>' + METRICOOL_TAG + '</body></html>'
+           '<link rel="stylesheet" href="/assets/site.css?v=9">%s%s</head><body>%s<main id="main">%s</main>%s<script src="/assets/site.js?v=11" defer></script>%s<script src="/assets/chat.js?v=7" defer></script>' + METRICOOL_TAG + '</body></html>'
            ) % (e(title), e(desc), SITE, path, e(title), e(desc), SITE, path, og_card(path, title, trail, body),
                 '<meta name="robots" content="noindex">' if noindex else '',
                 ''.join('<script type="application/ld+json">%s</script>' % json.dumps(s, ensure_ascii=False) for s in sch), head,
@@ -386,10 +404,22 @@ P('/buy/pre-construction/',
             '<b>Deposits are protected, up to a limit.</b> Tarion protects deposits on new condos up to $20,000, and the Condominium Act requires deposits above that to be held in trust or secured. Freehold homes have their own Tarion deposit protection limits.',
             '<b>Check the builder.</b> Every new-home builder in Ontario must be licensed by the Home Construction Regulatory Authority (HCRA). You can look them up in the Ontario Builder Directory before you sign.',
             '<b>Watch the closing costs.</b> New homes can add development charges, utility hook-ups and HST adjustments at closing. We read the agreement with you and your lawyer so there are no surprises.') +
-      todo('Current projects you can offer access to (name, builder, location, price from, deposit structure)', 'Your pre-construction track record or partnerships') +
+      prose('<h2>Projects open now</h2>', 'See the new communities we are registering buyers for: <a href="/preconstruction/">current pre-construction projects</a>.') +
+      todo('Your pre-construction track record or partnerships') +
       '</div>' + form('precon') + '</div>'),
   title='Pre-Construction Homes in Vaughan & York Region | SoldMike', desc='VIP access to new pre-construction condos, towns and detached homes in Vaughan and York Region.',
   trail=[('Buy', '/buy/'), ('Pre-construction', '/buy/pre-construction/')])
+
+P('/preconstruction/',
+  lambda: hero([('Home', '/'), ('Preconstruction', '/preconstruction/')], 'Preconstruction projects', 'New communities in Vaughan and King Township. Tap a project to see the homes and register for pricing.'),
+  lambda: band(head_block('Projects open for registration') + precon_cards() +
+      '<p style="color:var(--muted);font-size:14px;margin-top:18px">Each project opens on its own registration page. Prices, incentives and availability are set by the builder and can change without notice. Lot premiums are extra. E.&amp;O.E. Brokered by RE/MAX Premier The OP Team, Brokerage. Not the Vendor.</p>'),
+  lambda: band(head_block('New to buying from a builder?') + cards([
+      ('/buy/pre-construction/', 'How pre-construction works', 'Deposits, the 10-day condo cooling-off period, closing costs'),
+      ('/book-a-call/', 'Book a call', 'Ask about a project, lots or timing'),
+  ]), 'tint'),
+  title='Preconstruction Projects in Vaughan & King | SoldMike', desc='New home communities in Woodbridge, Kleinburg and Nobleton. See each project and register for the price list and floor plans.',
+  trail=[('Preconstruction', '/preconstruction/')])
 
 # =====================================================================
 # SELL
@@ -1157,9 +1187,9 @@ open('blog/feed.xml', 'w', encoding='utf-8').write('<?xml version="1.0" encoding
 # ---------- 404, sitemap, robots, checklist ----------
 PAGE = '/404'
 page404 = ('<!doctype html><html lang="en-CA"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Page not found | SoldMike</title><meta name="robots" content="noindex">'
-           '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=Barlow:wght@400;600&display=swap"><link rel="stylesheet" href="/assets/site.css?v=8"></head><body>'
+           '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=Barlow:wght@400;600&display=swap"><link rel="stylesheet" href="/assets/site.css?v=9"></head><body>'
            + header('/404') + '<main id="main">' + hero([('Home', '/'), ('Not found', '/404')], 'That page has moved', 'The page you were looking for is not here. Try one of these instead.') +
-           band(cards([('/listings/', 'Search homes', 'Every MLS® listing'), ('/sell/home-value/', 'Home value', 'What your home is worth'), ('/neighbourhoods/', 'Neighbourhoods', 'Area guides'), ('/contact/', 'Contact', 'Talk to Michael')])) + '</main>' + footer() + '<script src="/assets/site.js?v=10" defer></script><script src="/assets/chat.js?v=7" defer></script></body></html>')
+           band(cards([('/listings/', 'Search homes', 'Every MLS® listing'), ('/sell/home-value/', 'Home value', 'What your home is worth'), ('/neighbourhoods/', 'Neighbourhoods', 'Area guides'), ('/contact/', 'Contact', 'Talk to Michael')])) + '</main>' + footer() + '<script src="/assets/site.js?v=11" defer></script><script src="/assets/chat.js?v=7" defer></script></body></html>')
 open('404.html', 'w', encoding='utf-8').write(page404)
 
 today = date.today().isoformat()

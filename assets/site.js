@@ -112,8 +112,8 @@
     +'.acct-w.open .acct-m{display:flex}.acct-m p{margin:6px 12px 8px;font-size:14px;color:#545B78;line-height:1.4;word-break:break-all}'
     +'.acct-m a,.acct-m button{display:block;text-align:left;padding:11px 12px;border-radius:4px;text-decoration:none;color:#141833;font:500 16px Barlow,system-ui,sans-serif;background:none;border:0;cursor:pointer}'
     +'.acct-m a:hover,.acct-m button:hover{background:#F2F4F9;color:#D7141E}'
-    +'@media (min-width:1261px) and (max-width:1439px){.acct-b .t{display:none}.acct-b{padding:0 11px}}'
-    +'@media (max-width:1260px){.acct-w{order:0;margin-left:auto;margin-right:8px}}'
+    +'@media (min-width:1301px) and (max-width:1599px){.acct-b .t{display:none}.acct-b{padding:0 11px}}'
+    +'@media (max-width:1300px){.acct-w{order:0;margin-left:auto;margin-right:8px}}'
     +'@media (max-width:480px){.acct-b .t{max-width:70px;overflow:hidden;text-overflow:ellipsis}}';
   document.head.appendChild(st);
   var ICON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>';

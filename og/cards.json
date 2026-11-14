@@ -64,6 +64,14 @@
   "layout": "photo"
  },
  {
+  "slug": "preconstruction",
+  "path": "/preconstruction/",
+  "headline": "Preconstruction Projects in Vaughan & King",
+  "kicker": "Preconstruction",
+  "photo": "/media/precon/uptown.jpg",
+  "layout": "photo"
+ },
+ {
   "slug": "sell",
   "path": "/sell/",
   "headline": "Sell Your Home in Vaughan & Woodbridge",
