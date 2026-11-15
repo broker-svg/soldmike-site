@@ -113,8 +113,18 @@
     log.appendChild(f);scroll();setTimeout(function(){f.elements.name.focus();},50);
   }
 
+  // home value: hand off to the evaluation chat (/evaluation), or keep the simple follow-up form
+  function evalChoice(){
+    var c=document.createElement('div');c.className='chips';
+    var go=document.createElement('button');go.type='button';go.textContent='Start my home evaluation';
+    go.onclick=function(){location.href='/evaluation';};
+    var cb=document.createElement('button');cb.type='button';cb.textContent='Just have Michael call me';
+    cb.onclick=function(){c.remove();me('Just have Michael call me');bot('Of course. Leave your name and number and Michael will reach out personally.',function(){leadForm('Home value');});};
+    c.appendChild(go);c.appendChild(cb);log.appendChild(c);scroll();
+  }
+
   var A=[
-    [/worth|value|apprais|evaluat|price my/i,'Home values depend most on what similar homes nearby sold for in the last few months. Michael pulls those sales and sends you a price range with the comparables attached, no obligation.\n\nWant him to do that for your home?','Home value',true],
+    [/worth|value|apprais|evaluat|price my/i,'Home values depend most on what similar homes nearby sold for in the last few months. Michael pulls those sales and sends you a price range with the comparables attached, no obligation.\n\nA few quick questions about your home get it started. It takes about a minute.','Home value','eval'],
     [/cost to sell|selling cost|fees|commission|net/i,'The main costs of selling in Ontario are the real estate commission plus 13% HST on it, legal fees, and paying out your mortgage, including any penalty. Sellers don’t pay land transfer tax.\n\nYou can run your own numbers in the [cost to sell calculator](/sell/cost-to-sell-vaughan/).','Cost to sell',false],
     [/down ?payment|deposit|afford|mortgage|pre-?approv/i,'In Canada you need at least 5% down on the first $500,000 and 10% on the portion between $500,000 and $1.5 million. Homes at $1.5 million or more need 20% down.\n\nMichael can connect you with a mortgage agent for a pre-approval if that helps.','Down payment',true],
     [/famil|school|neighbo|area|live|woodbridge|kleinburg|maple|vellore|king|nobleton|caledon|bolton/i,'Great question. Woodbridge, Vellore, Kleinburg and Maple are all popular with families, each for different reasons: schools, lot sizes, commute and price.\n\nThe [neighbourhood guides](/neighbourhoods/) compare them. Tell me what matters most to you and Michael can shortlist the right areas.','Neighbourhoods',true],
@@ -124,7 +134,7 @@
   function ask(t){
     me(t);
     for(var i=0;i<A.length;i++){
-      if(A[i][0].test(t)){var a=A[i];bot(a[1],function(){if(a[3])leadForm(a[2]);else chips(["What's my home worth?",'Talk to Michael']);});return;}
+      if(A[i][0].test(t)){var a=A[i];bot(a[1],function(){if(a[3]==='eval')evalChoice();else if(a[3])leadForm(a[2]);else chips(["What's my home worth?",'Talk to Michael']);});return;}
     }
     if(/talk|call|michael|human|agent|contact/i.test(t)){bot('Of course. Leave your name and number and Michael will reach out personally.',function(){leadForm('Wants to talk to Michael');});return;}
     bot('Good question. I want you to get the right answer, so I’ll pass this to Michael and he’ll reply personally.',function(){leadForm('Question: '+t);});
