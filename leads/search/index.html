@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="en-CA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Buyer search | SoldMike</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#1D2870">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="icon" href="/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<style>
+/* Buyer search (host PIN), Buyer Search Intake phase 1: Michael draws a buyer's area and saves it on a lead.
+   Plain code, no AI. Nothing is emailed from here: the search is saved switched off until phase 2. */
+:root{--navy:#1D2870;--ink:#141833;--red:#D7141E;--mist:#F7F8FB;--line:#DCE0EC;--muted:#545B78;--green:#1B7A3E;
+  --display:'Barlow Condensed','Arial Narrow',system-ui,sans-serif;--body:'Barlow',system-ui,-apple-system,'Segoe UI',sans-serif;color-scheme:light}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:var(--mist);color:var(--ink);font-family:var(--body);font-size:18px;line-height:1.45;-webkit-tap-highlight-color:transparent}
+button,input{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--red);outline-offset:2px}
+[hidden]{display:none!important}
+h1,h2{font-family:var(--display);font-weight:800;text-transform:uppercase;line-height:1;margin:0}
+h2{font-size:26px}
+a{color:var(--navy)}
+.muted{color:var(--muted)}
+.err{color:var(--red);font-weight:600;margin:0}
+.wrap{max-width:1200px;margin:0 auto;padding:0 14px}
+.bar{background:var(--navy);color:#fff;padding:calc(12px + env(safe-area-inset-top,0px)) 14px 12px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px}
+.bar>:last-child{justify-self:end}
+.bar img{height:42px;width:auto;display:block}
+.bar b{font-family:var(--display);font-size:24px;text-transform:uppercase;letter-spacing:.02em}
+.bar a.lnk{border:1px solid #4A5592;color:#fff;border-radius:8px;min-height:40px;padding:0 14px;font-size:15px;display:inline-flex;align-items:center;text-decoration:none}
+.page{padding-top:14px;padding-bottom:120px;display:grid;gap:14px}
+@media (min-width:1000px){.page{grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);align-items:start}.full{grid-column:1/-1}.mapcol{position:sticky;top:10px}}
+.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:12px}
+.who{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.who b{font-size:22px}
+.in{width:100%;min-height:54px;border:1.5px solid var(--line);border-radius:10px;padding:0 14px;background:#fff;font-size:19px}
+.in:focus{outline:none;border-color:var(--navy)}
+.sug{display:flex;flex-direction:column;gap:6px}
+.sug button{min-height:52px;text-align:left;border:1px solid var(--line);border-radius:10px;background:#fff;padding:8px 14px;font-weight:600;cursor:pointer}
+.sug button span{display:block;font-weight:400;font-size:15px;color:var(--muted)}
+.sug button:hover{border-color:var(--navy)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{min-height:46px;padding:0 16px;border:1.5px solid var(--navy);border-radius:23px;background:#fff;color:var(--navy);font-weight:600;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--navy);color:#fff}
+.hood{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 8px 0 14px;border-radius:22px;background:#E8EBF8;font-weight:600}
+.hood button{width:32px;height:32px;border:0;border-radius:50%;background:#fff;cursor:pointer;font-size:18px;line-height:1}
+#map{height:56vh;min-height:340px;border-radius:12px;border:1px solid var(--line);z-index:0}
+@media (min-width:1000px){#map{height:calc(100vh - 330px)}}
+#map.drawing{cursor:crosshair}
+.tools{display:flex;flex-wrap:wrap;gap:8px}
+.tb{min-height:50px;padding:0 16px;border-radius:10px;border:1.5px solid var(--line);background:#fff;font-weight:600;cursor:pointer;flex:1 1 auto}
+.tb.inc{border-color:var(--navy);color:var(--navy)}
+.tb.exc{border-color:var(--red);color:var(--red)}
+.tb.go{background:var(--green);border-color:var(--green);color:#fff}
+.tb:disabled{opacity:.45}
+.hint{font-size:16px;margin:0;padding:10px 12px;border-radius:10px;background:var(--mist);border:1px solid var(--line);min-height:68px;display:flex;align-items:center}
+.hint.on{background:#FFF6DA;border-color:#EBD88E;font-weight:600}
+.row{display:flex;gap:10px}.row>div{flex:1;min-width:0}
+label.l{display:block;font-size:15px;font-weight:600;color:var(--muted);margin-bottom:4px}
+.btn{display:flex;align-items:center;justify-content:center;min-height:58px;padding:0 22px;border:0;border-radius:10px;background:var(--red);color:#fff;font-weight:600;font-size:19px;cursor:pointer;width:100%}
+.btn.navy{background:var(--navy)}
+.btn:disabled{opacity:.5}
+.res{display:flex;flex-direction:column}
+.home{display:grid;grid-template-columns:1fr auto;gap:2px 12px;padding:11px 0;border-top:1px solid var(--line);text-decoration:none;color:inherit}
+.home b{font-size:18px}.home .p{font-weight:600;white-space:nowrap}.home small{grid-column:1/-1;color:var(--muted);font-size:14px}
+.count{font-family:var(--display);font-size:30px;font-weight:800;text-transform:uppercase}
+.pin{background:none;border:0}
+.pin span{display:inline-block;transform:translate(-50%,-100%);white-space:nowrap;background:var(--navy);color:#fff;font:700 13px/1 var(--body);padding:6px 8px;border-radius:4px;box-shadow:0 2px 6px rgba(0,0,0,.3)}
+.pin.mine span{background:var(--red)}
+.dot{width:16px;height:16px;border-radius:50%;background:#fff;border:3px solid var(--navy);box-shadow:0 1px 4px rgba(0,0,0,.4)}
+.dot.x{border-color:var(--red)}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:#fff;padding:14px 20px;border-radius:12px;font-weight:600;z-index:2000;max-width:calc(100vw - 28px);text-align:center}
+dialog{border:0;border-radius:16px;padding:22px;width:min(380px,calc(100vw - 32px));box-shadow:0 30px 60px rgba(10,14,40,.4)}
+dialog::backdrop{background:rgba(20,24,51,.6)}
+dialog form{display:flex;flex-direction:column;gap:12px}
+dialog input{min-height:56px;border:1px solid var(--line);border-radius:10px;padding:0 16px;font-size:19px}
+</style>
+</head>
+<body>
+<div class="bar"><a href="/" aria-label="SoldMike home"><img src="/logo-soldmike-white.png" alt="SoldMike"></a><b>Buyer search</b><a class="lnk" id="back" href="/leads/">Leads</a></div>
+<div class="wrap page">
+  <div class="card full" id="whoCard"><p class="muted" style="margin:0">Loading…</p></div>
+
+  <div class="mapcol" style="display:flex;flex-direction:column;gap:10px">
+    <div class="card">
+      <h2>1. Where</h2>
+      <div><label class="l" for="hq">Neighbourhood by name (optional)</label><input class="in" id="hq" type="search" placeholder="Type a neighbourhood, e.g. Sonoma" autocomplete="off"></div>
+      <div class="sug" id="hsug" hidden></div>
+      <div class="chips" id="hoods"></div>
+      <div class="tools">
+        <button class="tb inc" type="button" id="bInc">Draw area</button>
+        <button class="tb exc" type="button" id="bExc">Cut out a part</button>
+        <button class="tb" type="button" id="bUndo" hidden>Undo point</button>
+        <button class="tb go" type="button" id="bDone" hidden>Finish shape</button>
+        <button class="tb" type="button" id="bCancel" hidden>Cancel</button>
+        <button class="tb" type="button" id="bClear">Clear drawing</button>
+      </div>
+      <p class="hint" id="hint"></p>
+      <div id="map" aria-label="Map. Use the buttons above to draw the search area."></div>
+      <p class="muted" style="margin:0;font-size:15px">Blue = search here. Red = leave this part out. Tap a finished shape to remove it.</p>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:14px">
+    <div class="card">
+      <h2>2. What</h2>
+      <div class="chips" id="cLease"><button class="chip" type="button" data-v="0">For sale</button><button class="chip" type="button" data-v="1">For rent</button></div>
+      <div><label class="l">Home type</label><div class="chips" id="cType"><button class="chip" type="button" data-v="">Any</button><button class="chip" type="button" data-v="detached">Detached</button><button class="chip" type="button" data-v="semi">Semi</button><button class="chip" type="button" data-v="town">Townhouse</button><button class="chip" type="button" data-v="condo">Condo</button></div></div>
+      <div class="row"><div><label class="l" for="pMin">Price from</label><input class="in" id="pMin" inputmode="decimal" placeholder="e.g. 1.2m" autocomplete="off"></div><div><label class="l" for="pMax">Price to</label><input class="in" id="pMax" inputmode="decimal" placeholder="e.g. 1.6m" autocomplete="off"></div></div>
+      <div><label class="l">Bedrooms</label><div class="chips" id="cBeds"><button class="chip" type="button" data-v="0">Any</button><button class="chip" type="button" data-v="1">1+</button><button class="chip" type="button" data-v="2">2+</button><button class="chip" type="button" data-v="3">3+</button><button class="chip" type="button" data-v="4">4+</button><button class="chip" type="button" data-v="5">5+</button></div></div>
+      <div><label class="l">Bathrooms</label><div class="chips" id="cBaths"><button class="chip" type="button" data-v="0">Any</button><button class="chip" type="button" data-v="1">1+</button><button class="chip" type="button" data-v="2">2+</button><button class="chip" type="button" data-v="3">3+</button><button class="chip" type="button" data-v="4">4+</button></div></div>
+      <button class="btn navy" type="button" id="bShow">Show matching homes</button>
+      <p class="err" id="err" hidden></p>
+    </div>
+    <div class="card" id="resCard" hidden>
+      <div><div class="count" id="cnt"></div><div class="muted" id="lbl"></div></div>
+      <div class="res" id="res"></div>
+      <button class="btn" type="button" id="bSave">Save this search</button>
+      <p class="muted" style="margin:0;font-size:15px">Saving puts the search on the lead. No emails go out yet: sending is the next phase.</p>
+    </div>
+  </div>
+</div>
+<dialog id="pinDlg"><form method="dialog" id="pinForm"><h2>Host only</h2><label for="pinIn">Enter your PIN</label><input id="pinIn" inputmode="numeric" autocomplete="off" type="password"><p class="err" id="pinErr" hidden>Wrong PIN</p><button class="btn" type="submit">Continue</button></form></dialog>
+<script src="/assets/listings.js?v=6"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+(function(){
+  var SM=window.SM, esc=SM.esc, $=function(id){return document.getElementById(id);};
+  var qs=new URLSearchParams(location.search);
+  var S={lead:null,id:+qs.get('s')||0,hoods:[],inc:[],exc:[],lease:0,type:'',beds:0,baths:0};
+  var map,shapeLayer,pinLayer,draft=null;   // draft = {kind:'inc'|'exc', pts:[[lat,lng]], line, dots}
+
+  // ---------- PIN + API (same PIN as the Leads page) ----------
+  function pin(){return SM.store('sm_oh_pin')||'';}
+  function api(path,opt){opt=opt||{};opt.headers=Object.assign({'X-OH-Pin':pin(),'Content-Type':'application/json'},opt.headers||{});
+    return fetch(SM.api+path,opt).then(function(r){if(r.status===401)throw 'pin';return r.json().then(function(j){if(!r.ok)throw (j&&j.error)||('Error '+r.status);return j;});});}
+  function askPin(){return new Promise(function(res){var d=$('pinDlg'),i=$('pinIn'),e=$('pinErr');
+    $('pinForm').onsubmit=function(ev){ev.preventDefault();SM.store('sm_oh_pin',i.value.trim());api('/api/oh/check',{method:'POST'}).then(function(){d.close();res();}).catch(function(){e.hidden=false;});};
+    d.showModal();i.focus();});}
+  function call(path,opt){return api(path,opt).catch(function(e){if(e==='pin')return askPin().then(function(){return api(path,opt);});throw e;});}
+  function toast(t){var el=document.createElement('div');el.className='toast';el.setAttribute('role','status');el.textContent=t;document.body.appendChild(el);setTimeout(function(){el.remove();},4200);}
+  function name(l){return ((l.first||'')+' '+(l.last||'')).trim()||l.email||l.phone||'No name';}
+  function fail(e){var el=$('err');el.textContent=typeof e==='string'&&e!=='pin'?e:'Could not reach the site. Check the connection and try again.';el.hidden=false;}
+
+  // ---------- who the search is for ----------
+  function showLead(){
+    var c=$('whoCard');
+    if(S.lead){
+      c.innerHTML='<div class="who"><span class="muted">Search for</span><b>'+esc(name(S.lead))+'</b><span class="muted">'+esc(S.lead.email||S.lead.phone||'')+'</span>'+(S.id?'':'<button class="tb" type="button" id="chg" style="flex:none">Change</button>')+'</div>';
+      $('back').href='/leads/#'+S.lead.id;$('back').textContent='Back to lead';
+      $('bSave').textContent=(S.id?'Save changes for ':'Save this search for ')+(S.lead.first||name(S.lead));
+      if($('chg'))$('chg').onclick=function(){S.lead=null;showLead();};
+      return;
+    }
+    c.innerHTML='<h2>Who is this for?</h2><input class="in" id="lq" type="search" placeholder="Search a lead by name, email or phone" autocomplete="off"><div class="sug" id="lsug"></div><p class="muted" style="margin:0;font-size:15px">Not on the list yet? You can still draw and look at the homes. Saving needs a lead.</p>';
+    $('bSave').textContent='Save this search';
+    var t;$('lq').oninput=function(){clearTimeout(t);var v=this.value.trim();t=setTimeout(function(){findLead(v);},300);};
+    findLead('');
+  }
+  function findLead(v){
+    call('/api/leads/list'+(v?'?q='+encodeURIComponent(v):'')).then(function(j){
+      var el=$('lsug');if(!el)return;
+      el.innerHTML=j.items.slice(0,6).map(function(l){return '<button type="button" data-id="'+l.id+'">'+esc(name(l))+'<span>'+esc([l.email||l.phone||'',l.source||''].filter(Boolean).join(' · '))+'</span></button>';}).join('')||'<p class="muted" style="margin:0">No lead matches that.</p>';
+      [].forEach.call(el.querySelectorAll('button'),function(b){b.onclick=function(){S.lead=j.items.filter(function(l){return l.id==b.dataset.id;})[0];showLead();};});
+    }).catch(function(){});
+  }
+
+  // ---------- map + drawing ----------
+  var COL={inc:'#1D2870',exc:'#D7141E'};
+  function initMap(){
+    map=L.map('map',{zoomControl:true,doubleClickZoom:false}).setView([43.83,-79.58],12);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'}).addTo(map);
+    shapeLayer=L.layerGroup().addTo(map);pinLayer=L.layerGroup().addTo(map);
+    map.on('click',function(e){if(!draft)return;draft.pts.push([+e.latlng.lat.toFixed(5),+e.latlng.lng.toFixed(5)]);drawDraft();});
+  }
+  function drawShapes(){
+    shapeLayer.clearLayers();
+    ['inc','exc'].forEach(function(k){S[k].forEach(function(ring,i){
+      var p=L.polygon(ring,{color:COL[k],weight:3,fillColor:COL[k],fillOpacity:k==='inc'?0.12:0.3,dashArray:k==='exc'?'6 6':null}).addTo(shapeLayer);
+      p.on('click',function(ev){if(draft)return;L.DomEvent.stop(ev);if(confirm(k==='inc'?'Remove this search area?':'Remove this cut-out?')){S[k].splice(i,1);drawShapes();stale();}});
+    });});
+  }
+  function drawDraft(){
+    if(draft.line)draft.line.remove();(draft.dots||[]).forEach(function(d){d.remove();});draft.dots=[];
+    if(!draft.pts.length){tools();return;}
+    draft.line=(draft.pts.length>2?L.polygon:L.polyline)(draft.pts,{color:COL[draft.kind],weight:3,fillOpacity:0.08,dashArray:'4 6',interactive:false}).addTo(map);
+    draft.pts.forEach(function(p){draft.dots.push(L.marker(p,{interactive:false,icon:L.divIcon({className:'',html:'<div class="dot'+(draft.kind==='exc'?' x':'')+'"></div>',iconSize:[16,16],iconAnchor:[8,8]})}).addTo(map));});
+    tools();
+  }
+  function tools(){
+    var on=!!draft,n=on?draft.pts.length:0;
+    $('bInc').hidden=$('bExc').hidden=$('bClear').hidden=on;
+    $('bUndo').hidden=$('bDone').hidden=$('bCancel').hidden=!on;
+    $('bUndo').disabled=!n;$('bDone').disabled=n<3;
+    $('map').classList.toggle('drawing',on);
+    var h=$('hint');h.classList.toggle('on',on);
+    if(!on)h.textContent=S.inc.length||S.exc.length?'Draw another area, cut a part out, or go to step 2.':'Press Draw area, then tap the map at each corner, going around the area.';
+    else h.textContent=(draft.kind==='inc'?'Drawing the search area. ':'Drawing the part to leave out. ')+(n<3?'Tap the map at each corner, going around the area ('+n+' so far, 3 or more needed).':n+' corners. Keep tapping, or press Finish shape.');
+  }
+  function start(kind){draft={kind:kind,pts:[],dots:[]};pinLayer.clearLayers();tools();}
+  function endDraft(keep){
+    if(!draft)return;
+    if(draft.line)draft.line.remove();(draft.dots||[]).forEach(function(d){d.remove();});
+    if(keep&&draft.pts.length>=3){S[draft.kind].push(draft.pts);stale();}
+    draft=null;drawShapes();tools();
+  }
+  $('bInc').onclick=function(){start('inc');};
+  $('bExc').onclick=function(){if(!S.inc.length&&!S.hoods.length){toast('Draw the search area or pick a neighbourhood first, then cut a part out.');return;}start('exc');};
+  $('bUndo').onclick=function(){draft.pts.pop();drawDraft();};
+  $('bDone').onclick=function(){endDraft(true);};
+  $('bCancel').onclick=function(){endDraft(false);};
+  $('bClear').onclick=function(){if(!S.inc.length&&!S.exc.length)return;if(confirm('Remove everything drawn on the map?')){S.inc=[];S.exc=[];drawShapes();stale();}};
+
+  // ---------- neighbourhood by name ----------
+  var ht;$('hq').oninput=function(){clearTimeout(ht);var v=this.value.trim();ht=setTimeout(function(){
+    if(v.length<2){$('hsug').hidden=true;return;}
+    call('/api/leads/area/hoods?q='+encodeURIComponent(v)).then(function(j){
+      var el=$('hsug');el.hidden=false;
+      el.innerHTML=j.items.map(function(h,i){return '<button type="button" data-i="'+i+'">'+esc(h.name)+'<span>'+esc(h.city)+' · '+h.homes+' active listing'+(h.homes===1?'':'s')+' right now</span></button>';}).join('')||'<p class="muted" style="margin:0">No neighbourhood with that name has active listings. Draw the area on the map instead.</p>';
+      [].forEach.call(el.querySelectorAll('button'),function(b){b.onclick=function(){var h=j.items[+b.dataset.i];
+        if(!S.hoods.some(function(x){return x.name===h.name&&x.city===h.city;}))S.hoods.push({name:h.name,city:h.city});
+        if(h.box)map.fitBounds([[h.box[0],h.box[1]],[h.box[2],h.box[3]]],{padding:[30,30],maxZoom:15});
+        $('hq').value='';el.hidden=true;showHoods();stale();};});
+    }).catch(function(){});
+  },300);};
+  function showHoods(){
+    $('hoods').innerHTML=S.hoods.map(function(h,i){return '<span class="hood">'+esc(h.name)+', '+esc(h.city)+'<button type="button" data-i="'+i+'" aria-label="Remove '+esc(h.name)+'">×</button></span>';}).join('');
+    [].forEach.call($('hoods').querySelectorAll('button'),function(b){b.onclick=function(){S.hoods.splice(+b.dataset.i,1);showHoods();stale();};});
+  }
+
+  // ---------- criteria ----------
+  function chips(id,key,num){
+    var el=$(id);
+    function paint(){[].forEach.call(el.children,function(b){b.setAttribute('aria-pressed',String(S[key])===b.dataset.v);});}
+    el.onclick=function(e){var b=e.target.closest('.chip');if(!b)return;S[key]=num?+b.dataset.v:b.dataset.v;paint();stale();};
+    paint();return paint;
+  }
+  var paints=[chips('cLease','lease',true),chips('cType','type',false),chips('cBeds','beds',true),chips('cBaths','baths',true)];
+  // "1.2m" = 1,200,000; "900k" = 900,000; for a sale a bare "950" means 950,000
+  function money(v){
+    v=String(v||'').toLowerCase().replace(/[$,\s]/g,'');var m=v.match(/^(\d+(?:\.\d+)?)(m|k)?/);if(!m)return 0;
+    var n=parseFloat(m[1]);if(m[2]==='m')n*=1e6;else if(m[2]==='k')n*=1e3;else if(!S.lease&&n<10)n*=1e6;else if(!S.lease&&n<10000)n*=1e3;
+    return Math.round(n);
+  }
+  ['pMin','pMax'].forEach(function(id){$(id).onchange=function(){var n=money(this.value);this.value=n?'$'+n.toLocaleString('en-CA'):'';stale();};});
+
+  function build(){
+    return {hoods:S.hoods,inc:S.inc,exc:S.exc,lease:S.lease,type:S.type,min:money($('pMin').value),max:money($('pMax').value),beds:S.beds,baths:S.baths};
+  }
+  function stale(){$('resCard').hidden=true;$('err').hidden=true;if(pinLayer)pinLayer.clearLayers();}
+  function short(n,lease){if(lease)return '$'+Math.round(n).toLocaleString('en-CA');return n>=1e6?'$'+(n/1e6).toFixed(2).replace(/\.?0+$/,'')+'M':'$'+Math.round(n/1e3)+'K';}
+
+  $('bShow').onclick=function(){
+    if(draft){toast('Finish or cancel the shape you are drawing first.');return;}
+    if(!S.inc.length&&!S.hoods.length){fail('Pick a neighbourhood or draw an area on the map first.');return;}
+    var b=this;b.disabled=true;b.textContent='Looking…';$('err').hidden=true;
+    call('/api/leads/area/preview',{method:'POST',body:JSON.stringify({q:build()})}).then(function(j){
+      $('cnt').textContent=(j.total||0).toLocaleString('en-CA')+(j.total===1?' home':' homes')+' right now';
+      $('lbl').textContent=j.label;
+      $('res').innerHTML=j.items.map(function(x){
+        return '<a class="home" href="'+esc(SM.link(x.id,x))+'" target="_blank" rel="noopener"><b>'+esc(SM.addrText(x))+'</b><span class="p">'+esc(SM.priceText(x))+'</span><small>'+esc([x.beds?x.beds+' bed':'',x.baths?x.baths+' bath':'',x.type,x.community,'MLS® '+x.mls,x.office].filter(Boolean).join(' · '))+'</small></a>';
+      }).join('')+(j.total>j.items.length?'<p class="muted" style="margin:10px 0 0;font-size:15px">Showing the newest '+j.items.length+'. Every home is a pin on the map.</p>':'')
+        ||'<p class="muted" style="margin:0">No active listings match right now. The search can still be saved: new ones will match as they come up.</p>';
+      pinLayer.clearLayers();
+      j.pins.forEach(function(x){L.marker([x.lat,x.lng],{icon:L.divIcon({className:'pin'+(x.mine?' mine':''),html:'<span>'+short(x.price,x.forlease)+'</span>',iconSize:null})}).addTo(pinLayer);});
+      $('resCard').hidden=false;$('resCard').scrollIntoView({behavior:'smooth',block:'nearest'});
+    }).catch(fail).then(function(){b.disabled=false;b.textContent='Show matching homes';});
+  };
+
+  $('bSave').onclick=function(){
+    if(!S.lead){toast('Pick who this search is for at the top of the page.');$('whoCard').scrollIntoView({behavior:'smooth'});return;}
+    var b=this;b.disabled=true;
+    call('/api/leads/area/save',{method:'POST',body:JSON.stringify({lead:S.lead.id,id:S.id||undefined,q:build()})}).then(function(j){
+      S.id=j.id;history.replaceState(null,'','?s='+j.id);showLead();
+      toast('Saved on '+name(S.lead)+'. No emails go out yet.');
+    }).catch(function(e){toast(typeof e==='string'&&e!=='pin'?e:'Could not save. Try again.');}).then(function(){b.disabled=false;});
+  };
+
+  // ---------- start: a new search for a lead (?lead=ID), or an existing one to change (?s=ID) ----------
+  function fill(q){
+    S.hoods=q.hoods||[];S.inc=q.inc||[];S.exc=q.exc||[];S.lease=q.lease?1:0;S.type=q.type||'';S.beds=q.beds||0;S.baths=q.baths||0;
+    $('pMin').value=q.min?'$'+q.min.toLocaleString('en-CA'):'';$('pMax').value=q.max?'$'+q.max.toLocaleString('en-CA'):'';
+    paints.forEach(function(p){p();});showHoods();drawShapes();tools();
+    var pts=[].concat.apply([],S.inc.concat(S.exc));if(pts.length)setTimeout(function(){map.invalidateSize(false);map.fitBounds(pts,{padding:[30,30],maxZoom:16,animate:false});},200);
+  }
+  function boot(){
+    initMap();tools();
+    if(S.id)return call('/api/leads/area/get?id='+S.id).then(function(j){S.lead=j.lead;showLead();fill(j.q);}).catch(function(e){S.id=0;showLead();fail(e);});
+    var lid=+qs.get('lead')||0;
+    if(lid)return call('/api/leads/get?id='+lid).then(function(j){S.lead=j.lead;showLead();}).catch(function(){showLead();});
+    showLead();
+  }
+  if(!pin())askPin().then(boot);else boot();
+})();
+</script>
+</body>
+</html>

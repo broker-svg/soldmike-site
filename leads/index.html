@@ -118,8 +118,11 @@ dialog input{min-height:56px;border:1px solid var(--line);border-radius:10px;pad
         +(l.phone?'<a class="btn ghost" href="tel:'+esc(l.phone)+'">Call '+esc(l.phone)+'</a>':'')+(l.email?'<a class="btn ghost" href="mailto:'+esc(l.email)+'">'+esc(l.email)+'</a>':'')+'</div>'
         +'<p class="muted" style="margin:0;font-size:15px">New-listing emails: '+(l.unsub?'<b style="color:var(--red)">stopped by the lead</b>':l.consent?'<b style="color:var(--green)">yes, they asked for them</b>':'no consent given')+'</p>';
       h+='<div class="sec"><h3>Saved searches</h3>'+(j.searches.length?j.searches.map(function(s){
+        // a buyer search Michael drew (Buyer Search Intake): opens in the drawing screen; it does not send emails yet
+        if(s.src==='Buyer search')return '<div class="ss"><div><b>'+esc(s.label)+'</b><small>Drawn by you · made '+esc(ago(s.created))+' · not sending emails yet</small></div><a class="btn ghost" style="min-height:44px;padding:0 16px;flex:none" href="/leads/search/?s='+s.id+'">Open</a></div>';
         return '<div class="ss"><div><b>'+esc(s.label)+'</b><small>'+s.matched+' new home'+(s.matched===1?'':'s')+' matched'+(s.sent?' · last alert '+esc(ago(s.sent)):'')+' · made '+esc(ago(s.created))+'</small></div><button class="tog" type="button" data-s="'+s.id+'" aria-pressed="'+(s.active?'true':'false')+'">'+(s.active?'On':'Off')+'</button></div>';
-      }).join(''):'<p class="muted" style="margin:0">None yet.</p>')+'</div>';
+      }).join(''):'<p class="muted" style="margin:0">None yet.</p>')
+        +'<a class="btn navy" style="margin-top:12px" href="/leads/search/?lead='+l.id+'">New buyer search (draw the area)</a></div>';
       h+='<div class="sec"><h3>Activity</h3>'+(j.events.length?j.events.map(function(e){
         var what=e.home?(e.ref?'<a href="/listings/home/?id='+encodeURIComponent(e.ref)+'" target="_blank" rel="noopener">'+esc(e.home)+'</a>':esc(e.home))+(e.price?' · '+SM.money(e.price)+(e.lease?'/mo':''):''):'';
         return '<div class="ev"><div><div class="k">'+esc(KIND[e.kind]||e.kind)+'</div><div class="t">'+esc(ago(e.at))+'</div></div><div>'+[what,esc(e.note||'')].filter(Boolean).join('<br>')+'</div></div>';
@@ -128,7 +131,7 @@ dialog input{min-height:56px;border:1px solid var(--line);border-radius:10px;pad
       document.getElementById('dd').innerHTML=h;
       document.getElementById('rm').onclick=function(){if(!confirm('Remove '+name(l)+' from the website lead list? Follow Up Boss is not affected.'))return;
         api('/api/leads/remove',{method:'POST',body:JSON.stringify({id:l.id})}).then(function(){location.hash='';});};
-      [].forEach.call(document.querySelectorAll('.tog'),function(b){b.onclick=function(){var on=b.getAttribute('aria-pressed')!=='true';
+      [].forEach.call(document.querySelectorAll('.tog[data-s]'),function(b){b.onclick=function(){var on=b.getAttribute('aria-pressed')!=='true';
         api('/api/leads/search',{method:'POST',body:JSON.stringify({id:+b.dataset.s,active:on})}).then(function(){b.setAttribute('aria-pressed',on);b.textContent=on?'On':'Off';});};});
     });
   }
