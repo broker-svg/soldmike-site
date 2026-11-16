@@ -2,7 +2,10 @@
 """Builds every inner page of soldmike.com from the PAGES data below.
 Run: python3 build.py   (writes <slug>/index.html, sitemap.xml, CONTENT-TODO.md)
 Anything in todo() is content still to write; CONTENT-TODO.md lists them all."""
-import json, os, html, re
+import json, os, html, re, sys
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'tools'))
+import perf  # speed pass: webp photos, real image sizes, fonts from our own server (tools/perf.py)
+perf.make_webp()
 from datetime import date
 
 SITE = 'https://soldmike.com'
@@ -238,14 +241,14 @@ def page(path, title, desc, trail, body, schema=None, noindex=False, head='', js
            '<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image">'
            '%s<link rel="icon" href="/logo.png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
            '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Barlow:wght@400;500;600&display=swap">'
-           '<link rel="stylesheet" href="/assets/site.css?v=9">%s%s</head><body>%s<main id="main">%s</main>%s<script src="/assets/site.js?v=11" defer></script>%s<script src="/assets/chat.js?v=7" defer></script>' + METRICOOL_TAG + '</body></html>'
+           '<link rel="stylesheet" href="/assets/site.css?v=10">%s%s</head><body>%s<main id="main">%s</main>%s<script src="/assets/site.js?v=11" defer></script>%s<script src="/assets/chat.js?v=7" defer></script>' + METRICOOL_TAG + '</body></html>'
            ) % (e(title), e(desc), SITE, path, e(title), e(desc), SITE, path, og_card(path, title, trail, body),
                 '<meta name="robots" content="noindex">' if noindex else '',
                 ''.join('<script type="application/ld+json">%s</script>' % json.dumps(s, ensure_ascii=False) for s in sch), head,
                 header(path), body, footer(), js)
     out = path.strip('/') + '/index.html' if path != '/' else 'index.html'
     os.makedirs(os.path.dirname(out) or '.', exist_ok=True)
-    open(out, 'w', encoding='utf-8').write(doc)
+    open(out, 'w', encoding='utf-8').write(perf.optimize(doc, path))
     if not noindex: SITEMAP.append(path)
 
 H = [('Home', '/')]
@@ -775,6 +778,17 @@ P('/free-guide/',
       '<b>Selling a home in Vaughan:</b> the 15 steps from pricing and prep to offers and closing day, with what you walk away with and how we launch a listing.',
       '<b>Buying a home in Vaughan:</b> the 15 steps from pre-approval and closing costs to winning the offer and getting your keys.',
       'Every step has a checklist, plus Michael\u2019s tips from selling in Vaughan since 2011.') + '</div>' + form('guide') + '</div>'),
+  # SEO audit Nov 15 2026: these pages had no links from anywhere on the site (same titles as VIDEO_GUIDES further down)
+  lambda: band(prose('<h2>More free checklists</h2>', 'Short PDFs you can print or fill in on your phone.') + cards([
+      ('/guides/condo-checklist/', 'Condo Buyer Checklist', 'Financing, monthly costs and your plan'),
+      ('/guides/monthly-cost-worksheet/', 'Monthly Cost Worksheet', 'What fits your life, not just the bank'),
+      ('/guides/showing-checklist/', 'Showing Checklist', 'What to look and listen for'),
+      ('/guides/offer-guide/', 'Offer Guide', 'Everything a seller weighs'),
+      ('/guides/red-flags-checklist/', 'Red-Flags Checklist', 'When to walk away'),
+      ('/guides/deal-goes-sideways/', 'If a Deal Goes Sideways', 'What to do if a buyer might not close'),
+      ('/market-snapshot/', 'Market Snapshot', 'What sold in your area, sent to you'),
+      ('/buy/buyer-guide/', 'Buying in Ontario', 'The 15 steps, start to keys'),
+      ('/sell/seller-guide/', 'Selling in Ontario', 'The 15 steps, start to sold')])),
   title='Free Guides: Buying and Selling a Home in Vaughan | SoldMike', desc='Download free step-by-step PDF guides to buying and selling a home in Vaughan, with a checklist for every step.', trail=[('Free guide', '/free-guide/')])
 
 P('/privacy/',
@@ -1097,7 +1111,7 @@ def home_nav():
     return '<nav class="nav" id="mainnav" aria-label="Main">%s<a class="btn" href="/sell/home-value/">Home value</a></nav>' % ''.join(out)
 idx = open('index.html', encoding='utf-8').read()
 a, b = idx.index('<!--NAV-->') + len('<!--NAV-->'), idx.index('<!--/NAV-->')
-open('index.html', 'w', encoding='utf-8').write(idx[:a] + '\n    ' + home_nav() + '\n    ' + idx[b:])
+open('index.html', 'w', encoding='utf-8').write(perf.optimize(idx[:a] + '\n    ' + home_nav() + '\n    ' + idx[b:], '/'))
 
 # =====================================================================
 # BLOG (Oct 14 2026): posts are Markdown files in blog/posts/ (front matter: title, slug, date, description, photo, photo_alt, tags).
@@ -1159,6 +1173,9 @@ for post in POSTS:
       lambda post=post: band('<article class="prose">%s</article>' % md_html(post['body'])
                              + ('<p style="margin-top:22px;color:var(--muted)">Topics: %s</p>' % ', '.join(e(x) for x in post['tags']) if post['tags'] else '')
                              + '<p style="margin-top:12px"><a href="/blog/" style="font-weight:600">More from the blog</a></p>', narrow=True),
+      # SEO audit Nov 15 2026: each post links to three others, so no post hangs off the blog index alone
+      lambda post=post: band(prose('<h2>Keep reading</h2>') + cards([('/blog/%s/' % p['slug'], p['title'], nice_date(p['date'])) for p in
+                             (lambda o: [o[(o.index(post) + k) % len(o)] for k in (1, 2, 3)])(POSTS)])) if len(POSTS) > 3 else '',
       lambda: cta('What could your home sell for?', 'Get a free, no-pressure home evaluation based on real recent sales.'),
       title='%s | SoldMike' % post['title'], desc=post.get('description', '')[:300], trail=[('Blog', '/blog/'), (post['title'], path)],
       schema=[{k: v for k, v in art.items() if v is not None}], head=FEED_LINK)
@@ -1187,10 +1204,10 @@ open('blog/feed.xml', 'w', encoding='utf-8').write('<?xml version="1.0" encoding
 # ---------- 404, sitemap, robots, checklist ----------
 PAGE = '/404'
 page404 = ('<!doctype html><html lang="en-CA"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Page not found | SoldMike</title><meta name="robots" content="noindex">'
-           '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=Barlow:wght@400;600&display=swap"><link rel="stylesheet" href="/assets/site.css?v=9"></head><body>'
+           '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=Barlow:wght@400;600&display=swap"><link rel="stylesheet" href="/assets/site.css?v=10"></head><body>'
            + header('/404') + '<main id="main">' + hero([('Home', '/'), ('Not found', '/404')], 'That page has moved', 'The page you were looking for is not here. Try one of these instead.') +
            band(cards([('/listings/', 'Search homes', 'Every MLS® listing'), ('/sell/home-value/', 'Home value', 'What your home is worth'), ('/neighbourhoods/', 'Neighbourhoods', 'Area guides'), ('/contact/', 'Contact', 'Talk to Michael')])) + '</main>' + footer() + '<script src="/assets/site.js?v=11" defer></script><script src="/assets/chat.js?v=7" defer></script></body></html>')
-open('404.html', 'w', encoding='utf-8').write(page404)
+open('404.html', 'w', encoding='utf-8').write(perf.optimize(page404, '/'))
 
 today = date.today().isoformat()
 urls = ['/'] + SITEMAP

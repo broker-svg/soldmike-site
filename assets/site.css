@@ -12,7 +12,7 @@
 html{scroll-behavior:smooth}
 body{margin:0;background:var(--white);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.6;overflow-x:hidden}
 a{color:var(--navy)}a:hover{color:var(--red)}
-img{max-width:100%;display:block}
+img{max-width:100%;height:auto;display:block}
 button,input,select,textarea{font:inherit}
 :focus-visible{outline:3px solid var(--red);outline-offset:3px}
 [hidden]{display:none!important}
@@ -141,7 +141,7 @@ dl.kv dd{margin:0;font-weight:600;text-align:right;font-variant-numeric:tabular-
 .filters label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin-bottom:4px}
 .filters select,.filters input{width:100%;height:46px;border:1px solid var(--line);border-radius:4px;padding:0 10px;background:var(--white);color:var(--ink)}
 @media (max-width:900px){.filters{grid-template-columns:1fr 1fr}.filters .btn{grid-column:1/-1}}
-.mapbox{position:relative;min-height:320px;border-radius:6px;overflow:hidden;background:url(/aerial.jpg) center/cover;margin-bottom:28px}
+.mapbox{position:relative;min-height:320px;border-radius:6px;overflow:hidden;background:url(/aerial.webp) center/cover;margin-bottom:28px}
 .mapbox::after{content:"";position:absolute;inset:0;background:rgba(20,24,51,.45)}
 .mapbox .note{position:absolute;left:18px;bottom:18px;right:18px;z-index:1;color:var(--white);font-weight:600;max-width:48ch}
 

@@ -1,0 +1,529 @@
+{
+"/aerial.jpg": {
+"h": 1054,
+"mtime": 1790886960,
+"w": 2000,
+"webp": "/aerial.webp"
+},
+"/assets/designations/abr-white.png": {
+"h": 160,
+"mtime": 1791164997,
+"w": 388,
+"webp": "/assets/designations/abr-white.webp"
+},
+"/assets/designations/abr.png": {
+"h": 160,
+"mtime": 1791164997,
+"w": 388,
+"webp": "/assets/designations/abr.webp"
+},
+"/assets/designations/rene-white.png": {
+"h": 160,
+"mtime": 1791164997,
+"w": 320,
+"webp": "/assets/designations/rene-white.webp"
+},
+"/assets/designations/rene.png": {
+"h": 160,
+"mtime": 1791164997,
+"w": 320,
+"webp": "/assets/designations/rene.webp"
+},
+"/assets/designations/srs-white.png": {
+"h": 160,
+"mtime": 1791164997,
+"w": 259,
+"webp": "/assets/designations/srs-white.webp"
+},
+"/assets/designations/srs.png": {
+"h": 160,
+"mtime": 1791164997,
+"w": 259,
+"webp": "/assets/designations/srs.webp"
+},
+"/assets/results/226-via-borghese.jpg": {
+"h": 600,
+"mtime": 1791164997,
+"w": 800,
+"webp": "/assets/results/226-via-borghese.webp"
+},
+"/assets/results/3-sedgewick.jpg": {
+"h": 600,
+"mtime": 1791164997,
+"w": 800,
+"webp": "/assets/results/3-sedgewick.webp"
+},
+"/assets/results/487-coldstream.jpg": {
+"h": 600,
+"mtime": 1791164997,
+"w": 800,
+"webp": "/assets/results/487-coldstream.webp"
+},
+"/assets/results/82-highland-park.jpg": {
+"h": 600,
+"mtime": 1791164997,
+"w": 800,
+"webp": "/assets/results/82-highland-park.webp"
+},
+"/hero.jpg": {
+"h": 844,
+"mtime": 1790886960,
+"w": 1600,
+"webp": "/hero.webp"
+},
+"/l1.jpg": {
+"h": 750,
+"mtime": 1790886960,
+"w": 1000
+},
+"/l2.jpg": {
+"h": 750,
+"mtime": 1790886960,
+"w": 1000
+},
+"/l3.jpg": {
+"h": 750,
+"mtime": 1790886960,
+"w": 1000
+},
+"/l4.jpg": {
+"h": 750,
+"mtime": 1790886960,
+"w": 1000
+},
+"/l5.jpg": {
+"h": 750,
+"mtime": 1790886960,
+"w": 1000
+},
+"/l6.jpg": {
+"h": 750,
+"mtime": 1790886960,
+"w": 1000,
+"webp": "/l6.webp"
+},
+"/logo-soldmike-white.png": {
+"h": 254,
+"mtime": 1790886960,
+"w": 720,
+"webp": "/logo-soldmike-white.webp"
+},
+"/logo-white.png": {
+"h": 212,
+"mtime": 1790886960,
+"w": 600,
+"webp": "/logo-white.webp"
+},
+"/logo.png": {
+"h": 254,
+"mtime": 1790886960,
+"w": 720,
+"webp": "/logo.webp"
+},
+"/lp/1.jpg": {
+"h": 1334,
+"mtime": 1790886960,
+"w": 2000,
+"webp": "/lp/1.webp"
+},
+"/lp/10.jpg": {
+"h": 1334,
+"mtime": 1790886960,
+"w": 2000,
+"webp": "/lp/10.webp"
+},
+"/lp/11.jpg": {
+"h": 1334,
+"mtime": 1790886960,
+"w": 2000,
+"webp": "/lp/11.webp"
+},
+"/lp/12.jpg": {
+"h": 1334,
+"mtime": 1790886960,
+"w": 2000,
+"webp": "/lp/12.webp"
+},
+"/lp/13.jpg": {
+"h": 1334,
+"mtime": 1790886960,
+"w": 2000,
+"webp": "/lp/13.webp"
+},
+"/lp/14.jpg": {
+"h": 1332,
+"mtime": 1790886960,
+"w": 2000,
+"webp": "/lp/14.webp"
+},
+"/lp/15.jpg": {
+"h": 1332,
+"mtime": 1790886960,
+"w": 2000,
+"webp": "/lp/15.webp"
+},
+"/lp/16.jpg": {
+"h": 1332,
+"mtime": 1790886960,
+"w": 2000,
+"webp": "/lp/16.webp"
+},
+"/lp/17.jpg": {
+"h": 1332,
+"mtime": 1790886960,
+"w": 2000,
+"webp": "/lp/17.webp"
+},
+"/lp/18.jpg": {
+"h": 1334,
+"mtime": 1790886960,
+"w": 2000,
+"webp": "/lp/18.webp"
+},
+"/lp/2.jpg": {
+"h": 1334,
+"mtime": 1790886960,
+"w": 2000,
+"webp": "/lp/2.webp"
+},
+"/lp/3.jpg": {
+"h": 1334,
+"mtime": 1790886960,
+"w": 2000,
+"webp": "/lp/3.webp"
+},
+"/lp/4.jpg": {
+"h": 1332,
+"mtime": 1790886960,
+"w": 2000,
+"webp": "/lp/4.webp"
+},
+"/lp/5.jpg": {
+"h": 1334,
+"mtime": 1790886960,
+"w": 2000,
+"webp": "/lp/5.webp"
+},
+"/lp/6.jpg": {
+"h": 1334,
+"mtime": 1790886960,
+"w": 2000,
+"webp": "/lp/6.webp"
+},
+"/lp/7.jpg": {
+"h": 1334,
+"mtime": 1790886960,
+"w": 2000,
+"webp": "/lp/7.webp"
+},
+"/lp/8.jpg": {
+"h": 1332,
+"mtime": 1790886960,
+"w": 2000,
+"webp": "/lp/8.webp"
+},
+"/lp/9.jpg": {
+"h": 1332,
+"mtime": 1790886960,
+"w": 2000,
+"webp": "/lp/9.webp"
+},
+"/lp/t1.jpg": {
+"h": 240,
+"mtime": 1790886960,
+"w": 360
+},
+"/lp/t10.jpg": {
+"h": 240,
+"mtime": 1790886960,
+"w": 360,
+"webp": "/lp/t10.webp"
+},
+"/lp/t11.jpg": {
+"h": 240,
+"mtime": 1790886960,
+"w": 360,
+"webp": "/lp/t11.webp"
+},
+"/lp/t12.jpg": {
+"h": 240,
+"mtime": 1790886960,
+"w": 360,
+"webp": "/lp/t12.webp"
+},
+"/lp/t13.jpg": {
+"h": 240,
+"mtime": 1790886960,
+"w": 360,
+"webp": "/lp/t13.webp"
+},
+"/lp/t14.jpg": {
+"h": 240,
+"mtime": 1790886960,
+"w": 360,
+"webp": "/lp/t14.webp"
+},
+"/lp/t15.jpg": {
+"h": 240,
+"mtime": 1790886960,
+"w": 360
+},
+"/lp/t16.jpg": {
+"h": 240,
+"mtime": 1790886960,
+"w": 360
+},
+"/lp/t17.jpg": {
+"h": 240,
+"mtime": 1790886960,
+"w": 360
+},
+"/lp/t18.jpg": {
+"h": 240,
+"mtime": 1790886960,
+"w": 360
+},
+"/lp/t2.jpg": {
+"h": 240,
+"mtime": 1790886960,
+"w": 360
+},
+"/lp/t3.jpg": {
+"h": 240,
+"mtime": 1790886960,
+"w": 360
+},
+"/lp/t4.jpg": {
+"h": 240,
+"mtime": 1790886960,
+"w": 360
+},
+"/lp/t5.jpg": {
+"h": 240,
+"mtime": 1790886960,
+"w": 360,
+"webp": "/lp/t5.webp"
+},
+"/lp/t6.jpg": {
+"h": 240,
+"mtime": 1790886960,
+"w": 360,
+"webp": "/lp/t6.webp"
+},
+"/lp/t7.jpg": {
+"h": 240,
+"mtime": 1790886960,
+"w": 360,
+"webp": "/lp/t7.webp"
+},
+"/lp/t8.jpg": {
+"h": 240,
+"mtime": 1790886960,
+"w": 360,
+"webp": "/lp/t8.webp"
+},
+"/lp/t9.jpg": {
+"h": 240,
+"mtime": 1790886960,
+"w": 360,
+"webp": "/lp/t9.webp"
+},
+"/media/blog/82-highland-park/front.jpg": {
+"h": 1064,
+"mtime": 1792025883,
+"w": 1600,
+"webp": "/media/blog/82-highland-park/front.webp"
+},
+"/media/blog/82-highland-park/street.jpg": {
+"h": 1064,
+"mtime": 1792025883,
+"w": 1600,
+"webp": "/media/blog/82-highland-park/street.webp"
+},
+"/media/gentle-fox/backyard-twilight.jpg": {
+"h": 1073,
+"mtime": 1791173195,
+"w": 1600,
+"webp": "/media/gentle-fox/backyard-twilight.webp"
+},
+"/media/gentle-fox/details.jpg": {
+"h": 900,
+"mtime": 1791173634,
+"w": 1600,
+"webp": "/media/gentle-fox/details.webp"
+},
+"/media/gentle-fox/drone-front.jpg": {
+"h": 900,
+"mtime": 1791173631,
+"w": 1600,
+"webp": "/media/gentle-fox/drone-front.webp"
+},
+"/media/gentle-fox/drone-overhead.jpg": {
+"h": 900,
+"mtime": 1791173632,
+"w": 1600,
+"webp": "/media/gentle-fox/drone-overhead.webp"
+},
+"/media/gentle-fox/kitchen-2.jpg": {
+"h": 900,
+"mtime": 1791173633,
+"w": 1600,
+"webp": "/media/gentle-fox/kitchen-2.webp"
+},
+"/media/gentle-fox/kitchen.jpg": {
+"h": 900,
+"mtime": 1791173632,
+"w": 1600,
+"webp": "/media/gentle-fox/kitchen.webp"
+},
+"/media/gentle-fox/pool.jpg": {
+"h": 900,
+"mtime": 1791173633,
+"w": 1600,
+"webp": "/media/gentle-fox/pool.webp"
+},
+"/media/gentle-fox/primary-bedroom.jpg": {
+"h": 900,
+"mtime": 1791173633,
+"w": 1600,
+"webp": "/media/gentle-fox/primary-bedroom.webp"
+},
+"/media/gentle-fox/twilight-street.jpg": {
+"h": 1170,
+"mtime": 1791172846,
+"w": 1800,
+"webp": "/media/gentle-fox/twilight-street.webp"
+},
+"/media/guides/condo-checklist.jpg": {
+"h": 1066,
+"mtime": 1793104548,
+"w": 1600,
+"webp": "/media/guides/condo-checklist.webp"
+},
+"/media/guides/deal-goes-sideways.jpg": {
+"h": 1066,
+"mtime": 1793104548,
+"w": 1600,
+"webp": "/media/guides/deal-goes-sideways.webp"
+},
+"/media/guides/market-snapshot.jpg": {
+"h": 1066,
+"mtime": 1793104548,
+"w": 1600,
+"webp": "/media/guides/market-snapshot.webp"
+},
+"/media/guides/monthly-cost-worksheet.jpg": {
+"h": 1066,
+"mtime": 1793104548,
+"w": 1600,
+"webp": "/media/guides/monthly-cost-worksheet.webp"
+},
+"/media/guides/offer-guide.jpg": {
+"h": 1066,
+"mtime": 1793104548,
+"w": 1600,
+"webp": "/media/guides/offer-guide.webp"
+},
+"/media/guides/red-flags-checklist.jpg": {
+"h": 1066,
+"mtime": 1793104548,
+"w": 1600,
+"webp": "/media/guides/red-flags-checklist.webp"
+},
+"/media/guides/showing-checklist.jpg": {
+"h": 1066,
+"mtime": 1793104548,
+"w": 1600,
+"webp": "/media/guides/showing-checklist.webp"
+},
+"/media/precon/cavallo.jpg": {
+"h": 787,
+"mtime": 1794693029,
+"w": 1200,
+"webp": "/media/precon/cavallo.webp"
+},
+"/media/precon/kleinburg.jpg": {
+"h": 800,
+"mtime": 1794692855,
+"w": 1200,
+"webp": "/media/precon/kleinburg.webp"
+},
+"/media/precon/uptown.jpg": {
+"h": 900,
+"mtime": 1794692855,
+"w": 1200,
+"webp": "/media/precon/uptown.webp"
+},
+"/media/precon/valley.jpg": {
+"h": 1195,
+"mtime": 1794692855,
+"w": 1200,
+"webp": "/media/precon/valley.webp"
+},
+"/media/road/coming-soon.jpg": {
+"h": 240,
+"mtime": 1792001817,
+"w": 240,
+"webp": "/media/road/coming-soon.webp"
+},
+"/media/road/media.jpg": {
+"h": 240,
+"mtime": 1792001817,
+"w": 240,
+"webp": "/media/road/media.webp"
+},
+"/media/road/mls.jpg": {
+"h": 240,
+"mtime": 1792001817,
+"w": 240,
+"webp": "/media/road/mls.webp"
+},
+"/media/road/offer.jpg": {
+"h": 240,
+"mtime": 1792001817,
+"w": 240,
+"webp": "/media/road/offer.webp"
+},
+"/media/road/prep.jpg": {
+"h": 240,
+"mtime": 1792001817,
+"w": 240,
+"webp": "/media/road/prep.webp"
+},
+"/media/road/pricing.jpg": {
+"h": 240,
+"mtime": 1792001817,
+"w": 240,
+"webp": "/media/road/pricing.webp"
+},
+"/media/road/showings.jpg": {
+"h": 240,
+"mtime": 1792001817,
+"w": 240,
+"webp": "/media/road/showings.webp"
+},
+"/media/road/staging.jpg": {
+"h": 240,
+"mtime": 1792001817,
+"w": 240,
+"webp": "/media/road/staging.webp"
+},
+"/mike.png": {
+"h": 720,
+"mtime": 1790886960,
+"w": 720,
+"webp": "/mike.webp"
+},
+"/open-house/icon-192.png": {
+"h": 192,
+"mtime": 1790892947,
+"w": 192,
+"webp": "/open-house/icon-192.webp"
+},
+"/open-house/icon-512.png": {
+"h": 512,
+"mtime": 1790892947,
+"w": 512,
+"webp": "/open-house/icon-512.webp"
+}
+}
