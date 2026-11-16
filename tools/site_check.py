@@ -102,6 +102,16 @@ def live(sample=40):
     for need in ('Sitemap: https://soldmike.com/sitemap.xml', 'Sitemap: https://soldmike.com/homes/sitemap.xml', 'Disallow: /hq/'):
         if need not in robots:
             problems.append(f'robots.txt is missing "{need}"')
+    # listing pages that answered "busy" (503) in the last 7 days, from the Worker's own error log (added after the Nov 2026 Search Console 5xx notice)
+    s, _, hh = get(SITE + '/homes/health')
+    try:
+        busy = json.loads(hh).get('busy7d', 0) if s == 200 else None
+    except ValueError:
+        busy = None
+    if busy is None:
+        problems.append(f'/homes/health returned {s} (cannot read the listing-page error count)')
+    elif busy:
+        problems.append(f'listing pages answered "busy" (503) {busy} time(s) in the last 7 days: check the database load and Search Console > Pages > Server error (5xx)')
     return n, len(homes)
 
 
