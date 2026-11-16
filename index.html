@@ -260,7 +260,7 @@ footer .wrap{padding-block:56px 32px;display:flex;flex-direction:column;gap:28px
 <!-- Hero: drone flyover of Woodbridge (42 Osprey Dr shoot) -->
 <section class="hero" aria-label="Introduction">
   <img class="poster" fetchpriority="high" src="/hero.webp" alt="" aria-hidden="true" width="1600" height="844">
-  <video id="heroVid" src="hero.mp4" poster="/hero.webp" autoplay muted loop playsinline preload="auto" aria-hidden="true"></video>
+  <video id="heroVid" data-src="/hero.mp4" poster="/hero.webp" muted loop playsinline preload="none" aria-hidden="true"></video>
   <div class="credit"><i></i>Over Woodbridge, filmed by our team</div>
   <div class="wrap">
     <div class="mike"><img src="/mike.webp" alt="Michael Barillari" width="720" height="720"></div>
@@ -418,7 +418,12 @@ footer .wrap{padding-block:56px 32px;display:flex;flex-direction:column;gap:28px
   // hero load sequence
   if(!reduce) root.classList.add('go');
   var vid=document.getElementById('heroVid');
-  if(reduce&&vid){vid.pause();}
+  // The video (2.4 MB) starts only after the page itself has loaded, so it never slows the first view. Not at all for reduced motion or data saver.
+  var saver=navigator.connection&&navigator.connection.saveData;
+  if(vid&&!reduce&&!saver){
+    var startVid=function(){vid.src=vid.getAttribute('data-src');var p=vid.play();if(p&&p.catch)p.catch(function(){});};
+    if(document.readyState==='complete')setTimeout(startVid,300);else window.addEventListener('load',function(){setTimeout(startVid,300);});
+  }
 
   // scroll reveals: arm only when we can observe; anything already on screen shows at once
   var rvs=[].slice.call(document.querySelectorAll('.rv'));

@@ -50,9 +50,9 @@
     var slides='',rail='',all='';
     P.forEach(function(p,i){
       var alt=esc(p.c||('Photo '+(i+1)+' of '+title));
-      slides+='<div class="slide'+(i?'':' on')+'" role="group" aria-roledescription="slide" aria-label="'+(i+1)+' of '+N+'"'+(i?' aria-hidden="true"':'')+'><img src="'+esc(p.u)+'" alt="'+alt+'"'+(i>1?' loading="lazy"':'')+'></div>';
-      rail+='<li><button type="button" data-i="'+i+'" aria-label="Show photo '+(i+1)+'"'+(i?'':' aria-current="true"')+'><img src="'+esc(p.u)+'" alt="" loading="lazy"></button></li>';
-      all+='<button type="button" data-i="'+i+'" aria-label="Open photo '+(i+1)+'"><img src="'+esc(p.u)+'" alt="" loading="lazy"></button>';
+      slides+='<div class="slide'+(i?'':' on')+'" role="group" aria-roledescription="slide" aria-label="'+(i+1)+' of '+N+'"'+(i?' aria-hidden="true"':'')+'><img src="'+esc(p.m||p.u)+'"'+(p.m?' srcset="'+esc(p.m)+' 960w, '+esc(p.u)+' 1920w" sizes="(max-width: 900px) 100vw, 66vw"':'')+' alt="'+alt+'"'+(i?(i>1?' loading="lazy"':''):' fetchpriority="high"')+' decoding="async"></div>';
+      rail+='<li><button type="button" data-i="'+i+'" aria-label="Show photo '+(i+1)+'"'+(i?'':' aria-current="true"')+'><img src="'+esc(p.t||p.m||p.u)+'" alt="" loading="lazy" decoding="async"></button></li>';
+      all+='<button type="button" data-i="'+i+'" aria-label="Open photo '+(i+1)+'"><img src="'+esc(p.m||p.u)+'" alt="" loading="lazy" decoding="async"></button>';
     });
     var facts=[[l.beds,'bedrooms'],[l.baths,'bathrooms'],[l.size?l.size.replace(/square feet/i,'').trim():'','sq ft'],[f.LotSizeDimensions,'lot size'],[f.ParkingTotal,'parking'],[l.type,'type']]
       .filter(function(x){return x[0]!=null&&x[0]!=='';}).slice(0,6);
@@ -149,11 +149,27 @@
     var tabs=[].slice.call(root.querySelectorAll('.tabs [role=tab]'));
     tabs.forEach(function(t){t.addEventListener('click',function(){tabs.forEach(function(x){var on=x===t;x.setAttribute('aria-selected',on);document.getElementById(x.getAttribute('aria-controls')).hidden=!on;});});});
     // map
-    if(l.lat!=null&&window.L){
-      var m=L.map('lmap',{scrollWheelZoom:false,zoomControl:true}).setView([l.lat,l.lng],l.addr?15:13);
-      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18,attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'}).addTo(m);
-      if(l.addr)L.marker([l.lat,l.lng],{icon:L.divIcon({className:'pin solo',html:'<span>'+esc(SM.priceText(l))+'</span>',iconSize:null})}).addTo(m);
-      else L.circle([l.lat,l.lng],{radius:700,color:'#1D2870',weight:2,fillOpacity:.08}).addTo(m);
+    // The map library loads only when the map is about to come into view (it used to load with every listing page).
+    var lmap=document.getElementById('lmap');
+    if(l.lat!=null&&lmap){
+      var drawMap=function(){
+        var m=L.map('lmap',{scrollWheelZoom:false,zoomControl:true}).setView([l.lat,l.lng],l.addr?15:13);
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18,attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'}).addTo(m);
+        if(l.addr)L.marker([l.lat,l.lng],{icon:L.divIcon({className:'pin solo',html:'<span>'+esc(SM.priceText(l))+'</span>',iconSize:null})}).addTo(m);
+        else L.circle([l.lat,l.lng],{radius:700,color:'#1D2870',weight:2,fillOpacity:.08}).addTo(m);
+      };
+      var asked=false,loadMap=function(){
+        if(asked)return;asked=true;
+        if(window.L)return drawMap();
+        var base='https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.';
+        var c=document.createElement('link');c.rel='stylesheet';c.href=base+'css';document.head.appendChild(c);
+        var s=document.createElement('script');s.src=base+'js';s.onload=drawMap;document.head.appendChild(s);
+      };
+      if('IntersectionObserver' in window){
+        var io=new IntersectionObserver(function(en){if(en.some(function(x){return x.isIntersecting;})){io.disconnect();loadMap();}},{rootMargin:'600px 0px'});
+        io.observe(lmap);
+        [].forEach.call(document.querySelectorAll('a[href="#location"]'),function(a){a.addEventListener('click',loadMap);});
+      }else loadMap();
     }
     // payment calculator
     var f=document.getElementById('calc');
