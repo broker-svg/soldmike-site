@@ -416,6 +416,14 @@
   "layout": "photo"
  },
  {
+  "slug": "blog-mortgage-stress-test-explained",
+  "path": "/blog/mortgage-stress-test-explained/",
+  "headline": "The Mortgage Stress Test, Explained Simply",
+  "kicker": "Blog",
+  "photo": "/media/gentle-fox/twilight-street.jpg",
+  "layout": "photo"
+ },
+ {
   "slug": "blog-selling-with-tenants-ontario",
   "path": "/blog/selling-with-tenants-ontario/",
   "headline": "Selling a House With Tenants in Ontario: N12 Notices and Timing",
@@ -484,7 +492,7 @@
   "path": "/blog/",
   "headline": "Blog: Selling & Buying in Vaughan and the GTA",
   "kicker": "Blog",
-  "photo": "/media/gentle-fox/backyard-twilight.jpg",
+  "photo": "/media/gentle-fox/twilight-street.jpg",
   "layout": "photo"
  },
  {
