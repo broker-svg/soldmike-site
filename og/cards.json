@@ -416,6 +416,14 @@
   "layout": "photo"
  },
  {
+  "slug": "blog-how-long-to-buy-a-house-gta",
+  "path": "/blog/how-long-to-buy-a-house-gta/",
+  "headline": "How Long Does It Take to Buy a House in the GTA?",
+  "kicker": "Blog",
+  "photo": "/media/gentle-fox/kitchen.jpg",
+  "layout": "photo"
+ },
+ {
   "slug": "blog-mortgage-stress-test-explained",
   "path": "/blog/mortgage-stress-test-explained/",
   "headline": "The Mortgage Stress Test, Explained Simply",
@@ -492,7 +500,7 @@
   "path": "/blog/",
   "headline": "Blog: Selling & Buying in Vaughan and the GTA",
   "kicker": "Blog",
-  "photo": "/media/gentle-fox/twilight-street.jpg",
+  "photo": "/media/gentle-fox/kitchen.jpg",
   "layout": "photo"
  },
  {
