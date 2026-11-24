@@ -836,7 +836,7 @@ dialog::backdrop{background:rgba(20,24,51,.6)}
         var L=j.people;
         var row2=function(p){return personRow(p,(p.label?'<span class="chip navy">'+esc(p.label)+'</span>':'')+(p.active&&tab!=='daily'?'<span class="chip">active '+ago(p.active)+'</span>':'')+(p.hot?'<span class="chip red">Hot</span>':''),cmaBtn(p));};
         h+=L.length?L.slice(0,limit).map(row2).join('')+more(L.length):'<p class="empty">'+(tab==='cma'?'Nobody on your CMA list yet. Tap <b>+ CMA</b> on anyone in the other tabs to add them.':'Nobody here right now.')+'</p>';
-        var note={appointments:'Tagged Appoinment in Follow Up Boss, newest activity first.',cma:'People to ask for a CMA (tag CMA). Longest since contact first.',searching:'Tagged Searching, newest activity first.',daily:'Tagged Daily (Buyer) or Daily Seller (Seller), longest since contact first.'}[tab];
+        var note={appointments:'Tagged Appointment in Follow Up Boss, newest activity first.',cma:'People to ask for a CMA (tag CMA). Longest since contact first.',searching:'Tagged Searching, newest activity first.',daily:'Tagged Daily (Buyer) or Daily Seller (Seller), longest since contact first.'}[tab];
         if(j.total>L.length)note+=' Showing '+L.length+' of '+j.total+'.';
         h+='<p class="muted" style="font-size:13px;margin:8px 0 0">'+note+'</p>';
       }

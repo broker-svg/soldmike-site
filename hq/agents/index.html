@@ -925,7 +925,7 @@ function actP(p){var a=p.act||{},inn=mx(a.rt,a.re,a.ic),out=mx(a.st,a.se,a.oc),e
 function focusOf(kind,p){
   if(p.stage==='Under Contract')return 'undercontract';
   if(p.stage==='Closed'||p.stage==='Past Client')return 'closed';
-  if(hasTag(p,'Appoinment'))return 'appointment';
+  if(hasTag(p,'Appointment')||hasTag(p,'Appoinment'))return 'appointment';
   if(kind==='b'&&hasTag(p,'Showing'))return 'showings';
   if(kind==='b'&&hasTag(p,'Searching'))return 'searching';
   if(hasTag(p,'Stale'))return 'stale';
@@ -957,13 +957,13 @@ function focusSection(kind){
   var tools='<div class="ltools"><input type="search" class="search" id="fq-'+kind+'" value="'+esc(S.fq[kind]||'')+'" placeholder="Search name, phone, tag…" aria-label="Search">'
     +'<select class="selsm" data-fsort="'+kind+'" aria-label="Sort">'+[['recent','Most recent activity'],['quiet','Longest since contact'],['name','Name']].map(function(o){return '<option value="'+o[0]+'"'+(srt===o[0]?' selected':'')+'>Sort: '+o[1]+'</option>';}).join('')+'</select></div>';
   var rows=L.length?'<ul class="rows">'+L.slice(0,S.fall[kind]?999:60).map(function(p){var tel=p.phone?String(p.phone).replace(/[^\d+]/g,''):'';
-    var tg=(p.tags||[]).filter(function(t){return ['Hot','Daily','Daily Seller','CMA','Appoinment','Searching','Showing'].indexOf(t)>=0;});
+    var tg=(p.tags||[]).filter(function(t){return ['Hot','Daily','Daily Seller','CMA','Appointment','Appoinment','Searching','Showing'].indexOf(t)>=0;});
     return '<li class="row prow2"><button type="button" class="rm" data-pview="'+kind+'" data-id="'+p.id+'"><i class="dot '+actP(p).st+'"></i><span class="rt2"><b>'+esc(p.name||'No name')+'</b><small>'+esc([p.phone,p.email].filter(Boolean).join(' · '))+'</small>'
       +(tg.length?'<span class="feats">'+tg.map(function(t){return '<span class="ft">'+esc(t==='Appoinment'?'Appointment':t)+'</span>';}).join('')+'</span>':'')+'</span></button>'
       +'<div class="rs">'+pChip(p)+(tel?'<a class="lk callb" href="tel:'+esc(tel)+'" aria-label="Call '+esc(p.name)+'">✆</a>':'')+'<a class="lk" href="'+fubUrl(p.id)+'" target="_blank" rel="noopener">FUB</a>'
       +'<select class="selsm" data-pmove="'+kind+'" data-id="'+p.id+'" aria-label="Move '+esc(p.name)+'"><option value="">Move to…</option>'+MOVE_TO[kind].filter(function(o){return o[0]!==f;}).map(function(o){return '<option value="'+o[0]+'">'+o[1]+'</option>';}).join('')+'</select></div></li>';}).join('')+'</ul>'
       +(L.length>60&&!S.fall[kind]?'<button type="button" class="more" data-fall="'+kind+'">Show all '+L.length+'</button>':'')
-    :'<p class="empty">'+({active:'Nobody active right now.',appointment:'No appointments. Tag someone Appoinment in FUB or move them here.',undercontract:'Nobody under contract.',stale:'Nobody stale.',searching:'Nobody searching.',showings:'Nobody in showings. Move a buyer here when you book showings.'})[f]+'</p>';
+    :'<p class="empty">'+({active:'Nobody active right now.',appointment:'No appointments. Tag someone Appointment in FUB or move them here.',undercontract:'Nobody under contract.',stale:'Nobody stale.',searching:'Nobody searching.',showings:'Nobody in showings. Move a buyer here when you book showings.'})[f]+'</p>';
   return '<section class="card">'+head+chips+tools+'<p class="lcount">'+L.length+' '+(L.length===1?'person':'people')+(P.hidden?' · '+P.hidden+' hidden (pond, other agent, lease)':'')+'</p>'+rows+'</section>';
 }
 /* activity feed from the focus people (replaces the board-based feed on Sellers / Buyers) */
@@ -1231,7 +1231,7 @@ function drawLink(){
   var c=edit.c,box=$('#linkBox'),L=c.fub?(liveOf(edit.kind,c)):{};
   if(c.fub){box.innerHTML='<div class="row2"><span class="chip g">Linked to FUB</span><b>'+esc(L.name||c.name||('#'+c.fub))+'</b><a class="lnkb" href="'+fubUrl(c.fub)+'" target="_blank" rel="noopener">Open</a><button type="button" class="lnkb" id="unlink">Unlink</button></div>';
     $('#unlink').onclick=function(){c.fub=null;drawLink();};return;}
-  var tags=edit.kind==='s'?['Daily Seller','CMA','Appoinment']:['Daily','Searching','Appoinment'];
+  var tags=edit.kind==='s'?['Daily Seller','CMA','Appointment']:['Daily','Searching','Appointment'];
   box.innerHTML='<label class="fl" for="fq">Find in Follow Up Boss (name, email or phone)<input id="fq" type="search" autocomplete="off" placeholder="e.g. Marchetti"></label>'
    +'<div class="tagrow"><span class="muted" style="font-size:14px;align-self:center">Or pick from tag:</span>'+tags.map(function(t){return '<button type="button" data-tag="'+esc(t)+'">'+esc(t)+'</button>';}).join('')+'</div><div class="results" id="fres"></div>';
   var tm;$('#fq').addEventListener('input',function(){var v=this.value.trim();clearTimeout(tm);if(v.length<2){$('#fres').innerHTML='';return;}tm=setTimeout(function(){fubSearch('q='+encodeURIComponent(v));},350);});
