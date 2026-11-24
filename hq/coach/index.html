@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="en-CA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Accountability Coach | SoldMike</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#1D2870">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Coach">
+<link rel="apple-touch-icon" href="/open-house/icon-192.png">
+<link rel="icon" href="/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600;700&display=swap">
+<style>
+/* Accountability Coach (host PIN): calls come from Follow Up Boss (read only), showings from the calendar, the rest is Michael's own count.
+   API: listings Worker src/coach.js. Sheets: 2nd Brain Real Estate/Daily Activity Tracker.md */
+:root{--navy:#1D2870;--navy2:#263386;--ink:#141833;--red:#D7141E;--line:#DFE3EF;--muted:#565E7A;--green:#1B7A3E;--amber:#9A5B00;--bg:#F3F5FA;--card:#fff;--soft:#EEF1F9;
+--display:'Barlow Condensed','Arial Narrow',system-ui,sans-serif;--body:'Barlow',system-ui,-apple-system,sans-serif;color-scheme:light}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--ink);font:18px/1.4 var(--body);-webkit-tap-highlight-color:transparent}
+button,input,select,textarea{font:inherit;color:inherit}[hidden]{display:none!important}:focus-visible{outline:3px solid var(--red);outline-offset:2px}
+a{color:var(--navy)}
+header{background:var(--navy);color:#fff;padding:env(safe-area-inset-top,0) 0 0}
+.in{max-width:1180px;margin:0 auto;padding:0 16px}
+.hd{display:flex;align-items:center;gap:14px;padding-top:12px;padding-bottom:10px}
+.hd a{color:#C9D1F5;text-decoration:none;font-weight:600;white-space:nowrap}
+.hd h1{font:800 30px/1 var(--display);text-transform:uppercase;letter-spacing:.03em;margin:0;flex:1}
+.hd button{background:none;border:1px solid #5464C4;color:#fff;border-radius:10px;min-height:44px;min-width:44px;cursor:pointer;font-size:20px}
+.tabs{background:var(--navy2);position:sticky;top:0;z-index:5}
+.tabs .in{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;padding:0 6px}.tabs .in::-webkit-scrollbar{display:none}
+.tabs button{flex:none;border:0;background:none;color:#C9D1F5;min-height:52px;padding:0 14px;font:700 21px var(--display);text-transform:uppercase;letter-spacing:.03em;border-bottom:4px solid transparent;cursor:pointer}
+.tabs button[aria-selected=true]{color:#fff;border-color:var(--red)}
+main{padding-top:18px;padding-bottom:60px}
+h2{font:800 25px/1.1 var(--display);text-transform:uppercase;letter-spacing:.03em;color:var(--navy);margin:0 0 10px}
+h3{font:700 20px/1.2 var(--display);text-transform:uppercase;letter-spacing:.04em;margin:0 0 6px;color:var(--muted)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin:0 0 16px;min-width:0}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px}.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.g2>.card,.g3>.card{margin:0}.g2,.g3{margin-bottom:16px}
+.big{font:800 52px/1 var(--display);color:var(--ink);font-variant-numeric:tabular-nums}.big small{font-size:26px;color:var(--muted);font-weight:700}
+.kv{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-top:1px solid var(--line)}.kv b{font-variant-numeric:tabular-nums}
+.bar{height:10px;background:var(--soft);border-radius:6px;overflow:hidden;margin:8px 0 10px}.bar i{display:block;height:100%;background:var(--navy);border-radius:6px}.bar i.ok{background:var(--green)}
+.next{border-left:6px solid var(--red)}
+.nx{display:flex;gap:14px;align-items:center;padding:12px 0;border-top:1px solid var(--line)}.nx:first-of-type{border-top:0}
+.nx .n{font:800 34px/1 var(--display);color:var(--red);width:26px;flex:none}.nx div{flex:1;min-width:0}.nx b{display:block;font-size:20px}.nx span{color:var(--muted)}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 16px;border-radius:10px;border:1px solid var(--navy);background:#fff;color:var(--navy);font-weight:600;text-decoration:none;cursor:pointer;white-space:nowrap}.btn.p{background:var(--navy);color:#fff}
+.mut{color:var(--muted)}.sm{font-size:16px}.red{color:var(--red)}.grn{color:var(--green)}
+.warnb{background:#FFF4DF;border:1px solid #EBCB8F;border-radius:12px;padding:12px 14px;margin-bottom:16px}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}th{font:700 17px var(--display);text-transform:uppercase;letter-spacing:.03em;color:var(--muted);text-align:right;padding:6px 6px;border-bottom:2px solid var(--line)}th:first-child,td:first-child{text-align:left}td{padding:9px 6px;border-bottom:1px solid var(--line);text-align:right}.tw{overflow-x:auto}
+tr.tot td{font-weight:700;border-top:2px solid var(--navy)}
+.ck{display:flex;gap:12px;align-items:center;min-height:50px;padding:6px 0;border-top:1px solid var(--line);cursor:pointer}.ck input{width:28px;height:28px;accent-color:var(--green);flex:none;margin:0}.ck.on span{color:var(--muted);text-decoration:line-through}
+.st{display:flex;align-items:center;gap:8px;padding:8px 0;border-top:1px solid var(--line)}.st>span{flex:1;min-width:0}.st small{display:block;color:var(--muted);font-size:16px}
+.pm{display:flex;align-items:center;gap:4px}.pm button{width:46px;height:46px;border-radius:12px;border:1px solid #BDC5DE;background:#fff;font-size:24px;cursor:pointer;line-height:1}.pm button:last-child{background:var(--navy);color:#fff;border-color:var(--navy)}.pm b{min-width:52px;text-align:center;font:800 28px var(--display)}.pm b.ok{color:var(--green)}.auto{min-width:148px;text-align:center;font:800 28px var(--display)}.auto small{font:500 15px var(--body)}
+.dots{display:grid;grid-template-columns:repeat(10,1fr);gap:5px;max-width:520px;margin:12px 0}.dots i{aspect-ratio:1;border:2px solid #C5CCE2;border-radius:8px;display:grid;place-items:center;font:600 15px var(--body);color:var(--muted);font-style:normal}.dots i.on{background:var(--green);border-color:var(--green);color:#fff}.dots i.g{border-color:var(--navy)}
+.daynav{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap}.daynav b{font:800 25px var(--display);text-transform:uppercase;color:var(--navy);flex:1;min-width:150px}
+.pp{display:flex;gap:10px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}.pp div{flex:1;min-width:0}.pp b a{color:var(--ink);text-decoration:none}.pp small{display:block;color:var(--muted);font-size:16px}
+textarea,input[type=number],input[type=password],select{border:1px solid #BDC5DE;border-radius:10px;padding:8px 10px;min-height:44px;background:#fff;max-width:100%}textarea{width:100%;min-height:150px}input[type=number]{width:92px;text-align:center}
+.scr{display:flex;flex-wrap:wrap;gap:8px}
+dialog{border:0;border-radius:16px;padding:22px;width:min(380px,calc(100vw - 32px))}dialog::backdrop{background:rgba(20,24,51,.6)}dialog input{width:100%;margin-bottom:12px}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:12px 18px;border-radius:12px;z-index:9;max-width:calc(100vw - 32px)}
+details summary{cursor:pointer;min-height:44px;display:flex;align-items:center;font-weight:600;color:var(--navy)}
+@media(max-width:820px){.g2,.g3{grid-template-columns:1fr}.hd h1{font-size:25px}.card{padding:15px}}
+</style>
+</head>
+<body>
+<header><div class="in hd"><a href="/hq/">‹ HQ</a><h1>Accountability Coach</h1><button type="button" id="ref" aria-label="Refresh">↻</button></div></header>
+<nav class="tabs" aria-label="Pages"><div class="in" role="tablist" id="tabs"></div></nav>
+<main class="in" id="main"><p class="mut">Loading your numbers…</p></main>
+<dialog id="pinDlg"><form id="pinForm"><h2>Host only</h2><input id="pinIn" inputmode="numeric" type="password" autocomplete="off" aria-label="PIN" placeholder="PIN"><p class="red" id="pinErr" hidden>Wrong PIN</p><button class="btn p" type="submit">Continue</button></form></dialog>
+<script>
+(function(){
+'use strict';
+var API=/^(localhost|127\.0\.0\.1)$/.test(location.hostname)?'http://localhost:8787':'https://soldmike-listings.broker-e2c.workers.dev';
+var $=function(i){return document.getElementById(i);};
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function store(k,v){try{if(v===undefined)return JSON.parse(localStorage.getItem(k)||'null');localStorage.setItem(k,JSON.stringify(v));}catch(e){return null;}}
+function toast(m){var t=document.createElement('div');t.className='toast';t.setAttribute('role','status');t.textContent=m;document.body.appendChild(t);setTimeout(function(){t.remove();},2600);}
+function ymd(d){return d.toLocaleDateString('en-CA',{timeZone:'America/Toronto'});}
+function add(day,n){var d=new Date(day+'T12:00:00Z');d.setUTCDate(d.getUTCDate()+n);return d.toISOString().slice(0,10);}
+function dow(day){return new Date(day+'T12:00:00Z').getUTCDay();}
+function monday(day){return add(day,-((dow(day)+6)%7));}
+function nice(day,o){return new Date(day+'T12:00:00Z').toLocaleDateString('en-CA',Object.assign({timeZone:'UTC'},o||{weekday:'long',month:'short',day:'numeric'}));}
+function diff(a,b){return Math.round((Date.parse(b+'T12:00:00Z')-Date.parse(a+'T12:00:00Z'))/864e5);}
+function api(p,o){o=o||{};o.headers={'X-OH-Pin':store('sm_oh_pin')||'','Content-Type':'application/json'};return fetch(API+'/api/hq/coach/'+p,o).then(function(r){if(r.status===401)throw 'pin';return r.json().catch(function(){return {};}).then(function(j){if(!r.ok)throw j.error||('Error '+r.status);return j;});});}
+function post(p,b){return api(p,{method:'POST',body:JSON.stringify(b)});}
+function askPin(){return new Promise(function(res){var d=$('pinDlg');$('pinForm').onsubmit=function(e){e.preventDefault();store('sm_oh_pin',$('pinIn').value.trim());api('data').then(function(j){d.close();res(j);}).catch(function(x){$('pinErr').textContent=x==='pin'?'Wrong PIN':String(x);$('pinErr').hidden=false;});};if(!d.open)d.showModal();});}
+
+var T=[['seller','Seller leads'],['buyer','Buyer leads'],['expired','Expired'],['fsbo','For sale by owner'],['past','Past client / COI'],['door','Door knocking'],['jljs','Just listed / just sold'],['openhouse','Open house'],['precon','Preconstruction'],['client','Current client'],['other','Other'],['unknown','Not in Follow Up Boss']];
+var TN={};T.forEach(function(t){TN[t[0]]=t[1];});
+var V='obsidian://open?vault=2nd%20Brain&file=Real%20Estate%2FScript%20Vault';
+// weekly goals sheet: index 0 = Sunday. The sheet has one Sat/Sun column, so the weekend goal sits on Saturday (calls = 110 a week)
+var GD={calls:[0,25,25,25,25,5,5],emails:[0,10,10,10,10,5,3],showings:[0,1,1,1,1,2,3],evals:[0,1,1,1,1,1,1],past:[0,1,1,1,1,1,0],offers:[0,1,1,1,1,1,1],door:[0,1,1,1,1,0,1],lunch:[0,1,1,1,1,0,0],closed:[0,1,1,1,1,1,1]};
+var GN=[['calls','Calls'],['emails','Direct emails'],['showings','Showings'],['evals','Evaluation / appointment'],['past','Past client outreach'],['offers','Offers written'],['door','Door knockers'],['lunch','Lunch / coffee / event'],['closed','Accepted / sold / closed']];
+var WD={seller:7,buyer:7,expired:2,fsbo:2,past:14,door:7};
+var GUIDE=[['First action',['Inquiries','Hot follow-ups','Appointment confirmation','Listing review','Market review','COI call','Past client call','5 buyers just signed','5 seller calls / emails','Send to Searching']],
+['Power hour',['Follow up','10 pool calls','5 database emails','Favourite property list','Review numbers & tomorrow']],
+['Pool: seller leads',['Expired listings','For sale by owner','AgentLocator']],['Pool: buyer leads',['Investors','Past clients','AgentLocator']],
+['Pool: AgentLocator',['Seller leads','Buyer leads: just signed in','Buyer leads: current online','Buyer leads: logged in today','Follow up: property inquiries','Follow up: favourite property saved','Follow up: most property views']],
+['Pool: action leads',['Open house','Door knockers','Events','Just sold','Just listed']],['Pool: incoming leads',['Website','Google ads','Referrals','Phone calls']],['Pool: other sources',['Information videos','Builders','Social media','Email database','Farming paper mail']]];
+var FERRY=[['fsbo','FSBO'],['expired','Expired'],['past','Past client / COI'],['jljs','Just listed / just sold'],['lead','Lead follow-up'],['door','Door knocking'],['other','Other']];
+var PROD=[['lappt','Listing appointments'],['ltaken','Listings taken'],['lexp','Listings expired'],['lcan','Listings cancelled'],['lturn','Listings turned down'],['lsold','Listings sold'],['mybuy','My buyer sales'],['agbuy','Buyer agent sales'],['price','Price reductions'],['fell','Deals fell apart'],['closed','Closed deals'],['paid','Paid income ($)'],['inv','Present inventory']];
+var TABS=[['glimpse','Glimpse'],['guide','Guidelines'],['log','Contact log'],['goals','Daily goals'],['who','Who to call'],['week','Week & year'],['set','Settings']];
+var S={tab:(location.hash||'#glimpse').slice(1),d:null,day:ymd(new Date()),wk:null,ppl:null};
+function today(){return ymd(new Date());}
+function isConv(c){return c.secs>=(+S.d.settings.conv||120);}
+function L(day){return S.d.logs[day]||{};}
+function n(v){return +v||0;}
+function goal(k,day){var s=(S.d.settings.goals||{})[k]||GD[k];return n(s[dow(day)]);}
+function calls(from,to,type){return S.d.calls.filter(function(c){return c.day>=from&&c.day<=to&&(!type||c.type===type);});}
+function sum(from,to,type){var r={made:0,rec:0,conn:0,conv:0,secs:0,people:{}};calls(from,to,type).forEach(function(c){r[c.inc?'rec':'made']++;r.secs+=c.secs;if(c.secs>=60)r.conn++;if(isConv(c)){r.conv++;r.people[c.pid||('x'+c.id)]=1;}});r.ppl=Object.keys(r.people).length;return r;}
+function man(from,to,k){var t=0;for(var d=from;d<=to;d=add(d,1))t+=n(L(d)[k]);return t;}
+function shown(from,to){var t=0,b=S.d.showings.by||{};Object.keys(b).forEach(function(d){if(d>=from&&d<=to)t+=b[d];});return t;}
+function done(k,from,to){
+  if(k==='calls')return sum(from,to).made+man(from,to,'xcalls');
+  if(k==='showings')return shown(from,to)+man(from,to,'xshow');
+  if(k==='past')return sum(from,to,'past').made+man(from,to,'c_past');
+  if(k==='door')return sum(from,to,'door').made+man(from,to,'c_door');
+  if(k==='evals')return man(from,to,'a_seller')+man(from,to,'a_buyer')+man(from,to,'evals');
+  return man(from,to,k);}
+function goalSum(k,from,to){var t=0;for(var d=from;d<=to;d=add(d,1))t+=goal(k,d);return t;}
+// Mike Ferry rows: conversations by type (people talked to that day, once each) + contacts counted by hand
+function ferryAuto(k,day){var ty=k==='lead'?['seller','buyer','precon','openhouse']:k==='other'?['other']:[k];var p={};calls(day,day).forEach(function(c){if(isConv(c)&&ty.indexOf(c.type)>=0)p[c.pid]=1;});return Object.keys(p).length;}
+function contacts(from,to){var t=0;for(var d=from;d<=to;d=add(d,1))FERRY.forEach(function(f){t+=ferryAuto(f[0],d)+n(L(d)['c_'+f[0]]);});return t;}
+function hm(s){var m=Math.round(s/60);return m>=60?Math.floor(m/60)+' h '+(m%60)+' m':m+' min';}
+function save(day){return post('log',{day:day,v:S.d.logs[day]}).catch(function(e){toast('Not saved: '+(e==='pin'?'PIN needed':e));});}
+function bump(day,k,by){var l=S.d.logs[day]=S.d.logs[day]||{};l[k]=Math.max(0,n(l[k])+by);save(day);render();}
+
+function since(){
+  var t=today(),w=Object.assign({},WD,S.d.settings.warn||{});
+  return Object.keys(w).filter(function(k){return n(w[k])>0;}).map(function(k){var last=null;
+    S.d.calls.forEach(function(c){if(c.type===k&&!c.inc&&(!last||c.day>last))last=c.day;});
+    Object.keys(S.d.logs).forEach(function(d){if(n(S.d.logs[d]['c_'+k])>0&&d<=t&&(!last||d>last))last=d;});
+    var days=last?diff(last,t):null;return {k:k,last:last,days:days,warn:n(w[k]),late:days===null||days>=n(w[k]),ratio:days===null?99-n(w[k])/100:days/n(w[k])};
+  }).sort(function(a,b){return b.ratio-a.ratio;});}
+var WHERE={expired:['Open expired list','/hq/agents/#sellers'],fsbo:['Open FSBO list','/hq/agents/#sellers']};
+
+function period(title,from,to,sub,goals){
+  var s=sum(from,to),g=goals?goalSum('calls',from,to):0,made=done('calls',from,to),pc=g?Math.min(100,made/g*100):0;
+  return '<section class="card"><h3>'+title+'</h3><p class="mut sm" style="margin:0 0 8px">'+sub+'</p><div class="big">'+made+(g?' <small>/ '+g+' calls</small>':' <small>calls</small>')+'</div>'+(g?'<div class="bar"><i class="'+(pc>=100?'ok':'')+'" style="width:'+pc+'%"></i></div>':'')+
+  [['Conversations',s.conv],['People talked to',s.ppl],['Calls received',s.rec],['Talk time',hm(s.secs)],['Appointments',done('evals',from,to)],['Showings',done('showings',from,to)],['Direct emails',man(from,to,'emails')]].map(function(r){return '<div class="kv"><span>'+r[0]+'</span><b>'+r[1]+'</b></div>';}).join('')+'</section>';}
+function glimpse(){
+  var t=today(),y=add(t,-1),m=monday(t),lm=add(m,-7),h='';
+  var nx=since().filter(function(x){return x.late;}).slice(0,3),left=Math.max(0,goal('calls',t)-done('calls',t,t));
+  h+='<section class="card next"><h2>Do this next</h2>';
+  if(!goal('calls',t))h+='<p class="mut" style="margin:0 0 6px">No call goal today.</p>';
+  else if(left)h+='<p style="margin:0 0 6px"><b>'+left+' more call'+(left>1?'s':'')+'</b> to hit today\'s goal of '+goal('calls',t)+'.</p>';
+  else h+='<p class="grn" style="margin:0 0 6px"><b>Today\'s call goal is done.</b></p>';
+  nx.forEach(function(x,i){var w=WHERE[x.k];h+='<div class="nx"><span class="n">'+(i+1)+'</span><div><b>'+TN[x.k]+'</b><span>'+(x.days===null?'No calls on record in the last '+S.d.keep+' days':x.days+' day'+(x.days===1?'':'s')+' since your last call')+'</span></div>'+(w?'<a class="btn" target="_blank" rel="noopener" href="'+w[1]+'">'+w[0]+'</a>':'<button class="btn" data-go="who" data-k="'+x.k+'">See who</button>')+'</div>';});
+  if(!nx.length)h+='<p class="mut">Every group has been called recently.</p>';
+  h+='<p style="margin:12px 0 0"><a class="btn" href="'+V+'">Open scripts</a></p></section>';
+  h+='<div class="g3">'+period('Today',t,t,nice(t),1)+period('Yesterday',y,y,nice(y),1)+period('Last week',lm,add(lm,6),nice(lm,{month:'short',day:'numeric'})+' to '+nice(add(lm,6),{month:'short',day:'numeric'}),1)+'</div>';
+  h+=typeTable('This week so far',m,t,'and last week',lm,add(lm,6));
+  return h;}
+function typeTable(title,a,b,vs,c,d){
+  var h='<section class="card"><h2>'+title+', by type</h2><div class="tw"><table><thead><tr><th>Who</th><th>Calls made</th><th>Received</th><th>Talked</th><th>Last wk made</th><th>Last wk talked</th></tr></thead><tbody>';
+  T.forEach(function(t){var x=sum(a,b,t[0]),z=sum(c,d,t[0]);h+='<tr><td>'+t[1]+'</td><td>'+x.made+'</td><td>'+x.rec+'</td><td><b>'+x.conv+'</b></td><td>'+z.made+'</td><td>'+z.conv+'</td></tr>';});
+  var x=sum(a,b),z=sum(c,d);return h+'<tr class="tot"><td>Total</td><td>'+x.made+'</td><td>'+x.rec+'</td><td>'+x.conv+'</td><td>'+z.made+'</td><td>'+z.conv+'</td></tr></tbody></table></div><p class="mut sm">Talked = a call of '+Math.round((+S.d.settings.conv||120)/60*10)/10+' minutes or more. Calls only, from Follow Up Boss.</p></section>';}
+function daynav(){var t=today();return '<div class="daynav"><button class="btn" data-day="-1" aria-label="Day before">‹</button><b>'+(S.day===t?'Today, ':'')+nice(S.day)+'</b>'+(S.day!==t?'<button class="btn" data-day="0">Today</button>':'')+'<button class="btn" data-day="1" aria-label="Next day"'+(S.day>=t?' disabled':'')+'>›</button></div>';}
+function pm(k,v,ok){return '<span class="pm"><button data-b="'+k+'" data-n="-1" aria-label="Less">−</button><b class="'+(ok?'ok':'')+'">'+v+'</b><button data-b="'+k+'" data-n="1" aria-label="More">+</button></span>';}
+function guide(){var l=L(S.day).guide||{},h=daynav();
+  h+='<div class="g2">';GUIDE.forEach(function(g,gi){var dn=g[1].filter(function(x,i){return l[gi+'_'+i];}).length;
+    h+='<section class="card"><h2>'+g[0]+' <span class="mut" style="font-size:20px">'+dn+' / '+g[1].length+'</span></h2>'+g[1].map(function(x,i){var k=gi+'_'+i;return '<label class="ck'+(l[k]?' on':'')+'"><input type="checkbox" data-g="'+k+'"'+(l[k]?' checked':'')+'><span>'+esc(x)+'</span></label>';}).join('')+'</section>';});
+  return h+'</div>';}
+function log(){var d=S.day,l=L(d),tot=contacts(d,d),gl=n((S.d.settings||{}).contactGoal)||5,h=daynav();
+  h+='<section class="card"><h2>Contacts</h2><div class="big">'+tot+' <small>/ '+gl+' goal</small></div><div class="dots">';for(var i=1;i<=50;i++)h+='<i class="'+(i<=tot?'on':'')+(i===gl?' g':'')+'">'+i+'</i>';h+='</div>';
+  FERRY.forEach(function(f){var a=ferryAuto(f[0],d);h+='<div class="st"><span>'+f[1]+'<small>'+a+' from calls'+(n(l['c_'+f[0]])?' + '+n(l['c_'+f[0]])+' added':'')+'</small></span>'+pm('c_'+f[0],a+n(l['c_'+f[0]]))+'</div>';});
+  h+='<p class="mut sm">Conversations in Follow Up Boss count by themselves, one per person a day. Use + for contacts made in person or on another phone.</p></section>';
+  h+='<div class="g2"><section class="card"><h2>Leads & appointments</h2>'+[['leads','Leads generated'],['a_seller','Seller appointments set'],['a_buyer','Buyer appointments set']].map(function(r){return '<div class="st"><span>'+r[1]+'</span>'+pm(r[0],n(l[r[0]]))+'</div>';}).join('')+'</section>';
+  h+='<section class="card"><h2>Action plan</h2><textarea id="plan" aria-label="Action plan" placeholder="Up to 10 things to do">'+esc(l.plan||'')+'</textarea></section></div>';
+  h+='<section class="card"><h2>Calls that day</h2>'+(calls(d,d).map(function(c){return '<div class="pp"><div><b>'+(c.pid?'<a target="_blank" rel="noopener" href="'+S.d.fubApp+'/2/people/view/'+c.pid+'">'+esc(c.name||'Person '+c.pid)+'</a>':'Number not in Follow Up Boss')+'</b><small>'+(c.inc?'Received':'Made')+' · '+new Date(c.at).toLocaleTimeString('en-CA',{timeZone:'America/Toronto',hour:'numeric',minute:'2-digit'})+' · '+hm(c.secs)+(c.outcome?' · '+esc(c.outcome):'')+'</small></div>'+(c.pid?'<select data-pid="'+c.pid+'" aria-label="Type">'+T.filter(function(t){return t[0]!=='unknown';}).map(function(t){return '<option value="'+t[0]+'"'+(c.type===t[0]?' selected':'')+'>'+t[1]+'</option>';}).join('')+'</select>':'')+'</div>';}).join('')||'<p class="mut">No calls in Follow Up Boss that day.</p>')+'<p class="mut sm">Wrong type? Change it here. It sticks to that person on this page only; Follow Up Boss is not changed.</p></section>';
+  return h;}
+function goals(){var d=S.day,l=L(d),h=daynav(),tg=0,td=0;
+  var row=GN.map(function(g){var k=g[0],v=done(k,d,d),gl=goal(k,d);tg+=gl;td+=Math.min(v,gl);
+    var key={calls:'xcalls',showings:'xshow',past:'c_past',door:'c_door',evals:'evals'}[k]||k;
+    var note={calls:'Follow Up Boss + other phones',showings:'calendar + added',past:'calls + added',door:'calls + added',evals:'appointments set + added'}[k];
+    return '<div class="st"><span>'+g[1]+'<small>goal '+gl+(note?' · '+note:'')+'</small></span>'+pm(key,v,gl&&v>=gl)+'</div>';}).join('');
+  h+='<section class="card"><h2>Daily goals</h2><div class="big">'+td+' <small>/ '+tg+'</small></div><div class="bar"><i class="'+(td>=tg?'ok':'')+'" style="width:'+(tg?td/tg*100:0)+'%"></i></div>'+row+(dow(d)===5?'<p class="mut">Also Friday: weekly market video 3 PM, posting 4 PM.</p>':'')+(dow(d)===0?'<p class="mut">Also Sunday: database email 10 AM. Weekend: open house.</p>':dow(d)===6?'<p class="mut">Weekend: open house.</p>':'')+'</section>';
+  return h;}
+function who(){
+  if(!S.ppl){loadPpl();return '<section class="card"><p class="mut">Finding people you haven\'t followed up with…</p></section>';}
+  if(S.ppl.err)return '<section class="card"><p class="red">Could not load people: '+esc(S.ppl.err)+'</p></section>';
+  var h=S.ppl.errors&&S.ppl.errors.length?'<div class="warnb">'+S.ppl.errors.length+' of the Follow Up Boss lists didn\'t load, so this may be missing people.</div>':'';
+  h+='<p class="mut">Longest without a call, text or email first.</p><div class="g2">';
+  ['seller','past','buyer','expired','fsbo','door','precon','openhouse','jljs','client'].forEach(function(k){var a=S.ppl.by[k]||[];
+    var empty={expired:'Nobody tagged Expired yet. Add the tag to a person when you first reach them.',fsbo:'Nobody tagged FSBO yet. Add the tag to a person when you first reach them.',door:'Nobody tagged Door Knock yet.'}[k];
+    if(!a.length&&!empty)return;
+    h+='<section class="card" id="w_'+k+'"><h2>'+TN[k]+' <span class="mut" style="font-size:20px">'+(S.ppl.counts[k]||0)+'</span></h2>';
+    var row=function(p){var dd=p.last?diff(ymd(new Date(p.last)),today()):null;return '<div class="pp"><div><b><a target="_blank" rel="noopener" href="'+S.ppl.fubApp+'/2/people/view/'+p.id+'">'+esc(p.name||'No name')+'</a></b><small>'+(dd===null||isNaN(dd)?'No contact on record':dd===0?'Today':dd+' day'+(dd===1?'':'s')+' ago')+(p.stage?' · '+esc(p.stage):'')+'</small></div><a class="btn" target="_blank" rel="noopener" href="'+S.ppl.fubApp+'/2/people/view/'+p.id+'">Open</a></div>';};
+    h+=a.length?a.slice(0,5).map(row).join('')+(a.length>5?'<details><summary>Show '+(a.length-5)+' more</summary>'+a.slice(5).map(row).join('')+'</details>':''):'<p class="mut">'+empty+'</p>';
+    if(WHERE[k])h+='<p><a class="btn" target="_blank" rel="noopener" href="'+WHERE[k][1]+'">'+WHERE[k][0]+'</a></p>';
+    h+='</section>';});
+  return h+'</div>';}
+function week(){var t=today(),m=S.wk||monday(t),e=add(m,6)<t?add(m,6):t,yr=t.slice(0,4)+'-01-01',w=S.d.weeks[m]||{},st=S.d.settings.start||{},s=sum(m,e);
+  function days(a,b){var c=0;for(var d=a;d<=b;d=add(d,1))if(calls(d,d).some(function(x){return !x.inc;})||Object.keys(L(d)).length)c++;return c;}
+  var first=S.d.calls.length?S.d.calls[S.d.calls.length-1].day:t;if(first<yr)first=yr;
+  var h='<div class="daynav"><button class="btn" data-wk="-7" aria-label="Week before">‹</button><b>Week of '+nice(m,{month:'short',day:'numeric'})+'</b><button class="btn" data-wk="7" aria-label="Next week"'+(m>=monday(t)?' disabled':'')+'>›</button></div>';
+  h+='<section class="card"><h2>Goal vs done</h2><div class="tw"><table><thead><tr><th>Activity</th><th>Done</th><th>Week goal</th><th></th></tr></thead><tbody>'+GN.map(function(g){var v=done(g[0],m,e),q=goalSum(g[0],m,add(m,6));return '<tr><td>'+g[1]+'</td><td><b class="'+(q&&v>=q?'grn':'')+'">'+v+'</b></td><td>'+q+'</td><td>'+(q?Math.round(v/q*100)+'%':'')+'</td></tr>';}).join('')+'</tbody></table></div></section>';
+  h+='<section class="card"><h2>Weekly production</h2><div class="tw"><table><thead><tr><th>Item</th><th>This week</th><th>Year to date</th></tr></thead><tbody>';
+  h+='<tr><td>Days worked</td><td>'+days(m,e)+'</td><td>'+(n(st.days)+days(first,t))+'</td></tr><tr><td>Hours on the phone</td><td>'+hm(s.secs)+'</td><td>'+hm(n(st.hours)*3600+sum(first,t).secs)+'</td></tr><tr><td>Contacts</td><td>'+contacts(m,e)+'</td><td>'+(n(st.contacts)+contacts(first,t))+'</td></tr>';
+  PROD.forEach(function(p){var y=n(st[p[0]]);Object.keys(S.d.weeks).forEach(function(d){if(d>=yr)y+=n(S.d.weeks[d][p[0]]);});
+    h+='<tr><td>'+p[1]+'</td><td><input type="number" min="0" inputmode="decimal" data-w="'+p[0]+'" value="'+(w[p[0]]==null?'':esc(w[p[0]]))+'" aria-label="'+p[1]+'"></td><td>'+(p[0]==='inv'?'':y.toLocaleString('en-CA'))+'</td></tr>';});
+  h+='</tbody></table></div><p class="mut sm">Calls here go back to '+nice(first,{month:'short',day:'numeric',year:'numeric'})+', not January 1. Put the earlier part of the year in Settings.</p></section>';
+  return h+typeTable('Week of '+nice(m,{month:'short',day:'numeric'}),m,e,'',add(m,-7),add(m,-1));}
+function settings(){var s=S.d.settings,g=s.goals||{},w=Object.assign({},WD,s.warn||{}),st=s.start||{},D=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  var h='<section class="card"><h2>Daily goals</h2><div class="tw"><table><thead><tr><th>Activity</th>'+D.map(function(x){return '<th>'+x+'</th>';}).join('')+'</tr></thead><tbody>'+GN.map(function(r){return '<tr><td>'+r[1]+'</td>'+D.map(function(x,i){return '<td><input style="width:64px" type="number" min="0" data-goal="'+r[0]+'" data-i="'+i+'" value="'+n((g[r[0]]||GD[r[0]])[i])+'" aria-label="'+r[1]+' '+x+'"></td>';}).join('')+'</tr>';}).join('')+'</tbody></table></div><p class="mut sm">From your goals sheet. Its one weekend column sits on Saturday, so calls start at 110 a week.</p></section>';
+  h+='<div class="g2"><section class="card"><h2>Warn me after (days)</h2>'+Object.keys(WD).map(function(k){return '<div class="st"><span>'+TN[k]+'</span><input type="number" min="0" data-warn="'+k+'" value="'+n(w[k])+'" aria-label="'+TN[k]+'"></div>';}).join('')+'<p class="mut sm">0 turns it off.</p></section>';
+  h+='<section class="card"><h2>Counting</h2><div class="st"><span>A conversation is (seconds or more)</span><input type="number" min="1" id="sConv" value="'+(+s.conv||120)+'"></div><div class="st"><span>Contacts goal a day</span><input type="number" min="1" id="sCon" value="'+(n(s.contactGoal)||5)+'"></div></section></div>';
+  h+='<section class="card"><h2>Earlier this year</h2><p class="mut sm">Numbers from before this page started, added to year to date.</p><div class="g2">'+[['days','Days worked'],['hours','Hours on the phone'],['contacts','Contacts']].concat(PROD.filter(function(p){return p[0]!=='inv';})).map(function(p){return '<div class="st"><span>'+p[1]+'</span><input type="number" min="0" data-start="'+p[0]+'" value="'+(st[p[0]]||'')+'" aria-label="'+p[1]+'"></div>';}).join('')+'</div></section><button class="btn p" id="saveSet">Save settings</button>';
+  return h;}
+var R={glimpse:glimpse,guide:guide,log:log,goals:goals,who:who,week:week,set:settings};
+function render(){
+  if(!R[S.tab])S.tab='glimpse';
+  $('tabs').innerHTML=TABS.map(function(t){return '<button role="tab" data-go="'+t[0]+'" aria-selected="'+(S.tab===t[0])+'">'+t[1]+'</button>';}).join('');
+  if(!S.d)return;
+  var h='';if(S.d.syncErr)h+='<div class="warnb"><b>Follow Up Boss didn\'t answer.</b> These are the numbers from the last good check'+(S.d.sync.at?', '+new Date(S.d.sync.at).toLocaleString('en-CA'):'')+'.</div>';
+  else if(S.d.sync.full===false)h+='<div class="warnb">Still loading older calls. Press ↻ again in a minute.</div>';
+  if(S.d.showings.err)h+='<div class="warnb">The calendar didn\'t answer, so showings may be low.</div>';
+  $('main').innerHTML=h+R[S.tab]();
+  var sel=$('tabs').querySelector('[aria-selected=true]');if(sel){var box=$('tabs');box.scrollLeft=Math.max(0,sel.offsetLeft-box.clientWidth/2+sel.clientWidth/2);}
+}
+function go(t,k){S.tab=t;history.replaceState(null,'','#'+t);render();window.scrollTo(0,0);if(k)focusWho(k);}
+function focusWho(k){S.want=k;var e=$('w_'+k);if(e){e.scrollIntoView();window.scrollBy(0,-64);S.want=null;}}
+function loadPpl(){if(S.pl)return;S.pl=1;api('people').then(function(j){S.ppl=j;}).catch(function(e){S.ppl={err:String(e)};}).then(function(){S.pl=0;if(S.tab==='who'){render();if(S.want)focusWho(S.want);}});}
+function load(){return api('data').catch(function(e){if(e==='pin')return askPin();throw e;}).then(function(j){S.d=j;S.ppl=null;render();}).catch(function(e){$('main').innerHTML='<section class="card"><h2>Could not load</h2><p>'+esc(e)+'</p></section>';});}
+document.addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;var x=b.dataset;
+  if(x.go)return go(x.go,x.k);
+  if(x.b)return bump(S.day,x.b,+x.n);
+  if(x.day!==undefined){S.day=x.day==='0'?today():add(S.day,+x.day);if(S.day>today())S.day=today();return render();}
+  if(x.wk){S.wk=add(S.wk||monday(today()),+x.wk);return render();}
+  if(b.id==='ref'){toast('Refreshing…');return load();}
+  if(b.id==='saveSet'){var s={goals:{},warn:{},start:{},conv:+$('sConv').value||120,contactGoal:+$('sCon').value||5};
+    document.querySelectorAll('[data-goal]').forEach(function(i){(s.goals[i.dataset.goal]=s.goals[i.dataset.goal]||[])[+i.dataset.i]=+i.value||0;});
+    document.querySelectorAll('[data-warn]').forEach(function(i){s.warn[i.dataset.warn]=+i.value||0;});document.querySelectorAll('[data-start]').forEach(function(i){if(i.value)s.start[i.dataset.start]=+i.value;});
+    post('settings',{v:s}).then(function(){S.d.settings=s;toast('Saved');}).catch(function(er){toast('Not saved: '+er);});}
+});
+document.addEventListener('change',function(e){var i=e.target,x=i.dataset,l;
+  if(x.g){l=S.d.logs[S.day]=S.d.logs[S.day]||{};l.guide=l.guide||{};if(i.checked)l.guide[x.g]=1;else delete l.guide[x.g];save(S.day);var y=window.scrollY;render();window.scrollTo(0,y);}
+  else if(i.id==='plan'){l=S.d.logs[S.day]=S.d.logs[S.day]||{};l.plan=i.value.slice(0,3000);save(S.day);}
+  else if(x.pid){post('type',{pid:+x.pid,type:i.value}).then(function(){S.d.calls.forEach(function(c){if(c.pid===+x.pid)c.type=i.value;});S.ppl=null;render();toast('Type saved');}).catch(function(er){toast('Not saved: '+er);});}
+  else if(x.w){var m=S.wk||monday(today()),w=S.d.weeks[m]=S.d.weeks[m]||{};if(i.value==='')delete w[x.w];else w[x.w]=+i.value;post('week',{day:m,v:w}).then(function(){toast('Saved');var y2=window.scrollY;render();window.scrollTo(0,y2);}).catch(function(er){toast('Not saved: '+er);});}
+});
+window.addEventListener('hashchange',function(){S.tab=location.hash.slice(1);render();});
+document.addEventListener('visibilitychange',function(){if(!document.hidden&&S.d&&S.tab!=='set'&&document.activeElement.tagName!=='TEXTAREA')load();});
+render();load();
+})();
+</script>
+</body>
+</html>
