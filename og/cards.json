@@ -416,6 +416,14 @@
   "layout": "photo"
  },
  {
+  "slug": "blog-home-inspections-offer-dates",
+  "path": "/blog/home-inspections-offer-dates/",
+  "headline": "Home Inspections: Cost, Timing and Offer Dates",
+  "kicker": "Blog",
+  "photo": "/media/gentle-fox/backyard-twilight.jpg",
+  "layout": "photo"
+ },
+ {
   "slug": "blog-how-long-to-buy-a-house-gta",
   "path": "/blog/how-long-to-buy-a-house-gta/",
   "headline": "How Long Does It Take to Buy a House in the GTA?",
@@ -500,7 +508,7 @@
   "path": "/blog/",
   "headline": "Blog: Selling & Buying in Vaughan and the GTA",
   "kicker": "Blog",
-  "photo": "/media/gentle-fox/kitchen.jpg",
+  "photo": "/media/gentle-fox/backyard-twilight.jpg",
   "layout": "photo"
  },
  {
