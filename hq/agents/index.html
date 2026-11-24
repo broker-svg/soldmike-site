@@ -1135,6 +1135,7 @@ function sellerCard(c,st){
     +(factsLine('s',c)?'<div class="fl2">'+esc(factsLine('s',c))+'</div>':'')+featChips(c,3)
     +(c.note?'<div class="note">'+esc(c.note)+'</div>':'')
     +'<div class="due"><div class="dh">Due now · '+(left?left+' left':'all done')+'</div>'+due.map(function(d,di){var sc=st.secs&&st.secs[d],hd=sc&&(di===0||st.secs[due[di-1]]!==sc)?'<div class="dh2">'+esc(sc)+' · <span data-seccount="'+esc(sc)+'">'+secDone(st,due,done,sc)+'</span></div>':'';return hd+'<label><input type="checkbox" data-check="'+c.id+'" value="'+esc(d)+'"'+(done.indexOf(d)>=0?' checked':'')+'><span>'+esc(d)+'</span></label>';}).join('')+'</div>'
+    +(['talk','poss','prosp','follow'].indexOf(c.stage)>=0?'<div class="pacts"><a class="btn sm" href="/hq/appointment/?card='+c.id+'" target="_blank" rel="noopener">Listing appointment</a></div>':'')
     +'<div class="pacts">'+hot.map(function(k){return pbtn(k,'s',c.id,1);}).join('')+'</div>'
     +'<button type="button" class="morebtn" data-more aria-expanded="false">All prompts</button><div class="pacts" hidden>'+rest.map(function(k){return pbtn(k,'s',c.id);}).join('')+'</div>'
     +moveRow('s',c)+'</article>';
@@ -1170,6 +1171,7 @@ function listingPlaybook(){var ph=PHASES.filter(function(x){return x.k===S.lpp;}
    +'<div class="phase"><h3>'+(i+1)+'. '+esc(ph.n)+'</h3><p class="muted">'+esc(ph.s)+'</p>'
    +(S.board.s?'<div class="pwho"><span>Sellers here</span>'+(at(ph.k).length?at(ph.k).map(function(c){return '<button type="button" class="pb" data-view="s" data-id="'+c.id+'">'+esc(c.addr||c.name||'Seller')+'</button>';}).join(''):'<small class="muted">'+(ph.k==='live'?'Launch steps are on each For sale seller’s checklist':'Nobody right now')+'</small>')+'</div>':'')
    +'<ul class="pchk">'+ph.items.map(function(t){return t[0]==='#'?'<li class="psec">'+esc(t.slice(1))+'</li>':'<li>'+esc(t)+'</li>';}).join('')+'</ul>'
+   +(ph.k==='appt'?'<p><a class="btn" href="/hq/appointment/" target="_blank" rel="noopener">Open the listing appointment (tablet)</a></p>':'')
    +'<div class="ptools"><span>Tools for this step</span><div>'+ph.tools.map(function(k){return pbtn(k,'lp','',1);}).join('')+'</div></div>'
    +(ph.next?'<p class="pnext">Next: <button type="button" class="lnkb" data-lpp="'+PHASES[i+1].k+'">'+esc(ph.next)+' →</button></p>':'<p class="pnext">Last phase. Done.</p>')+'</div></div></section>';}
 function listingPrep(){var T=[

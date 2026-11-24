@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en-CA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Listing Appointment | SoldMike</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#1D2870">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Appointment">
+<link rel="apple-touch-icon" href="/open-house/icon-192.png">
+<link rel="icon" href="/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=Barlow:wght@400;500;600;700&display=swap">
+<style>
+/* Listing appointment (host PIN). Two modes: My notes (private) and Show seller (no notes, no private fields, no objections).
+   Process + wording: 2nd Brain Real Estate/Listing Appointment.md. API: listings Worker src/appt.js */
+:root{--navy:#1D2870;--navy2:#263386;--ink:#141833;--red:#D7141E;--line:#DFE3EF;--muted:#565E7A;--green:#1B7A3E;--bg:#F3F5FA;--soft:#EEF1F9;
+--display:'Barlow Condensed','Arial Narrow',system-ui,sans-serif;--body:'Barlow',system-ui,-apple-system,sans-serif;color-scheme:light}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--ink);font:20px/1.45 var(--body);-webkit-tap-highlight-color:transparent}
+button,input,textarea{font:inherit;color:inherit}[hidden]{display:none!important}:focus-visible{outline:3px solid var(--red);outline-offset:2px}a{color:var(--navy)}
+header{background:var(--navy);color:#fff;padding-top:env(safe-area-inset-top,0);position:sticky;top:0;z-index:5}
+.in{max-width:980px;margin:0 auto;padding-left:18px;padding-right:18px}
+.hd{display:flex;gap:12px;align-items:center;padding-top:10px;padding-bottom:10px}
+.hd a{color:#C9D1F5;font-weight:600;text-decoration:none;white-space:nowrap}.hd b{flex:1;min-width:0;font:800 26px/1.1 var(--display);text-transform:uppercase;letter-spacing:.02em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hd small{color:#C9D1F5;font-size:16px;white-space:nowrap}
+.hd button{border:1px solid #5464C4;background:none;color:#fff;border-radius:10px;min-height:46px;padding:0 14px;font-weight:600;cursor:pointer;white-space:nowrap}.hd button[aria-pressed=true]{background:#fff;color:var(--navy)}
+.steps{background:var(--navy2)}.steps .in{display:flex;overflow-x:auto;scrollbar-width:none;gap:2px;padding-left:8px;padding-right:8px}.steps .in::-webkit-scrollbar{display:none}
+.steps button{flex:none;border:0;background:none;color:#C9D1F5;font:700 20px var(--display);text-transform:uppercase;min-height:52px;padding:0 12px;border-bottom:4px solid transparent;cursor:pointer}.steps button[aria-current=step]{color:#fff;border-color:var(--red)}
+main.in{padding-top:22px;padding-bottom:120px}
+h1{font:800 42px/1.05 var(--display);text-transform:uppercase;color:var(--navy);margin:0 0 4px}.lead{color:var(--muted);margin:0 0 18px}
+h2{font:800 25px/1.1 var(--display);text-transform:uppercase;color:var(--navy);margin:0 0 10px}
+.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:16px}
+.q{margin-bottom:18px}.q:last-child{margin-bottom:0}.q label{display:block;font-weight:600;font-size:22px;margin-bottom:6px}
+textarea,input[type=text],input[type=password]{width:100%;border:1px solid #BDC5DE;border-radius:12px;padding:12px;background:#fff;min-height:52px}textarea{min-height:78px;resize:vertical}
+.chips{display:flex;flex-wrap:wrap;gap:8px}.chips button{min-height:50px;padding:0 18px;border:1px solid #BDC5DE;border-radius:25px;background:#fff;font-weight:600;cursor:pointer}.chips button[aria-pressed=true]{background:var(--navy);border-color:var(--navy);color:#fff}
+.priv{background:#FFF8EA;border-color:#EBCB8F}.priv h2::after{content:" · private";color:#8A5200;font-size:18px}
+.say{font-size:24px;line-height:1.45;margin:0}.links{display:flex;flex-wrap:wrap;gap:10px}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:52px;padding:0 18px;border-radius:12px;border:1px solid var(--navy);background:#fff;color:var(--navy);font-weight:600;text-decoration:none;cursor:pointer}.btn.p{background:var(--navy);color:#fff}
+.big li{font-size:27px;line-height:1.35;margin-bottom:12px}.big{padding-left:26px;margin:0}
+.tiers{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.tiers div{border:1px solid var(--line);border-left:6px solid var(--navy);border-radius:12px;padding:16px}.tiers div:last-child{border-left-color:var(--red)}.tiers b{display:block;font:800 25px var(--display);text-transform:uppercase;color:var(--navy)}
+.obj{border-top:1px solid var(--line);padding:6px 0}.obj summary{cursor:pointer;font-weight:600;min-height:48px;display:flex;align-items:center}
+.ck{display:flex;gap:12px;align-items:center;min-height:54px;border-top:1px solid var(--line);cursor:pointer}.ck input{width:30px;height:30px;accent-color:var(--green);flex:none}
+.row{display:flex;gap:10px;align-items:center;border-top:1px solid var(--line);padding:12px 0}.row div{flex:1;min-width:0}.row small{display:block;color:var(--muted);font-size:17px}
+.foot{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);padding:10px 0 calc(10px + env(safe-area-inset-bottom,0px));z-index:4}.foot .in{display:flex;gap:10px;justify-content:space-between}
+.mut{color:var(--muted)}.red{color:var(--red)}
+dialog{border:0;border-radius:16px;padding:22px;width:min(380px,calc(100vw - 32px))}dialog::backdrop{background:rgba(20,24,51,.6)}dialog input{margin-bottom:12px}
+.toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:12px 18px;border-radius:12px;z-index:9;max-width:calc(100vw - 32px)}
+@media(max-width:640px){h1{font-size:34px}.hd b{font-size:21px}.hd small{display:none}.tiers{grid-template-columns:1fr}.big li{font-size:23px}.card{padding:16px}.hd button{padding:0 10px;font-size:17px}}
+</style>
+</head>
+<body>
+<header><div class="in hd"><a href="#" id="home">‹ All</a><b id="ttl">Listing appointment</b><small id="sv" role="status"></small><button type="button" id="mode" aria-pressed="false" hidden>Show seller</button></div>
+<nav class="steps" aria-label="Steps" id="nav" hidden><div class="in" id="steps"></div></nav></header>
+<main class="in" id="main"><p class="mut">Loading…</p></main>
+<div class="foot" id="foot" hidden><div class="in"><button class="btn" type="button" id="prev">‹ Back</button><button class="btn p" type="button" id="next">Next ›</button></div></div>
+<dialog id="pinDlg"><form id="pinForm"><h2>Host only</h2><input id="pinIn" inputmode="numeric" type="password" autocomplete="off" aria-label="PIN" placeholder="PIN"><p class="red" id="pinErr" hidden>Wrong PIN</p><button class="btn p" type="submit">Continue</button></form></dialog>
+<script>
+(function(){
+'use strict';
+var API=/^(localhost|127\.0\.0\.1)$/.test(location.hostname)?'http://localhost:8787':'https://soldmike-listings.broker-e2c.workers.dev';
+function $(i){return document.getElementById(i);}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function store(k,v){try{if(v===undefined)return JSON.parse(localStorage.getItem(k)||'null');localStorage.setItem(k,JSON.stringify(v));}catch(e){return null;}}
+function toast(m){var t=document.createElement('div');t.className='toast';t.setAttribute('role','status');t.textContent=m;document.body.appendChild(t);setTimeout(function(){t.remove();},2600);}
+function api(p,b){return fetch(API+'/api/hq/appt/'+p,{method:b?'POST':'GET',headers:{'X-OH-Pin':store('sm_oh_pin')||'','Content-Type':'application/json'},body:b?JSON.stringify(b):undefined}).then(function(r){if(r.status===401)throw 'pin';return r.json().catch(function(){return {};}).then(function(j){if(!r.ok)throw j.error||('Error '+r.status);return j;});});}
+function askPin(){return new Promise(function(res){var d=$('pinDlg');$('pinForm').onsubmit=function(e){e.preventDefault();store('sm_oh_pin',$('pinIn').value.trim());api('list').then(function(){d.close();res();}).catch(function(x){$('pinErr').textContent=x==='pin'?'Wrong PIN':String(x);$('pinErr').hidden=false;});};if(!d.open)d.showModal();});}
+
+var WEB='https://soldmike.com';
+// t: textarea, c: choice chips, p: private (never on the seller screen)
+var STEPS=[
+ {k:'intro',n:'Introduction',h:'Introduction',s:'Agenda, then why me',
+  qs:[['heard','How did you hear about me?'],['others','Have you spoken with other agents?']],
+  priv:[['opener_note','What I know before I walk in']],
+  say:'“I appreciate you having me in. I know you’ve got a lot going on right now, and I’m not here to waste your time. I’ve done my homework on the area, I have a clear strategy in mind, and I’ll be straight with you on pricing and what it’s going to take to get this sold in your timeframe. Let’s walk through what I’m seeing and go from there.”',
+  show:{h:'Today',li:['Tour the home','Hear your plans','Look at the numbers','How we market it','Next steps'],links:[['Client reviews','/reviews/'],['Case studies','/results/'],['Our team’s sales','/vow/search?status=sold&team=1'],['Our current listings','/listings/our-listings/']]}},
+ {k:'why',n:'Motivation',h:'Motivation and timeline',s:'The most important part',
+  qs:[['why','Why are you thinking of selling now?'],['list','When would you like to be listed?'],['move','When do you need to be moved?'],['hard','Is that date firm or flexible?',['Firm','Flexible','Flexible but tight']],['ifnot','What happens if it doesn’t sell by then?'],['matters','What matters most to you?',['Price','Timing','Ease']]],
+  priv:[['respect','Anything to respect this week (holidays, family)']],show:{h:'Your plans',li:['Why now','When you want to be listed','When you need to be moved','What matters most: price, timing or ease']}},
+ {k:'buy',n:'Buy & sell',h:'Buy and sell situation',s:'Where they’re going',
+  qs:[['sit','Situation',['Straight sale','Buying too','Already bought']],['going','Where are you going next? Have you found it?'],['reason','Reason',['Upsizing','Downsizing','Relocating','Neighbourhood change','Other']],['proceeds','Do you need this sale to buy?',['Yes','No','Not sure']],['lender','Have you spoken with a lender?',['Yes','No','Not needed']]],show:{h:'Your next move',li:['Where you’re going','Buying, selling, or both','How the dates line up']}},
+ {k:'home',n:'The home',h:'The home',s:'Walk through together',
+  qs:[['upg','What have you done to the home, when, with permits?'],['issue','Anything a buyer’s inspector would find?'],['occ','Who lives here now?',['Owner','Tenant','Vacant']],['ages','Ages: roof, furnace, A/C, windows'],['incl','What stays?'],['excl','What goes?'],['rent','What’s rented? (hot water tank, furnace…)']],
+  priv:[['cond','Condition: outside and inside'],['bsmt','Basement: finish, washroom, entrance, water'],['lot','Lot, garage, parking, survey']],show:{h:'Your home',li:['What you love about it','What you’ve improved','What stays and what goes']}},
+ {k:'price',n:'Price',h:'Price',s:'Lead with the numbers',
+  qs:[['think','What do you think it’s worth, and what is that based on?']],
+  priv:[['num','Their number'],['min','Minimum they need to walk away with'],['tiers','My four prices: offer date · market value · optimistic · overpriced']],
+  note:'Lead with the CMA and recommended strategy. Aligned: take the listing. Not aligned: walk. No negotiating on approach.',
+  show:{h:'How pricing works',tiers:[['Offer date price','A strategic price to bring the most buyers through and create competing offers.'],['Market value','What recent comparable sales say.'],['Optimistic price','The realistic high end. What we work toward.'],['Overpriced','Where the home simply won’t sell.']]}},
+ {k:'mkt',n:'Marketing',h:'Marketing and promotion',s:'How we promote it',
+  qs:[['noshow','Anything you would not want shown or posted?'],['love','What do you love about the home and the area?']],priv:[['best','Best selling point to lead with']],
+  show:{h:'How we market your home',li:['Photos, video, drone and floor plan','Your own property page','Social media: reels, posts and stories','Email to our database','MLS and REALTOR.ca','Weekly update to you'],links:[['How we market','/sell/how-we-market/'],['Videos','/videos/'],['Our current listings','/listings/our-listings/']]}},
+ {k:'dec',n:'Decision',h:'Decision',s:'Give them room. Build agreement with everyone in the room.',
+  qs:[['who','Who else needs to be part of this decision?'],['stop','What would stop you from moving ahead?']],
+  priv:[['voice','Dominant voice'],['emo','Emotional attachment',['Low','Medium','High','Unknown']],['style','How they decide',['Decisive','Needs time','Joint']]],
+  obj:[['“We want to list at a higher price and see what happens.”','I get it, but sitting on the market hurts you more than it helps. Buyers see days on market and they use it against you. My job is to get you the most money in the shortest time, and that starts with the right price on day one. If you want to test the market, I’m not the right fit, but if you want to sell, let’s do it properly.'],['“We need some time to think about it.”','Of course, take the time you need. I’ll send you a summary of everything we covered tonight so you have it in front of you. When’s a good time to reconnect, end of the week or early next week?'],['“Another agent told us it’s worth more.”','I’d love to see what they’re basing that on. I’ll show you exactly what’s sold, what’s sitting, and why my number is where it is. I’m not here to win the listing by telling you what you want to hear. I’m here to actually sell your home.'],['“Your commission is too high.”','Fair question. Let me show you what’s included and what we netted our last three sellers.'],['“We want to wait for spring.”','That makes sense. Fewer homes compete in the fall, so serious buyers see yours first. Want me to show you how many sold last month?'],['“We’ll just try it ourselves.”','Plenty of people try. If it doesn’t go the way you want, can I be the first call?']],
+  show:{h:'Your questions',li:['What else would you like to know?','Who else should be part of this?']}},
+ {k:'next',n:'Next steps',h:'Next steps',s:'Leave with a date',
+  qs:[['out','Outcome',['Signed','Deciding','Not now','Not a fit']],['fdate','Follow-up day and time'],['todo','What I promised to send']],
+  cks:[['c1','Listing agreement reviewed'],['c2','Data form started'],['c3','Everyone’s legal names and ID'],['c4','Prep and media dates talked through'],['c5','Follow-up time booked'],['c6','Thank-you text sent']],
+  show:{h:'What happens next',li:['Paperwork, reviewed line by line','Prepare: staging, photos, video','Launch everywhere at once','Showings, feedback, weekly updates','Offers reviewed together','Support through closing']}}];
+var S={rec:null,i:0,seller:false,t:null,dirty:false,list:null};
+function v(k){return S.rec.v[k]||'';}
+function field(q){var k=q[0];if(q[2])return '<div class="q"><label>'+esc(q[1])+'</label><div class="chips">'+q[2].map(function(o){return '<button type="button" data-c="'+k+'" data-o="'+esc(o)+'" aria-pressed="'+(v(k)===o)+'">'+esc(o)+'</button>';}).join('')+'</div></div>';
+  return '<div class="q"><label for="f_'+k+'">'+esc(q[1])+'</label><textarea id="f_'+k+'" data-f="'+k+'" rows="2">'+esc(v(k))+'</textarea></div>';}
+function links(a){return '<div class="links" style="margin-top:18px">'+a.map(function(l){return '<a class="btn" target="_blank" rel="noopener" href="'+WEB+l[1]+'">'+esc(l[0])+'</a>';}).join('')+'</div>';}
+function render(){
+  var r=S.rec;$('nav').hidden=$('foot').hidden=$('mode').hidden=!r;$('home').hidden=S.seller;
+  if(!r)return home();
+  $('home').textContent='‹ All';$('home').href='#';
+  var st=STEPS[S.i];$('ttl').textContent=S.seller?(r.addr||'Your home'):(r.addr||r.name||'Appointment');$('mode').textContent=S.seller?'My notes':'Show seller';$('mode').setAttribute('aria-pressed',S.seller);$('sv').hidden=S.seller;
+  $('steps').innerHTML=STEPS.map(function(x,i){return '<button type="button" data-i="'+i+'"'+(i===S.i?' aria-current="step"':'')+'>'+(i+1)+'. '+x.n+'</button>';}).join('');
+  var cur=$('steps').querySelector('[aria-current]');$('steps').scrollLeft=Math.max(0,cur.offsetLeft-$('steps').clientWidth/2+cur.clientWidth/2);
+  $('prev').disabled=S.i===0;$('next').textContent=S.i===STEPS.length-1?(S.seller?'Done':'Finish'):'Next ›';
+  var h='';
+  if(S.seller){var w=st.show;h='<h1>'+esc(w.h)+'</h1><div class="card" style="margin-top:18px">'+(w.tiers?'<div class="tiers">'+w.tiers.map(function(t){return '<div><b>'+esc(t[0])+'</b>'+esc(t[1])+'</div>';}).join('')+'</div>':'<ul class="big">'+w.li.map(function(l){return '<li>'+esc(l)+'</li>';}).join('')+'</ul>')+(w.links?links(w.links):'')+'</div>';}
+  else{h='<h1>'+esc(st.h)+'</h1><p class="lead">'+esc(st.s)+'</p>';
+    if(st.say)h+='<div class="card"><h2>Opener</h2><p class="say">'+esc(st.say)+'</p></div>';
+    h+='<div class="card"><h2>Ask</h2>'+st.qs.map(field).join('')+'</div>';
+    if(st.cks)h+='<div class="card"><h2>Before I leave</h2>'+st.cks.map(function(c){return '<label class="ck"><input type="checkbox" data-k="'+c[0]+'"'+(v(c[0])?' checked':'')+'><span>'+esc(c[1])+'</span></label>';}).join('')+'</div>';
+    if(st.note)h+='<div class="card priv"><h2>My approach</h2><p class="say">'+esc(st.note)+'</p></div>';
+    if(st.obj)h+='<div class="card priv"><h2>Objections</h2>'+st.obj.map(function(o){return '<details class="obj"><summary>'+esc(o[0])+'</summary><p class="say">'+esc(o[1])+'</p></details>';}).join('')+'</div>';
+    if(st.priv)h+='<div class="card priv"><h2>My notes</h2>'+st.priv.map(field).join('')+'</div>';
+    if(st.k==='next')h+='<div class="card"><h2>After</h2><p class="mut">Copies a prompt with your answers. Paste it to Claude for the one-page seller profile, likely objections and follow-up. Nothing is sent.</p><button class="btn p" type="button" id="copy">Copy summary for Claude</button></div>';}
+  $('main').innerHTML=h;
+}
+function home(){$('ttl').textContent='Listing appointment';$('home').textContent='‹ Sellers';$('home').href='/hq/agents/#sellers';$('sv').textContent='';
+  if(!S.list){$('main').innerHTML='<p class="mut">Loading…</p>';return;}
+  var used={};S.list.items.forEach(function(x){if(x.card)used[x.card]=1;});
+  $('main').innerHTML='<h1>Appointments</h1><p class="lead">Start one, or pick up where you left off.</p><div class="card"><h2>New</h2><form id="nw"><div class="q"><label for="nA">Address</label><input type="text" id="nA" autocomplete="off"></div><div class="q"><label for="nN">Seller</label><input type="text" id="nN" autocomplete="off"></div><button class="btn p" type="submit">Start</button></form></div>'
+   +(S.list.items.length?'<div class="card"><h2>Saved</h2>'+S.list.items.map(function(x){return '<div class="row"><div><b>'+esc(x.addr||x.name)+'</b><small>'+esc(x.addr?x.name:'')+(x.addr&&x.name?' · ':'')+new Date(x.updated).toLocaleDateString('en-CA',{month:'short',day:'numeric'})+'</small></div><button class="btn" type="button" data-arch="'+x.id+'">Archive</button><button class="btn p" type="button" data-open="'+x.id+'">Open</button></div>';}).join('')+'</div>':'')
+   +(S.list.cards.some(function(c){return !used[c.id];})?'<div class="card"><details><summary style="cursor:pointer;min-height:48px;font-weight:600;display:flex;align-items:center">From my seller board</summary>'+S.list.cards.filter(function(c){return !used[c.id];}).map(function(c){return '<div class="row"><div><b>'+esc(c.addr||c.name)+'</b><small>'+esc(c.addr?c.name:'')+'</small></div><button class="btn" type="button" data-card="'+c.id+'">Start</button></div>';}).join('')+'</details></div>':'');}
+function fail(e){if(e==='pin')return askPin().then(boot);toast(String(e));}
+function loadList(){S.rec=null;S.list=null;S.seller=false;render();return api('list').then(function(j){S.list=j;render();}).catch(fail);}
+function open(id){return api('get?id='+id).then(function(j){S.rec=j;S.i=0;S.seller=false;history.replaceState(null,'',location.pathname+'#'+id);$('sv').textContent='Saved';render();window.scrollTo(0,0);}).catch(fail);}
+// saves one at a time, newest answers last
+function save(){clearTimeout(S.t);if(!S.rec||!S.dirty)return Promise.resolve();if(S.busy)return S.busy.then(save);
+  var r=S.rec;S.dirty=false;$('sv').textContent='Saving…';
+  S.busy=api('save',{id:r.id,addr:r.addr,name:r.name,v:r.v}).then(function(){$('sv').textContent=S.dirty?'Saving…':'Saved';},function(e){S.dirty=true;$('sv').textContent='Not saved';S.bad=e;if(e==='pin')askPin().then(save);else S.t=setTimeout(save,5000);}).then(function(){S.busy=null;});
+  return S.busy;}
+function touch(){S.dirty=true;$('sv').textContent='Saving…';clearTimeout(S.t);S.t=setTimeout(save,700);}
+function leave(){return save().then(function(){if(S.dirty){toast('Not saved yet. Check the connection.');return false;}history.replaceState(null,'',location.pathname);loadList();return true;});}
+function summary(){var r=S.rec,o=['Seller profile for '+(r.addr||r.name)+(r.addr&&r.name?' ('+r.name+')':'')+'. From my answers below, follow 2nd Brain: Real Estate/Listing Appointment.md and the listing-consultation skill: (1) one-page seller profile, (2) three likely objections and how I handle each, (3) my next step and follow-up. Say what is still missing. Don’t send anything to anyone.',''];
+  STEPS.forEach(function(s){var a=s.qs.concat(s.priv||[]).filter(function(q){return v(q[0]);}).map(function(q){return '- '+q[1]+': '+v(q[0]);});(s.cks||[]).forEach(function(c){if(v(c[0]))a.push('- Done: '+c[1]);});if(a.length)o.push(s.h.toUpperCase(),a.join('\n'),'');});return o.join('\n');}
+document.addEventListener('click',function(e){var b=e.target.closest('button,a');if(!b)return;var d=b.dataset;
+  if(b.id==='home'&&S.rec){e.preventDefault();leave();return;}
+  if(d.i){S.i=+d.i;render();window.scrollTo(0,0);return;}
+  if(b.id==='prev'){S.i=Math.max(0,S.i-1);render();window.scrollTo(0,0);return;}
+  if(b.id==='next'){if(S.i<STEPS.length-1){S.i++;render();window.scrollTo(0,0);}else if(S.seller){S.i=0;render();window.scrollTo(0,0);}else leave();return;}
+  if(b.id==='mode'){S.seller=!S.seller;render();window.scrollTo(0,0);return;}
+  if(d.c){S.rec.v[d.c]=v(d.c)===d.o?'':d.o;b.parentNode.querySelectorAll('button').forEach(function(x){x.setAttribute('aria-pressed',S.rec.v[d.c]===x.dataset.o);});touch();return;}
+  if(d.open)return open(d.open);
+  if(d.card)return api('open',{card:+d.card}).then(function(j){return open(j.id);}).catch(fail);
+  if(d.arch){if(confirm('Archive this appointment? It leaves this list.'))api('archive',{id:+d.arch}).then(loadList).catch(fail);return;}
+  if(b.id==='copy'){navigator.clipboard.writeText(summary()).then(function(){toast('Copied. Paste it to Claude.');},function(){toast('Could not copy');});}
+});
+document.addEventListener('input',function(e){var k=e.target.dataset&&e.target.dataset.f;if(k){S.rec.v[k]=e.target.value;touch();}});
+document.addEventListener('change',function(e){var k=e.target.dataset&&e.target.dataset.k;if(k){S.rec.v[k]=e.target.checked?1:'';touch();}});
+document.addEventListener('submit',function(e){if(e.target.id!=='nw')return;e.preventDefault();var a=$('nA').value.trim(),n=$('nN').value.trim();if(!a&&!n)return toast('Add an address or a name');api('open',{addr:a,name:n}).then(function(j){return open(j.id);}).catch(fail);});
+document.addEventListener('visibilitychange',function(){if(document.hidden)save();});
+window.addEventListener('beforeunload',function(e){if(S.dirty||S.busy){save();e.preventDefault();}});
+function boot(){var c=new URLSearchParams(location.search).get('card'),h=location.hash.slice(1);
+  if(/^\d+$/.test(h))return open(h);
+  if(/^\d+$/.test(c||''))return api('open',{card:+c}).then(function(j){return open(j.id);}).catch(fail);
+  return loadList();}
+boot();
+})();
+</script>
+</body>
+</html>
