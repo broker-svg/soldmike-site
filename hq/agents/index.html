@@ -114,6 +114,7 @@ a{color:var(--navy)}
 .pc .note{font-size:15px;overflow-wrap:anywhere;white-space:pre-line}
 .due{display:grid;gap:2px}
 .due .dh{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+.due .dh2{font-size:13px;font-weight:700;color:var(--navy);margin-top:10px}
 .due label{display:flex;gap:10px;align-items:flex-start;font-size:15px;line-height:1.3;cursor:pointer;padding:4px 0}
 .due input{width:20px;height:20px;margin:0;flex:none;accent-color:var(--green)}
 .due input:checked+span{color:var(--muted);text-decoration:line-through}
@@ -621,13 +622,21 @@ var PHASES=[
   '#Condo only','Status certificate ordered','Monthly fee and what it covers','Parking and locker numbers, owned or exclusive use','Management company contact','Amenities, pet and rental rules','Special assessments or big projects coming','Fobs, keys and their replacement cost',
   '#Access','Owner-occupied, vacant or tenanted','Tenant: lease, rent, notice needed','Pets, alarm, lockbox spot','Best showing times',
   '#Marketing','Top features and upgrades list','What they love about the area','Feature sheet details'],tools:['intake','followup','listdocs'],next:'Coming soon'},
- {k:'prep',n:'Coming soon',s:'Signed, getting the home ready',items:['Listing agreement + data form signed','Intake complete (nothing left on the missing list)','Listing Plan with dates','Stager walkthrough booked','Seller declutter day','Staging day','Photos, video, drone, floor plan (TPM)','Listing description approved','Feature sheet approved','Coming soon post (keyword for DMs)'],tools:['listplan','listdesc','listdocs'],next:'Going live'},
+ {k:'prep',n:'Coming soon',s:'Signed, getting the home ready',items:['Listing agreement + data form signed','Intake complete (nothing left on the missing list)','Listing Plan with dates','Stager walkthrough booked','Seller declutter day','Staging day','Photos, video, drone, floor plan (TPM)','Listing description approved','Feature sheet approved','Coming soon post (keyword for DMs)',
+  '#MLS data form 290 · freehold (every ★ filled)','290: ARN, PIN, legal description','290: Area, municipality, community, full address, postal code','290: Fronting on, lot frontage, depth, size code, cross streets','290: List price, list date, expiry date, seller names','290: Property type, style, type of dwelling, sq ft range','290: Beds above grade, full baths, kitchens','290: Basement type and features','290: Garage type + spaces, total parking, parking type','290: Heating type + fuel, A/C, pool, sewers, water, exterior','290: Rooms: kitchen, primary, beds 2 and 3 (level + size)','290: Inclusions, exclusions, rental items','290: Remarks, showing instructions, offer date','290: Taxes + year, possession (not on the paper list)','290: Optional fields checked, nothing left to ask the seller'],tools:['listplan','listdesc','listdocs'],next:'Going live'},
  {k:'live',n:'Going live',s:'Launch day',items:['MLS live, details checked','Showing instructions on MLS','Admin prep email sent','Sign and lockbox installed','Property website / links live','Just listed posts scheduled','Added to the newsletter','Seller told it’s live, with the links'],tools:['instructions'],next:'For sale'},
  {k:'sale',n:'For sale',s:'Weekly updates',items:['Weekly Listing Update sent to the seller','Showing feedback chased','Open house (if planned)','Competition checked (new listings, price changes)','Price review at day 14 if no offer date'],tools:['update'],next:'Offer night'},
  {k:'offer',n:'Offer night',s:'Offers in, decision made',items:['Offer registration deadline set','Offer Day email sent to the seller','Offers reviewed and summarized','Seller call: walk through every offer','Send offers back for improvement or accept','Signed offer and deposit details to the lawyer'],tools:['offers'],next:'Sold to closed'},
- {k:'sold',n:'Sold to closed',s:'From firm to keys',items:['Conditions waived / firm','Deposit received','SOLD sign + Just Sold post','Lawyer details exchanged','Closing day: keys handed over','Closing gift sent','Ask for a Google review','Add to past-client follow-up'],tools:['justsold'],next:''}];
+ {k:'sold',n:'Sold to closed',s:'From accepted offer to keys',items:['#1. Right after acceptance','Signed agreement to all parties (Michael)','Deposit received','Submit deal to the brokerage (Admin)','Signed agreement to both lawyers (Admin)','Lawyer details exchanged','Update Follow Up Boss with the deal (Admin)','Sellers told next steps and closing timeline (Michael)','SOLD sign + Just Sold post',
+  '#2. Condition period','Condition deadlines on the calendar (Admin)','Buyer’s agent followed up daily (Michael)','Written financing approval received (Michael)','Inspection done, if there is one (Michael)','Signed waiver or fulfillment before the deadline (Michael)','Conditions waived / firm','Sellers told the deal is firm (Michael)',
+  '#3. Before closing','Closing date confirmed with both lawyers (Admin)','Deposit confirmed in the brokerage trust account (Admin)','Outstanding documents to the lawyers (Admin)','Final walkthrough booked, 24–48 hours before (Michael)','Inclusions in place, exclusions removed (Michael)','Rental items: transfer or removal arranged (Michael)','Utilities set up for transfer, 2 weeks before (Michael)','Lockbox stays on as agreed (Admin)','Keys, openers, manuals ready (Michael)',
+  '#4. Closing day','Lawyer confirms closed and funds released (Michael)','Sellers out, keys ready (Michael)','Closing day: keys handed over','Lockbox and sign removed (Michael)','Closing message sent to the sellers (Michael)','Follow Up Boss: move to past client (Admin)','1-year anniversary on the calendar (Admin)','Closing gift sent','Ask for a Google review','Add to past-client follow-up'],tools:['deal','justsold'],next:''}];
 var PH={};PHASES.forEach(function(x){PH[x.k]=x;});
 function dueOf(items){var sec='',out=[];items.forEach(function(t){if(t[0]==='#')sec=t.slice(1);else out.push(sec&&sec!=='Win or lose'?sec+': '+t:t);});return out;}
+function plain(items){return items.filter(function(t){return t[0]!=='#';});}
+function condoLike(c){return /condo|apartment|commercial|lease/i.test(((c.facts||{}).ptype||'')+' '+((c.facts||{}).type||''));}
+function stDue(st,c){return st.due.filter(function(d){return !/^290: /.test(d)||!condoLike(c);});} // Form 290 is freehold only
+function secOf(k){var p=PH[k],o={},sec='';if(p)p.items.forEach(function(t){if(t[0]==='#')sec=t.slice(1);else{o[t]=sec;}});return o;}
 // seller stage -> playbook phase (Toolkit › Listing Prep). Going live sits inside For sale.
 var STAGE_PHASE={prosp:'appt',follow:'follow',signed:'prep',soon:'prep',sale:'sale',offer:'offer',sold:'sold'};
 var SSTAGES=[
@@ -636,10 +645,10 @@ var SSTAGES=[
   {k:'poss',n:'Possibility',g:'Leads',c:'#7C86B8',p:['homeeval','sellerintro'],due:['Send the Home Evaluation','Book a walk-through','Add to Daily Seller list']},
   {k:'prosp',n:'Listing appointment',g:'Leads',c:'#4A5592',p:PH.appt.tools,due:PH.appt.items},
   {k:'follow',n:'Follow-up & intake',g:'Leads',c:'#33409A',p:PH.follow.tools,due:dueOf(PH.follow.items)},
-  {k:'soon',n:'Coming soon',g:'Before listing',c:'#26338A',p:PH.prep.tools,due:PH.prep.items},
+  {k:'soon',n:'Coming soon',g:'Before listing',c:'#26338A',p:PH.prep.tools,due:plain(PH.prep.items),secs:secOf('prep')},
   {k:'sale',n:'For sale',g:'During',c:'#D7141E',p:['update','instructions'],due:PH.live.items.map(function(t){return 'Launch: '+t;}).concat(PH.sale.items)},
   {k:'offer',n:'Offer night',g:'During',c:'#B0101A',p:PH.offer.tools,due:PH.offer.items},
-  {k:'sold',n:'Sold, before closing',g:'After sold',c:'#1B7A3E',p:PH.sold.tools,due:PH.sold.items},
+  {k:'sold',n:'Sold, before closing',g:'After sold',c:'#1B7A3E',p:PH.sold.tools,due:plain(PH.sold.items),secs:secOf('sold')},
   {k:'closed',n:'Past client',g:'Done',c:'#545B78',p:['justsold'],due:['Keys handed over','Closing gift sent','Ask for a Google review','Add to past-client nurture']}
 ];
 var BSTAGES=[
@@ -677,9 +686,9 @@ var PROMPTS={
       {k:'lockbox',l:'Lockbox # and where it is',full:1,ph:'#5450, railing left of the building, OP Team sticker'},{k:'notify',l:'Who to tell when a showing is booked',full:1,ph:'Email both sellers'},
       {k:'keys',l:'Keys / fob',ph:'Fob, $100 to replace if lost'},{k:'occ',l:'Occupied / pets',ph:'Owner-occupied, dog in crate'},{k:'docs',l:'Documents available',full:1,ph:'Status certificate, floor plan, survey'},
       {k:'offers',l:'Offer rules',ta:1,full:1,ph:'Register by 5 PM on offer night, irrevocable…'},{k:'rules',l:'Other showing rules',ta:1,full:1,ph:'Remove shoes, lights on, leave cards'}]},
-  intake:{files:1,label:'Listing Intake',skill:'',lead:'Listing intake for this property. From the details below and the files I uploaded (status certificate, survey, bills, old listing, GeoWarehouse…), give me: (1) the MLS data form details in form order, (2) a feature sheet draft, and (3) a "still missing" list grouped as Paperwork / Property facts / Condo / Access / Marketing, worded so I can text or email it straight to the seller. Use Arbors Lane as the model (2nd Brain: Listings/404-100 Arbors Lane.md). Save it all in a new 2nd Brain note Listings/<address>.md. Don’t send anything to anyone.',
+  intake:{files:1,label:'Listing Intake',skill:'',lead:'Listing intake for this property. From the details below and the files I uploaded (status certificate, survey, bills, old listing, GeoWarehouse…), give me: (1) the MLS data form details in form order (freehold: every ★ field in 2nd Brain: Rules/MLS Data Forms.md › Form 290 freehold checklist), (2) a feature sheet draft, and (3) a "still missing" list grouped as Paperwork / Property facts / Condo / Access / Marketing, worded so I can text or email it straight to the seller. Use Arbors Lane as the model (2nd Brain: Listings/404-100 Arbors Lane.md). Save it all in a new 2nd Brain note Listings/<address>.md. Don’t send anything to anyone.',
     fields:[{k:'addr',l:'Property address',req:1,full:1},'client','email','phone',{k:'ptype',l:'Type',opts:['Freehold','Condo apartment','Condo townhouse','Freehold townhouse (POTL)']},{k:'sellers',l:'All sellers’ legal names (as on title)',full:1},
-      {k:'legal',l:'Legal description / PIN / ARN',full:1,ph:'From GeoWarehouse'},'sqft',{k:'lot',l:'Lot size'},{k:'built',l:'Year built'},{k:'taxes',l:'Taxes (year)'},{k:'util',l:'Monthly utilities',ph:'Hydro $120, gas $90, water $60'},
+      {k:'legal',l:'Legal description / PIN / ARN',full:1,ph:'From GeoWarehouse'},'sqft',{k:'lot',l:'Lot size'},{k:'built',l:'Year built'},{k:'taxes',l:'Taxes (year)'},{k:'mlsx',l:'Fronting on, frontage × depth, cross streets, sq ft range, sewers / water',full:1,ph:'W, 36 × 110 ft, Rutherford / Islington, 2500–3000, municipal'},{k:'util',l:'Monthly utilities',ph:'Hydro $120, gas $90, water $60'},
       {k:'systems',l:'Ages: furnace, A/C, roof, windows',ta:1,full:1},{k:'reno',l:'Renovations (what, when, permits)',ta:1,full:1},{k:'rent',l:'Rental items',full:1,ph:'Hot water tank (Enercare) or none'},
       {k:'incl',l:'Inclusions',ta:1,full:1},{k:'excl',l:'Exclusions',full:1},
       {k:'rooms',l:'Rooms (beds, other rooms)',ph:'4 bed, office, main floor family'},{k:'bathpc',l:'Bathrooms and pieces',ph:'Main 2pc, upper 4pc + 5pc'},
@@ -696,7 +705,7 @@ var PROMPTS={
       {k:'golive',l:'Go-live date',type:'date',nodef:1},{k:'offerdate',l:'Offer date',type:'date',nodef:1},{k:'stage',l:'Where we are now',opts:['Before the listing appointment','Listing agreement signed','Prepping to go live','Live']},
       {k:'staging',l:'Staging',opts:['Stager','Seller declutters only','None']},{k:'media',l:'Media',ph:'TPM photos, video, drone, floor plan'},
       {k:'done',l:'Already booked / done',ta:1,full:1,ph:'Stager walkthrough Thu 4:30, photos Mon'},'notes']},
-  listdocs:{files:1,label:'Listing Documents',skill:'form290-filler',lead:'Prepare the listing paperwork for this property. I’m attaching the blank editable PDFs (and the GeoWarehouse report). Fill them from the details below, the same way as Arbors Lane (2nd Brain: Listings/404-100 Arbors Lane.md), and use the fixed brokerage block from Rules/MLS Data Forms.md. Only fill what you know for sure. At the end, list every field you left blank or weren’t sure about so I can check it. Save the filled PDFs and tell me where they are. Don’t send them to anyone.',
+  listdocs:{files:1,label:'Listing Documents',skill:'form290-filler',lead:'Prepare the listing paperwork for this property. I’m attaching the blank editable PDFs (and the GeoWarehouse report). Fill them from the details below, the same way as Arbors Lane (2nd Brain: Listings/404-100 Arbors Lane.md), and use the fixed brokerage block from Rules/MLS Data Forms.md. Before finishing a freehold data form, check it field by field against 2nd Brain: Rules/MLS Data Forms.md › Form 290 freehold checklist and list every ★ field that is blank or unsure. Only fill what you know for sure. At the end, list every field you left blank or weren’t sure about so I can check it. Save the filled PDFs and tell me where they are. Don’t send them to anyone.',
     fields:[{k:'addr',l:'Property address',req:1,full:1},{k:'sellers',l:'Sellers’ full legal names',req:1,full:1},{k:'ptype',l:'Type (sets the forms)',opts:['Freehold: OREA 271 + PropTx 290','Condo: OREA 271 + PropTx 291','Commercial lease: PropTx 592','Other (say below)']},
       {k:'attach',l:'What I’m attaching',full:1,ph:'Blank 271 + 290 PDFs, GeoWarehouse report'},{k:'price',l:'List price'},{k:'start',l:'Listing start',type:'date',nodef:1},{k:'end',l:'Listing end',type:'date',nodef:1},{k:'holdover',l:'Holdover (days)',ph:'90'},
       {k:'comm',l:'Commission',full:1,ph:'4.25% total: 2.5% co-op, 1.5% listing, 0.25% expenses'},{k:'pin',l:'PIN / ARN',ph:'From GeoWarehouse'},{k:'poss',l:'Possession',ph:'60–90 days / TBA'},
@@ -707,6 +716,9 @@ var PROMPTS={
       {k:'incl',l:'Inclusions',full:1},{k:'buyer',l:'Who will buy it',ph:'First-time buyer, downsizer, investor'},{k:'attach',l:'What I’m attaching',ph:'Photos, feature sheet'},'notes']},
   offers:{files:1,label:'Offer Summary',skill:'offer-review-summary',lead:'Summarize the offers on this listing for my seller.',
     fields:['addr','client','email',{k:'offerdate',l:'Offer date',type:'date'},{k:'count',l:'Number of offers'},{k:'list',l:'List price'},{k:'detail',l:'Offer details (or say "PDFs attached")',ta:1,full:1}]},
+  deal:{files:1,label:'Deal Checklist',skill:'deal-checklist',lead:'Make the sold-to-closing checklist for this deal in the 4 phases of 2nd Brain: Real Estate/Deal Checklist.md, each task with owner (Michael or Admin) and a real date worked back from the dates below. Flag anything TBD. Add the closing message at the end, written for my side of the deal (seller or buyer). Save it as a 2nd Brain note with the listing. Don’t send anything or add calendar events until I say so.',
+    fields:[{k:'addr',l:'Property address',req:1,full:1},{k:'side',l:'My client',opts:['Seller','Buyer','Both']},{k:'sellers',l:'Sellers'},{k:'buyers',l:'Buyers'},{k:'price',l:'Accepted price'},{k:'accepted',l:'Accepted on',type:'date',nodef:1},{k:'dep',l:'Deposit + due date',ph:'$50,000, 24 hours'},{k:'closing',l:'Closing date',type:'date',nodef:1},
+      {k:'cond',l:'Conditions + deadlines',ta:1,full:1,ph:'Financing, 5 business days, Mar 24'},{k:'agent',l:'Other agent + brokerage',full:1},{k:'lawb',l:'Buyer’s lawyer'},{k:'laws',l:'Seller’s lawyer'},{k:'incl',l:'Inclusions',full:1},{k:'excl',l:'Exclusions / rentals',full:1},{k:'terms',l:'Special terms',ta:1,full:1}]},
   justsold:{label:'Just Sold',skill:'metricool-scheduler',lead:'Make Just Sold posts with the approved Sold graphic (2nd Brain: Marketing/Sold Posts.md). For each address: find the hero exterior in the Drive sold folder, get sold price, list price and community from soldmike.ca Team Sold Listings, add the OVER ASKING sticker only if sold > list, render with Sold Posts/render_sold.py, write the JUST SOLD caption, show me the graphics first, then schedule in Metricool (SoldMike) on the next Monday slots and update the Agent Desk listings list.',
     fields:[{k:'addrs',l:'Addresses',ta:1,full:1,req:1},{k:'showprice',l:'Show the sold price',opts:['Yes','No']},'notes']},
   listings:{label:'Send Listings',skill:'draft-outreach',lead:'Draft an email sending these listings to my buyer.',
@@ -1110,9 +1122,10 @@ function moveRow(kind,c){var ST=stagesOf(kind);
    +(c.fub?'<a class="lk" href="'+fubUrl(c.fub)+'" target="_blank" rel="noopener">FUB</a>':kind==='s'?'<button type="button" class="lk" data-cfub="'+c.id+'">Add to FUB</button>':'')+'</div>';}
 function phaseStrip(stage){var map={prosp:0,follow:1,signed:2,soon:2,sale:4,offer:5,sold:6,closed:7},n=map[stage];if(n==null)return '';
   return '<div class="pstrip" title="Phase '+Math.min(n+1,7)+' of 7">'+PHASES.map(function(x,i){return '<i class="'+(i<n||n===7?'d':i===n||(n===4&&i===3)?'c':'')+'" title="'+esc(x.n)+'"></i>';}).join('')+'</div>';}
+function secDone(st,due,done,sc){var a=due.filter(function(x){return st.secs[x]===sc;}),n=a.filter(function(x){return done.indexOf(x)>=0;}).length;return n===a.length?'done ✓':n+' of '+a.length;}
 function sellerCard(c,st){
-  var L=liveOf('s',c),all=['sellerintro','homeeval','cma','listpres','followup','intake','listplan','listdocs','listdesc','instructions','update','offers','justsold'],hot=st.p,rest=all.filter(function(k){return hot.indexOf(k)<0;});
-  var done=c.checks||[],left=st.due.filter(function(d){return done.indexOf(d)<0;}).length;
+  var L=liveOf('s',c),all=['sellerintro','homeeval','cma','listpres','followup','intake','listplan','listdocs','listdesc','instructions','update','offers','deal','justsold'],hot=st.p,rest=all.filter(function(k){return hot.indexOf(k)<0;});
+  var due=stDue(st,c),done=c.checks||[],left=due.filter(function(d){return done.indexOf(d)<0;}).length;
   var title=c.addr||c.name||L.name||'No name',sub=c.addr?(c.name||L.name):'';
   var open=!!S.exp[c.id];
   var head='<div class="t"><div class="th"><b>'+dot('s',c)+esc(title)+'</b><button type="button" class="cx" data-cexp="'+c.id+'" aria-expanded="'+open+'" aria-label="'+(open?'Hide':'Show')+' details">'+(open?'−':'+')+'</button></div>'+(sub?'<span>'+esc(sub)+'</span>':'')+'</div>'+phaseStrip(c.stage)
@@ -1121,7 +1134,7 @@ function sellerCard(c,st){
   return '<article class="pc">'+head
     +(factsLine('s',c)?'<div class="fl2">'+esc(factsLine('s',c))+'</div>':'')+featChips(c,3)
     +(c.note?'<div class="note">'+esc(c.note)+'</div>':'')
-    +'<div class="due"><div class="dh">Due now · '+(left?left+' left':'all done')+'</div>'+st.due.map(function(d){return '<label><input type="checkbox" data-check="'+c.id+'" value="'+esc(d)+'"'+(done.indexOf(d)>=0?' checked':'')+'><span>'+esc(d)+'</span></label>';}).join('')+'</div>'
+    +'<div class="due"><div class="dh">Due now · '+(left?left+' left':'all done')+'</div>'+due.map(function(d,di){var sc=st.secs&&st.secs[d],hd=sc&&(di===0||st.secs[due[di-1]]!==sc)?'<div class="dh2">'+esc(sc)+' · <span data-seccount="'+esc(sc)+'">'+secDone(st,due,done,sc)+'</span></div>':'';return hd+'<label><input type="checkbox" data-check="'+c.id+'" value="'+esc(d)+'"'+(done.indexOf(d)>=0?' checked':'')+'><span>'+esc(d)+'</span></label>';}).join('')+'</div>'
     +'<div class="pacts">'+hot.map(function(k){return pbtn(k,'s',c.id,1);}).join('')+'</div>'
     +'<button type="button" class="morebtn" data-more aria-expanded="false">All prompts</button><div class="pacts" hidden>'+rest.map(function(k){return pbtn(k,'s',c.id);}).join('')+'</div>'
     +moveRow('s',c)+'</article>';
@@ -2077,6 +2090,7 @@ document.addEventListener('change',function(e){var t=e.target,ds=t.dataset;
       if(st==='closed'){S.closed[kind]=true;}render();refreshViewing();toast('Moved to '+stagesOf(kind).filter(function(x){return x.k===st;})[0].n+(S.tagSync&&c.fub&&j.tagged===false?' (FUB tag not updated)':''));}).catch(fail);return;}
   if(ds.check){var c2=cardById('s',ds.check),v=t.value,ch=(c2.checks||[]).filter(function(x){return x!==v;});if(t.checked)ch.push(v);c2.checks=ch;
     var card=t.closest('.pc'),left=$$('[data-check]',card).filter(function(x){return !x.checked;}).length;$('.dh',card).textContent='Due now · '+(left?left+' left':'all done');
+    $$('[data-seccount]',card).forEach(function(e){var st=SSTAGES.filter(function(x){return x.k===c2.stage;})[0];if(st)e.textContent=secDone(st,stDue(st,c2),ch,e.dataset.seccount);});
     post('desk/card/checks',{id:c2.id,checks:ch}).catch(fail);return;}
   if(ds.td){post('item/done',{id:+ds.td,done:t.checked}).then(function(){var x=S.todos.filter(function(y){return y.id===+ds.td;})[0];if(x)x.done=t.checked?1:0;}).catch(fail);return;}
 });
