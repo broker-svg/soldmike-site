@@ -46,7 +46,8 @@ h3{font:700 20px/1.2 var(--display);text-transform:uppercase;letter-spacing:.04e
 .warnb{background:#FFF4DF;border:1px solid #EBCB8F;border-radius:12px;padding:12px 14px;margin-bottom:16px}
 table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}th{font:700 17px var(--display);text-transform:uppercase;letter-spacing:.03em;color:var(--muted);text-align:right;padding:6px 6px;border-bottom:2px solid var(--line)}th:first-child,td:first-child{text-align:left}td{padding:9px 6px;border-bottom:1px solid var(--line);text-align:right}.tw{overflow-x:auto}
 tr.tot td{font-weight:700;border-top:2px solid var(--navy)}
-.ck{display:flex;gap:12px;align-items:center;min-height:50px;padding:6px 0;border-top:1px solid var(--line);cursor:pointer}.ck input{width:28px;height:28px;accent-color:var(--green);flex:none;margin:0}.ck.on span{color:var(--muted);text-decoration:line-through}
+.ck{display:flex;gap:12px;align-items:center;min-height:50px;padding:6px 0;border-top:1px solid var(--line);cursor:pointer}.ck input{width:28px;height:28px;accent-color:var(--green);flex:none;margin:0}.ck.on span{color:var(--muted)}.ck.on .gl{text-decoration:line-through}
+.ti{display:flex;align-items:center;gap:8px;border-top:1px solid var(--line)}.ti .ck{border-top:0;flex:1;min-width:0}.ck small{display:block;color:var(--muted);font-size:16px}.ck .t{display:block}.ck.on small{text-decoration:none}.ck.on span{text-decoration:none}.ck.on .t{text-decoration:line-through}.x{border:0;background:none;width:44px;height:44px;font-size:22px;color:var(--muted);cursor:pointer;flex:none}.addf{display:flex;gap:8px;margin-top:12px}.addf input{flex:1;min-width:0;border:1px solid #BDC5DE;border-radius:10px;padding:8px 12px;min-height:48px}
 .st{display:flex;align-items:center;gap:8px;padding:8px 0;border-top:1px solid var(--line)}.st>span{flex:1;min-width:0}.st small{display:block;color:var(--muted);font-size:16px}
 .pm{display:flex;align-items:center;gap:4px}.pm button{width:46px;height:46px;border-radius:12px;border:1px solid #BDC5DE;background:#fff;font-size:24px;cursor:pointer;line-height:1}.pm button:last-child{background:var(--navy);color:#fff;border-color:var(--navy)}.pm b{min-width:52px;text-align:center;font:800 28px var(--display)}.pm b.ok{color:var(--green)}.auto{min-width:148px;text-align:center;font:800 28px var(--display)}.auto small{font:500 15px var(--body)}
 .dots{display:grid;grid-template-columns:repeat(10,1fr);gap:5px;max-width:520px;margin:12px 0}.dots i{aspect-ratio:1;border:2px solid #C5CCE2;border-radius:8px;display:grid;place-items:center;font:600 15px var(--body);color:var(--muted);font-style:normal}.dots i.on{background:var(--green);border-color:var(--green);color:#fff}.dots i.g{border-color:var(--navy)}
@@ -97,8 +98,8 @@ var GUIDE=[['First action',['Inquiries','Hot follow-ups','Appointment confirmati
 ['Pool: action leads',['Open house','Door knockers','Events','Just sold','Just listed']],['Pool: incoming leads',['Website','Google ads','Referrals','Phone calls']],['Pool: other sources',['Information videos','Builders','Social media','Email database','Farming paper mail']]];
 var FERRY=[['fsbo','FSBO'],['expired','Expired'],['past','Past client / COI'],['jljs','Just listed / just sold'],['lead','Lead follow-up'],['door','Door knocking'],['other','Other']];
 var PROD=[['lappt','Listing appointments'],['ltaken','Listings taken'],['lexp','Listings expired'],['lcan','Listings cancelled'],['lturn','Listings turned down'],['lsold','Listings sold'],['mybuy','My buyer sales'],['agbuy','Buyer agent sales'],['price','Price reductions'],['fell','Deals fell apart'],['closed','Closed deals'],['paid','Paid income ($)'],['inv','Present inventory']];
-var TABS=[['glimpse','Glimpse'],['guide','Guidelines'],['log','Contact log'],['goals','Daily goals'],['who','Who to call'],['week','Week & year'],['set','Settings']];
-var S={tab:(location.hash||'#glimpse').slice(1),d:null,day:ymd(new Date()),wk:null,ppl:null};
+var TABS=[['today','Today'],['glimpse','Glimpse'],['guide','Guidelines'],['log','Contact log'],['goals','Daily goals'],['who','Who to call'],['week','Week & year'],['set','Settings']];
+var S={tab:(location.hash||'#today').slice(1),d:null,day:ymd(new Date()),wk:null,ppl:null};
 function today(){return ymd(new Date());}
 function isConv(c){return c.secs>=(+S.d.settings.conv||120);}
 function L(day){return S.d.logs[day]||{};}
@@ -157,7 +158,7 @@ function daynav(){var t=today();return '<div class="daynav"><button class="btn" 
 function pm(k,v,ok){return '<span class="pm"><button data-b="'+k+'" data-n="-1" aria-label="Less">−</button><b class="'+(ok?'ok':'')+'">'+v+'</b><button data-b="'+k+'" data-n="1" aria-label="More">+</button></span>';}
 function guide(){var l=L(S.day).guide||{},h=daynav();
   h+='<div class="g2">';GUIDE.forEach(function(g,gi){var dn=g[1].filter(function(x,i){return l[gi+'_'+i];}).length;
-    h+='<section class="card"><h2>'+g[0]+' <span class="mut" style="font-size:20px">'+dn+' / '+g[1].length+'</span></h2>'+g[1].map(function(x,i){var k=gi+'_'+i;return '<label class="ck'+(l[k]?' on':'')+'"><input type="checkbox" data-g="'+k+'"'+(l[k]?' checked':'')+'><span>'+esc(x)+'</span></label>';}).join('')+'</section>';});
+    h+='<section class="card"><h2>'+g[0]+' <span class="mut" style="font-size:20px">'+dn+' / '+g[1].length+'</span></h2>'+g[1].map(function(x,i){var k=gi+'_'+i;return '<label class="ck'+(l[k]?' on':'')+'"><input type="checkbox" data-g="'+k+'"'+(l[k]?' checked':'')+'><span class="gl">'+esc(x)+'</span></label>';}).join('')+'</section>';});
   return h+'</div>';}
 function log(){var d=S.day,l=L(d),tot=contacts(d,d),gl=n((S.d.settings||{}).contactGoal)||5,h=daynav();
   h+='<section class="card"><h2>Contacts</h2><div class="big">'+tot+' <small>/ '+gl+' goal</small></div><div class="dots">';for(var i=1;i<=50;i++)h+='<i class="'+(i<=tot?'on':'')+(i===gl?' g':'')+'">'+i+'</i>';h+='</div>';
@@ -189,7 +190,7 @@ function who(){
     h+='</section>';});
   return h+'</div>';}
 function week(){var t=today(),m=S.wk||monday(t),e=add(m,6)<t?add(m,6):t,yr=t.slice(0,4)+'-01-01',w=S.d.weeks[m]||{},st=S.d.settings.start||{},s=sum(m,e);
-  function days(a,b){var c=0;for(var d=a;d<=b;d=add(d,1))if(calls(d,d).some(function(x){return !x.inc;})||Object.keys(L(d)).length)c++;return c;}
+  function days(a,b){var c=0;for(var d=a;d<=b;d=add(d,1))if(calls(d,d).some(function(x){return !x.inc;})||Object.keys(L(d)).some(function(k){return k!=='chk';}))c++;return c;}
   var first=S.d.calls.length?S.d.calls[S.d.calls.length-1].day:t;if(first<yr)first=yr;
   var h='<div class="daynav"><button class="btn" data-wk="-7" aria-label="Week before">‹</button><b>Week of '+nice(m,{month:'short',day:'numeric'})+'</b><button class="btn" data-wk="7" aria-label="Next week"'+(m>=monday(t)?' disabled':'')+'>›</button></div>';
   h+='<section class="card"><h2>Goal vs done</h2><div class="tw"><table><thead><tr><th>Activity</th><th>Done</th><th>Week goal</th><th></th></tr></thead><tbody>'+GN.map(function(g){var v=done(g[0],m,e),q=goalSum(g[0],m,add(m,6));return '<tr><td>'+g[1]+'</td><td><b class="'+(q&&v>=q?'grn':'')+'">'+v+'</b></td><td>'+q+'</td><td>'+(q?Math.round(v/q*100)+'%':'')+'</td></tr>';}).join('')+'</tbody></table></div></section>';
@@ -203,11 +204,56 @@ function settings(){var s=S.d.settings,g=s.goals||{},w=Object.assign({},WD,s.war
   var h='<section class="card"><h2>Daily goals</h2><div class="tw"><table><thead><tr><th>Activity</th>'+D.map(function(x){return '<th>'+x+'</th>';}).join('')+'</tr></thead><tbody>'+GN.map(function(r){return '<tr><td>'+r[1]+'</td>'+D.map(function(x,i){return '<td><input style="width:64px" type="number" min="0" data-goal="'+r[0]+'" data-i="'+i+'" value="'+n((g[r[0]]||GD[r[0]])[i])+'" aria-label="'+r[1]+' '+x+'"></td>';}).join('')+'</tr>';}).join('')+'</tbody></table></div><p class="mut sm">From your goals sheet. Its one weekend column sits on Saturday, so calls start at 110 a week.</p></section>';
   h+='<div class="g2"><section class="card"><h2>Warn me after (days)</h2>'+Object.keys(WD).map(function(k){return '<div class="st"><span>'+TN[k]+'</span><input type="number" min="0" data-warn="'+k+'" value="'+n(w[k])+'" aria-label="'+TN[k]+'"></div>';}).join('')+'<p class="mut sm">0 turns it off.</p></section>';
   h+='<section class="card"><h2>Counting</h2><div class="st"><span>A conversation is (seconds or more)</span><input type="number" min="1" id="sConv" value="'+(+s.conv||120)+'"></div><div class="st"><span>Contacts goal a day</span><input type="number" min="1" id="sCon" value="'+(n(s.contactGoal)||5)+'"></div></section></div>';
+  h+='<div class="g2"><section class="card"><h2>Today list: call targets</h2><div class="st"><span>Hour of power calls</span><input type="number" min="1" id="sHop" value="'+hopGoal()+'"></div><div class="st"><span>Afternoon calls (after noon)</span><input type="number" min="1" id="sPm" value="'+pmGoal()+'"></div></section><section class="card"><h2>Today list: show</h2>'+DAILY.concat(WEEKLY,RESULTS).map(function(i){return '<label class="ck"><input type="checkbox" data-show="'+i[0]+'"'+((s.hide||{})[i[0]]?'':' checked')+'><span>'+esc(i[1])+'</span></label>';}).join('')+'</section></div>';
   h+='<section class="card"><h2>Earlier this year</h2><p class="mut sm">Numbers from before this page started, added to year to date.</p><div class="g2">'+[['days','Days worked'],['hours','Hours on the phone'],['contacts','Contacts']].concat(PROD.filter(function(p){return p[0]!=='inv';})).map(function(p){return '<div class="st"><span>'+p[1]+'</span><input type="number" min="0" data-start="'+p[0]+'" value="'+(st[p[0]]||'')+'" aria-label="'+p[1]+'"></div>';}).join('')+'</div></section><button class="btn p" id="saveSet">Save settings</button>';
   return h;}
-var R={glimpse:glimpse,guide:guide,log:log,goals:goals,who:who,week:week,set:settings};
+// Today: Tom Ferry daily + weekly sheets. Ticks live in logs[day].chk and weeks[monday].chk (1 = done, 0 = unticked by hand); items with a count tick themselves.
+var DAILY=[['am','Morning routine'],['ceo','CEO time'],['market','Market intelligence'],['role','Role playing'],['hop','Hour of power / follow-up'],['nums','Track numbers'],['asst','Meet with assistant'],['pend','Update on pendings'],['lchk','Listing check-up'],['posts','2 social media posts'],['appts','Go on appointments'],['pm','Afternoon follow-up']];
+var WEEKLY=[['train','Team training'],['meet','Team meeting'],['prev','Project review'],['ptime','Project time'],['sfu','Seller follow-up'],['mplan','Manage marketing plan'],['book','Book appointments'],['preview','Preview homes'],['vids','Post 1-2 videos'],['oh','Organize open houses']];
+var RESULTS=[['list','List properties'],['sell','Sell houses'],['close','Close properties']];
+var LINK={pend:['Deals','/hq/agents/#buyers'],lchk:['Listings','/hq/agents/#sellers'],mplan:['Marketing','/hq/agents/#marketing'],sfu:['Who','#who'],book:['Log','#log'],nums:['Numbers','#goals'],pm:['Who','#who'],hop:['Who','#who']};
+function hopGoal(){return n(S.d.settings.hop)||10;}
+function pmGoal(){return n(S.d.settings.pm)||5;}
+function pl(v,w){return v+' '+w+(v===1?'':'s');}
+function torH(iso){return +new Date(iso).toLocaleString('en-CA',{timeZone:'America/Toronto',hour:'2-digit',hourCycle:'h23'}).replace(/\D/g,'');}
+// [done by itself, note]
+function autoOf(k){var t=today(),m=monday(t),v,w;
+  if(k==='hop'){v=done('calls',t,t);return [v>=hopGoal(),v+' of '+hopGoal()+' calls'];}
+  if(k==='pm'){v=calls(t,t).filter(function(c){return !c.inc&&torH(c.at)>=12;}).length;return [v>=pmGoal(),v+' of '+pmGoal()+' calls since noon'];}
+  if(k==='appts'){v=done('showings',t,t);return [false,v?pl(v,'showing')+' today':'No showings on the calendar today'];}
+  if(k==='sfu'){v=sum(m,t,'seller').made;return [v>0,pl(v,'seller lead call')+' this week'];}
+  if(k==='book'){v=man(m,t,'a_seller')+man(m,t,'a_buyer');return [v>0,v?pl(v,'appointment')+' logged':'Ticks when you log one'];}
+  w=S.d.weeks[m]||{};
+  if(k==='list')return [n(w.ltaken)>0,n(w.ltaken)?n(w.ltaken)+' this week':''];
+  if(k==='sell'){v=n(w.lsold)+n(w.mybuy);return [v>0,v?v+' this week':''];}
+  if(k==='close')return [n(w.closed)>0,n(w.closed)?n(w.closed)+' this week':''];
+  return [false,''];}
+function chk(sc){return (sc==='d'?L(today()).chk:(S.d.weeks[monday(today())]||{}).chk)||{};}
+function isOn(sc,k){var c=chk(sc)[k];return c===undefined?autoOf(k)[0]:!!c;}
+function shownItems(a){var h=S.d.settings.hide||{};return a.filter(function(i){return !h[i[0]];});}
+function tick(sc,k,on){var t=today(),m=monday(t),o;
+  if(sc==='d'){o=S.d.logs[t]=S.d.logs[t]||{};o.chk=o.chk||{};o.chk[k]=on?1:0;save(t);}
+  else{o=S.d.weeks[m]=S.d.weeks[m]||{};o.chk=o.chk||{};o.chk[k]=on?1:0;post('week',{day:m,v:o}).catch(function(e){toast('Not saved: '+(e==='pin'?'PIN needed':e));});}}
+function sawNumbers(t){if(S.d&&(t==='goals'||t==='week')&&chk('d').nums===undefined)tick('d','nums',1);}
+function todos(){return S.d.settings.todos||[];}
+function saveTodos(a){var b=a.filter(function(x){return !x.d||x.d>=today();}).slice(0,60);S.d.settings.todos=b;post('settings',{v:S.d.settings}).catch(function(e){toast('Not saved: '+(e==='pin'?'PIN needed':e));});}
+function item(sc,i){var k=i[0],on=isOn(sc,k),nt=autoOf(k)[1],lk=LINK[k];
+  return '<div class="ti"><label class="ck'+(on?' on':'')+'"><input type="checkbox" data-sc="'+sc+'" data-k="'+k+'"'+(on?' checked':'')+'><span><span class="t">'+esc(i[1])+'</span>'+(nt?'<small>'+esc(nt)+'</small>':'')+'</span></label>'+(lk&&!on?(lk[1][0]==='#'?'<button class="btn" data-go="'+lk[1].slice(1)+'">'+lk[0]+'</button>':'<a class="btn" target="_blank" rel="noopener" href="'+lk[1]+'">'+lk[0]+'</a>'):'')+'</div>';}
+function todoRow(x){return '<div class="ti"><label class="ck'+(x.d?' on':'')+'"><input type="checkbox" data-todo="'+esc(x.id)+'"'+(x.d?' checked':'')+'><span class="t">'+esc(x.t)+'</span></label><button class="x" data-rm="'+esc(x.id)+'" aria-label="Remove '+esc(x.t)+'">×</button></div>';}
+function listCard(title,sc,items,foot){var dn=items.filter(function(i){return isOn(sc,i[0]);}),op=items.filter(function(i){return !isOn(sc,i[0]);}),pc=items.length?dn.length/items.length*100:0;
+  return '<section class="card"><h2>'+title+' <span class="mut" style="font-size:20px">'+dn.length+' of '+items.length+' done</span></h2><div class="bar"><i class="'+(pc>=100?'ok':'')+'" style="width:'+pc+'%"></i></div>'+
+    (op.length?'<h3>Not done yet</h3>'+op.map(function(i){return item(sc,i);}).join(''):'<p class="grn"><b>All done.</b></p>')+
+    (dn.length?'<h3 style="margin-top:18px">Done</h3>'+dn.map(function(i){return item(sc,i);}).join(''):'')+(foot||'')+'</section>';}
+function todayTab(){var t=today(),m=monday(t),td=todos().filter(function(x){return !x.d||x.d>=t;}),op=td.filter(function(x){return !x.d;}),dn=td.filter(function(x){return x.d;});
+  var res=shownItems(RESULTS),dl=shownItems(DAILY),wl=shownItems(WEEKLY);
+  var h='<div class="daynav"><b>'+nice(t)+'</b></div>';
+  h+='<div class="g2">'+listCard('Today','d',dl,'')+'<div>';
+  h+='<section class="card"><h2>My to-dos <span class="mut" style="font-size:20px">'+(op.length?op.length+' left':'')+'</span></h2>'+op.map(todoRow).join('')+dn.map(todoRow).join('')+'<form class="addf" id="todoForm"><input id="todoIn" maxlength="120" autocomplete="off" aria-label="New to-do" placeholder="Add something to do"><button class="btn p" type="submit">Add</button></form><p class="mut sm" style="margin:8px 0 0">Stays here until you tick it.</p></section>';
+  h+=listCard('This week','w',wl,res.length?'<h3 style="margin-top:18px">Results this week</h3>'+res.map(function(i){return item('w',i);}).join(''):'');
+  return h+'</div></div><p class="mut sm">Week of '+nice(m,{month:'short',day:'numeric'})+'. Today starts fresh each day, this week starts fresh Monday. Calls come from Follow Up Boss. Hide items or change call targets in Settings.</p>';}
+var R={today:todayTab,glimpse:glimpse,guide:guide,log:log,goals:goals,who:who,week:week,set:settings};
 function render(){
-  if(!R[S.tab])S.tab='glimpse';
+  if(!R[S.tab])S.tab='today';
   $('tabs').innerHTML=TABS.map(function(t){return '<button role="tab" data-go="'+t[0]+'" aria-selected="'+(S.tab===t[0])+'">'+t[1]+'</button>';}).join('');
   if(!S.d)return;
   var h='';if(S.d.syncErr)h+='<div class="warnb"><b>Follow Up Boss didn\'t answer.</b> These are the numbers from the last good check'+(S.d.sync.at?', '+new Date(S.d.sync.at).toLocaleString('en-CA'):'')+'.</div>';
@@ -216,29 +262,35 @@ function render(){
   $('main').innerHTML=h+R[S.tab]();
   var sel=$('tabs').querySelector('[aria-selected=true]');if(sel){var box=$('tabs');box.scrollLeft=Math.max(0,sel.offsetLeft-box.clientWidth/2+sel.clientWidth/2);}
 }
-function go(t,k){S.tab=t;history.replaceState(null,'','#'+t);render();window.scrollTo(0,0);if(k)focusWho(k);}
+function go(t,k){S.tab=t;sawNumbers(t);history.replaceState(null,'','#'+t);render();window.scrollTo(0,0);if(k)focusWho(k);}
 function focusWho(k){S.want=k;var e=$('w_'+k);if(e){e.scrollIntoView();window.scrollBy(0,-64);S.want=null;}}
 function loadPpl(){if(S.pl)return;S.pl=1;api('people').then(function(j){S.ppl=j;}).catch(function(e){S.ppl={err:String(e)};}).then(function(){S.pl=0;if(S.tab==='who'){render();if(S.want)focusWho(S.want);}});}
 function load(){return api('data').catch(function(e){if(e==='pin')return askPin();throw e;}).then(function(j){S.d=j;S.ppl=null;render();}).catch(function(e){$('main').innerHTML='<section class="card"><h2>Could not load</h2><p>'+esc(e)+'</p></section>';});}
+function keep(){var y=window.scrollY;render();window.scrollTo(0,y);}
+document.addEventListener('submit',function(e){if(e.target.id!=='todoForm')return;e.preventDefault();var v=$('todoIn').value.trim();if(!v)return;saveTodos(todos().concat([{id:Date.now().toString(36),t:v.slice(0,120)}]));keep();$('todoIn').focus();});
 document.addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;var x=b.dataset;
   if(x.go)return go(x.go,x.k);
+  if(x.rm){saveTodos(todos().filter(function(q){return q.id!==x.rm;}));return keep();}
   if(x.b)return bump(S.day,x.b,+x.n);
   if(x.day!==undefined){S.day=x.day==='0'?today():add(S.day,+x.day);if(S.day>today())S.day=today();return render();}
   if(x.wk){S.wk=add(S.wk||monday(today()),+x.wk);return render();}
   if(b.id==='ref'){toast('Refreshing…');return load();}
-  if(b.id==='saveSet'){var s={goals:{},warn:{},start:{},conv:+$('sConv').value||120,contactGoal:+$('sCon').value||5};
+  if(b.id==='saveSet'){var s={goals:{},warn:{},start:{},conv:+$('sConv').value||120,contactGoal:+$('sCon').value||5,hop:+$('sHop').value||10,pm:+$('sPm').value||5,hide:{},todos:todos()};
+    document.querySelectorAll('[data-show]').forEach(function(i){if(!i.checked)s.hide[i.dataset.show]=1;});
     document.querySelectorAll('[data-goal]').forEach(function(i){(s.goals[i.dataset.goal]=s.goals[i.dataset.goal]||[])[+i.dataset.i]=+i.value||0;});
     document.querySelectorAll('[data-warn]').forEach(function(i){s.warn[i.dataset.warn]=+i.value||0;});document.querySelectorAll('[data-start]').forEach(function(i){if(i.value)s.start[i.dataset.start]=+i.value;});
     post('settings',{v:s}).then(function(){S.d.settings=s;toast('Saved');}).catch(function(er){toast('Not saved: '+er);});}
 });
 document.addEventListener('change',function(e){var i=e.target,x=i.dataset,l;
   if(x.g){l=S.d.logs[S.day]=S.d.logs[S.day]||{};l.guide=l.guide||{};if(i.checked)l.guide[x.g]=1;else delete l.guide[x.g];save(S.day);var y=window.scrollY;render();window.scrollTo(0,y);}
+  else if(x.sc){tick(x.sc,x.k,i.checked);keep();}
+  else if(x.todo){saveTodos(todos().map(function(q){if(q.id===x.todo){if(i.checked)q.d=today();else delete q.d;}return q;}));keep();}
   else if(i.id==='plan'){l=S.d.logs[S.day]=S.d.logs[S.day]||{};l.plan=i.value.slice(0,3000);save(S.day);}
   else if(x.pid){post('type',{pid:+x.pid,type:i.value}).then(function(){S.d.calls.forEach(function(c){if(c.pid===+x.pid)c.type=i.value;});S.ppl=null;render();toast('Type saved');}).catch(function(er){toast('Not saved: '+er);});}
   else if(x.w){var m=S.wk||monday(today()),w=S.d.weeks[m]=S.d.weeks[m]||{};if(i.value==='')delete w[x.w];else w[x.w]=+i.value;post('week',{day:m,v:w}).then(function(){toast('Saved');var y2=window.scrollY;render();window.scrollTo(0,y2);}).catch(function(er){toast('Not saved: '+er);});}
 });
 window.addEventListener('hashchange',function(){S.tab=location.hash.slice(1);render();});
-document.addEventListener('visibilitychange',function(){if(!document.hidden&&S.d&&S.tab!=='set'&&document.activeElement.tagName!=='TEXTAREA')load();});
+document.addEventListener('visibilitychange',function(){if(!document.hidden&&S.d&&S.tab!=='set'&&document.activeElement.tagName!=='TEXTAREA'&&!($('todoIn')&&$('todoIn').value))load();});
 render();load();
 })();
 </script>
