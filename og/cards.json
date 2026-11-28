@@ -416,6 +416,14 @@
   "layout": "photo"
  },
  {
+  "slug": "blog-back-out-of-buying-a-house-ontario",
+  "path": "/blog/back-out-of-buying-a-house-ontario/",
+  "headline": "Can You Back Out of Buying a House in Ontario?",
+  "kicker": "Blog",
+  "photo": "/media/gentle-fox/pool.jpg",
+  "layout": "photo"
+ },
+ {
   "slug": "blog-home-inspections-offer-dates",
   "path": "/blog/home-inspections-offer-dates/",
   "headline": "Home Inspections: Cost, Timing and Offer Dates",
@@ -508,7 +516,7 @@
   "path": "/blog/",
   "headline": "Blog: Selling & Buying in Vaughan and the GTA",
   "kicker": "Blog",
-  "photo": "/media/gentle-fox/backyard-twilight.jpg",
+  "photo": "/media/gentle-fox/pool.jpg",
   "layout": "photo"
  },
  {
